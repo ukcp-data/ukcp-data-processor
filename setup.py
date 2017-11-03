@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from data_factory import __version__
+from ukcp_dp import __version__
 
 
 def readme():
