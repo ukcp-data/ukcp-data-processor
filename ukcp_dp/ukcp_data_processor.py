@@ -10,7 +10,7 @@ the entry point for this package.
 from ukcp_dp._input_data import InputData
 from ukcp_dp.constants import PlotType
 from ukcp_dp.data_extractor import DataExtractor
-from ukcp_dp.file_finder import get_file_list
+from ukcp_dp.file_finder import get_file_lists
 from ukcp_dp.file_writers import write_file
 from ukcp_dp.plotters import PlumePlotter
 from ukcp_dp.validator import Validator
@@ -66,12 +66,12 @@ class UKCPDataProcessor(object):
         if self.validated is False:
             self.validate_inputs()
 
-        file_list = get_file_list(self.input_data)
-        data_extractor = DataExtractor(file_list, self.input_data)
+        file_lists = get_file_lists(self.input_data)
+        data_extractor = DataExtractor(file_lists, self.input_data)
         self.title = data_extractor.get_title()
-        self.cube = data_extractor.get_cube()
+        self.cubes = data_extractor.get_cubes()
 
-        return self.cube
+        return self.cubes
 
     def write_plot(self, plot_type, output_path, title=None):
         """
@@ -84,7 +84,7 @@ class UKCPDataProcessor(object):
 
         @return the data used to generate the plot
         """
-        if self.cube is None:
+        if self.cubes is None:
             self.select_data()
 
         if title is None:
@@ -94,7 +94,7 @@ class UKCPDataProcessor(object):
             plotter = PlumePlotter()
 
         plot_data = plotter.generate_plot(
-            output_path, self.input_data, self.cube, title)
+            output_path, self.input_data, self.cubes, title)
 
         return plot_data
 
@@ -104,7 +104,7 @@ class UKCPDataProcessor(object):
 
         @param output_data_file_path (str): the full path to the file
         """
-        if self.cube is None:
+        if self.cubes is None:
             self.select_data()
 
-        write_file(self.cube, self.title, output_data_file_path)
+        write_file(self.cubes, self.title, output_data_file_path)

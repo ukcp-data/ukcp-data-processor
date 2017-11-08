@@ -2,7 +2,7 @@ import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
 from ukcp_dp.constants import InputType
-from ukcp_dp.vocab_manager import get_collection_terms
+from ukcp_dp.vocab_manager import get_months, get_season_months
 
 
 class DataExtractor():
@@ -11,56 +11,94 @@ class DataExtractor():
     criteria.
     """
 
-    def __init__(self, file_list, input_data):
+    def __init__(self, file_lists, input_data):
         """
         Initialise the DataExtractor.
 
-        @param file_list (list(str)) a list of file names
+        @param file_lists dict, a dict with two lists of files
+            key - 'main' or 'overlay'
+            value - list(str) a list of file names
         @param input_data (InputData) an object containing user defined values
         """
-        self.file_list = file_list
+        self.file_lists = file_lists
         self.input_data = input_data
-        self.cube = self._get_cube()
+        self.cubes = self._get_cubes()
 
-    def get_cube(self):
+    def get_cubes(self):
         """
-        Get an iris data cube based on the given files and using selection
-        criteria from the input_data
+        Get a list of iris data cubes based on the given files and using
+        selection criteria from the input_data.
+        If requested, the second cube will be the 10, 50 and 90 percentiles.
+
+        @return a list of iris data cubes
+        """
+        return self.cubes
+
+    def _get_cubes(self):
+        """
+        Get a list of iris data cubes based from the given files using
+        selection criteria from the input_data.
+        If requested, the second cube will be the 10, 50 and 90 percentiles.
 
         @return an iris data cube
         """
-        return self.cube
+        cubes = []
+        cubes.append(self._get_cube(self.file_lists['main']))
 
-    def _get_cube(self):
+        # show 10, 50 and 90 percentiles
+        if (self.input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is
+                True):
+            cubes.append(self._get_cube(self.file_lists['overlay'], True))
+
+        return cubes
+
+    def _get_cube(self, file_list, show_probability_levels=False):
         """
-        Get an iris data cube based from the given files using selection
-        criteria from the input_data
+        Get an iris data cube based on the given files using selection
+        criteria from the input_data.
 
         @return an iris data cube
         """
+
         # Load the cubes based on the variable
         if self.input_data.get_value(InputType.VARIABLE) == 'pr':
-            cubes = iris.load(self.file_list, ["precipitation rate"])
+            cubes = iris.load(file_list, ["precipitation rate"])
         elif self.input_data.get_value(InputType.VARIABLE) == 'tas':
-            cubes = iris.load(self.file_list, ["air_temperature"])
+            cubes = iris.load(file_list, ["air_temperature"])
         else:
             raise Exception(
                 "Unknown variable: {}.".format(self.input_data.get_value(
                     InputType.VARIABLE)))
+
+        # Hack as ensemble_member is included as a attribute and coordinate
+        ENSEMBLE_MEMBER = 'ensemble_member'
+        for cube in cubes:
+            try:
+                del cube.metadata.attributes[ENSEMBLE_MEMBER]
+            except KeyError:
+                pass
+
+        cubes = iris.cube.CubeList(cubes)
         cube = cubes.concatenate_cube()
+
+        # generate a time slice constraint
+        time_slice_constraint = self._time_slice_selector()
+        if time_slice_constraint is not None:
+            with iris.FUTURE.context(cell_datetime_objects=True):
+                cube = cube.extract(time_slice_constraint)
+
+        # generate a temporal constraint
+        temporal_constraint = self._get_temporal_selector()
+        if temporal_constraint is not None:
+            with iris.FUTURE.context(cell_datetime_objects=True):
+                cube = cube.extract(temporal_constraint)
 
         # generate an area constraint
         area_constraint = self._get_spatial_selector()
         cube = cube.extract(area_constraint)
 
-        # generate a temporal constraint
-        temporal_constraint = self._get_temporal_selector()
-        if temporal_constraint is not None:
-            cube = cube.extract(temporal_constraint)
-
         # show 10, 50 and 90 percentiles
-        if (self.input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is
-                True):
+        if (show_probability_levels is True):
             cube = self._get_probability_levels(cube)
 
         return cube
@@ -101,10 +139,9 @@ class DataExtractor():
 
         elif (self.input_data.get_area_type() == 'admin_region' or
                 self.input_data.get_area_type() == 'country' or
-                self.input_data.get_area_type() == 'catchment'):
+                self.input_data.get_area_type() == 'river_basin'):
             area_constraint = iris.Constraint(
                 region=self.input_data.get_area())
-
         else:
             raise Exception(
                 "Unknown area type: {}.".format(
@@ -120,20 +157,52 @@ class DataExtractor():
 
         if (self.input_data.get_value(InputType.TIME_PERIOD) == 'all' or
                 temporal_average_type == 'annual'):
+            # we want everything, so no need to add a restriction
             pass
-        elif (temporal_average_type == 'mon' or
-              temporal_average_type == 'seasonal'):
-            for i in [i for i, term in enumerate(
-                    get_collection_terms(temporal_average_type))
-                    if term == self.input_data.get_value(
-                        InputType.TIME_PERIOD)]:
-                temporal_constraint = iris.Constraint(meaning_period=i)
+
+        elif temporal_average_type == 'mon':
+            for i, term in enumerate(
+                    get_months()):
+                if term == self.input_data.get_value(InputType.TIME_PERIOD):
+                    # i is the index not the month number
+                    temporal_constraint = iris.Constraint(
+                        time=lambda t: i < t.point.month <= i + 1)
+                    break
+
+        elif temporal_average_type == 'seasonal':
+            months = get_season_months(
+                self.input_data.get_value(InputType.TIME_PERIOD))
+            temporal_constraint = iris.Constraint(
+                time=lambda t: t.point.month in months)
+
         else:
             raise Exception(
                 "Unknown temporal average type: {}.".format(
                     self.input_data.get_value(
                         InputType.TEMPORAL_AVERAGE_TYPE)))
+
         return temporal_constraint
+
+    def _time_slice_selector(self):
+        # generate a time slice constraint
+        time_slice_constraint = None
+        year_max = None
+
+        try:
+            # year
+            year_min = self.input_data.get_value(InputType.YEAR)
+            year_max = self.input_data.get_value(InputType.YEAR) + 1
+        except KeyError:
+            # year_minimum, year_maximum
+            year_min = self.input_data.get_value(InputType.YEAR_MINIMUM)
+            year_max = self.input_data.get_value(InputType.YEAR_MAXIMUM)
+
+        if year_max is not None:
+            # we have some form of time slice
+            time_slice_constraint = iris.Constraint(
+                time=lambda t: year_min <= t.point.year < year_max)
+
+        return time_slice_constraint
 
     def get_title(self):
         """
@@ -171,18 +240,22 @@ class DataExtractor():
                              InputType.VARIABLE)))
 
         if self.input_data.get_area_type() == 'point':
-            grid_x = self.cube.coord('projection_x_coordinate').bounds[0][0]
-            grid_y = self.cube.coord('projection_y_coordinate').bounds[0][0]
+            grid_x = (self.cubes[0].coord('projection_x_coordinate')
+                      .bounds[0][0])
+            grid_y = (self.cubes[0].coord('projection_y_coordinate')
+                      .bounds[0][0])
             title = "{t} at grid {x}, {y}".format(t=title, x=grid_x, y=grid_y)
 
         elif self.input_data.get_area_type() == 'bbox':
             # TODO bbox
-            grid_x = self.cube.coord('projection_x_coordinate').bounds[0][0]
-            grid_y = self.cube.coord('projection_y_coordinate').bounds[0][0]
+            grid_x = (self.cubes[0].coord('projection_x_coordinate')
+                      .bounds[0][0])
+            grid_y = (self.cubes[0].coord('projection_y_coordinate')
+                      .bounds[0][0])
             title = "{t} at grid {x}, {y}".format(t=title, x=grid_x, y=grid_y)
 
         else:
             title = "{t} in {area}".format(
-                t=title, area=self.input_data.get_area())
+                t=title, area=self.input_data.get_area_label())
 
         return title

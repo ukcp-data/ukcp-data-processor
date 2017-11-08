@@ -131,20 +131,6 @@ VOCAB = {'data_source': {
             'r1i1p19': 'r1i1p19',
             'r1i1p20': 'r1i1p20'
             },
-         'ensemble_member_set': {
-            'global_realisations': ['r1i1p1', 'r1i1p2', 'r1i1p3', 'r1i1p4',
-                                    'r1i1p5', 'r1i1p6', 'r1i1p7', 'r1i1p8',
-                                    'r1i1p9', 'r1i1p10', 'r1i1p11', 'r1i1p12',
-                                    'r1i1p13', 'r1i1p14', 'r1i1p15', 'r1i1p16',
-                                    'r1i1p17', 'r1i1p18', 'r1i1p19',
-                                    'r1i1p20'],
-            'regional_realisations': ['r1i1p1', 'r1i1p2', 'r1i1p3', 'r1i1p4',
-                                      'r1i1p5', 'r1i1p6', 'r1i1p7', 'r1i1p8',
-                                      'r1i1p9', 'r1i1p10', 'r1i1p11',
-                                      'r1i1p12', 'r1i1p13', 'r1i1p14',
-                                      'r1i1p15'],
-            'cpm': []  # TODO
-            },
          'admin_region': {
             'all': 'All administrative regions',
             'north_east_england': 'North East England',
@@ -244,6 +230,42 @@ VOCAB = {'data_source': {
             },
          }
 
+# an ordered list of months
+MONTHS = [
+    'jan',
+    'feb',
+    'mar',
+    'apr',
+    'may',
+    'jun',
+    'jul',
+    'aug',
+    'sep',
+    'oct',
+    'nov',
+    'dec'
+    ]
+
+SEASON_MONTHS = {
+    'djf': [12, 1, 2],
+    'mam': [3, 4, 5],
+    'jja': [6, 6, 8],
+    'son': [9, 10, 11]
+    }
+
+ENSEMBLE_MEMBER_SET = {
+    'global_realisations': ['r1i1p1', 'r1i1p2', 'r1i1p3', 'r1i1p4', 'r1i1p5',
+                            'r1i1p6', 'r1i1p7', 'r1i1p8', 'r1i1p9', 'r1i1p10',
+                            'r1i1p11', 'r1i1p12', 'r1i1p13', 'r1i1p14',
+                            'r1i1p15', 'r1i1p16', 'r1i1p17', 'r1i1p18',
+                            'r1i1p19', 'r1i1p20'],
+    'regional_realisations': ['r1i1p1', 'r1i1p2', 'r1i1p3', 'r1i1p4', 'r1i1p5',
+                              'r1i1p6', 'r1i1p7', 'r1i1p8', 'r1i1p9',
+                              'r1i1p10', 'r1i1p11', 'r1i1p12', 'r1i1p13',
+                              'r1i1p14', 'r1i1p15'],
+    'cpm': []  # TODO
+    }
+
 
 def get_collection_terms(collection):
     """
@@ -278,19 +300,52 @@ def get_collection_term_label(collection, term):
         return
 
 
-def validate_collection_label(collection, label):
+def get_collection_term_value(collection, label):
     """
-    Validate the label of a given collection term.
+    Get the value associated with a given collection term label.
 
     @param collection (str): the name of the collection
-    @param label (str): the label to validate
+    @param label (str): the label off a term from the collection
 
-    @return True if label is valid
+    @return a str containing the value associated with the collection term
+        label
     """
     try:
         label_dict = VOCAB[collection]
     except KeyError:
-        return False
-    if label in label_dict.values():
-        return True
-    return False
+        return
+    for key in label_dict.keys():
+        if label_dict[key] == label:
+            return key
+    return
+
+
+def get_months():
+    """
+    Get an ordered list of months.
+    The values are the same as those used in the vocab, 'jan', 'feb' etc.
+
+    @return a list of strings representing the months
+    """
+    return MONTHS
+
+
+def get_season_months(season):
+    """
+    Get a list of ints representing he months in a season.
+
+    @param season (str) the season represented as 'djf', 'mam' etc.
+
+    @return a list of ints
+    """
+    try:
+        return SEASON_MONTHS[season]
+    except KeyError:
+        return
+
+
+def get_ensemble_member_set(data_source):
+    try:
+        return ENSEMBLE_MEMBER_SET[data_source]
+    except KeyError:
+        return

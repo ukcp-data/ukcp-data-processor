@@ -1,37 +1,48 @@
 from ukcp_dp.constants import DATA_DIR, InputType
-from ukcp_dp.vocab_manager import get_collection_term_label
+from ukcp_dp.vocab_manager import get_ensemble_member_set
 import os
 
 
-def get_file_list(input_data):
+def get_file_lists(input_data):
     """
-    Get a list of files based on the data provided in the input data.
+    Get lists of files based on the data provided in the input data.
 
     @param input_data (InputData): an InputData object
 
-    @return a list of files, including their full paths
+    @return a dict of lists of files, including their full paths
+        key - 'main' or 'overlay'
+        value - list of file paths
     """
-    file_list = []
+    file_list = {}
     if (input_data.get_value(InputType.DATA_SOURCE) in
             ['land_probabilistic', ]):
-        return _get_file_list_type_1(input_data)
+        file_list['main'] = _get_file_list_type_1(
+            input_data, input_data.get_value(InputType.DATA_SOURCE))
     elif (input_data.get_value(InputType.DATA_SOURCE) in
             ['global_realisations', 'regional_realisations']):
-        return _get_file_list_type_2(input_data)
+        file_list['main'] = _get_file_list_type_2(input_data)
+    if input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is True:
+        if (input_data.get_value(InputType.DATA_SOURCE) ==
+                'land_probabilistic'):
+            file_list['overlay'] = file_list['main']
+        else:
+            file_list['overlay'] = _get_file_list_type_1(
+                input_data, input_data.get_value(InputType.DATA_SOURCE))
     return file_list
 
 
-def _get_file_list_type_1(input_data):
+def _get_file_list_type_1(input_data, data_source):
     """
     Get a list of files based on the data provided in the input data.
 
     @param input_data (InputData): an InputData object
+    @param data_source (Str): the data source
 
     @return a list of files, including their full paths
     """
     file_path = os.path.join(
         DATA_DIR,
-        input_data.get_value(InputType.DATA_SOURCE),
+        data_source,
         input_data.get_value(InputType.SPATIAL_REPRESENTATION),
         input_data.get_value(InputType.SCENARIO),
         'percentile',
@@ -46,7 +57,7 @@ def _get_file_list_type_1(input_data):
                      '{year}1201.nc'.format(
                          variable=input_data.get_value(InputType.VARIABLE),
                          scenario=input_data.get_value(InputType.SCENARIO),
-                         source=input_data.get_value(InputType.DATA_SOURCE),
+                         source=data_source,
                          spatial_representation=input_data.get_value(
                              InputType.SPATIAL_REPRESENTATION),
                          temporal_type=input_data.get_value(
@@ -66,8 +77,7 @@ def _get_file_list_type_2(input_data):
     @return a list of files, including their full paths
     """
     file_list = []
-    for ensemble in get_collection_term_label(
-            'ensemble_member_set',
+    for ensemble in get_ensemble_member_set(
             input_data.get_value(InputType.DATA_SOURCE)):
         file_list.append(_get_file_list_for_ensemble(input_data, ensemble))
     return file_list

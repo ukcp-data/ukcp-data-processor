@@ -1,6 +1,6 @@
 # WPS imports
 from ukcp_dp.vocab_manager import get_collection_term_label, \
-    validate_collection_label
+    get_collection_term_value
 from constants import InputType, INPUT_TYPES, INPUT_TYPES_SINGLE_VALUE, \
     INPUT_TYPES_MULTI_VALUE
 
@@ -104,10 +104,6 @@ class InputData(object):
 
         @throws Exception
         """
-        print()
-        print(value_type)
-        print(values)
-        print()
         if values is None:
             raise Exception("Unknown {value_type}: None.".format(
                 value_type=value_type))
@@ -160,10 +156,12 @@ class InputData(object):
 
         Having called set_area it is possible to retrieve the area type:
             'point', 'bbox', 'country', 'admin_region' or 'river_basin'
-        The area label:
-            'UK Countries', 'Administrative Regions' or 'River Basins'
-        And the areas
-            [x,y] or 'Wales' etc.
+        The area type label:
+            'Country', 'Administrative Region' or 'River Basin'
+        The areas
+            [x,y] or 'wales' etc.
+        And the area labels
+            'Wales' etc.
 
         @param area (list or str): For a point and bbox the data should be
             provided as a list:
@@ -172,7 +170,7 @@ class InputData(object):
                 western boundary]
             For a spatially aggregated area the data should be provided as a
             string:
-                'uk_countries|Wales'
+                'country|Wales'
 
         @throws Exception
 
@@ -185,26 +183,35 @@ class InputData(object):
             if area_type not in ['bbox', 'point']:
                 raise Exception("Unknown area: {}.".format(area))
 
-            self.validated_inputs[InputType.AREA] = [area_type, None, area]
+            self.validated_inputs[InputType.AREA] = [area_type, None, area,
+                                                     None]
         else:
             # this will be a predefined region, i.e.
             # country|Scotland
             area_type, area_name = area.split('|', 1)
+
             # check the area type
             area_type_label = get_collection_term_label(
                 InputType.AREA, area_type)
-
             if area_type_label is None:
                 raise Exception("Unknown area type: {}.".format(area_type))
 
             # check the area name
-            if (get_collection_term_label(area_type, area_name) is None and
-                    validate_collection_label(area_type, area_name) is False):
-                raise Exception("Unknown area name: {}.".format(area_name))
+            get_collection_term_value(area_type, area_name)
+            area_label = get_collection_term_label(area_type, area_name)
+            if (area_label is None):
+
+                # currently the names are stored as 'labels' in the shape files
+                # so need to convert the label to the value
+                area_label = area_name
+                area_name = get_collection_term_value(area_type, area_name)
+                if area_name is None:
+                    raise Exception("Unknown area name: {}.".format(area_name))
 
             self.validated_inputs[InputType.AREA] = [area_type,
                                                      area_type_label,
-                                                     area_name]
+                                                     area_name,
+                                                     area_label]
 
     def get_area_type(self):
         """
@@ -226,13 +233,22 @@ class InputData(object):
 
     def get_area(self):
         """
-        Get the value/name of the area.
+        Get the value of the area.
 
         @return a str or list dependent on the area type. It will be a list of
             2 or 4 floats for a point or bbox or a string for a region.
 
         """
         return(self.validated_inputs[InputType.AREA][2])
+
+    def get_area_label(self):
+        """
+        Get the name of the area.
+
+        @return a str containing the area label
+
+        """
+        return(self.validated_inputs[InputType.AREA][3])
 
     def get_font_size(self):
         """

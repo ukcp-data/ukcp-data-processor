@@ -17,17 +17,18 @@ class BasePlotter():
     """
     The base case for plotters.
 
-    This class should be extended with a _generate_plot(self, cube) method to
+    This class should be extended with a _generate_plot(self, cubes) method to
     plot the data.
     """
 
-    def generate_plot(self, output_path, input_data, cube, title):
+    def generate_plot(self, output_path, input_data, cubes, title):
         """
         Generate a plot.
 
         @param output_path (str): the full path to the file
         @param input_data (InputData): an object containing user defined values
-        @param cube (iris data cube): an object containing the selected data
+        @param cubes (list(iris data cube)): a list of cubes containing the
+            selected data
         @param title (str): a title for the plot
 
         @return the data used to generate the plot
@@ -35,7 +36,7 @@ class BasePlotter():
         # Set the image size
         self._set_figure_size(input_data.get_value(InputType.IMAGE_SIZE))
 
-        self._generate_plot(input_data, cube)
+        self._generate_plot(input_data, cubes)
 
         # Set default font size
         plt.rc('font', size=input_data.get_font_size())
@@ -54,12 +55,13 @@ class BasePlotter():
 
         return plt.gca().get_lines()
 
-    def _generate_plot(self, input_data, cube):
+    def _generate_plot(self, input_data, cubes):
         """
         This method should be overridden to produce the plots.
 
         @param input_data (InputData): an object containing user defined values
-        @param cube (iris data cube): an object containing the selected data
+        @param cubes (list(iris data cube)): a list of cubes containing the
+            selected data
         """
         pass
 
