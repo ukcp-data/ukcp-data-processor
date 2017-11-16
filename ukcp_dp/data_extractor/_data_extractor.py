@@ -57,6 +57,9 @@ class DataExtractor():
         Get an iris data cube based on the given files using selection
         criteria from the input_data.
 
+        @param show_probability_levels (boolean): if True only include the
+            10th, 50th and 90th percentile data
+
         @return an iris data cube
         """
 
@@ -95,7 +98,8 @@ class DataExtractor():
 
         # generate an area constraint
         area_constraint = self._get_spatial_selector()
-        cube = cube.extract(area_constraint)
+        if area_constraint is not None:
+            cube = cube.extract(area_constraint)
 
         # show 10, 50 and 90 percentiles
         if (show_probability_levels is True):
@@ -113,35 +117,43 @@ class DataExtractor():
 
     def _get_spatial_selector(self):
         # generate an area constraint
+        area_constraint = None
+
         if self.input_data.get_area_type() == 'point':
             # coordinates are coming in as OSGB, x, y
+            half_cell_size = self._get_cell_size() / 2
             bng_x = self.input_data.get_area()[0]
             bng_y = self.input_data.get_area()[1]
             x_constraint = iris.Constraint(
                 projection_x_coordinate=lambda cell:
-                (bng_x - 12500) <= cell < (bng_x + 12500))
+                (bng_x - half_cell_size) <= cell < (bng_x + half_cell_size))
             y_constraint = iris.Constraint(
                 projection_y_coordinate=lambda cell:
-                (bng_y - 12500) <= cell < (bng_y + 12500))
+                (bng_y - half_cell_size) <= cell < (bng_y + half_cell_size))
             area_constraint = x_constraint & y_constraint
 
         elif self.input_data.get_area_type() == 'bbox':
-            # Hack for bbox
-            bng_x = 112873.63
-            bng_y = 276711.27
+            # coordinates are coming in as OSGB, w, s, e, n
+            half_cell_size = self._get_cell_size() / 2
+            bng_w = self.input_data.get_area()[0]
+            bng_s = self.input_data.get_area()[1]
+            bng_e = self.input_data.get_area()[2]
+            bng_n = self.input_data.get_area()[3]
             x_constraint = iris.Constraint(
                 projection_x_coordinate=lambda cell:
-                (bng_x - 12500) <= cell < (bng_x + 12500))
+                (bng_w - half_cell_size) <= cell < (bng_e + half_cell_size))
             y_constraint = iris.Constraint(
                 projection_y_coordinate=lambda cell:
-                (bng_y - 12500) <= cell < (bng_y + 12500))
+                (bng_s - half_cell_size) <= cell < (bng_n + half_cell_size))
             area_constraint = x_constraint & y_constraint
 
         elif (self.input_data.get_area_type() == 'admin_region' or
                 self.input_data.get_area_type() == 'country' or
                 self.input_data.get_area_type() == 'river_basin'):
-            area_constraint = iris.Constraint(
-                region=self.input_data.get_area())
+
+            if self.input_data.get_area() != 'all':
+                area_constraint = iris.Constraint(
+                    region=self.input_data.get_area())
         else:
             raise Exception(
                 "Unknown area type: {}.".format(
@@ -215,47 +227,58 @@ class DataExtractor():
                 or self.input_data.get_value(InputType.TIME_PERIOD) == 'all'):
             title = ('Demonstration Version - {temporal_type} average '
                      '{variable}\n'
-                     'for {start_year} to {end_year}'.format(
+                     'for'.format(
                          temporal_type=self.input_data.get_value_label(
                              InputType.TEMPORAL_AVERAGE_TYPE),
-                         start_year=self.input_data.get_value(
-                             InputType.YEAR_MINIMUM),
-                         end_year=self.input_data.get_value(
-                             InputType.YEAR_MAXIMUM),
                          variable=self.input_data.get_value_label(
                              InputType.VARIABLE)))
         else:
             title = ('Demonstration Version - {temporal_type} average '
                      '{variable} for\n'
-                     '{time_period} in {start_year} to {end_year}'.format(
+                     '{time_period} in'.format(
                          temporal_type=self.input_data.get_value_label(
                              InputType.TEMPORAL_AVERAGE_TYPE),
                          time_period=self.input_data.get_value_label(
                              InputType.TIME_PERIOD),
-                         start_year=self.input_data.get_value(
-                             InputType.YEAR_MINIMUM),
-                         end_year=self.input_data.get_value(
-                             InputType.YEAR_MAXIMUM),
                          variable=self.input_data.get_value_label(
                              InputType.VARIABLE)))
+
+        try:
+            start_year = self.input_data.get_value(InputType.YEAR_MINIMUM)
+            end_year = self.input_data.get_value(InputType.YEAR_MAXIMUM)
+            title = '{t} {start_year} to {end_year}'.format(
+                t=title, start_year=start_year, end_year=end_year)
+        except KeyError:
+            title = '{t} {year}'.format(
+                t=title, year=self.input_data.get_value(InputType.YEAR))
 
         if self.input_data.get_area_type() == 'point':
             grid_x = (self.cubes[0].coord('projection_x_coordinate')
                       .bounds[0][0])
             grid_y = (self.cubes[0].coord('projection_y_coordinate')
                       .bounds[0][0])
-            title = "{t} at grid {x}, {y}".format(t=title, x=grid_x, y=grid_y)
+            title = "{t} for grid square {x}, {y}".format(
+                t=title, x=grid_x, y=grid_y)
 
         elif self.input_data.get_area_type() == 'bbox':
-            # TODO bbox
-            grid_x = (self.cubes[0].coord('projection_x_coordinate')
-                      .bounds[0][0])
-            grid_y = (self.cubes[0].coord('projection_y_coordinate')
-                      .bounds[0][0])
-            title = "{t} at grid {x}, {y}".format(t=title, x=grid_x, y=grid_y)
+            x_bounds = self.cubes[0].coord('projection_x_coordinate').bounds
+            y_bounds = self.cubes[0].coord('projection_y_coordinate').bounds
+            grid_x1 = (x_bounds[0][0])
+            grid_y1 = (y_bounds[0][0])
+            grid_x2 = (x_bounds[-1][1])
+            grid_y2 = (y_bounds[-1][1])
+            title = "{t} in area {x1}, {y1} to {x2}, {y2}".format(
+                t=title, x1=grid_x1, y1=grid_y1, x2=grid_x2, y2=grid_y2)
 
         else:
             title = "{t} in {area}".format(
                 t=title, area=self.input_data.get_area_label())
 
         return title
+
+    def _get_cell_size(self):
+        sr = self.input_data.get_value(InputType.SPATIAL_REPRESENTATION)
+        try:
+            return int(sr.split('km')[0]) * 1000
+        except Exception:
+            return
