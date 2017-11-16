@@ -1,34 +1,39 @@
-from _base_plotter import BasePlotter
+from _graph_plotter import GraphPlotter
 import iris
 import iris.quickplot as qplt
+from matplotlib.transforms import Bbox
 from ukcp_dp.constants import InputType
 from ukcp_dp.vocab_manager._vocab import get_ensemble_member_set
 
 
-class PlumePlotter(BasePlotter):
+class PlumePlotter(GraphPlotter):
     """
     The plume plotter class.
 
-    This class extends BasePlotter with a _generate_plot(self, cube).
+    This class extends BasePlotter with a _generate_graph(self, cube).
     """
 
-    def _generate_plot(self, input_data, cubes):
+    def _generate_graph(self, cubes, fig, metadata_bbox):
         """
         Override base class method.
 
-        @param input_data (InputData): an object containing user defined values
         @param cubes (list(iris data cube)): a list of cubes containing the
             selected data
+        @param fig (matplotlib.figure.Figure)
         """
+        # Set the axea below the metadata and allow room for the labels
+        fig.add_axes(Bbox([[0.07, 0.08], [0.99, metadata_bbox[0][1] - 0.06]]))
         try:
-            ensemble = input_data.get_value(InputType.ENSEMBLE)
+            ensemble = self.input_data.get_value(InputType.ENSEMBLE)
             self._plot_ensemble(cubes[0],
-                                input_data.get_value(InputType.DATA_SOURCE),
+                                self.input_data.get_value(
+                                    InputType.DATA_SOURCE),
                                 ensemble)
         except KeyError:
             pass
 
-        if input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is True:
+        if (self.input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is
+                True):
             self._plot_probability_levels(cubes[1])
 
     def _plot_probability_levels(self, cube):
@@ -48,8 +53,8 @@ class PlumePlotter(BasePlotter):
         ensemble_members = get_ensemble_member_set(data_source)
         for member in ensemble_members:
             # hack due to incorrect values for ensemble member
-#             ensemble_constraint = iris.Constraint(
-#                 coord_values={'Ensemble member': member})
+            #             ensemble_constraint = iris.Constraint(
+            #                 coord_values={'Ensemble member': member})
             ensemble_constraint = iris.Constraint(
                 coord_values={'Ensemble member':
                               int(member.split('r1i1p')[1]) - 1})

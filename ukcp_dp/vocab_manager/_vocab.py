@@ -5,6 +5,28 @@ def _get_range(min_value, max_value):
     return values
 
 
+COLLECTION_LABELS = {
+    'area_type': 'Area',
+    'baseline': 'Baseline',
+    'data_format': 'Data Format',
+    'ensemble': 'Ensemble',
+    'data_source': 'Data Source',
+    'font_size': 'Font Size',
+    'image_format': 'Image Format',
+    'image_size': 'Image Size',
+    'legend_position': 'Legend Position',
+    'scenario': 'Scenario',
+    'show_boundaries': 'Show Boundaries',
+    'show_probability_levels': 'Show Probability Levels',
+    'spatial_representation': 'Spatial Representation',
+    'temporal_average_type': 'Temporal Average Type',
+    'time_period': 'Time Period',
+    'variable': 'Variable',
+    'year': 'Year',
+    'year_minimum': 'Year Minimum',
+    'year_maximum': 'Year Maximum'
+    }
+
 VOCAB = {'data_source': {
             'land_probabilistic': 'Land probabilistic projections',
             'probabilistic': 'Probabilistic projections',
@@ -41,7 +63,9 @@ VOCAB = {'data_source': {
             'tasmax': 'Maximum surface air temperature',
             'tasmin': 'Minimum surface air temperature',
             'tas': 'Surface air temperature',
-            'pr': 'Precipitation'
+            'tasAnom': 'Surface air temperature anomaly',
+            'pr': 'Precipitation',
+            'prAnom': 'Precipitation anomaly'
             },
          'temporal_average_type': {
             'annual': 'Annual',
@@ -244,14 +268,14 @@ MONTHS = [
     'oct',
     'nov',
     'dec'
-    ]
+]
 
 SEASON_MONTHS = {
     'djf': [12, 1, 2],
     'mam': [3, 4, 5],
     'jja': [6, 6, 8],
     'son': [9, 10, 11]
-    }
+}
 
 ENSEMBLE_MEMBER_SET = {
     'global_realisations': ['r1i1p1', 'r1i1p2', 'r1i1p3', 'r1i1p4', 'r1i1p5',
@@ -264,7 +288,21 @@ ENSEMBLE_MEMBER_SET = {
                               'r1i1p10', 'r1i1p11', 'r1i1p12', 'r1i1p13',
                               'r1i1p14', 'r1i1p15'],
     'cpm': []  # TODO
-    }
+}
+
+
+def get_collection_label(collection):
+    """
+    Get the label for a collection
+
+    @param collection (str): the name of the collection
+
+    @return a str containing the collection label
+    """
+    try:
+        return COLLECTION_LABELS[collection]
+    except KeyError:
+        return
 
 
 def get_collection_terms(collection):
