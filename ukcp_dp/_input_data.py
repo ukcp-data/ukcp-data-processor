@@ -1,8 +1,8 @@
-# WPS imports
+from constants import InputType, INPUT_TYPES, INPUT_TYPES_SINGLE_VALUE, \
+    INPUT_TYPES_MULTI_VALUE, FONT_SIZE_SMALL, FONT_SIZE_MEDIUM, \
+    FONT_SIZE_LARGE
 from ukcp_dp.vocab_manager import get_collection_term_label, \
     get_collection_term_value
-from constants import InputType, INPUT_TYPES, INPUT_TYPES_SINGLE_VALUE, \
-    INPUT_TYPES_MULTI_VALUE
 
 
 class InputData(object):
@@ -183,8 +183,10 @@ class InputData(object):
             if area_type not in ['bbox', 'point']:
                 raise Exception("Unknown area: {}.".format(area))
 
-            self.validated_inputs[InputType.AREA] = [area_type, None, area,
-                                                     None]
+            area_type_label = get_collection_term_label(
+                InputType.AREA, area_type)
+            self.validated_inputs[InputType.AREA] = [
+                area_type, area_type_label, area, area]
         else:
             # this will be a predefined region, i.e.
             # country|Scotland
@@ -257,11 +259,11 @@ class InputData(object):
         @return an int representing the font size
         """
         if self.get_value(InputType.FONT_SIZE) == 's':
-            return 10
+            return FONT_SIZE_SMALL
         elif self.get_value(InputType.FONT_SIZE) == 'm':
-            return 12
+            return FONT_SIZE_MEDIUM
         elif self.get_value(InputType.FONT_SIZE) == 'l':
-            return 14
+            return FONT_SIZE_LARGE
 
     def _set_allowed_values(self, allowed_values):
         for key in allowed_values.keys():

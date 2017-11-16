@@ -47,6 +47,24 @@ INPUT_TYPES_MULTI_VALUE = [InputType.ENSEMBLE]
 INPUT_TYPES = INPUT_TYPES_SINGLE_VALUE + INPUT_TYPES_MULTI_VALUE
 INPUT_TYPES.append(InputType.AREA)
 
+DATA_SELECTION_TYPES = [InputType.BASELINE,
+                        InputType.DATA_SOURCE,
+#                         InputType.ENSEMBLE,
+                        InputType.SHOW_PROBABILITY_LEVELS,
+                        InputType.SCENARIO,
+                        InputType.SPATIAL_REPRESENTATION,
+                        InputType.TEMPORAL_AVERAGE_TYPE,
+                        InputType.TIME_PERIOD,
+                        InputType.VARIABLE,
+                        InputType.YEAR,
+                        InputType.YEAR_MINIMUM,
+                        InputType.YEAR_MAXIMUM
+                        ]
+
+FONT_SIZE_SMALL = 6
+FONT_SIZE_MEDIUM = 9
+FONT_SIZE_LARGE = 12
+
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 
 # Plot types
