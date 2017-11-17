@@ -16,6 +16,7 @@ os.environ["MPLCONFIGDIR"] = wps_config_dict.get(
 import matplotlib.cbook as cbook
 import matplotlib.image as image
 from matplotlib.transforms import Bbox
+import matplotlib.gridspec as gridspec
 
 
 class BasePlotter():
@@ -80,7 +81,11 @@ class BasePlotter():
 
     def _add_metadata_text(self, fig):
         """
-        Add details of the metedata to a text box.
+        Generate a table containing details of the metedata.
+
+        @param fig (matplotlib.figure.Figure)
+
+        @return a Bbox surrounding the metadata table
         """
         # get the plot details
         plot_details = []
@@ -92,6 +97,8 @@ class BasePlotter():
             name = get_collection_label(dst)
             try:
                 value = self.input_data.get_value_label(dst)
+                if isinstance(value, list):
+                    value = ', '.join(value)
                 plot_details.append('{name}: {value}'.format(
                     name=name, value=value))
             except KeyError:
@@ -102,49 +109,53 @@ class BasePlotter():
         if count > 5:
             count = 5
 
-        box_text = ''
-        box_text_2 = ''
+        # unable to format the alignment of the column header, it is included
+        # as a normal row
+        cell_text = [['Plot Details', '']]
+
         for i in range(0, count):
-            box_text += '\n{}'.format(plot_details[i])
+            row = [plot_details[i]]
             try:
-                box_text_2 += '\n{}'.format(plot_details[i + 5])
+                row.append(plot_details[i + 5])
             except IndexError:
-                pass
+                row.append('')
+            cell_text.append(row)
 
-        # display the plot details
-        fig.text(0.15, 0.92, 'Plot Details',
-                 fontsize='larger',
-                 verticalalignment='top',
-                 horizontalalignment='left',
-                 multialignment='left')
+        gs = gridspec.GridSpec(1, 1)
+        gs.update(top=0.92, bottom=0.8, left=0.16, right=0.99)
 
-        box_1_x_offset = 0.16
-        box_1_y_offset = 0.915
-        box_1 = fig.text(box_1_x_offset, box_1_y_offset, box_text,
-                         verticalalignment='top',
-                         horizontalalignment='left',
-                         multialignment='left',
-                         bbox=dict(alpha=0.0))
+        # create axes to put the table on
+        ax = fig.add_subplot(gs[0, 0])
+        ax.axis("off")
 
+        # create the table
+        the_table = ax.table(cellText=cell_text,
+                             cellLoc='left',
+                             loc='upper right')
+
+        the_table.auto_set_font_size(False)
+        the_table.set_fontsize(self.input_data.get_font_size())
+
+        for i, cell in enumerate(the_table.properties()['children']):
+            if i < 2:
+                cell.set_facecolor('silver')
+                cell.set_text_props(weight='bold')
+            cell.set_linewidth(0)
+            cell.PAD = 0.02
+            cell.set_text_props(horizontalalignment='left')
+            cell.set_text_props(wrap=True)
+            cell.set_height(cell.get_height() + 0.04)
+
+        # get the bbox of the table
         fig.show()
-        box_1_width = fig.transFigure.inverted().transform(
-            box_1.get_bbox_patch().get_bbox().get_points())[1][0]
-        box_1_hieght = fig.transFigure.inverted().transform(
-            box_1.get_bbox_patch().get_bbox().get_points())[1][1]
-        box_2_x_offset = box_1_x_offset + box_1_width + 0.03
+        renderer = fig.canvas.get_renderer()
+        bbox = (the_table.get_window_extent(renderer).
+                inverse_transformed(fig.transFigure))
 
-        fig.text(box_2_x_offset, box_1_y_offset, box_text_2,
-                 verticalalignment='top',
-                 horizontalalignment='left',
-                 multialignment='left')
-
-        # add a box around the metedata
-        bbox = [[box_1_x_offset - 0.02, box_1_y_offset - box_1_hieght - 0.01],
-                [0.99, box_1_y_offset + 0.015]]
-        ax = fig.add_axes(Bbox(bbox))
+        # add a box around the table
+        ax = fig.add_axes(Bbox(bbox), axis_bgcolor='none')
         ax.set_xticks([])
         ax.set_yticks([])
-
         return bbox
 
     def _get_plot_settings(self, cmsize, fsize, var_id):

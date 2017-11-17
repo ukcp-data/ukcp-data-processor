@@ -37,12 +37,12 @@ class GraphPlotter(BasePlotter):
         # Add a water mark
         fig.text(0.5, 0.5, 'DRAFT - NOT FOR USE',
                  fontsize=45, color='gray',
-                 ha='center', va='center',  rotation=30, alpha=0.9)
+                 ha='center', va='center',  rotation=30, alpha=0.8)
 
         self._generate_graph(cubes, fig, metadata_bbox)
 
         # Add the title
-        fig.suptitle(title)
+        fig.suptitle(title, fontsize='larger')
 
         # Add the legend
         plt.legend(loc=self.input_data.get_value(InputType.LEGEND_POSITION))
@@ -55,11 +55,13 @@ class GraphPlotter(BasePlotter):
         plotgeneral.end_figure(output_path)
         return
 
-    def _generate_graph(self, cubes):
+    def _generate_graph(self, cubes, fig, metadata_bbox):
         """
         This method should be overridden to produce the plots.
 
         @param cubes (list(iris data cube)): a list of cubes containing the
             selected data
+        @param fig (matplotlib.figure.Figure)
+        @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
         pass

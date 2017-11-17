@@ -1,4 +1,5 @@
 from _map_plotter import MapPlotter
+import matplotlib.gridspec as gridspec
 import ukcp_dp.ukcp_standard_plots.mapper as maps
 
 
@@ -10,72 +11,90 @@ class PostageStampMapPlotter(MapPlotter):
     plotsettings).
     """
 
-    def _generate_subplots(self, cube, plotsettings, fig):
+    def _generate_subplots(self, cube, plotsettings, fig, metadata_bbox):
         """
         Override base class method.
 
         @param cube (iris data cube): a cube containing the selected data
         @param plotsettings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
+        @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
+        gs_top = metadata_bbox.y0 - 0.06
+        gs_left = 0.02
+        gs_right = 0.98
 
         ensemble_count = len(cube.coord('Ensemble member').points)
+
         # work out the number of sub-plots based on orientation of the plot
         # and number of ensembles
         if self._is_landscape(cube) is True:
+            bar_gs = gridspec.GridSpec(1, 3)
+            bar_grid = bar_gs[0, 2]
+
             if ensemble_count == 20:
-                x = 6
-                y = 5
-                start_point = 7
-                x_bar = 2
-                y_bar = 5
-                start_point_bar = 10
+                gs = gridspec.GridSpec(4, 6)
+                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
+                        gs[0, 5],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
+                        gs[1, 5],
+                        gs[2, 0], gs[2, 1], gs[2, 2], gs[2, 3], gs[2, 4],
+                        gs[2, 5],
+                        gs[3, 0], gs[3, 1]]
+
             elif ensemble_count == 15:
-                x = 6
-                y = 4
-                start_point = 7
-                x_bar = 2
-                y_bar = 4
-                start_point_bar = 8
+                gs = gridspec.GridSpec(3, 6)
+                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
+                        gs[0, 5],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
+                        gs[1, 5],
+                        gs[2, 0], gs[2, 1], gs[2, 2]]
             else:
                 # TODO need info about CPM ensemble members
-                x = 6
-                y = 4
-                start_point = 7
-                x_bar = 2
-                y_bar = 4
-                start_point_bar = 8
+                gs = gridspec.GridSpec(3, 6)
+                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
+                        gs[0, 5],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
+                        gs[1, 5],
+                        gs[2, 0], gs[2, 1], gs[2, 2]]
+
+            gs.update(top=gs_top, bottom=0.02, left=gs_left, right=gs_right)
 
         else:  # portrait
             if ensemble_count == 20:
-                x = 8
-                y = 3
-                start_point = 1
-                x_bar = 2
-                y_bar = 3
-                start_point_bar = 6
+                gs = gridspec.GridSpec(3, 8)
+                gs.update(top=gs_top, bottom=0.02, left=gs_left,
+                          right=gs_right)
+                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
+                        gs[0, 5], gs[0, 6], gs[0, 7],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
+                        gs[1, 5], gs[1, 6], gs[1, 7],
+                        gs[2, 0], gs[2, 1], gs[2, 2], gs[2, 3]]
+
             elif ensemble_count == 15:
-                x = 6
-                y = 4
-                start_point = 7
-                x_bar = 2
-                y_bar = 4
-                start_point_bar = 8
+                gs = gridspec.GridSpec(2, 8)
+                gs.update(top=gs_top, bottom=0.1, left=gs_left, right=gs_right)
+                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
+                        gs[0, 5], gs[0, 6], gs[0, 7],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
+                        gs[1, 5], gs[1, 6]]
+
             else:
                 # TODO need info about CPM ensemble members
-                x = 8
-                y = 4
-                start_point = 9
-                x_bar = 2
-                y_bar = 4
-                start_point_bar = 8
+                gs = gridspec.GridSpec(2, 8)
+                gs.update(top=gs_top, bottom=0.1, left=gs_left, right=gs_right)
+                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
+                        gs[0, 5], gs[0, 6], gs[0, 7],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
+                        gs[1, 5], gs[1, 6]]
 
-        # NOT WORKING
-        fig.subplots_adjust(top=0.59)
+            bar_gs = gridspec.GridSpec(1, 3)
+            bar_grid = bar_gs[0, 2]
+
+        bar_gs.update(top=0.23, bottom=0.08, left=gs_left, right=gs_right)
 
         for i, ensemble in enumerate(cube.slices_over('Ensemble member')):
-            ax = fig.add_subplot(y, x, i + start_point,
-                                 projection=plotsettings.proj)
+            ax = fig.add_subplot(grid[i], projection=plotsettings.proj)
 
             # Setting bar_orientation="none" here to override (prevent) drawing
             # the colorbar:
@@ -86,28 +105,10 @@ class PostageStampMapPlotter(MapPlotter):
             # TODO this should come directly from the file
             # add a title
             title = 'r1i1p{n}'.format(n=i + 1)
-            ax.set_title(title, fontsize='smaller')
+            ax.set_title(title)
 
         # add the sub plot to contain the bar
-        ax = fig.add_subplot(y_bar, x_bar, start_point_bar)
+        ax = fig.add_subplot(bar_grid)
         ax.axis('off')
 
         return result
-
-    def _is_landscape(self, cube):
-        """
-        Return True if the range of the x coordinates is larger than the range
-        of the y coordinates.
-
-        @param cube (iris data cube): a cube containing the selected data
-
-        @return a boolean, True if orientation is landscape
-        """
-        y_coords = cube.coord('projection_y_coordinate').points
-        y_range = max(y_coords) - min(y_coords)
-        x_coords = cube.coord('projection_x_coordinate').points
-        x_range = max(x_coords) - min(x_coords)
-
-        if y_range > x_range:
-            return False
-        return True

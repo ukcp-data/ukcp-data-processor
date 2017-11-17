@@ -36,19 +36,20 @@ class MapPlotter(BasePlotter):
 
         # Add the logo and metadata box
         self._add_logo(fig)
-        self._add_metadata_text(fig)
+        metadata_bbox = self._add_metadata_text(fig)
 
         # Call the method to generate the maps
-        result = self._generate_subplots(cube, plotsettings, fig)
+        result = self._generate_subplots(
+            cube, plotsettings, fig, metadata_bbox)
 
         # TODO Remove water mark
         # Add a water mark
         fig.text(0.5, 0.5, 'DRAFT - NOT FOR USE',
                  fontsize=45, color='gray',
-                 ha='center', va='center',  rotation=30, alpha=0.9)
+                 ha='center', va='center',  rotation=30, alpha=0.8)
 
         # Add the title ????
-        fig.suptitle(title)
+        fig.suptitle(title, fontsize='larger')
 
         # Add the colourbar
         plotgeneral.make_standard_bar(plotsettings, fig,
@@ -56,15 +57,34 @@ class MapPlotter(BasePlotter):
                                       colmappable=result[1])
 
         # Set the margins, and save/display & close the plot:
-        plotgeneral.set_standard_margins(settings=None, fig=fig)
+#         plotgeneral.set_standard_margins(settings=None, fig=fig)
         plotgeneral.end_figure(output_path)
 
-    def _generate_subplots(self, cube, plotsettings, fig):
+    def _generate_subplots(self, cube, plotsettings, fig, metadata_bbox):
         """
         This method should be overridden to produce the sub-plots.
 
         @param cube (iris data cube): a cube containing the selected data
         @param plotsettings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
+        @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
         pass
+
+    def _is_landscape(self, cube):
+        """
+        Return True if the range of the x coordinates is larger than the range
+        of the y coordinates.
+
+        @param cube (iris data cube): a cube containing the selected data
+
+        @return a boolean, True if orientation is landscape
+        """
+        y_coords = cube.coord('projection_y_coordinate').points
+        y_range = max(y_coords) - min(y_coords)
+        x_coords = cube.coord('projection_x_coordinate').points
+        x_range = max(x_coords) - min(x_coords)
+
+        if y_range > x_range:
+            return False
+        return True

@@ -20,9 +20,10 @@ class PlumePlotter(GraphPlotter):
         @param cubes (list(iris data cube)): a list of cubes containing the
             selected data
         @param fig (matplotlib.figure.Figure)
+        @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
         # Set the axea below the metadata and allow room for the labels
-        fig.add_axes(Bbox([[0.07, 0.08], [0.99, metadata_bbox[0][1] - 0.06]]))
+        fig.add_axes(Bbox([[0.07, 0.08], [0.99, metadata_bbox.y0 - 0.06]]))
         try:
             ensemble = self.input_data.get_value(InputType.ENSEMBLE)
             self._plot_ensemble(cubes[0],

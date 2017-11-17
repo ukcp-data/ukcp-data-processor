@@ -49,7 +49,7 @@ INPUT_TYPES.append(InputType.AREA)
 
 DATA_SELECTION_TYPES = [InputType.BASELINE,
                         InputType.DATA_SOURCE,
-#                         InputType.ENSEMBLE,
+                        InputType.ENSEMBLE,
                         InputType.SHOW_PROBABILITY_LEVELS,
                         InputType.SCENARIO,
                         InputType.SPATIAL_REPRESENTATION,
@@ -62,8 +62,8 @@ DATA_SELECTION_TYPES = [InputType.BASELINE,
                         ]
 
 FONT_SIZE_SMALL = 6
-FONT_SIZE_MEDIUM = 9
-FONT_SIZE_LARGE = 12
+FONT_SIZE_MEDIUM = 8
+FONT_SIZE_LARGE = 10
 
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 
