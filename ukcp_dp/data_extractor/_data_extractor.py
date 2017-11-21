@@ -59,7 +59,8 @@ class DataExtractor():
             cube_baseline = self._get_cube(
                 self.file_lists['main'], baseline=True)
             cube_climatology = make_climatology(
-                cube_baseline, climtype="monthly")
+                cube_baseline, climtype=self.input_data.get_value_label(
+                    InputType.TEMPORAL_AVERAGE_TYPE).lower())
             cube_climatology = cube_climatology.extract(
                 iris.Constraint(time=cube_climatology.coord('time').points[0]))
             cube_anomaly = make_anomaly(cube_absoute, cube_climatology)
