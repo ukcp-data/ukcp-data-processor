@@ -2,6 +2,8 @@ import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
 from ukcp_dp.constants import InputType
+from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
+    make_anomaly
 from ukcp_dp.vocab_manager import get_months, get_season_months
 
 
@@ -38,21 +40,45 @@ class DataExtractor():
         """
         Get a list of iris data cubes based from the given files using
         selection criteria from the input_data.
+        If the variable type is an anomaly then then a climatology may be need
+        to be produced in order to generate the anomalies.
         If requested, the second cube will be the 10, 50 and 90 percentiles.
 
         @return an iris data cube
         """
         cubes = []
-        cubes.append(self._get_cube(self.file_lists['main']))
 
-        # show 10, 50 and 90 percentiles
+        variable = self.input_data.get_value(InputType.VARIABLE)
+        if (variable.endswith('Anom') and
+                self.input_data.get_value(InputType.DATA_SOURCE) !=
+                'land_probabilistic'):
+            # anomalies have been selected for something other than LS1,
+            # therefore we need to calculate the climatology using the baseline
+            # and then the anomalies
+            cube_absoute = self._get_cube(self.file_lists['main'])
+            cube_baseline = self._get_cube(
+                self.file_lists['main'], baseline=True)
+            cube_climatology = make_climatology(
+                cube_baseline, climtype="monthly")
+            cube_climatology = cube_climatology.extract(
+                iris.Constraint(time=cube_climatology.coord('time').points[0]))
+            cube_anomaly = make_anomaly(cube_absoute, cube_climatology)
+            cubes.append(cube_anomaly)
+
+        else:
+            # we can use the values directly from the file
+            cubes.append(self._get_cube(self.file_lists['main']))
+
+        # show 10, 50 and 90 percentiles?
         if (self.input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is
                 True):
-            cubes.append(self._get_cube(self.file_lists['overlay'], True))
+            cubes.append(self._get_cube(
+                self.file_lists['overlay'], show_probability_levels=True))
 
         return cubes
 
-    def _get_cube(self, file_list, show_probability_levels=False):
+    def _get_cube(self, file_list, baseline=False,
+                  show_probability_levels=False):
         """
         Get an iris data cube based on the given files using selection
         criteria from the input_data.
@@ -64,9 +90,9 @@ class DataExtractor():
         """
 
         # Load the cubes based on the variable
-        if self.input_data.get_value(InputType.VARIABLE) == 'pr':
+        if self.input_data.get_value(InputType.VARIABLE).startswith('pr'):
             cubes = iris.load(file_list, ["precipitation rate"])
-        elif self.input_data.get_value(InputType.VARIABLE) == 'tas':
+        elif self.input_data.get_value(InputType.VARIABLE).startswith('tas'):
             cubes = iris.load(file_list, ["air_temperature"])
         else:
             raise Exception(
@@ -84,8 +110,12 @@ class DataExtractor():
         cubes = iris.cube.CubeList(cubes)
         cube = cubes.concatenate_cube()
 
-        # generate a time slice constraint
-        time_slice_constraint = self._time_slice_selector()
+        if baseline is True:
+            # generate a time slice constraint based on the baseline
+            time_slice_constraint = self._time_slice_selector(True)
+        else:
+            # generate a time slice constraint
+            time_slice_constraint = self._time_slice_selector(False)
         if time_slice_constraint is not None:
             with iris.FUTURE.context(cell_datetime_objects=True):
                 cube = cube.extract(time_slice_constraint)
@@ -195,19 +225,25 @@ class DataExtractor():
 
         return temporal_constraint
 
-    def _time_slice_selector(self):
+    def _time_slice_selector(self, baseline):
         # generate a time slice constraint
         time_slice_constraint = None
         year_max = None
 
-        try:
-            # year
-            year_min = self.input_data.get_value(InputType.YEAR)
-            year_max = self.input_data.get_value(InputType.YEAR) + 1
-        except KeyError:
-            # year_minimum, year_maximum
-            year_min = self.input_data.get_value(InputType.YEAR_MINIMUM)
-            year_max = self.input_data.get_value(InputType.YEAR_MAXIMUM)
+        if baseline is True:
+            year_min = int(self.input_data.get_value(
+                InputType.BASELINE).split('-')[0])
+            year_max = int(self.input_data.get_value(
+                InputType.BASELINE).split('-')[1])
+        else:
+            try:
+                # year
+                year_min = self.input_data.get_value(InputType.YEAR)
+                year_max = self.input_data.get_value(InputType.YEAR) + 1
+            except KeyError:
+                # year_minimum, year_maximum
+                year_min = self.input_data.get_value(InputType.YEAR_MINIMUM)
+                year_max = self.input_data.get_value(InputType.YEAR_MAXIMUM)
 
         if year_max is not None:
             # we have some form of time slice

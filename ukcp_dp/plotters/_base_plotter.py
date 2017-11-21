@@ -113,13 +113,17 @@ class BasePlotter():
         # as a normal row
         cell_text = [['Plot Details', '']]
 
+        # populate the cells
         for i in range(0, count):
-            row = [plot_details[i]]
+            cell = [_wrap(plot_details[i],
+                          self.input_data.get_value(InputType.FONT_SIZE))]
             try:
-                row.append(plot_details[i + 5])
+                cell.append(_wrap(plot_details[i + 5],
+                                  self.input_data.get_value(
+                                      InputType.FONT_SIZE)))
             except IndexError:
-                row.append('')
-            cell_text.append(row)
+                cell.append('')
+            cell_text.append(cell)
 
         gs = gridspec.GridSpec(1, 1)
         gs.update(top=0.92, bottom=0.8, left=0.16, right=0.99)
@@ -136,16 +140,27 @@ class BasePlotter():
         the_table.auto_set_font_size(False)
         the_table.set_fontsize(self.input_data.get_font_size())
 
+        line_adjuster = _get_line_adjuster()
+
         for i, cell in enumerate(the_table.properties()['children']):
             if i < 2:
+                # header row
                 cell.set_facecolor('silver')
                 cell.set_text_props(weight='bold')
+            # remove cell boarders
             cell.set_linewidth(0)
             cell.PAD = 0.02
             cell.set_text_props(horizontalalignment='left')
             cell.set_text_props(wrap=True)
-            cell.set_height(cell.get_height() + 0.04)
 
+            lines_in_cell = len(cell.get_text().get_text().split('\n'))
+
+            # set the cell height
+            cell.set_height((cell.get_height() +
+                             line_adjuster
+                             [self.input_data.get_value(InputType.IMAGE_SIZE)]
+                             [self.input_data.get_value(InputType.FONT_SIZE)]
+                             [lines_in_cell]))
         # get the bbox of the table
         fig.show()
         renderer = fig.canvas.get_renderer()
@@ -175,6 +190,8 @@ class BasePlotter():
                 plotsettings = stds.UKCP_PRECIP_ANOM.copy()
             else:
                 plotsettings = stds.UKCP_PRECIP.copy()
+
+        plotsettings.bar_orientation = 'horizontal'
 
         # 100 dots per cm
         plotsettings.dpi = 100
@@ -207,3 +224,80 @@ class BasePlotter():
         UKCP_EURO.cont = False
 
         return UKCP_EURO
+
+
+def _wrap(text, font_size):
+    if font_size == 's':
+        cell_width = 90
+    elif font_size == 'm':
+        cell_width = 75
+    else:
+        cell_width = 70
+
+    if len(text) < cell_width:
+        return text
+
+    ssv = text.split(' ')
+    lines = ''
+    line = ''
+    for bit in ssv:
+        if len(line) + len(bit) < cell_width:
+            line += ' {}'.format(bit)
+        else:
+            lines += '\n{}'.format(line)
+            line = bit
+
+    # add the residue
+    lines += '\n{}'.format(line)
+    result = lines.split('\n', 1)[1]
+    return result
+
+
+def _get_line_adjuster():
+    line_adjuster = {600:
+                     {
+                         's':
+                         {1: -0.12,
+                          2: -0.06,
+                          3: 0},
+                         'm':
+                         {1: -0.08,
+                          2: 0.02,
+                          3: 0.12},
+                         'l':
+                         {1: -0.04,
+                          2: 0.22,
+                          3: 0.44}
+                     },
+                     900:
+                     {
+                         's':
+                         {1: -0.08,
+                          2: -0.02,
+                          3: 0.02},
+                         'm':
+                         {1: -0.02,
+                          2: 0.09,
+                          3: 0.2},
+                         'l':
+                         {1: 0.04,
+                          2: 0.18,
+                          3: 0.34}
+                     },
+                     1200:
+                     {
+                         's':
+                         {1: -0.04,
+                          2: 0.0,
+                          3: 0.08},
+                         'm':
+                         {1: 0,
+                          2: 0.1,
+                          3: 0.2},
+                         'l':
+                         {1: 0.04,
+                          2: 0.2,
+                          3: 0.4}
+                     },
+                     }
+    return line_adjuster

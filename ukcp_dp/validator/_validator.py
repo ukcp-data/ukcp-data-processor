@@ -67,15 +67,23 @@ class Validator():
             year_max = None
 
         if (year_max is not None and year_min is None):
+            # if max is set then min must be set
             raise Exception("{min} must be provided when {max} is set".format(
                 min=InputType.YEAR_MINIMUM, max=InputType.YEAR_MAXIMUM))
 
         if (year_min is not None and year_max is None):
+            # if min is set then max must be set
             raise Exception("{max} must be provided when {min} is set".format(
                 min=InputType.YEAR_MINIMUM, max=InputType.YEAR_MAXIMUM))
 
         if (year is not None and year_max is not None):
+            # year and max should not be set at the same time
             raise Exception("{year} cannot be set at the same time as {min} "
                             "and {max}".format(year=InputType.YEAR,
                                                min=InputType.YEAR_MINIMUM,
                                                max=InputType.YEAR_MAXIMUM))
+
+        if (year is not None):
+            # if year is set then set min and max to equal year
+            self.input_data.set_value(InputType.YEAR_MINIMUM, year)
+            self.input_data.set_value(InputType.YEAR_MAXIMUM, year)

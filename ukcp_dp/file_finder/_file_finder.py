@@ -38,13 +38,16 @@ def _get_file_list_type_1(input_data):
 
     @return a list of files, including their full paths
     """
+    # TODO currently the path/file names do not include "Anom"
+    variable = input_data.get_value(InputType.VARIABLE).split('Anom')[0]
+
     file_path = os.path.join(
         DATA_DIR,
         'land-prob',
         input_data.get_value(InputType.SPATIAL_REPRESENTATION),
         input_data.get_value(InputType.SCENARIO),
         'percentile',
-        input_data.get_value(InputType.VARIABLE),
+        variable,
         input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
         'v20170331')
 
@@ -58,7 +61,7 @@ def _get_file_list_type_1(input_data):
         file_name = ('{variable}_{scenario}_{dataset_id}_'
                      'percentile_{temporal_type}_{year}0101-'
                      '{year}1201.nc'.format(
-                         variable=input_data.get_value(InputType.VARIABLE),
+                         variable=variable,
                          scenario=input_data.get_value(InputType.SCENARIO),
                          dataset_id=dataset_id,
                          temporal_type=input_data.get_value(
@@ -99,9 +102,11 @@ def _get_file_list_for_ensemble(input_data, ensemble):
                       temporal_type=input_data.get_value_label(
                           InputType.TEMPORAL_AVERAGE_TYPE).lower()))
 
+    # we need to use the variable root and calculate the anomaly later
+    variable = input_data.get_value(InputType.VARIABLE).split('Anom')[0]
     file_name = ('{variable}_{scenario}_{dataset_id}_{ensemble}_'
                  '{temporal_type}_19010101-21001201.nc'.format(
-                     variable=input_data.get_value(InputType.VARIABLE),
+                     variable=variable,
                      scenario=input_data.get_value(InputType.SCENARIO),
                      dataset_id=dataset_id,
                      source=input_data.get_value(InputType.DATA_SOURCE),
@@ -116,7 +121,7 @@ def _get_file_list_for_ensemble(input_data, ensemble):
         'uk',
         input_data.get_value(InputType.SCENARIO),
         ensemble,
-        input_data.get_value(InputType.VARIABLE),
+        variable,
         input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
         'v20170331',
         file_name)

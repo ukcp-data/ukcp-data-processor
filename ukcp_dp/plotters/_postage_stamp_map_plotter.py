@@ -29,9 +29,6 @@ class PostageStampMapPlotter(MapPlotter):
         # work out the number of sub-plots based on orientation of the plot
         # and number of ensembles
         if self._is_landscape(cube) is True:
-            bar_gs = gridspec.GridSpec(1, 3)
-            bar_grid = bar_gs[0, 2]
-
             if ensemble_count == 20:
                 gs = gridspec.GridSpec(4, 6)
                 grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
@@ -88,16 +85,16 @@ class PostageStampMapPlotter(MapPlotter):
                         gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
                         gs[1, 5], gs[1, 6]]
 
-            bar_gs = gridspec.GridSpec(1, 3)
-            bar_grid = bar_gs[0, 2]
-
+        # define the location for the colour bar
+        bar_gs = gridspec.GridSpec(1, 2)
+        bar_grid = bar_gs[0, 1]
         bar_gs.update(top=0.23, bottom=0.08, left=gs_left, right=gs_right)
 
         for i, ensemble in enumerate(cube.slices_over('Ensemble member')):
             ax = fig.add_subplot(grid[i], projection=plotsettings.proj)
 
             # Setting bar_orientation="none" here to override (prevent) drawing
-            # the colorbar:
+            # the colour bar:
             result = maps.plot_standard_map(ensemble, plotsettings, fig=fig,
                                             ax=ax, barlab=None,
                                             bar_orientation="none",
