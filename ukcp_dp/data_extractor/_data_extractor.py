@@ -1,3 +1,4 @@
+import cf_units
 import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
@@ -5,6 +6,9 @@ from ukcp_dp.constants import InputType
 from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
     make_anomaly
 from ukcp_dp.vocab_manager import get_months, get_season_months
+
+import logging
+log = logging.getLogger(__name__)
 
 
 class DataExtractor():
@@ -34,6 +38,7 @@ class DataExtractor():
 
         @return a list of iris data cubes
         """
+        log.info('get_cubes')
         return self.cubes
 
     def _get_cubes(self):
@@ -51,7 +56,7 @@ class DataExtractor():
         variable = self.input_data.get_value(InputType.VARIABLE)
         if (variable.endswith('Anom') and
                 self.input_data.get_value(InputType.DATA_SOURCE) !=
-                'land_probabilistic'):
+                'land-prob'):
             # anomalies have been selected for something other than LS1,
             # therefore we need to calculate the climatology using the baseline
             # and then the anomalies
@@ -69,6 +74,11 @@ class DataExtractor():
         else:
             # we can use the values directly from the file
             cubes.append(self._get_cube(self.file_lists['main']))
+
+        if variable == 'tasAnom':
+            # this in an anomaly so set the units to Celcius, otherwise they
+            # will get converted later and that would be bad
+            cubes[0].units = cf_units.Unit("Celsius")
 
         # show 10, 50 and 90 percentiles?
         if (self.input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is

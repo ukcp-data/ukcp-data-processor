@@ -4,6 +4,9 @@ import matplotlib.gridspec as gridspec
 from ukcp_dp.constants import InputType
 import ukcp_dp.ukcp_standard_plots.mapper as maps
 
+import logging
+log = logging.getLogger(__name__)
+
 
 class ThreeMapPlotter(MapPlotter):
     """
@@ -22,6 +25,7 @@ class ThreeMapPlotter(MapPlotter):
         @param fig (matplotlib.figure.Figure)
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
+        log.debug('_generate_subplots')
         gs_top = metadata_bbox.y0 - 0.06
         gs_left = 0.02
         gs_right = 0.98
@@ -42,8 +46,7 @@ class ThreeMapPlotter(MapPlotter):
         bar_gs.update(top=0.23, bottom=0.08, left=gs_left, right=gs_right)
 
         titles = ['10th Percentile', '50th Percentile', '90th Percentile']
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                'land_probabilistic'):
+        if self.input_data.get_value(InputType.DATA_SOURCE) == 'land-prob':
             for i, percentile in enumerate([10, 50, 90]):
                 result = self._add_sub_plot(
                     fig, grid[i], plotsettings, titles[i],

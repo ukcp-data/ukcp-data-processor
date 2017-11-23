@@ -1,8 +1,12 @@
 from ukcp_dp.constants import InputType
 
+import logging
+log = logging.getLogger(__name__)
+
 
 class Validator():
     def validate(self, input_data):
+        log.debug('validate')
         self.input_data = input_data
         self._validate_spatial_rep()
         self._validate_show_probability_levels()
@@ -21,15 +25,15 @@ class Validator():
             # Not set, lets be kind and set it
             if self.input_data.get_area_type() in ['bbox', 'point']:
                 if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                        'global_realisations'):
+                        'land-gcm'):
                     self.input_data.set_value(
                         InputType.SPATIAL_REPRESENTATION, '60km')
                 elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                        'regional_realisations'):
+                        'land-rcm'):
                     self.input_data.set_value(
                         InputType.SPATIAL_REPRESENTATION, '12km')
                 elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                        'land_probabilistic'):
+                        'land-prob'):
                     self.input_data.set_value(
                         InputType.SPATIAL_REPRESENTATION, '25km')
             else:

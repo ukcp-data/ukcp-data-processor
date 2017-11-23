@@ -28,10 +28,10 @@ COLLECTION_LABELS = {
     }
 
 VOCAB = {'data_source': {
-            'land_probabilistic': 'Land probabilistic projections',
+            'land-prob': 'Land probabilistic projections',
             'probabilistic': 'Probabilistic projections',
-            'global_realisations': 'Global simulations',
-            'regional_realisations': 'Regional simulations',
+            'land-gcm': 'Global simulations',
+            'land-rcm': 'Regional simulations',
             'hires_uk': 'High-resolution simulations',
             'marine': 'Marine projections',
             'observations': 'Observations'
@@ -278,15 +278,13 @@ SEASON_MONTHS = {
 }
 
 ENSEMBLE_MEMBER_SET = {
-    'global_realisations': ['r1i1p1', 'r1i1p2', 'r1i1p3', 'r1i1p4', 'r1i1p5',
-                            'r1i1p6', 'r1i1p7', 'r1i1p8', 'r1i1p9', 'r1i1p10',
-                            'r1i1p11', 'r1i1p12', 'r1i1p13', 'r1i1p14',
-                            'r1i1p15', 'r1i1p16', 'r1i1p17', 'r1i1p18',
-                            'r1i1p19', 'r1i1p20'],
-    'regional_realisations': ['r1i1p1', 'r1i1p2', 'r1i1p3', 'r1i1p4', 'r1i1p5',
-                              'r1i1p6', 'r1i1p7', 'r1i1p8', 'r1i1p9',
-                              'r1i1p10', 'r1i1p11', 'r1i1p12', 'r1i1p13',
-                              'r1i1p14', 'r1i1p15'],
+    'land-gcm': ['r1i1p1', 'r1i1p2', 'r1i1p3', 'r1i1p4', 'r1i1p5', 'r1i1p6',
+                 'r1i1p7', 'r1i1p8', 'r1i1p9', 'r1i1p10', 'r1i1p11', 'r1i1p12',
+                 'r1i1p13', 'r1i1p14', 'r1i1p15', 'r1i1p16', 'r1i1p17',
+                 'r1i1p18', 'r1i1p19', 'r1i1p20'],
+    'land-rcm': ['r1i1p1', 'r1i1p2', 'r1i1p3', 'r1i1p4', 'r1i1p5', 'r1i1p6',
+                 'r1i1p7', 'r1i1p8', 'r1i1p9', 'r1i1p10', 'r1i1p11', 'r1i1p12',
+                 'r1i1p13', 'r1i1p14', 'r1i1p15'],
     'cpm': []  # TODO
 }
 

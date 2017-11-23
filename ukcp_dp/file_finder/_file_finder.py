@@ -2,6 +2,9 @@ import os
 
 from ukcp_dp.constants import DATA_DIR, InputType
 
+import logging
+log = logging.getLogger(__name__)
+
 
 def get_file_lists(input_data):
     """
@@ -13,16 +16,15 @@ def get_file_lists(input_data):
         key - 'main' or 'overlay'
         value - list of file paths
     """
+    log.info('get_file_lists')
     file_list = {}
-    if (input_data.get_value(InputType.DATA_SOURCE) in
-            ['land_probabilistic', ]):
+    if (input_data.get_value(InputType.DATA_SOURCE) in ['land-prob', ]):
         file_list['main'] = _get_file_list_type_1(input_data)
     elif (input_data.get_value(InputType.DATA_SOURCE) in
-            ['global_realisations', 'regional_realisations']):
+            ['land-gcm', 'land-rcm']):
         file_list['main'] = _get_file_list_type_2(input_data)
     if input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is True:
-        if (input_data.get_value(InputType.DATA_SOURCE) ==
-                'land_probabilistic'):
+        if input_data.get_value(InputType.DATA_SOURCE) == 'land-prob':
             file_list['overlay'] = file_list['main']
         else:
             file_list['overlay'] = _get_file_list_type_1(input_data)
@@ -95,9 +97,9 @@ def _get_file_list_for_ensemble(input_data, ensemble):
     else:
         spatial_representation = ''
 
-    dataset_id = ('ukcp18-land-gcm-uk{spatial_representation}-'
+    dataset_id = ('ukcp18-{data_source}-uk{spatial_representation}-'
                   '{temporal_type}'.format(
-                      input_data.get_value(InputType.SPATIAL_REPRESENTATION),
+                      data_source=input_data.get_value(InputType.DATA_SOURCE),
                       spatial_representation=spatial_representation,
                       temporal_type=input_data.get_value_label(
                           InputType.TEMPORAL_AVERAGE_TYPE).lower()))
@@ -116,7 +118,7 @@ def _get_file_list_for_ensemble(input_data, ensemble):
 
     file_path = os.path.join(
         DATA_DIR,
-        'land-sim',
+        input_data.get_value(InputType.DATA_SOURCE),
         input_data.get_value(InputType.SPATIAL_REPRESENTATION),
         'uk',
         input_data.get_value(InputType.SCENARIO),
