@@ -71,9 +71,9 @@ import cf_units
 import standards_class as stds
 import plotting_general as plotgeneral
 import __init__ as stdplots
-from ukcp_common_analysis import common_analysis as common
-from ukcp_common_analysis import io              as ukcpio
-from ukcp_common_analysis import regions         as regs
+from ukcp_dp.ukcp_common_analysis import common_analysis as common
+from ukcp_dp.ukcp_common_analysis import io              as ukcpio
+from ukcp_dp.ukcp_common_analysis import regions         as regs
 
 # Force matplotlib to use True Type fonts
 # (the default is Type 3, pdf.fonttype 3)

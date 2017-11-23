@@ -57,7 +57,7 @@ import cf_units
 import cartopy
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
-import ukcp_standard_plots.map_projections as projns
+import ukcp_dp.ukcp_standard_plots.map_projections as projns
 #==========================================================================
 
 

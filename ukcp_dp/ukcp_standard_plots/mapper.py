@@ -72,8 +72,8 @@ import cartopy.io.shapereader as shpreader
 from   cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import standards_class as stds
 import plotting_general as plotgeneral
-from ukcp_common_analysis import common_analysis as common
-import ukcp_common_analysis.regions as regs
+from ukcp_dp.ukcp_common_analysis import common_analysis as common
+import ukcp_dp.ukcp_common_analysis.regions as regs
 
 
 # Force matplotlib to use True Type fonts

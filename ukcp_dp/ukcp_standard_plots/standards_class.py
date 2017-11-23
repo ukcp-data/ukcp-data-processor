@@ -32,7 +32,7 @@ import copy
 import cf_units
 import cartopy.crs as ccrs
 import map_projections              as projns
-import ukcp_common_analysis.regions as regs
+import ukcp_dp.ukcp_common_analysis.regions as regs
 #=========================================================================
 
 
