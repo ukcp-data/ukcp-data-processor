@@ -1,22 +1,14 @@
+from matplotlib.transforms import Bbox
 from ukcp_dp.constants import DATA_SELECTION_TYPES
 from ukcp_dp.constants import InputType
+from ukcp_dp.ukcp_standard_plots import standards_class as stds
 from ukcp_dp.vocab_manager import get_collection_label
-import os
-import ukcp_dp.ukcp_standard_plots.standards_class as stds
-
-
-# Import (and parse) config files
-from cows_wps.utils.parse_wps_config import getWPSConfigDict
-wps_config_dict = getWPSConfigDict()
-
-# Import process-specific modules
-os.environ["MPLCONFIGDIR"] = wps_config_dict.get(
-    "mpl_configdir", "/tmp/.matplotlib")
-
 import matplotlib.cbook as cbook
-import matplotlib.image as image
-from matplotlib.transforms import Bbox
 import matplotlib.gridspec as gridspec
+import matplotlib.image as image
+
+import logging
+log = logging.getLogger(__name__)
 
 
 class BasePlotter():
@@ -38,6 +30,7 @@ class BasePlotter():
         @param output_path (str): the full path to the file
         @param title (str): a title for the plot
         """
+        log.info('generate_plot')
         # an object containing user defined values
         self.input_data = input_data
 
