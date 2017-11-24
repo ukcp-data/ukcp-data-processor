@@ -5,6 +5,9 @@ from matplotlib.transforms import Bbox
 from ukcp_dp.constants import InputType
 from ukcp_dp.vocab_manager._vocab import get_ensemble_member_set
 
+import logging
+log = logging.getLogger(__name__)
+
 
 class PlumePlotter(GraphPlotter):
     """
@@ -22,7 +25,8 @@ class PlumePlotter(GraphPlotter):
         @param fig (matplotlib.figure.Figure)
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
-        # Set the axea below the metadata and allow room for the labels
+        log.debug('_generate_graph')
+        # Set the area below the metadata and allow room for the labels
         fig.add_axes(Bbox([[0.07, 0.08], [0.99, metadata_bbox.y0 - 0.06]]))
         try:
             ensemble = self.input_data.get_value(InputType.ENSEMBLE)

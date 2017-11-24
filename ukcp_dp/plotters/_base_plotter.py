@@ -210,7 +210,6 @@ class BasePlotter():
         UKCP_EURO.vrange = [-311.0, -302.0]
         UKCP_EURO.vmid = None
         UKCP_EURO.vstep = 1.0
-        UKCP_EURO.bar_orientation = 'horizontal'
         # [left,bottom, width,height]
         # UKCP_EURO.bar_position = [0.55, 0.15, 0.4, 0.03]
         UKCP_EURO.bar_position = None

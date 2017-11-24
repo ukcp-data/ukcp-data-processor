@@ -2,6 +2,9 @@ from _map_plotter import MapPlotter
 import matplotlib.gridspec as gridspec
 import ukcp_dp.ukcp_standard_plots.mapper as maps
 
+import logging
+log = logging.getLogger(__name__)
+
 
 class PostageStampMapPlotter(MapPlotter):
     """
@@ -20,6 +23,7 @@ class PostageStampMapPlotter(MapPlotter):
         @param fig (matplotlib.figure.Figure)
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
+        log.debug('_generate_subplots')
         gs_top = metadata_bbox.y0 - 0.06
         gs_left = 0.02
         gs_right = 0.98
