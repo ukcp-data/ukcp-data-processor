@@ -68,8 +68,8 @@ VOCAB = {'data_source': {
             'prAnom': 'Precipitation anomaly'
             },
          'temporal_average_type': {
-            'annual': 'Annual',
-            'seasonal': 'Seasonal',
+            'ann': 'Annual',
+            'seas': 'Seasonal',
             'mon': 'Monthly'
             },
          'spatial_representation': {
@@ -95,13 +95,13 @@ VOCAB = {'data_source': {
             'nov': 'November',
             'dec': 'December'
             },
-         'seasonal': {
+         'seas': {
             'djf': 'December January February',
             'mam': 'March April May',
             'jja': 'June July August',
             'son': 'September October November'
             },
-         'annual': {
+         'ann': {
             'ann': 'annual'
             },
          'time_period': {

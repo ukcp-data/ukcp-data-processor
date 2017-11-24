@@ -65,6 +65,12 @@ FONT_SIZE_SMALL = 4
 FONT_SIZE_MEDIUM = 7
 FONT_SIZE_LARGE = 10
 
+TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
+
+MONTHLY = 'mon'
+SEASONAL = 'seas'
+ANNUAL = 'ann'
+
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 
 # Plot types

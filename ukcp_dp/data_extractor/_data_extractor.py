@@ -2,7 +2,7 @@ import cf_units
 import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
-from ukcp_dp.constants import InputType
+from ukcp_dp.constants import InputType, TEMP_ANOMS, MONTHLY, SEASONAL, ANNUAL
 from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
     make_anomaly
 from ukcp_dp.vocab_manager import get_months, get_season_months
@@ -75,16 +75,19 @@ class DataExtractor():
             # we can use the values directly from the file
             cubes.append(self._get_cube(self.file_lists['main']))
 
-        if variable == 'tasAnom':
-            # this in an anomaly so set the units to Celcius, otherwise they
+        if variable in TEMP_ANOMS:
+            # this in an anomaly so set the units to Celsius, otherwise they
             # will get converted later and that would be bad
             cubes[0].units = cf_units.Unit("Celsius")
+            log.debug('updated cube units to Celsius')
 
         # show 10, 50 and 90 percentiles?
         if (self.input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is
                 True):
             cubes.append(self._get_cube(
                 self.file_lists['overlay'], show_probability_levels=True))
+            if variable in TEMP_ANOMS:
+                cubes[1].units = cf_units.Unit("Celsius")
 
         return cubes
 
@@ -209,11 +212,11 @@ class DataExtractor():
             InputType.TEMPORAL_AVERAGE_TYPE)
 
         if (self.input_data.get_value(InputType.TIME_PERIOD) == 'all' or
-                temporal_average_type == 'annual'):
+                temporal_average_type == ANNUAL):
             # we want everything, so no need to add a restriction
             pass
 
-        elif temporal_average_type == 'mon':
+        elif temporal_average_type == MONTHLY:
             for i, term in enumerate(
                     get_months()):
                 if term == self.input_data.get_value(InputType.TIME_PERIOD):
@@ -222,7 +225,7 @@ class DataExtractor():
                         time=lambda t: i < t.point.month <= i + 1)
                     break
 
-        elif temporal_average_type == 'seasonal':
+        elif temporal_average_type == SEASONAL:
             months = get_season_months(
                 self.input_data.get_value(InputType.TIME_PERIOD))
             temporal_constraint = iris.Constraint(
@@ -270,7 +273,7 @@ class DataExtractor():
         @return a str containing the title
         """
         if (self.input_data.get_value(
-                InputType.TEMPORAL_AVERAGE_TYPE) == 'annual'
+                InputType.TEMPORAL_AVERAGE_TYPE) == ANNUAL
                 or self.input_data.get_value(InputType.TIME_PERIOD) == 'all'):
             title = ('Demonstration Version - {temporal_type} average '
                      '{variable}\n'
