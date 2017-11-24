@@ -45,7 +45,7 @@ def _get_file_list_type_1(input_data):
 
     file_path = os.path.join(
         DATA_DIR,
-        'land-prob',
+        input_data.get_value(InputType.DATA_SOURCE),
         input_data.get_value(InputType.SPATIAL_REPRESENTATION),
         input_data.get_value(InputType.SCENARIO),
         'percentile',
@@ -55,8 +55,13 @@ def _get_file_list_type_1(input_data):
 
     file_list = []
 
-    dataset_id = 'ukcp18-land-prob-{}'.format(
-        input_data.get_value(InputType.SPATIAL_REPRESENTATION))
+    dataset_id = ('ukcp18-{data_source}-uk-{spatial_representation}-'
+                  '{temporal_type}'.format(
+                      data_source=input_data.get_value(InputType.DATA_SOURCE),
+                      spatial_representation=input_data.get_value(
+                          InputType.SPATIAL_REPRESENTATION),
+                      temporal_type=input_data.get_value(
+                          InputType.TEMPORAL_AVERAGE_TYPE)))
 
     for year in range(input_data.get_value(InputType.YEAR_MINIMUM),
                       (input_data.get_value(InputType.YEAR_MAXIMUM) + 1)):
@@ -92,17 +97,19 @@ def _get_file_list_type_2(input_data):
 
 
 def _get_file_list_for_ensemble(input_data, ensemble):
-    if input_data.get_value(InputType.SPATIAL_REPRESENTATION) == 'river_basin':
-        spatial_representation = '-river'
-    else:
-        spatial_representation = ''
+    spatial_representation = input_data.get_value(
+        InputType.SPATIAL_REPRESENTATION)
+    if spatial_representation == 'river_basin':
+        spatial_representation = 'river'
+    elif spatial_representation == 'admin_region':
+        spatial_representation = 'admin'
 
-    dataset_id = ('ukcp18-{data_source}-uk{spatial_representation}-'
+    dataset_id = ('ukcp18-{data_source}-uk-{spatial_representation}-'
                   '{temporal_type}'.format(
                       data_source=input_data.get_value(InputType.DATA_SOURCE),
                       spatial_representation=spatial_representation,
-                      temporal_type=input_data.get_value_label(
-                          InputType.TEMPORAL_AVERAGE_TYPE).lower()))
+                      temporal_type=input_data.get_value(
+                          InputType.TEMPORAL_AVERAGE_TYPE)))
 
     # we need to use the variable root and calculate the anomaly later
     variable = input_data.get_value(InputType.VARIABLE).split('Anom')[0]
