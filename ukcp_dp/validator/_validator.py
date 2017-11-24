@@ -11,6 +11,7 @@ class Validator():
         self._validate_spatial_rep()
         self._validate_show_probability_levels()
         self._validate_time_slice()
+        self._validate_show_boundaries()
 
         return self.input_data
 
@@ -91,3 +92,9 @@ class Validator():
             # if year is set then set min and max to equal year
             self.input_data.set_value(InputType.YEAR_MINIMUM, year)
             self.input_data.set_value(InputType.YEAR_MAXIMUM, year)
+
+    def _validate_show_boundaries(self):
+        try:
+            self.input_data.get_value(InputType.SHOW_BOUNDARIES)
+        except KeyError:
+            self.input_data.set_value(InputType.SHOW_BOUNDARIES, 'none')

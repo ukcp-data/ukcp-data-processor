@@ -338,16 +338,11 @@ def plot_map(dcube_input, fig=None,ax=None,
                           colors=contlinecol, alpha=contlinealpha )
 
     
-    # Coastlines:
-    if coastlcol is not None:
-        ax.coastlines("10m", linewidth=coastlw, color=coastlcol) ## or 110m or 50m
-    
-    
     # Country borders:
     if countrylcol is not None:
         #ax.add_feature(cartopy.feature.BORDERS, linestyle='-',color="grey")
         hires_borders = cartopy.feature.NaturalEarthFeature('cultural',
-                                         'admin_0_boundary_lines_land','10m') 
+                                        'admin_0_map_units','10m') 
         ax.add_feature(hires_borders, edgecolor=countrylcol,facecolor="",
                        linewidth=countrylw)
 
@@ -368,10 +363,13 @@ def plot_map(dcube_input, fig=None,ax=None,
         #default_rivers = cartopy.feature.RIVERS
         # 110m, 50m and 10m are available
         hires_rivers = cartopy.feature.NaturalEarthFeature('physical',
-                                                           'rivers_lake_centerlines','50m')
+                                                            'rivers_europe','10m')
         ax.add_feature(hires_rivers, edgecolor=riverslcol, facecolor="",
                        linewidth=riverslw)
 
+    # Coastlines:
+    if coastlcol is not None:
+        ax.coastlines("10m", linewidth=coastlw, color=coastlcol) ## or 110m or 50m
         
     # The original pbskill_maps.py routine
     #    http://fcm9/projects/ClimateImpacts/browser/pbett/pbvericlimpred/pbskill_maps.py?rev=4935

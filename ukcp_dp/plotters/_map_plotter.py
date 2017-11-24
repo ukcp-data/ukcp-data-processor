@@ -27,7 +27,8 @@ class MapPlotter(BasePlotter):
         plotsettings = self._get_plot_settings(
             self.input_data.get_value(InputType.IMAGE_SIZE),
             self.input_data.get_font_size(),
-            self.input_data.get_value(InputType.VARIABLE))
+            self.input_data.get_value(InputType.VARIABLE),
+            self.input_data.get_value(InputType.SHOW_BOUNDARIES))
         reg = regs.reg_from_cube(cube)
         plotsettings.set_xylims(reg)
 

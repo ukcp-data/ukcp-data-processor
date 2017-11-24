@@ -215,8 +215,10 @@ VOCAB = {'data_source': {
             'anglian': 'Anglian'
             },
          'show_boundaries': {
-             True: 'True',
-             False: 'False'
+            'none': 'None',
+            'country': 'Country',
+            'admin_region': 'Administrative Region',
+            'river_basin': 'River Basin'
              },
          'font_size': {
             's': 'small',

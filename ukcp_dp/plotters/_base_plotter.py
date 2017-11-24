@@ -166,7 +166,7 @@ class BasePlotter():
         ax.set_yticks([])
         return bbox
 
-    def _get_plot_settings(self, cmsize, fsize, var_id):
+    def _get_plot_settings(self, cmsize, fsize, var_id, show_boundaries):
         """
         Get the plot settings based on the variable being plotted.
 
@@ -185,6 +185,15 @@ class BasePlotter():
                 plotsettings = stds.UKCP_PRECIP.copy()
 
         plotsettings.bar_orientation = 'horizontal'
+
+        # decide what, if any, boundaries to draw
+        plotsettings.countrylcol = None
+        if show_boundaries == 'country':
+            plotsettings.countrylcol = 'grey'
+        elif show_boundaries == 'admin_region':
+            plotsettings.regionlcol = 'grey'
+        elif show_boundaries == 'river_basin':
+            plotsettings.riverslcol = 'blue'
 
         # 100 dots per cm
         plotsettings.dpi = 100

@@ -25,7 +25,8 @@ class GraphPlotter(BasePlotter):
         plotsettings = self._get_plot_settings(
             self.input_data.get_value(InputType.IMAGE_SIZE),
             self.input_data.get_font_size(),
-            self.input_data.get_value(InputType.VARIABLE))
+            self.input_data.get_value(InputType.VARIABLE),
+            self.input_data.get_value(InputType.SHOW_BOUNDARIES))
 
         fig, _, _ = plotgeneral.start_standard_figure(plotsettings)
 
