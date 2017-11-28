@@ -214,6 +214,10 @@ VOCAB = {'data_source': {
             'north_east_scotland': 'North East Scotland',
             'anglian': 'Anglian'
             },
+         'extract_percentiles': {
+            True: 'True',
+            False: 'False'
+            },
          'show_boundaries': {
             'none': 'None',
             'country': 'Country',
@@ -255,6 +259,8 @@ VOCAB = {'data_source': {
             False: 'False'
             },
          }
+
+VOCAB['highlighted_ensemble_members'] = VOCAB['ensemble']
 
 # an ordered list of months
 MONTHS = [

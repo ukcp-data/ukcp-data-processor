@@ -1,4 +1,4 @@
-from ukcp_dp.constants import InputType
+from ukcp_dp.constants import DATA_SOURCE_PROB, InputType
 
 import logging
 log = logging.getLogger(__name__)
@@ -9,9 +9,11 @@ class Validator():
         log.debug('validate')
         self.input_data = input_data
         self._validate_spatial_rep()
+        self._validate_extract_percentiles()
         self._validate_show_probability_levels()
         self._validate_time_slice()
-        self._validate_show_boundaries()
+        self._validate_boundary_overlay()
+        self._validate_highlighted_ensemble_members()
 
         return self.input_data
 
@@ -34,13 +36,26 @@ class Validator():
                     self.input_data.set_value(
                         InputType.SPATIAL_REPRESENTATION, '12km')
                 elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                        'land-prob'):
+                        DATA_SOURCE_PROB):
                     self.input_data.set_value(
                         InputType.SPATIAL_REPRESENTATION, '25km')
             else:
                 self.input_data.set_value(
                     InputType.SPATIAL_REPRESENTATION,
                     self.input_data.get_area_type())
+
+    def _validate_extract_percentiles(self):
+        try:
+            extract_percentiles = self.input_data.get_value(
+                InputType.EXTRACT_PERCENTILES)
+            if not isinstance(extract_percentiles, bool):
+                raise Exception("Invalid {value_type}: {value}.".format(
+                    value_type=InputType.EXTRACT_PERCENTILES,
+                    value=extract_percentiles))
+
+        except KeyError:
+            # Not set, lets be kind and set it to False
+            self.input_data.set_value(InputType.EXTRACT_PERCENTILES, False)
 
     def _validate_show_probability_levels(self):
         try:
@@ -93,8 +108,15 @@ class Validator():
             self.input_data.set_value(InputType.YEAR_MINIMUM, year)
             self.input_data.set_value(InputType.YEAR_MAXIMUM, year)
 
-    def _validate_show_boundaries(self):
+    def _validate_boundary_overlay(self):
         try:
             self.input_data.get_value(InputType.SHOW_BOUNDARIES)
         except KeyError:
             self.input_data.set_value(InputType.SHOW_BOUNDARIES, 'none')
+
+    def _validate_highlighted_ensemble_members(self):
+        try:
+            self.input_data.get_value(InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
+        except KeyError:
+            self.input_data._set_values(InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS,
+                                        [])

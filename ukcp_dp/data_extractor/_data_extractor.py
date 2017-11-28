@@ -2,7 +2,8 @@ import cf_units
 import iris
 import iris.plot as iplt
 import iris.quickplot as qplt
-from ukcp_dp.constants import InputType, TEMP_ANOMS, MONTHLY, SEASONAL, ANNUAL
+from ukcp_dp.constants import ANNUAL, DATA_SOURCE_PROB, InputType, \
+    MONTHLY, SEASONAL, TEMP_ANOMS
 from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
     make_anomaly
 from ukcp_dp.vocab_manager import get_months, get_season_months
@@ -56,7 +57,7 @@ class DataExtractor():
         variable = self.input_data.get_value(InputType.VARIABLE)
         if (variable.endswith('Anom') and
                 self.input_data.get_value(InputType.DATA_SOURCE) !=
-                'land-prob'):
+                DATA_SOURCE_PROB):
             # anomalies have been selected for something other than LS1,
             # therefore we need to calculate the climatology using the baseline
             # and then the anomalies
@@ -66,14 +67,24 @@ class DataExtractor():
             cube_climatology = make_climatology(
                 cube_baseline, climtype=self.input_data.get_value_label(
                     InputType.TEMPORAL_AVERAGE_TYPE).lower())
+            # there should be only one time coord
             cube_climatology = cube_climatology.extract(
                 iris.Constraint(time=cube_climatology.coord('time').points[0]))
-            cube_anomaly = make_anomaly(cube_absoute, cube_climatology)
-            cubes.append(cube_anomaly)
+            main_cube = make_anomaly(cube_absoute, cube_climatology)
+
+        elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_PROB):
+            main_cube = self._get_cube(self.file_lists['main'],
+                                       show_probability_levels=True)
 
         else:
             # we can use the values directly from the file
-            cubes.append(self._get_cube(self.file_lists['main']))
+            main_cube = self._get_cube(self.file_lists['main'])
+
+        if self.input_data.get_value(InputType.EXTRACT_PERCENTILES):
+            cubes.append(self._extract_percentiles(main_cube))
+        else:
+            cubes.append(main_cube)
 
         if variable in TEMP_ANOMS:
             # this in an anomaly so set the units to Celsius, otherwise they
@@ -82,7 +93,9 @@ class DataExtractor():
             log.debug('updated cube units to Celsius')
 
         # show 10, 50 and 90 percentiles?
-        if (self.input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is
+        if (self.input_data.get_value(InputType.DATA_SOURCE) !=
+                DATA_SOURCE_PROB and
+            self.input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is
                 True):
             cubes.append(self._get_cube(
                 self.file_lists['overlay'], show_probability_levels=True))
@@ -97,6 +110,7 @@ class DataExtractor():
         Get an iris data cube based on the given files using selection
         criteria from the input_data.
 
+        @param file_list (list[str]): a list of file name to retrieve data from
         @param show_probability_levels (boolean): if True only include the
             10th, 50th and 90th percentile data
 
@@ -140,16 +154,23 @@ class DataExtractor():
             with iris.FUTURE.context(cell_datetime_objects=True):
                 cube = cube.extract(temporal_constraint)
 
-        # generate an area constraint
-        area_constraint = self._get_spatial_selector()
-        if area_constraint is not None:
-            cube = cube.extract(area_constraint)
-
         # show 10, 50 and 90 percentiles
         if (show_probability_levels is True):
             cube = self._get_probability_levels(cube)
 
+        # generate an area constraint
+        area_constraint = self._get_spatial_selector(
+            self._get_resolution_m(cube))
+        if area_constraint is not None:
+            cube = cube.extract(area_constraint)
+
         return cube
+
+    def _extract_percentiles(self, cube):
+        # generate the 10th,50th and 90th percentiles for the ensembles
+        result = cube.collapsed('Ensemble member', iris.analysis.PERCENTILE,
+                                percent=[10, 50, 90])
+        return result
 
     def _get_probability_levels(self, cube):
         # get a cube with the 10, 50 and 90 percentiles
@@ -159,36 +180,36 @@ class DataExtractor():
         percentile_cubes.append(cube.extract(iris.Constraint(percentile=90)))
         return percentile_cubes.merge_cube()
 
-    def _get_spatial_selector(self):
+    def _get_spatial_selector(self, resolution):
         # generate an area constraint
         area_constraint = None
 
         if self.input_data.get_area_type() == 'point':
             # coordinates are coming in as OSGB, x, y
-            half_cell_size = self._get_cell_size() / 2
+            half_grig_size = resolution / 2
             bng_x = self.input_data.get_area()[0]
             bng_y = self.input_data.get_area()[1]
             x_constraint = iris.Constraint(
                 projection_x_coordinate=lambda cell:
-                (bng_x - half_cell_size) <= cell < (bng_x + half_cell_size))
+                (bng_x - half_grig_size) <= cell < (bng_x + half_grig_size))
             y_constraint = iris.Constraint(
                 projection_y_coordinate=lambda cell:
-                (bng_y - half_cell_size) <= cell < (bng_y + half_cell_size))
+                (bng_y - half_grig_size) <= cell < (bng_y + half_grig_size))
             area_constraint = x_constraint & y_constraint
 
         elif self.input_data.get_area_type() == 'bbox':
             # coordinates are coming in as OSGB, w, s, e, n
-            half_cell_size = self._get_cell_size() / 2
+            half_grig_size = resolution / 2
             bng_w = self.input_data.get_area()[0]
             bng_s = self.input_data.get_area()[1]
             bng_e = self.input_data.get_area()[2]
             bng_n = self.input_data.get_area()[3]
             x_constraint = iris.Constraint(
                 projection_x_coordinate=lambda cell:
-                (bng_w - half_cell_size) <= cell < (bng_e + half_cell_size))
+                (bng_w - half_grig_size) <= cell < (bng_e + half_grig_size))
             y_constraint = iris.Constraint(
                 projection_y_coordinate=lambda cell:
-                (bng_s - half_cell_size) <= cell < (bng_n + half_cell_size))
+                (bng_s - half_grig_size) <= cell < (bng_n + half_grig_size))
             area_constraint = x_constraint & y_constraint
 
         elif (self.input_data.get_area_type() == 'admin_region' or
@@ -326,9 +347,9 @@ class DataExtractor():
 
         return title
 
-    def _get_cell_size(self):
-        sr = self.input_data.get_value(InputType.SPATIAL_REPRESENTATION)
+    def _get_resolution_m(self, cube):
+        resolution = cube.attributes['resolution']
         try:
-            return int(sr.split('km')[0]) * 1000
+            return int(resolution.split('km')[0]) * 1000
         except Exception:
             return

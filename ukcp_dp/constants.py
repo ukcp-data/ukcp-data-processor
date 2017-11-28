@@ -7,8 +7,10 @@ InputType = enum(
     BASELINE='baseline',
     DATA_FORMAT='data_format',
     ENSEMBLE='ensemble',
+    EXTRACT_PERCENTILES='extract_percentiles',
     DATA_SOURCE='data_source',
     FONT_SIZE='font_size',
+    HIGHLIGHTED_ENSEMBLE_MEMBERS='highlighted_ensemble_members',
     IMAGE_FORMAT='image_format',
     IMAGE_SIZE='image_size',
     LEGEND_POSITION='legend_position',
@@ -27,6 +29,7 @@ InputType = enum(
 INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
                             InputType.DATA_FORMAT,
                             InputType.DATA_SOURCE,
+                            InputType.EXTRACT_PERCENTILES,
                             InputType.FONT_SIZE,
                             InputType.IMAGE_FORMAT,
                             InputType.IMAGE_SIZE,
@@ -42,7 +45,8 @@ INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
                             InputType.YEAR_MINIMUM,
                             InputType.YEAR_MAXIMUM]
 
-INPUT_TYPES_MULTI_VALUE = [InputType.ENSEMBLE]
+INPUT_TYPES_MULTI_VALUE = [InputType.ENSEMBLE,
+                           InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS]
 
 INPUT_TYPES = INPUT_TYPES_SINGLE_VALUE + INPUT_TYPES_MULTI_VALUE
 INPUT_TYPES.append(InputType.AREA)
@@ -70,6 +74,8 @@ TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 MONTHLY = 'mon'
 SEASONAL = 'seas'
 ANNUAL = 'ann'
+
+DATA_SOURCE_PROB = 'land-prob'
 
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 

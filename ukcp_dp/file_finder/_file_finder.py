@@ -1,6 +1,6 @@
 import os
 
-from ukcp_dp.constants import DATA_DIR, InputType
+from ukcp_dp.constants import DATA_DIR, DATA_SOURCE_PROB, InputType
 
 import logging
 log = logging.getLogger(__name__)
@@ -18,13 +18,13 @@ def get_file_lists(input_data):
     """
     log.info('get_file_lists')
     file_list = {}
-    if (input_data.get_value(InputType.DATA_SOURCE) in ['land-prob', ]):
+    if (input_data.get_value(InputType.DATA_SOURCE) == DATA_SOURCE_PROB):
         file_list['main'] = _get_file_list_type_1(input_data)
     elif (input_data.get_value(InputType.DATA_SOURCE) in
             ['land-gcm', 'land-rcm']):
         file_list['main'] = _get_file_list_type_2(input_data)
     if input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is True:
-        if input_data.get_value(InputType.DATA_SOURCE) == 'land-prob':
+        if input_data.get_value(InputType.DATA_SOURCE) == DATA_SOURCE_PROB:
             file_list['overlay'] = file_list['main']
         else:
             file_list['overlay'] = _get_file_list_type_1(input_data)
@@ -34,7 +34,9 @@ def get_file_lists(input_data):
 
 def _get_file_list_type_1(input_data):
     """
-    Get a list of files based on the data provided in the input data.
+    Get a list of files based on the data provided in the input data. As this
+    may be the file list for the overlay, some fields are not from the user
+    input.
 
     @param input_data (InputData): an InputData object
 
@@ -43,10 +45,24 @@ def _get_file_list_type_1(input_data):
     # TODO currently the path/file names do not include "Anom"
     variable = input_data.get_value(InputType.VARIABLE).split('Anom')[0]
 
+    spatial_representation = input_data.get_value(
+        InputType.SPATIAL_REPRESENTATION)
+    if spatial_representation == 'river_basin':
+        spatial_representation = 'river'
+    elif spatial_representation == 'admin_region':
+        spatial_representation = 'admin'
+    elif spatial_representation == 'country':
+        pass
+    else:
+        # we cannot rely on the input value as this file list may be for the
+        # overlay
+        spatial_representation = '25km'
+
     file_path = os.path.join(
         DATA_DIR,
-        input_data.get_value(InputType.DATA_SOURCE),
-        input_data.get_value(InputType.SPATIAL_REPRESENTATION),
+        DATA_SOURCE_PROB,
+        spatial_representation,
+        'uk',
         input_data.get_value(InputType.SCENARIO),
         'percentile',
         variable,
@@ -57,9 +73,8 @@ def _get_file_list_type_1(input_data):
 
     dataset_id = ('ukcp18-{data_source}-uk-{spatial_representation}-'
                   '{temporal_type}'.format(
-                      data_source=input_data.get_value(InputType.DATA_SOURCE),
-                      spatial_representation=input_data.get_value(
-                          InputType.SPATIAL_REPRESENTATION),
+                      data_source=DATA_SOURCE_PROB,
+                      spatial_representation=spatial_representation,
                       temporal_type=input_data.get_value(
                           InputType.TEMPORAL_AVERAGE_TYPE)))
 
