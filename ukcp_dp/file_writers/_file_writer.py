@@ -18,30 +18,43 @@ def write_file(cubes, title, output_data_file_path):
 
 def _write_csv_file(cube, title, output_data_file_path):
 
-    # assumption, the main dimension is time
-    dim_1_points = cube.coord('time').points
+    dim_coords = []
+    for dm in cube.dim_coords:
+        dim_coords.append(dm.var_name)
 
-    with open(output_data_file_path, 'w') as f:
-        f.write(title.replace('\n', ' '))
-        f.write('\n')
+    # an array for containing one line of data
+    line_out = [0] * len(dim_coords)
 
-        for dim_1_point in dim_1_points:
-            # TODO make 'time' dynamic ?
-            dim_1_cube = cube.extract(iris.Constraint(time=dim_1_point))
-            with iris.FUTURE.context(cell_datetime_objects=True):
-                f.write(str(dim_1_cube.coord('time').cell(0)))  # X
+    with open(output_data_file_path, 'w') as output_data_file:
+        # write the title
+        output_data_file.write(title.replace('\n', ' '))
+        output_data_file.write('\n')
 
-            for dim in dim_1_cube.coords(dim_coords=True):
-                for dim_2_point in dim_1_cube.coord(dim.name()).points:
-                    cube_1 = dim_1_cube.extract(
-                        iris.Constraint(
-                            coord_values={dim.name(): dim_2_point}))
-                    f.write(',')
-                    f.write(str(cube_1.data))  # Y
+        # write the header
+        output_data_file.write(','.join(dim_coords))
+        output_data_file.write(',')
+        output_data_file.write(cube.var_name)
+        output_data_file.write('\n')
 
-            f.write('\n')
-
+        for _slice in cube.slices_over(dim_coords[0]):
+            line_out[0] = str(_slice.coord(dim_coords[0]).points[0])
+            _write_dim_csv(
+                _slice, dim_coords[1:], line_out, 1, output_data_file)
+            output_data_file.write('\n')
     return
+
+
+def _write_dim_csv(cube, dim_coords, line_out, index, output_data_file):
+    for _slice in cube.slices_over(dim_coords[0]):
+        line_out[index] = str(_slice.coord(dim_coords[0]).points[0])
+        if len(dim_coords) > 1:
+            new_index = index + 1
+            _write_dim_csv(
+                _slice, dim_coords[1:], line_out, new_index, output_data_file)
+        else:
+            # write data
+            output_data_file.write(','.join(line_out))
+            output_data_file.write('\n')
 
 
 def _write_netcdf_file(cube, output_data_file_path):
