@@ -26,9 +26,13 @@ def _write_csv_file(cube, title, output_data_file_path):
     log.info('Writing data to csv file')
 
     # we need a list of the names of the dimensions
+    # use long names were available
     dim_names = []
     for dm in cube.dim_coords:
-        dim_names.append(dm.var_name)
+        if dm.long_name is not None:
+            dim_names.append(dm.long_name)
+        else:
+            dim_names.append(dm.var_name)
 
     # an array for containing one line of data
     # the '+ 1' is to allow for the variable
@@ -42,11 +46,11 @@ def _write_csv_file(cube, title, output_data_file_path):
         # write the header
         output_data_file.write(','.join(dim_names))
         output_data_file.write(',')
-        output_data_file.write(cube.var_name)
+        output_data_file.write(cube.long_name)
         output_data_file.write('\n')
 
         for _slice in cube.slices_over(dim_names[0]):
-            line_out[0] = str(_slice.coord(dim_names[0]).points[0])
+            line_out[0] = _get_value(_slice, dim_names)
             _write_dim_csv(
                 _slice, dim_names[1:], line_out, 1, output_data_file)
             output_data_file.write('\n')
@@ -57,7 +61,8 @@ def _write_dim_csv(cube, dim_names, line_out, index, output_data_file):
     # update the line_out for the current level in the dimensional hierarchy
     # then go down another level or add the data
     for _slice in cube.slices_over(dim_names[0]):
-        line_out[index] = str(_slice.coord(dim_names[0]).points[0])
+        line_out[index] = _get_value(_slice, dim_names)
+
         if len(dim_names) > 1:
             # descend to the next dimension
             new_index = index + 1
@@ -70,6 +75,14 @@ def _write_dim_csv(cube, dim_names, line_out, index, output_data_file):
             line_out[index + 1] = str(_slice.data)
             output_data_file.write(','.join(line_out))
             output_data_file.write('\n')
+
+
+def _get_value(_slice, dim_names):
+    if dim_names[0] == 'time':
+        with iris.FUTURE.context(cell_datetime_objects=True):
+            return str(_slice.coord(dim_names[0]).cell(0))
+    else:
+        return str(_slice.coord(dim_names[0]).points[0])
 
 
 def _write_netcdf_file(cube, output_data_file_path):
