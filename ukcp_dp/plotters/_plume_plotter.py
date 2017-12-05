@@ -2,8 +2,8 @@ from _graph_plotter import GraphPlotter
 import iris
 import iris.quickplot as qplt
 import matplotlib.pyplot as plt
-from matplotlib.transforms import Bbox
 from ukcp_dp.constants import DATA_SOURCE_PROB, InputType
+from ukcp_dp.data_extractor import get_probability_levels
 
 import logging
 log = logging.getLogger(__name__)
@@ -16,23 +16,21 @@ class PlumePlotter(GraphPlotter):
     This class extends BasePlotter with a _generate_graph(self, cube).
     """
 
-    def _generate_graph(self, cubes, fig, metadata_bbox):
+    def _generate_graph(self, cubes):
         """
         Override base class method.
 
         @param cubes (list(iris data cube)): a list of cubes containing the
             selected data
-        @param fig (matplotlib.figure.Figure)
-        @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
         log.debug('_generate_graph')
-        # Set the area below the metadata and allow room for the labels
-        fig.add_axes(Bbox([[0.07, 0.08], [0.99, metadata_bbox.y0 - 0.06]]))
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
+            # extract 10th, 50th and 90th percentiles
+            cube = get_probability_levels(cubes[0])
             # plot the percentiles
-            self._plot_probability_levels(cubes[0])
+            self._plot_probability_levels(cube)
 
         else:
             # plot the ensemble members

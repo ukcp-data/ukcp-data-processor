@@ -2,6 +2,7 @@ from _map_plotter import MapPlotter
 import iris
 import matplotlib.gridspec as gridspec
 from ukcp_dp.constants import DATA_SOURCE_PROB, InputType
+from ukcp_dp.data_extractor import get_probability_levels
 import ukcp_dp.ukcp_standard_plots.mapper as maps
 
 import logging
@@ -26,6 +27,11 @@ class ThreeMapPlotter(MapPlotter):
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
         log.debug('_generate_subplots')
+        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_PROB):
+            # extract 10th, 50th and 90th percentiles
+            cube = get_probability_levels(cube)
+
         gs_top = metadata_bbox.y0 - 0.06
         gs_left = 0.02
         gs_right = 0.98

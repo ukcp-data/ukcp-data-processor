@@ -1,12 +1,12 @@
-import cf_units
-import iris
-import iris.plot as iplt
-import iris.quickplot as qplt
 from ukcp_dp.constants import ANNUAL, DATA_SOURCE_PROB, InputType, \
     MONTHLY, SEASONAL, TEMP_ANOMS
 from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
     make_anomaly
 from ukcp_dp.vocab_manager import get_months, get_season_months
+import cf_units
+import iris
+import iris.plot as iplt
+import iris.quickplot as qplt
 
 import logging
 log = logging.getLogger(__name__)
@@ -74,8 +74,7 @@ class DataExtractor():
 
         elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
-            main_cube = self._get_cube(self.file_lists['main'],
-                                       show_probability_levels=True)
+            main_cube = self._get_cube(self.file_lists['main'])
 
         else:
             # we can use the values directly from the file
@@ -156,7 +155,7 @@ class DataExtractor():
 
         # show 10, 50 and 90 percentiles
         if (show_probability_levels is True):
-            cube = self._get_probability_levels(cube)
+            cube = get_probability_levels(cube)
 
         # generate an area constraint
         area_constraint = self._get_spatial_selector(
@@ -172,44 +171,36 @@ class DataExtractor():
                                 percent=[10, 50, 90])
         return result
 
-    def _get_probability_levels(self, cube):
-        # get a cube with the 10, 50 and 90 percentiles
-        percentile_cubes = iris.cube.CubeList()
-        percentile_cubes.append(cube.extract(iris.Constraint(percentile=10)))
-        percentile_cubes.append(cube.extract(iris.Constraint(percentile=50)))
-        percentile_cubes.append(cube.extract(iris.Constraint(percentile=90)))
-        return percentile_cubes.merge_cube()
-
     def _get_spatial_selector(self, resolution):
         # generate an area constraint
         area_constraint = None
 
         if self.input_data.get_area_type() == 'point':
             # coordinates are coming in as OSGB, x, y
-            half_grig_size = resolution / 2
+            half_grid_size = resolution / 2
             bng_x = self.input_data.get_area()[0]
             bng_y = self.input_data.get_area()[1]
             x_constraint = iris.Constraint(
                 projection_x_coordinate=lambda cell:
-                (bng_x - half_grig_size) <= cell < (bng_x + half_grig_size))
+                (bng_x - half_grid_size) <= cell < (bng_x + half_grid_size))
             y_constraint = iris.Constraint(
                 projection_y_coordinate=lambda cell:
-                (bng_y - half_grig_size) <= cell < (bng_y + half_grig_size))
+                (bng_y - half_grid_size) <= cell < (bng_y + half_grid_size))
             area_constraint = x_constraint & y_constraint
 
         elif self.input_data.get_area_type() == 'bbox':
             # coordinates are coming in as OSGB, w, s, e, n
-            half_grig_size = resolution / 2
+            half_grid_size = resolution / 2
             bng_w = self.input_data.get_area()[0]
             bng_s = self.input_data.get_area()[1]
             bng_e = self.input_data.get_area()[2]
             bng_n = self.input_data.get_area()[3]
             x_constraint = iris.Constraint(
                 projection_x_coordinate=lambda cell:
-                (bng_w - half_grig_size) <= cell < (bng_e + half_grig_size))
+                (bng_w - half_grid_size) <= cell < (bng_e + half_grid_size))
             y_constraint = iris.Constraint(
                 projection_y_coordinate=lambda cell:
-                (bng_s - half_grig_size) <= cell < (bng_n + half_grig_size))
+                (bng_s - half_grid_size) <= cell < (bng_n + half_grid_size))
             area_constraint = x_constraint & y_constraint
 
         elif (self.input_data.get_area_type() == 'admin_region' or
@@ -353,3 +344,16 @@ class DataExtractor():
             return int(resolution.split('km')[0]) * 1000
         except Exception:
             return
+
+
+def get_probability_levels(cube):
+    """
+    Extract a the 10, 50 and 90 percentiles from a cube.
+
+    @return a cube containing the 10, 50 and 90 percentiles
+    """
+    percentile_cubes = iris.cube.CubeList()
+    percentile_cubes.append(cube.extract(iris.Constraint(percentile=10)))
+    percentile_cubes.append(cube.extract(iris.Constraint(percentile=50)))
+    percentile_cubes.append(cube.extract(iris.Constraint(percentile=90)))
+    return percentile_cubes.merge_cube()

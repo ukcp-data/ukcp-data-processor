@@ -6,6 +6,15 @@ import logging
 log = logging.getLogger(__name__)
 
 
+# month and day
+MONTH_START_DATE = '0101'
+MONTH_END_DATE = '1201'
+SEASON_START_DATE = '12101'
+SEASON_END_DATE = '1130'
+
+VERSION = 'v20170331'
+
+
 def get_file_lists(input_data):
     """
     Get lists of files based on the data provided in the input data.
@@ -67,7 +76,7 @@ def _get_file_list_type_1(input_data):
         'percentile',
         variable,
         input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
-        'v20170331')
+        VERSION)
 
     file_list = []
 
@@ -78,17 +87,36 @@ def _get_file_list_type_1(input_data):
                       temporal_type=input_data.get_value(
                           InputType.TEMPORAL_AVERAGE_TYPE)))
 
+    if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'ann':
+        # current thinking is that there will only be one file, but I'm not
+        # sure of the date format yet
+        file_list.append(os.path.join(file_path, '*'))
+        return file_list
+
     for year in range(input_data.get_value(InputType.YEAR_MINIMUM),
                       (input_data.get_value(InputType.YEAR_MAXIMUM) + 1)):
+
+        if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
+            start_date = '{year}{mon_day}'.format(
+                year=year, mon_day=MONTH_START_DATE)
+            end_date = '{year}{mon_day}'.format(
+                year=year, mon_day=MONTH_END_DATE)
+        else:  # 'seas'
+            start_date = '{year}{mon_day}'.format(
+                year=year - 1, mon_day=SEASON_START_DATE)
+            end_date = '{year}{mon_day}'.format(
+                year=year, mon_day=SEASON_END_DATE)
+
         file_name = ('{variable}_{scenario}_{dataset_id}_'
-                     'percentile_{temporal_type}_{year}0101-'
-                     '{year}1201.nc'.format(
+                     'percentile_{temporal_type}_{start_data}-'
+                     '{end_date}.nc'.format(
                          variable=variable,
                          scenario=input_data.get_value(InputType.SCENARIO),
                          dataset_id=dataset_id,
                          temporal_type=input_data.get_value(
                              InputType.TEMPORAL_AVERAGE_TYPE),
-                         year=year))
+                         start_data=start_date,
+                         end_date=end_date))
         file_list.append(os.path.join(file_path, file_name))
 
     return file_list
@@ -129,7 +157,7 @@ def _get_file_list_for_ensemble(input_data, ensemble):
     # we need to use the variable root and calculate the anomaly later
     variable = input_data.get_value(InputType.VARIABLE).split('Anom')[0]
     file_name = ('{variable}_{scenario}_{dataset_id}_{ensemble}_'
-                 '{temporal_type}_19010101-21001201.nc'.format(
+                 '{temporal_type}_19000101-20991201.nc'.format(
                      variable=variable,
                      scenario=input_data.get_value(InputType.SCENARIO),
                      dataset_id=dataset_id,
@@ -147,7 +175,7 @@ def _get_file_list_for_ensemble(input_data, ensemble):
         ensemble,
         variable,
         input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
-        'v20170331',
+        VERSION,
         file_name)
 
     return file_path

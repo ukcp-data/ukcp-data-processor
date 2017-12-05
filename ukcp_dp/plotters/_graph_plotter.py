@@ -1,5 +1,6 @@
 from _base_plotter import BasePlotter
 import matplotlib.pyplot as plt
+from matplotlib.transforms import Bbox
 from ukcp_dp.constants import InputType
 import ukcp_dp.ukcp_standard_plots.plotting_general as plotgeneral
 
@@ -40,7 +41,10 @@ class GraphPlotter(BasePlotter):
                  fontsize=45, color='gray',
                  ha='center', va='center',  rotation=30, alpha=0.8)
 
-        self._generate_graph(cubes, fig, metadata_bbox)
+        # Set the area below the metadata and allow room for the labels
+        fig.add_axes(Bbox([[0.07, 0.08], [0.99, metadata_bbox.y0 - 0.06]]))
+
+        self._generate_graph(cubes)
 
         # Add the title
         fig.suptitle(title, fontsize='larger')
@@ -56,13 +60,11 @@ class GraphPlotter(BasePlotter):
         plotgeneral.end_figure(output_path)
         return
 
-    def _generate_graph(self, cubes, fig, metadata_bbox):
+    def _generate_graph(self, cubes):
         """
         This method should be overridden to produce the plots.
 
         @param cubes (list(iris data cube)): a list of cubes containing the
             selected data
-        @param fig (matplotlib.figure.Figure)
-        @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
         pass

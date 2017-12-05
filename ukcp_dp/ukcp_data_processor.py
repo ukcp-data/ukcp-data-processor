@@ -8,7 +8,8 @@ the entry point for this package.
 """
 
 from ukcp_dp._input_data import InputData
-from ukcp_dp.data_extractor import DataExtractor
+from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, PlotType
+from ukcp_dp.data_extractor import DataExtractor, get_probability_levels
 from ukcp_dp.file_finder import get_file_lists
 from ukcp_dp.file_writers import write_file
 from ukcp_dp.plotters import write_plot as plotter_write_plot
@@ -20,6 +21,7 @@ class UKCPDataProcessor(object):
     def __init__(self):
         self.cube = None
         self.input_data = None
+        self.plot_type = None
         self.validator = Validator()
         self.validated = False
 
@@ -76,6 +78,10 @@ class UKCPDataProcessor(object):
         """
         Generate a plot.
 
+        For some of the plot types not all of the data will be plotted, i.e.
+        where the 10th 50 and 90th percentiles are plotted. A subsequent call
+        to write_data_files will only write out the data used for the plot.
+
         @param plot_type (PlotType): the type of plot to generate
         @param output_path (str): the full path to the file
         @param title (str): optional. If a title is not provided one will be
@@ -89,6 +95,7 @@ class UKCPDataProcessor(object):
 
         plotter_write_plot(plot_type, output_path, self.input_data, self.cubes,
                            title)
+        self.plot_type = plot_type
 
         return
 
@@ -96,9 +103,28 @@ class UKCPDataProcessor(object):
         """
         Write the data to a file.
 
+        If a plot has been written that used a subset of the selected data then
+        only that subset will be written out. Subsequent calls will write all
+        of the selected data.
+
         @param output_data_file_path (str): the full path to the file
         """
         if self.cubes is None:
             self.select_data()
 
-        write_file(self.cubes, self.title, output_data_file_path)
+        cube = self.cubes[0]
+
+        # The data in the cube may contain more data than was used to make a
+        # plot. If the data has not been written out since the last plot then
+        # we may need to constrain it. Next time round all the data will be
+        # written.
+        if (self.plot_type is not None and
+            (self.plot_type == PlotType.PLUME_PLOT or
+             self.plot_type == PlotType.THREE_MAPS) and
+            (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_PROB)):
+            # extract 10th, 50th and 90th percentiles
+            cube = get_probability_levels(cube)
+            self.plot_type = None
+
+        write_file(cube, self.title, output_data_file_path)

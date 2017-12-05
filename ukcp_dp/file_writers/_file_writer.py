@@ -5,14 +5,14 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def write_file(cubes, title, output_data_file_path):
+def write_file(cube, title, output_data_file_path):
     _, file_extension = os.path.splitext(output_data_file_path)
 
     if file_extension == '.csv':
-        _write_csv_file(cubes[0], title, output_data_file_path)
+        _write_csv_file(cube, title, output_data_file_path)
 
     elif file_extension == '.nc':
-        _write_netcdf_file(cubes[0], output_data_file_path)
+        _write_netcdf_file(cube, output_data_file_path)
 
     else:
         raise Exception('Unknown file extension, {}, must be one of "csv" '
@@ -49,11 +49,7 @@ def _write_csv_file(cube, title, output_data_file_path):
         output_data_file.write(cube.long_name)
         output_data_file.write('\n')
 
-        for _slice in cube.slices_over(dim_names[0]):
-            line_out[0] = _get_value(_slice, dim_names)
-            _write_dim_csv(
-                _slice, dim_names[1:], line_out, 1, output_data_file)
-            output_data_file.write('\n')
+        _write_dim_csv(cube, dim_names, line_out, 0, output_data_file)
     return
 
 

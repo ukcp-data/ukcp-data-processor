@@ -80,6 +80,8 @@ DATA_SOURCE_PROB = 'land-prob'
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 
 # Plot types
-PlotType = enum(PLUME_PLOT='PLUME_PLOT',
+PlotType = enum(CDF_PLOT='CDF_PLOT',
+                PDF_PLOT='PDF_PLOT',
+                PLUME_PLOT='PLUME_PLOT',
                 POSTAGE_STAMP_MAPS='POSTAGE_STAMP_MAPS',
                 THREE_MAPS='THREE_MAPS')
