@@ -99,8 +99,8 @@ class BasePlotter():
 
         # now work out how to display the plot details
         count = len(plot_details)
-        if count > 5:
-            count = 5
+        if count > 6:
+            count = 6
 
         # unable to format the alignment of the column header, it is included
         # as a normal row
@@ -111,7 +111,7 @@ class BasePlotter():
             cell = [_wrap(plot_details[i],
                           self.input_data.get_value(InputType.FONT_SIZE))]
             try:
-                cell.append(_wrap(plot_details[i + 5],
+                cell.append(_wrap(plot_details[i + 6],
                                   self.input_data.get_value(
                                       InputType.FONT_SIZE)))
             except IndexError:
