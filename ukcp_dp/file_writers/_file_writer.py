@@ -6,6 +6,7 @@ log = logging.getLogger(__name__)
 
 
 def write_file(cube, title, output_data_file_path):
+    log.debug(cube)
     _, file_extension = os.path.splitext(output_data_file_path)
 
     if file_extension == '.csv':

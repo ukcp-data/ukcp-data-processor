@@ -9,8 +9,8 @@ log = logging.getLogger(__name__)
 # month and day
 MONTH_START_DATE = '0101'
 MONTH_END_DATE = '1201'
-SEASON_START_DATE = '12101'
-SEASON_END_DATE = '1130'
+SEASON_START_DATE = '1201'
+SEASON_END_DATE = '1101'
 
 VERSION = 'v20170331'
 

@@ -70,7 +70,16 @@ class DataExtractor():
             # there should be only one time coord
             cube_climatology = cube_climatology.extract(
                 iris.Constraint(time=cube_climatology.coord('time').points[0]))
+
+            for coord in ['month', 'month_number', 'season']:
+                try:
+                    cube_climatology.remove_coord(coord)
+                except iris.exceptions.CoordinateNotFoundError:
+                    pass
+
             main_cube = make_anomaly(cube_absoute, cube_climatology)
+            main_cube.attributes['baseline'] = self.input_data.get_value(
+                InputType.BASELINE)
 
         elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
@@ -238,10 +247,8 @@ class DataExtractor():
                     break
 
         elif temporal_average_type == SEASONAL:
-            months = get_season_months(
-                self.input_data.get_value(InputType.TIME_PERIOD))
             temporal_constraint = iris.Constraint(
-                time=lambda t: t.point.month in months)
+                clim_season=self.input_data.get_value(InputType.TIME_PERIOD))
 
         else:
             raise Exception(
