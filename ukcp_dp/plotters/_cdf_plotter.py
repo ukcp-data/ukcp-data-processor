@@ -26,8 +26,10 @@ class CdfPlotter(GraphPlotter):
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
+            cube = cubes[0]
+            cube.data.sort()
             # plot the percentiles
-            qplt.plot(cubes[0], cubes[0].dim_coords[0])
+            qplt.plot(cube, cube.dim_coords[0])
 
         # clear the title field
         plt.title('')
