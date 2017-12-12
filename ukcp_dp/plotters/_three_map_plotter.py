@@ -1,8 +1,6 @@
 from _map_plotter import MapPlotter
 import iris
 import matplotlib.gridspec as gridspec
-from ukcp_dp.constants import DATA_SOURCE_PROB, InputType
-from ukcp_dp.data_extractor import get_probability_levels
 import ukcp_dp.ukcp_standard_plots.mapper as maps
 
 import logging
@@ -21,16 +19,12 @@ class ThreeMapPlotter(MapPlotter):
         """
         Override base class method.
 
-        @param cube (iris data cube): a cube containing the selected data
+        @param cube (iris cube): a cube containing the selected data
         @param plotsettings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
         log.debug('_generate_subplots')
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_PROB):
-            # extract 10th, 50th and 90th percentiles
-            cube = get_probability_levels(cube)
 
         gs_top = metadata_bbox.y0 - 0.06
         gs_left = 0.02
@@ -51,17 +45,14 @@ class ThreeMapPlotter(MapPlotter):
 
         bar_gs.update(top=0.23, bottom=0.08, left=gs_left, right=gs_right)
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_PROB):
-            slice_string = 'percentile'
-        else:
-            slice_string = 'percentile_over_Ensemble member'
-
-        for i, percentile_slice in enumerate(cube.slices_over(slice_string)):
-            title = '{}th Percentile'.format(int(
-                percentile_slice.coord(slice_string).points[0]))
+        # extract 10th, 50th and 90th percentiles
+        percentiles = [10, 50, 90]
+        for i, percentile in enumerate(percentiles):
+            percentile_cube = cube.extract(
+                iris.Constraint(percentile=percentile))
+            title = '{}th Percentile'.format(percentile)
             result = self._add_sub_plot(
-                fig, grid[i], plotsettings, title, percentile_slice)
+                fig, grid[i], plotsettings, title, percentile_cube)
 
         # add the sub plot to contain the bar
         ax = fig.add_subplot(bar_grid)

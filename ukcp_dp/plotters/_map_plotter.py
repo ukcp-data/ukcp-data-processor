@@ -13,16 +13,14 @@ class MapPlotter(BasePlotter):
     _generate_map(self, cube, plotsettings, fig) method to plot the map.
     """
 
-    def _generate_plot(self, cubes, output_path, title):
+    def _generate_plot(self, output_path, title):
         """
         Override base class method.
 
-        @param cubes (list(iris data cube)): a list of cubes containing the
-            selected data
         @param output_path (str): the full path to the file
         @param title (str): a title for the plot
         """
-        cube = cubes[0]
+        cube = self.cube_list[0]
 
         plotsettings = self._get_plot_settings(
             self.input_data.get_value(InputType.IMAGE_SIZE),
@@ -65,7 +63,7 @@ class MapPlotter(BasePlotter):
         """
         This method should be overridden to produce the sub-plots.
 
-        @param cube (iris data cube): a cube containing the selected data
+        @param cube (iris cube): a cube containing the selected data
         @param plotsettings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
@@ -77,7 +75,7 @@ class MapPlotter(BasePlotter):
         Return True if the range of the x coordinates is larger than the range
         of the y coordinates.
 
-        @param cube (iris data cube): a cube containing the selected data
+        @param cube (iris cube): a cube containing the selected data
 
         @return a boolean, True if orientation is landscape
         """

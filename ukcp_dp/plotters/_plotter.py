@@ -6,14 +6,15 @@ from _three_map_plotter import ThreeMapPlotter
 from ukcp_dp.constants import PlotType
 
 
-def write_plot(plot_type, output_path, input_data, cubes, title):
+def write_plot(plot_type, output_path, input_data, cube_list, overlay_cube,
+               title):
     """
     Generate a plot based on the plot type.
 
     @param plot_type (PlotType): the type of plot to generate
     @param output_path (str): the full path to the file
     @param input_data (InputData): an object containing user defined values
-    @param cubes (list(iris data cube)): a list of cubes containing the
+    @param cubes (list(iris cube)): a list of cubes containing the
         selected data
     @param title (str): a title for the plot
     """
@@ -31,6 +32,7 @@ def write_plot(plot_type, output_path, input_data, cubes, title):
     else:
         raise Exception('Invalid plot type: {}'.format(plot_type))
 
-    plotter.generate_plot(input_data, cubes, output_path, title)
+    plotter.generate_plot(input_data, cube_list, overlay_cube, output_path,
+                          title)
 
     return

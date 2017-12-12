@@ -20,28 +20,31 @@ class BasePlotter():
     the data.
     """
 
-    def generate_plot(self, input_data, cubes, output_path, title):
+    def generate_plot(self, input_data, cube_list, overlay_cube, output_path,
+                      title):
         """
         Generate a plot.
 
         @param input_data (InputData): an object containing user defined values
-        @param cubes (list(iris data cube)): a list of cubes containing the
+        @param cube_list (iris cube list): a list of cubes containing the
             selected data
+        @param overlay_cube (iris cube): a cube containing the data for
+            the overlay
         @param output_path (str): the full path to the file
         @param title (str): a title for the plot
         """
         log.info('generate_plot')
         # an object containing user defined values
         self.input_data = input_data
+        self.cube_list = cube_list
+        self.overlay_cube = overlay_cube
 
-        self._generate_plot(cubes, output_path, title)
+        self._generate_plot(output_path, title)
 
-    def _generate_plot(self, cubes, output_path, title):
+    def _generate_plot(self, output_path, title):
         """
         This method should be overridden to produce the plots.
 
-        @param cubes (list(iris data cube)): a list of cubes containing the
-            selected data
         @param output_path (str): the full path to the file
         @param title (str): a title for the plot
         """

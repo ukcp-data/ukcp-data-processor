@@ -15,21 +15,20 @@ class CdfPlotter(GraphPlotter):
     This class extends BasePlotter with a _generate_graph(self, cube).
     """
 
-    def _generate_graph(self, cubes):
+    def _generate_graph(self):
         """
         Override base class method.
 
-        @param cubes (list(iris data cube)): a list of cubes containing the
-            selected data
         """
         log.debug('_generate_graph')
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
-            cube = cubes[0]
-            cube.data.sort()
-            # plot the percentiles
-            qplt.plot(cube, cube.dim_coords[0])
+
+            for scenario_cube in self.cube_list:
+                scenario_cube.data.sort()
+                # plot the percentiles
+                qplt.plot(scenario_cube, scenario_cube.dim_coords[0])
 
         # clear the title field
         plt.title('')

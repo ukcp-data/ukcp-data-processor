@@ -14,12 +14,10 @@ class GraphPlotter(BasePlotter):
     _generate_graph(self, cubes) method to plot the map.
     """
 
-    def _generate_plot(self, cubes, output_path, title):
+    def _generate_plot(self, output_path, title):
         """
         Override base class method.
 
-        @param cubes (list(iris data cube)): a list of cubes containing the
-            selected data
         @param output_path (str): the full path to the file
         @param title (str): a title for the plot
         """
@@ -44,7 +42,7 @@ class GraphPlotter(BasePlotter):
         # Set the area below the metadata and allow room for the labels
         fig.add_axes(Bbox([[0.07, 0.08], [0.99, metadata_bbox.y0 - 0.06]]))
 
-        self._generate_graph(cubes)
+        self._generate_graph()
 
         # Add the title
         fig.suptitle(title, fontsize='larger')
@@ -60,11 +58,9 @@ class GraphPlotter(BasePlotter):
         plotgeneral.end_figure(output_path)
         return
 
-    def _generate_graph(self, cubes):
+    def _generate_graph(self):
         """
         This method should be overridden to produce the plots.
 
-        @param cubes (list(iris data cube)): a list of cubes containing the
-            selected data
         """
         pass

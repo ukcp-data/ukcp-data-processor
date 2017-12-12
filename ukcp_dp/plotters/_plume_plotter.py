@@ -3,7 +3,6 @@ import iris
 import iris.quickplot as qplt
 import matplotlib.pyplot as plt
 from ukcp_dp.constants import DATA_SOURCE_PROB, InputType
-from ukcp_dp.data_extractor import get_probability_levels
 
 import logging
 log = logging.getLogger(__name__)
@@ -16,41 +15,37 @@ class PlumePlotter(GraphPlotter):
     This class extends BasePlotter with a _generate_graph(self, cube).
     """
 
-    def _generate_graph(self, cubes):
+    def _generate_graph(self):
         """
         Override base class method.
 
-        @param cubes (list(iris data cube)): a list of cubes containing the
-            selected data
         """
         log.debug('_generate_graph')
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
-            # extract 10th, 50th and 90th percentiles
-            cube = get_probability_levels(cubes[0])
             # plot the percentiles
-            self._plot_probability_levels(cube)
+            self._plot_probability_levels(self.cube_list[0])
 
         else:
             # plot the ensemble members
-            self._plot_ensemble(cubes[0])
+            self._plot_ensemble(self.cube_list[0])
 
-        try:
+        if self.overlay_cube is not None:
             # add overlay
-            self._plot_probability_levels(cubes[1])
-        except IndexError:
-            # no overlay
-            pass
+            self._plot_probability_levels(self.overlay_cube)
 
         # clear the title field
         plt.title('')
 
     def _plot_probability_levels(self, cube):
-        for percentile_slice in cube.slices_over('percentile'):
-            label = '{}th Percentile'.format(int(
-                percentile_slice.coord('percentile').points[0]))
-            qplt.plot(percentile_slice, label=label)
+        # extract 10th, 50th and 90th percentiles
+        percentiles = [10, 50, 90]
+        for percentile in percentiles:
+            percentile_cube = cube.extract(
+                iris.Constraint(percentile=percentile))
+            label = '{}th Percentile'.format(percentile)
+            qplt.plot(percentile_cube, label=label)
 
     def _plot_ensemble(self, cube):
         highlighted_ensemble_members = self.input_data.get_value(

@@ -108,7 +108,8 @@ class InputData(object):
             raise Exception("Unknown {value_type}: None.".format(
                 value_type=value_type))
 
-        values = [] + values
+        if not isinstance(values, list):
+            values = [values]
         if value_type in self.allowed_values.keys():
             for value in values:
 

@@ -18,7 +18,7 @@ class PostageStampMapPlotter(MapPlotter):
         """
         Override base class method.
 
-        @param cube (iris data cube): a cube containing the selected data
+        @param cube (iris cube): a cube containing the selected data
         @param plotsettings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
@@ -103,9 +103,10 @@ class PostageStampMapPlotter(MapPlotter):
                                             ax=ax, barlab=None,
                                             bar_orientation="none",
                                             outfnames=None)
-            # TODO this should come directly from the file
+            # TODO need a better way to generate the title
             # add a title
-            title = 'r1i1p{n}'.format(n=i + 1)
+            title = 'r1i1p{n}'.format(
+                n=int(ensemble.coord('Ensemble member').points[0] + 1))
             ax.set_title(title)
 
         # add the sub plot to contain the bar

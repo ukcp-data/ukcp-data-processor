@@ -15,9 +15,9 @@ COLLECTION_LABELS = {
     'image_format': 'Image Format',
     'image_size': 'Image Size',
     'legend_position': 'Legend Position',
+    'overlay_probability_levels': 'Overlay Probability Levels',
     'scenario': 'Scenario',
     'show_boundaries': 'Show Boundaries',
-    'show_probability_levels': 'Show Probability Levels',
     'spatial_representation': 'Spatial Representation',
     'temporal_average_type': 'Temporal Average Type',
     'time_period': 'Time Period',
@@ -214,7 +214,7 @@ VOCAB = {'data_source': {
             'north_east_scotland': 'North East Scotland',
             'anglian': 'Anglian'
             },
-         'extract_percentiles': {
+         'convert_to_percentiles': {
             True: 'True',
             False: 'False'
             },
@@ -254,7 +254,7 @@ VOCAB = {'data_source': {
          'year': _get_range(1900, 2101),
          'year_minimum': _get_range(1900, 2101),
          'year_maximum': _get_range(1900, 2101),
-         'show_probability_levels': {
+         'overlay_probability_levels': {
             True: 'True',
             False: 'False'
             },
@@ -277,13 +277,6 @@ MONTHS = [
     'nov',
     'dec'
 ]
-
-SEASON_MONTHS = {
-    'djf': [12, 1, 2],
-    'mam': [3, 4, 5],
-    'jja': [6, 6, 8],
-    'son': [9, 10, 11]
-}
 
 ENSEMBLE_MEMBER_SET = {
     'land-gcm': ['r1i1p1', 'r1i1p2', 'r1i1p3', 'r1i1p4', 'r1i1p5', 'r1i1p6',
@@ -372,20 +365,6 @@ def get_months():
     @return a list of strings representing the months
     """
     return MONTHS
-
-
-def get_season_months(season):
-    """
-    Get a list of ints representing he months in a season.
-
-    @param season (str) the season represented as 'djf', 'mam' etc.
-
-    @return a list of ints
-    """
-    try:
-        return SEASON_MONTHS[season]
-    except KeyError:
-        return
 
 
 def get_ensemble_member_set(data_source):

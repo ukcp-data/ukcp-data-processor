@@ -2,7 +2,7 @@ from ukcp_dp.constants import ANNUAL, DATA_SOURCE_PROB, InputType, \
     MONTHLY, SEASONAL, TEMP_ANOMS
 from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
     make_anomaly
-from ukcp_dp.vocab_manager import get_months, get_season_months
+from ukcp_dp.vocab_manager import get_months
 import cf_units
 import iris
 import iris.plot as iplt
@@ -29,102 +29,131 @@ class DataExtractor():
         """
         self.file_lists = file_lists
         self.input_data = input_data
-        self.cubes = self._get_cubes()
+        self.cubes = self._get_main_cubes()
+        self.overlay_cube = self._get_overlay_cube()
 
     def get_cubes(self):
         """
-        Get a list of iris data cubes based on the given files and using
-        selection criteria from the input_data.
-        If requested, the second cube will be the 10, 50 and 90 percentiles.
+        Get an iris cube list.
 
-        @return a list of iris data cubes
+        The data are based on the selection criteria from the input_data.
+
+        @return an iris cube list
         """
         log.info('get_cubes')
         return self.cubes
 
-    def _get_cubes(self):
+    def get_overlay_cube(self):
         """
-        Get a list of iris data cubes based from the given files using
-        selection criteria from the input_data.
+        Get an iris cube for the overlay data.
+
+        The data are based on the selection criteria from the input_data. The
+        cube will contain the 10th, 50th and 90th percentiles.
+
+        @return an iris cube, may be 'None'
+        """
+        return self.overlay_cube
+
+    def _get_main_cubes(self):
+        """
+        Get an iris cube list based on the given files and using selection
+        criteria from the input_data.
+
         If the variable type is an anomaly then then a climatology may be need
         to be produced in order to generate the anomalies.
-        If requested, the second cube will be the 10, 50 and 90 percentiles.
 
-        @return an iris data cube
+        @return an iris cube list containing the main data
         """
-        cubes = []
-
         variable = self.input_data.get_value(InputType.VARIABLE)
-        if (variable.endswith('Anom') and
-                self.input_data.get_value(InputType.DATA_SOURCE) !=
-                DATA_SOURCE_PROB):
-            # anomalies have been selected for something other than LS1,
-            # therefore we need to calculate the climatology using the baseline
-            # and then the anomalies
-            cube_absoute = self._get_cube(self.file_lists['main'])
-            cube_baseline = self._get_cube(
-                self.file_lists['main'], baseline=True)
-            cube_climatology = make_climatology(
-                cube_baseline, climtype=self.input_data.get_value_label(
-                    InputType.TEMPORAL_AVERAGE_TYPE).lower())
-            # there should be only one time coord
-            cube_climatology = cube_climatology.extract(
-                iris.Constraint(time=cube_climatology.coord('time').points[0]))
+        cubes = iris.cube.CubeList()
 
-            for coord in ['month', 'month_number', 'season']:
-                try:
-                    cube_climatology.remove_coord(coord)
-                except iris.exceptions.CoordinateNotFoundError:
-                    pass
+        for file_list in self.file_lists['main']:
 
-            main_cube = make_anomaly(cube_absoute, cube_climatology)
-            main_cube.attributes['baseline'] = self.input_data.get_value(
-                InputType.BASELINE)
+            if (variable.endswith('Anom') and
+                    self.input_data.get_value(InputType.DATA_SOURCE) !=
+                    DATA_SOURCE_PROB):
+                cube = self._get_anomaly_cube(file_list)
 
-        elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_PROB):
-            main_cube = self._get_cube(self.file_lists['main'])
+            else:
+                # we can use the values directly from the file
+                cube = self._get_cube(file_list)
 
-        else:
-            # we can use the values directly from the file
-            main_cube = self._get_cube(self.file_lists['main'])
+            # do we need to convert percentiles?
+            if self.input_data.get_value(InputType.CONVERT_TO_PERCENTILES):
+                cube = (self._convert_to_percentiles_from_ensembles(cube))
 
-        if self.input_data.get_value(InputType.EXTRACT_PERCENTILES):
-            cubes.append(self._extract_percentiles(main_cube))
-        else:
-            cubes.append(main_cube)
-
-        if variable in TEMP_ANOMS:
-            # this in an anomaly so set the units to Celsius, otherwise they
-            # will get converted later and that would be bad
-            cubes[0].units = cf_units.Unit("Celsius")
-            log.debug('updated cube units to Celsius')
-
-        # show 10, 50 and 90 percentiles?
-        if (self.input_data.get_value(InputType.DATA_SOURCE) !=
-                DATA_SOURCE_PROB and
-            self.input_data.get_value(InputType.SHOW_PROBABILITY_LEVELS) is
-                True):
-            cubes.append(self._get_cube(
-                self.file_lists['overlay'], show_probability_levels=True))
             if variable in TEMP_ANOMS:
-                cubes[1].units = cf_units.Unit("Celsius")
+                # this in an anomaly so set the units to Celsius, otherwise
+                # they will get converted later and that would be bad
+                cube.units = cf_units.Unit("Celsius")
+                log.debug('updated cube units to Celsius')
+
+            cubes.append(cube)
 
         return cubes
 
-    def _get_cube(self, file_list, baseline=False,
-                  show_probability_levels=False):
+    def _get_anomaly_cube(self, file_list):
+        # anomalies have been selected for something other than LS1,
+        # therefore we need to calculate the climatology using the
+        # baseline and then the anomalies
+        cube_absoute = self._get_cube(file_list)
+        cube_baseline = self._get_cube(file_list, baseline=True)
+        cube_climatology = make_climatology(
+            cube_baseline, climtype=self.input_data.get_value_label(
+                InputType.TEMPORAL_AVERAGE_TYPE).lower())
+        # there should be only one time coord
+        cube_climatology = cube_climatology.extract(iris.Constraint(
+            time=cube_climatology.coord('time').points[0]))
+
+        # we need to remove these to be able to make the anomaly
+        for coord in ['month', 'month_number', 'season']:
+            try:
+                cube_climatology.remove_coord(coord)
+            except iris.exceptions.CoordinateNotFoundError:
+                pass
+
+        cube_anomaly = make_anomaly(cube_absoute, cube_climatology)
+        # add the attributes back in and add info about the baseline
+        cube_anomaly.attributes = cube_absoute.attributes
+        cube_anomaly.attributes['baseline_period'] = (
+            self.input_data.get_value(InputType.BASELINE))
+
+        return cube_anomaly
+
+    def _get_overlay_cube(self):
         """
-        Get an iris data cube based on the given files using selection
-        criteria from the input_data.
+        Get an iris cube based on the given files and using selection criteria
+        from the input_data.
+
+        The cube produced containing the 10th, 50th and 90th percentiles.
+
+        @return an iris cube, maybe 'None'
+        """
+        variable = self.input_data.get_value(InputType.VARIABLE)
+        overlay_cube = None
+        if (self.input_data.get_value(InputType.DATA_SOURCE) !=
+                DATA_SOURCE_PROB and
+            self.input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is
+                True):
+            overlay_cube = (self._get_cube(
+                self.file_lists['overlay'], overlay_probability_levels=True))
+            if variable in TEMP_ANOMS:
+                overlay_cube.units = cf_units.Unit("Celsius")
+        return overlay_cube
+
+    def _get_cube(self, file_list, baseline=False,
+                  overlay_probability_levels=False):
+        """
+        Get an iris cube based on the given files using selection criteria
+        from the input_data.
 
         @param file_list (list[str]): a list of file name to retrieve data from
-        @param show_probability_levels (boolean): if True only include the
+        @param baseline (boolean): if True calculate the baseline data
+        @param overlay_probability_levels (boolean): if True only include the
             10th, 50th and 90th percentile data
 
-        @return an iris data cube
+        @return an iris cube
         """
-
         # Load the cubes based on the variable
         if self.input_data.get_value(InputType.VARIABLE).startswith('pr'):
             cubes = iris.load(file_list, ["precipitation rate"])
@@ -135,15 +164,17 @@ class DataExtractor():
                 "Unknown variable: {}.".format(self.input_data.get_value(
                     InputType.VARIABLE)))
 
-        # Hack as ensemble_member is included as a attribute and coordinate
-        ENSEMBLE_MEMBER = 'ensemble_member'
-        for cube in cubes:
-            try:
-                del cube.metadata.attributes[ENSEMBLE_MEMBER]
-            except KeyError:
-                pass
+        # Remove attribute ensemble_member_id to allow us to merge cubes
+        if (self.input_data.get_value(InputType.DATA_SOURCE) !=
+                DATA_SOURCE_PROB):
+            for cube in cubes:
+                try:
+                    del cube.metadata.attributes['ensemble_member_id']
+                except KeyError:
+                    pass
 
         cubes = iris.cube.CubeList(cubes)
+
         cube = cubes.concatenate_cube()
 
         if baseline is True:
@@ -162,8 +193,8 @@ class DataExtractor():
             with iris.FUTURE.context(cell_datetime_objects=True):
                 cube = cube.extract(temporal_constraint)
 
-        # show 10, 50 and 90 percentiles
-        if (show_probability_levels is True):
+        # extract 10, 50 and 90 percentiles
+        if (overlay_probability_levels is True):
             cube = get_probability_levels(cube)
 
         # generate an area constraint
@@ -174,10 +205,12 @@ class DataExtractor():
 
         return cube
 
-    def _extract_percentiles(self, cube):
+    def _convert_to_percentiles_from_ensembles(self, cube):
         # generate the 10th,50th and 90th percentiles for the ensembles
         result = cube.collapsed('Ensemble member', iris.analysis.PERCENTILE,
                                 percent=[10, 50, 90])
+        result.coord(
+            'percentile_over_Ensemble member').long_name = 'percentile'
         return result
 
     def _get_spatial_selector(self, resolution):
@@ -291,6 +324,7 @@ class DataExtractor():
 
         @return a str containing the title
         """
+#         return ''
         if (self.input_data.get_value(
                 InputType.TEMPORAL_AVERAGE_TYPE) == ANNUAL
                 or self.input_data.get_value(InputType.TIME_PERIOD) == 'all'):

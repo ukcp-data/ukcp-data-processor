@@ -14,13 +14,15 @@ from ukcp_dp.file_finder import get_file_lists
 from ukcp_dp.file_writers import write_file
 from ukcp_dp.plotters import write_plot as plotter_write_plot
 from ukcp_dp.validator import Validator
+from iris.cube import CubeList
 
 
 class UKCPDataProcessor(object):
 
     def __init__(self):
-        self.cube = None
+        self.cube_list = None
         self.input_data = None
+        self.overlay_cube = None
         self.plot_type = None
         self.validator = Validator()
         self.validated = False
@@ -60,9 +62,9 @@ class UKCPDataProcessor(object):
 
     def select_data(self):
         """
-        Use the data set via 'set_inputs' to generate an iris data cube.
+        Use the data set via 'set_inputs' to generate an iris cube list.
 
-        @return an iris data cube
+        @return an iris cube list
         """
         if self.validated is False:
             self.validate_inputs()
@@ -70,9 +72,9 @@ class UKCPDataProcessor(object):
         file_lists = get_file_lists(self.input_data)
         data_extractor = DataExtractor(file_lists, self.input_data)
         self.title = data_extractor.get_title()
-        self.cubes = data_extractor.get_cubes()
-
-        return self.cubes
+        self.cube_list = data_extractor.get_cubes()
+        self.overlay_cube = data_extractor.get_overlay_cube()
+        return self.cube_list
 
     def write_plot(self, plot_type, output_path, title=None):
         """
@@ -87,14 +89,14 @@ class UKCPDataProcessor(object):
         @param title (str): optional. If a title is not provided one will be
             generated.
         """
-        if self.cubes is None:
+        if self.cube_list is None:
             self.select_data()
 
         if title is None:
             title = self.title
 
-        plotter_write_plot(plot_type, output_path, self.input_data, self.cubes,
-                           title)
+        plotter_write_plot(plot_type, output_path, self.input_data,
+                           self.cube_list, self.overlay_cube, title)
         self.plot_type = plot_type
 
         return
@@ -109,10 +111,10 @@ class UKCPDataProcessor(object):
 
         @param output_data_file_path (str): the full path to the file
         """
-        if self.cubes is None:
+        if self.cube_list is None:
             self.select_data()
 
-        cube = self.cubes[0]
+        cubes = self.cube_list
 
         # The data in the cube may contain more data than was used to make a
         # plot. If the data has not been written out since the last plot then
@@ -123,8 +125,10 @@ class UKCPDataProcessor(object):
              self.plot_type == PlotType.THREE_MAPS) and
             (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB)):
-            # extract 10th, 50th and 90th percentiles
-            cube = get_probability_levels(cube)
+            cubes = CubeList()
+            for cube in self.cube_list:
+                # extract 10th, 50th and 90th percentiles
+                cubes.append(get_probability_levels(cube))
             self.plot_type = None
 
-        write_file(cube, self.title, output_data_file_path)
+        write_file(cubes, self.title, output_data_file_path)

@@ -9,8 +9,8 @@ class Validator():
         log.debug('validate')
         self.input_data = input_data
         self._validate_spatial_rep()
-        self._validate_extract_percentiles()
-        self._validate_show_probability_levels()
+        self._validate_convert_to_percentiles()
+        self._validate_overlay_probability_levels()
         self._validate_time_slice()
         self._validate_boundary_overlay()
         self._validate_highlighted_ensemble_members()
@@ -44,31 +44,32 @@ class Validator():
                     InputType.SPATIAL_REPRESENTATION,
                     self.input_data.get_area_type())
 
-    def _validate_extract_percentiles(self):
+    def _validate_convert_to_percentiles(self):
         try:
-            extract_percentiles = self.input_data.get_value(
-                InputType.EXTRACT_PERCENTILES)
-            if not isinstance(extract_percentiles, bool):
+            convert_to_percentiles = self.input_data.get_value(
+                InputType.CONVERT_TO_PERCENTILES)
+            if not isinstance(convert_to_percentiles, bool):
                 raise Exception("Invalid {value_type}: {value}.".format(
-                    value_type=InputType.EXTRACT_PERCENTILES,
-                    value=extract_percentiles))
+                    value_type=InputType.CONVERT_TO_PERCENTILES,
+                    value=convert_to_percentiles))
 
         except KeyError:
             # Not set, lets be kind and set it to False
-            self.input_data.set_value(InputType.EXTRACT_PERCENTILES, False)
+            self.input_data.set_value(InputType.CONVERT_TO_PERCENTILES, False)
 
-    def _validate_show_probability_levels(self):
+    def _validate_overlay_probability_levels(self):
         try:
-            show_probability_levels = self.input_data.get_value(
-                InputType.SHOW_PROBABILITY_LEVELS)
-            if not isinstance(show_probability_levels, bool):
+            overlay_probability_levels = self.input_data.get_value(
+                InputType.OVERLAY_PROBABILITY_LEVELS)
+            if not isinstance(overlay_probability_levels, bool):
                 raise Exception("Invalid {value_type}: {value}.".format(
-                    value_type=InputType.SHOW_PROBABILITY_LEVELS,
-                    value=show_probability_levels))
+                    value_type=InputType.OVERLAY_PROBABILITY_LEVELS,
+                    value=overlay_probability_levels))
 
         except KeyError:
             # Not set, lets be kind and set it to False
-            self.input_data.set_value(InputType.SHOW_PROBABILITY_LEVELS, False)
+            self.input_data.set_value(
+                InputType.OVERLAY_PROBABILITY_LEVELS, False)
 
     def _validate_time_slice(self):
         try:
