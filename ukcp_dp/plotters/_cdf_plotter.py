@@ -12,7 +12,7 @@ class CdfPlotter(GraphPlotter):
     """
     The cdf plotter class.
 
-    This class extends BasePlotter with a _generate_graph(self, cube).
+    This class extends BasePlotter with a _generate_graph(self).
     """
 
     def _generate_graph(self):
@@ -27,8 +27,8 @@ class CdfPlotter(GraphPlotter):
 
             for scenario_cube in self.cube_list:
                 scenario_cube.data.sort()
-                # plot the percentiles
-                qplt.plot(scenario_cube, scenario_cube.dim_coords[0])
+                qplt.plot(scenario_cube, scenario_cube.dim_coords[0],
+                          label=scenario_cube.attributes['scenario'])
 
         # clear the title field
         plt.title('')
