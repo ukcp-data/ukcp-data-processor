@@ -78,8 +78,7 @@ ANNUAL = 'ann'
 
 DATA_SOURCE_PROB = 'land-prob'
 
-DATA_DIR = '/fakedata/ukcp18/data'
-# DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
+DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 
 # Plot types
 PlotType = enum(CDF_PLOT='CDF_PLOT',
