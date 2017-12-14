@@ -44,6 +44,10 @@ class PlumePlotter(GraphPlotter):
         for percentile in percentiles:
             percentile_cube = cube.extract(
                 iris.Constraint(percentile=percentile))
+            if percentile_cube is None:
+                raise Exception(
+                    'Attempted to plot the {}th percentile, but no data found'.
+                    format(percentile))
             label = '{}th Percentile'.format(percentile)
             qplt.plot(percentile_cube, label=label)
 
