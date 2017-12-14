@@ -51,6 +51,10 @@ class ThreeMapPlotter(MapPlotter):
             percentile_cube = cube.extract(
                 iris.Constraint(percentile=percentile))
             title = '{}th Percentile'.format(percentile)
+            if percentile_cube is None:
+                raise Exception(
+                    'Attempted to plot the {}th percentile, but no data found'.
+                    format(percentile))
             result = self._add_sub_plot(
                 fig, grid[i], plotsettings, title, percentile_cube)
 
@@ -69,8 +73,6 @@ class ThreeMapPlotter(MapPlotter):
                                         ax=ax, barlab=None,
                                         bar_orientation="none",
                                         outfnames=None)
-        # TODO this should come directly from the file
-        # add a title
         ax.set_title(title)
 
         return result
