@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 MONTH_START_DATE = '0101'
 MONTH_END_DATE = '1201'
 SEASON_START_DATE = '1201'
-SEASON_END_DATE = '1101'
+SEASON_END_DATE = '1130'
 
 VERSION = 'v20170331'
 
@@ -61,8 +61,7 @@ def _get_land_prob_file_list(input_data):
 
     @return a list of lists of files, including their full paths
     """
-    # TODO currently the path/file names do not include "Anom"
-    variable = input_data.get_value(InputType.VARIABLE).split('Anom')[0]
+    variable = input_data.get_value(InputType.VARIABLE)
 
     spatial_representation = _get_land_prob_spatial_representation(input_data)
 
