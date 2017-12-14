@@ -90,6 +90,8 @@ class DataExtractor():
 
             cubes.append(cube)
 
+        log.debug(cubes)
+
         return cubes
 
     def _get_anomaly_cube(self, file_list):
@@ -97,26 +99,36 @@ class DataExtractor():
         # therefore we need to calculate the climatology using the
         # baseline and then the anomalies
         cube_absoute = self._get_cube(file_list)
+
         cube_baseline = self._get_cube(file_list, baseline=True)
+
         cube_climatology = make_climatology(
             cube_baseline, climtype=self.input_data.get_value_label(
                 InputType.TEMPORAL_AVERAGE_TYPE).lower())
-        # there should be only one time coord
-        cube_climatology = cube_climatology.extract(iris.Constraint(
-            time=cube_climatology.coord('time').points[0]))
+        if (self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
+                MONTHLY or
+            self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
+                SEASONAL):
+            # we have to collapse the time coord so the dimensions match those
+            # of the cube_absoute
+            cube_climatology = cube_climatology.collapsed(
+                'time', iris.analysis.MEAN)
 
-        # we need to remove these to be able to make the anomaly
-        for coord in ['month', 'month_number', 'season']:
-            try:
-                cube_climatology.remove_coord(coord)
-            except iris.exceptions.CoordinateNotFoundError:
-                pass
+        percent_anomalies = ['hussAnom', 'prAnom', 'rain5DayAccumMaxAnom', 'petAnom']
+        if self.input_data.get_value(InputType.VARIABLE) in percent_anomalies:
+            preferred_unit = cf_units.Unit("%")
+        else:
+            preferred_unit = None
 
-        cube_anomaly = make_anomaly(cube_absoute, cube_climatology)
-        # add the attributes back in and add info about the baseline
+        cube_anomaly = make_anomaly(
+            cube_absoute, cube_climatology, preferred_unit)
+
+        # add the attributes back in and add info about the baseline and
+        # anomaly
         cube_anomaly.attributes = cube_absoute.attributes
         cube_anomaly.attributes['baseline_period'] = (
             self.input_data.get_value(InputType.BASELINE))
+        cube_anomaly.attributes['anomaly_type'] = 'relative_change'
 
         return cube_anomaly
 
@@ -139,6 +151,9 @@ class DataExtractor():
                 self.file_lists['overlay'], overlay_probability_levels=True))
             if variable in TEMP_ANOMS:
                 overlay_cube.units = cf_units.Unit("Celsius")
+
+        log.debug('Overlay cube: {}'.format(overlay_cube))
+
         return overlay_cube
 
     def _get_cube(self, file_list, baseline=False,
@@ -154,22 +169,15 @@ class DataExtractor():
 
         @return an iris cube
         """
-        # Load the cubes based on the variable
-        if self.input_data.get_value(InputType.VARIABLE).startswith('pr'):
-            cubes = iris.load(file_list, ["precipitation rate"])
-        elif self.input_data.get_value(InputType.VARIABLE).startswith('tas'):
-            cubes = iris.load(file_list, ["air_temperature"])
-        else:
-            raise Exception(
-                "Unknown variable: {}.".format(self.input_data.get_value(
-                    InputType.VARIABLE)))
+        # Load the cubes
+        cubes = iris.load(file_list)
 
         # Remove attribute ensemble_member_id to allow us to merge cubes
         if (self.input_data.get_value(InputType.DATA_SOURCE) !=
                 DATA_SOURCE_PROB):
             for cube in cubes:
                 try:
-                    del cube.metadata.attributes['ensemble_member_id']
+                    del cube.metadata.attributes['ensemble_member']
                 except KeyError:
                     pass
 
