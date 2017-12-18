@@ -114,7 +114,8 @@ class DataExtractor():
             cube_climatology = cube_climatology.collapsed(
                 'time', iris.analysis.MEAN)
 
-        percent_anomalies = ['hussAnom', 'prAnom', 'rain5DayAccumMaxAnom', 'petAnom']
+        percent_anomalies = ['hussAnom', 'prAnom', 'rain5DayAccumMaxAnom',
+                             'petAnom']
         if self.input_data.get_value(InputType.VARIABLE) in percent_anomalies:
             preferred_unit = cf_units.Unit("%")
         else:
@@ -195,21 +196,32 @@ class DataExtractor():
             with iris.FUTURE.context(cell_datetime_objects=True):
                 cube = cube.extract(time_slice_constraint)
 
+        if cube is None:
+            raise Exception('Selection constraints resulted in no data being'
+                            ' selected')
+
         # generate a temporal constraint
         temporal_constraint = self._get_temporal_selector()
         if temporal_constraint is not None:
             with iris.FUTURE.context(cell_datetime_objects=True):
                 cube = cube.extract(temporal_constraint)
 
+        if cube is None:
+            raise Exception('Selection constraints resulted in no data being'
+                            ' selected')
+
         # extract 10, 50 and 90 percentiles
         if (overlay_probability_levels is True):
             cube = get_probability_levels(cube)
 
         # generate an area constraint
-        area_constraint = self._get_spatial_selector(
-            self._get_resolution_m(cube))
+        area_constraint = self._get_spatial_selector(cube)
         if area_constraint is not None:
             cube = cube.extract(area_constraint)
+
+        if cube is None:
+            raise Exception('Selection constraints resulted in no data being'
+                            ' selected')
 
         return cube
 
@@ -221,12 +233,13 @@ class DataExtractor():
             'percentile_over_Ensemble member').long_name = 'percentile'
         return result
 
-    def _get_spatial_selector(self, resolution):
+    def _get_spatial_selector(self, cube):
         # generate an area constraint
         area_constraint = None
 
         if self.input_data.get_area_type() == 'point':
             # coordinates are coming in as OSGB, x, y
+            resolution = self._get_resolution_m(cube)
             half_grid_size = resolution / 2
             bng_x = self.input_data.get_area()[0]
             bng_y = self.input_data.get_area()[1]
@@ -240,6 +253,7 @@ class DataExtractor():
 
         elif self.input_data.get_area_type() == 'bbox':
             # coordinates are coming in as OSGB, w, s, e, n
+            resolution = self._get_resolution_m(cube)
             half_grid_size = resolution / 2
             bng_w = self.input_data.get_area()[0]
             bng_s = self.input_data.get_area()[1]
