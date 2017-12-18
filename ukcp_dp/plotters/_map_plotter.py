@@ -8,9 +8,9 @@ class MapPlotter(BasePlotter):
     """
     The map plotter class.
 
-    This class extends BasePlotter with _generate_plot(self, cubes,
-    output_path, title). This class should be extended with a
-    _generate_map(self, cube, plotsettings, fig) method to plot the map.
+    This class extends BasePlotter with _generate_plot(self, output_path,
+    title). This class should be extended with a _generate_subplots(self, cube,
+    plotsettings, fig, metadata_bbox) method to plot the map.
     """
 
     def _generate_plot(self, output_path, title):
@@ -47,7 +47,7 @@ class MapPlotter(BasePlotter):
                  fontsize=45, color='gray',
                  ha='center', va='center',  rotation=30, alpha=0.8)
 
-        # Add the title ????
+        # Add the title
         fig.suptitle(title, fontsize='larger')
 
         # Add the colourbar

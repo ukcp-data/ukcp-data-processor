@@ -13,6 +13,7 @@ class Validator():
         self._validate_overlay_probability_levels()
         self._validate_time_slice()
         self._validate_boundary_overlay()
+        self._validate_colour_mode()
         self._validate_highlighted_ensemble_members()
 
         return self.input_data
@@ -43,6 +44,11 @@ class Validator():
                 self.input_data.set_value(
                     InputType.SPATIAL_REPRESENTATION,
                     self.input_data.get_area_type())
+
+    def _validate_colour_mode(self):
+        if self.input_data.get_value(InputType.COLOUR_MODE) is None:
+            # Not set, lets be kind and set it to 'c'
+            self.input_data.set_value(InputType.COLOUR_MODE, 'c')
 
     def _validate_convert_to_percentiles(self):
         try:

@@ -218,6 +218,10 @@ VOCAB = {'data_source': {
             True: 'True',
             False: 'False'
             },
+         'colour_mode': {
+            'c': 'colour',
+            'g': 'grey scale'
+            },
          'show_boundaries': {
             'none': 'None',
             'country': 'Country',

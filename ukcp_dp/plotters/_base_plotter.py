@@ -1,6 +1,6 @@
 from matplotlib.transforms import Bbox
-from ukcp_dp.constants import DATA_SELECTION_TYPES
-from ukcp_dp.constants import InputType
+from ukcp_dp.constants import DATA_SELECTION_TYPES, InputType, \
+    GREYSCALE_COLOURMAP
 from ukcp_dp.ukcp_standard_plots import standards_class as stds
 from ukcp_dp.vocab_manager import get_collection_label
 import matplotlib.cbook as cbook
@@ -16,8 +16,12 @@ class BasePlotter():
     The base class for plotters.
 
     This class should be extended with a
-    _generate_plot(self, input_data, cubes, output_path, title) method to plot
+    _generate_plot(self, output_path, title) method to plot
     the data.
+    The following variable are available to overriding methods:
+        self.input_data
+        self.cube_list
+        self.overlay_cube
     """
 
     def generate_plot(self, input_data, cube_list, overlay_cube, output_path,
@@ -211,6 +215,9 @@ class BasePlotter():
             plotsettings.cmsize = [30.48, 20.32]
 
         plotsettings.fsize = fsize
+
+        if self.input_data.get_value(InputType.COLOUR_MODE) == 'g':
+            plotsettings.cpal = GREYSCALE_COLOURMAP
 
         return plotsettings
 

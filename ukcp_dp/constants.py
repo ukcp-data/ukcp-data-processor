@@ -5,6 +5,7 @@ def enum(**named_values):
 InputType = enum(
     AREA='area_type',
     BASELINE='baseline',
+    COLOUR_MODE='colour_mode',
     CONVERT_TO_PERCENTILES='convert_to_percentiles',
     DATA_FORMAT='data_format',
     ENSEMBLE='ensemble',
@@ -27,6 +28,7 @@ InputType = enum(
 )
 
 INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
+                            InputType.COLOUR_MODE,
                             InputType.CONVERT_TO_PERCENTILES,
                             InputType.DATA_FORMAT,
                             InputType.DATA_SOURCE,
@@ -69,6 +71,10 @@ DATA_SELECTION_TYPES = [InputType.BASELINE,
 FONT_SIZE_SMALL = 4
 FONT_SIZE_MEDIUM = 7
 FONT_SIZE_LARGE = 10
+
+GREYSCALE_COLOURMAP = 'brewer_Greys_09'
+QUALITIVE_COLOURMAP = 'viridis'
+OVERLAY_COLOURMAP = 'jet'
 
 TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 

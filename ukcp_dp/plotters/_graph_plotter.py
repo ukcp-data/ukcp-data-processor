@@ -1,7 +1,8 @@
 from _base_plotter import BasePlotter
+import matplotlib.cm as mpl_cm
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
-from ukcp_dp.constants import InputType
+from ukcp_dp.constants import InputType, QUALITIVE_COLOURMAP
 import ukcp_dp.ukcp_standard_plots.plotting_general as plotgeneral
 
 
@@ -9,9 +10,9 @@ class GraphPlotter(BasePlotter):
     """
     The graph plotter class.
 
-    This class extends BasePlotter with _generate_plot(self, cubes,
-    output_path, title). This class should be extended with a
-    _generate_graph(self, cubes) method to plot the map.
+    This class extends BasePlotter with _generate_plot(self, output_path,
+    title). This class should be extended with a _generate_graph(self) method
+    to plot the map.
     """
 
     def _generate_plot(self, output_path, title):
@@ -27,6 +28,7 @@ class GraphPlotter(BasePlotter):
             self.input_data.get_value(InputType.VARIABLE),
             self.input_data.get_value(InputType.SHOW_BOUNDARIES))
 
+        # First create the figure
         fig, _, _ = plotgeneral.start_standard_figure(plotsettings)
 
         # Add the logo and metadata box
@@ -42,7 +44,14 @@ class GraphPlotter(BasePlotter):
         # Set the area below the metadata and allow room for the labels
         fig.add_axes(Bbox([[0.07, 0.08], [0.99, metadata_bbox.y0 - 0.06]]))
 
-        self._generate_graph()
+        if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
+            # use a standard colour map for line plots
+            cpal = QUALITIVE_COLOURMAP
+        else:
+            cpal = plotsettings.cpal
+        cmap = plt.get_cmap(cpal)
+
+        self._generate_graph(cmap)
 
         # Add the title
         fig.suptitle(title, fontsize='larger')
