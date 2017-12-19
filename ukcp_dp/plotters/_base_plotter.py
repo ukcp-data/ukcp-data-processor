@@ -93,7 +93,17 @@ class BasePlotter():
             name=self.input_data.get_area_type_label(),
             value=self.input_data.get_area_label()))
 
-        for dst in DATA_SELECTION_TYPES:
+        data_selection_types = list(DATA_SELECTION_TYPES)
+
+        # we do not want to display year min, year max as well as year
+        if (self.input_data.get_value(InputType.YEAR_MINIMUM) ==
+                self.input_data.get_value(InputType.YEAR_MAXIMUM)):
+            data_selection_types.remove(InputType.YEAR_MINIMUM)
+            data_selection_types.remove(InputType.YEAR_MAXIMUM)
+        else:
+            data_selection_types.remove(InputType.YEAR)
+
+        for dst in data_selection_types:
             name = get_collection_label(dst)
             try:
                 value = self.input_data.get_value_label(dst)
