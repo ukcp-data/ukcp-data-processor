@@ -13,7 +13,7 @@ class PdfPlotter(GraphPlotter):
     """
     The pdf plotter class.
 
-    This class extends BasePlotter with a _generate_graph(self, cube).
+    This class extends BasePlotter with a _generate_graph(self).
     """
 
     def _generate_graph(self):
@@ -22,14 +22,32 @@ class PdfPlotter(GraphPlotter):
 
         """
         log.debug('_generate_graph')
+
+        # there must be a better way to do this
+        count = 0
+        for _ in self.cube_list:
+            count += 1
+
+        if self.input_data.get_value(InputType.COLOUR_MODE) == 'g':
+            cmap = SCENARIO_GREYSCALE_PALETTE
+            c_norm = colors.Normalize(vmin=0, vmax=count)
+            scalar_map = cmx.ScalarMappable(norm=c_norm, cmap=cmap)
+
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
-            for cube in self.cube_list:
+
+            for i, cube in enumerate(self.cube_list):
                 # plot the percentiles
                 cube.data.sort()
+
+                if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
+                    colour_val = SCENARIO_COLOURS[i]
+                else:
+                    colour_val = scalar_map.to_rgba(i + 1)
+
                 cube = self._add_dx(cube)
                 qplt.plot(self.cube_list, self.cube_list.coord(
-                    'relative probability'))
+                    'relative probability'), color=colour_val)
 
         # clear the title field
         plt.title('')
