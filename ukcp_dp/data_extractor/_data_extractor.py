@@ -368,14 +368,15 @@ class DataExtractor():
                          variable=self.input_data.get_value_label(
                              InputType.VARIABLE)))
 
-        try:
+        if (self.input_data.get_value(InputType.YEAR_MINIMUM) ==
+                self.input_data.get_value(InputType.YEAR_MAXIMUM)):
+            title = '{t} {year}'.format(
+                t=title, year=self.input_data.get_value(InputType.YEAR))
+        else:
             start_year = self.input_data.get_value(InputType.YEAR_MINIMUM)
             end_year = self.input_data.get_value(InputType.YEAR_MAXIMUM)
             title = '{t} {start_year} to {end_year}'.format(
                 t=title, start_year=start_year, end_year=end_year)
-        except KeyError:
-            title = '{t} {year}'.format(
-                t=title, year=self.input_data.get_value(InputType.YEAR))
 
         if self.input_data.get_area_type() == 'point':
             grid_x = (self.cubes[0].coord('projection_x_coordinate')
