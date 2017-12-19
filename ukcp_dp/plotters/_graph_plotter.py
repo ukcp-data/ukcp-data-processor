@@ -2,7 +2,7 @@ from _base_plotter import BasePlotter
 import matplotlib.cm as mpl_cm
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
-from ukcp_dp.constants import InputType, QUALITIVE_COLOURMAP
+from ukcp_dp.constants import InputType
 import ukcp_dp.ukcp_standard_plots.plotting_general as plotgeneral
 
 
@@ -44,14 +44,7 @@ class GraphPlotter(BasePlotter):
         # Set the area below the metadata and allow room for the labels
         fig.add_axes(Bbox([[0.07, 0.08], [0.99, metadata_bbox.y0 - 0.06]]))
 
-        if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
-            # use a standard colour map for line plots
-            cpal = QUALITIVE_COLOURMAP
-        else:
-            cpal = plotsettings.cpal
-        cmap = plt.get_cmap(cpal)
-
-        self._generate_graph(cmap)
+        self._generate_graph()
 
         # Add the title
         fig.suptitle(title, fontsize='larger')

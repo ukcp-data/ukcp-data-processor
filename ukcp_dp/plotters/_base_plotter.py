@@ -1,6 +1,6 @@
 from matplotlib.transforms import Bbox
 from ukcp_dp.constants import DATA_SELECTION_TYPES, InputType, \
-    GREYSCALE_COLOURMAP
+    GREYSCALE_PALETTE
 from ukcp_dp.ukcp_standard_plots import standards_class as stds
 from ukcp_dp.vocab_manager import get_collection_label
 import matplotlib.cbook as cbook
@@ -217,7 +217,7 @@ class BasePlotter():
         plotsettings.fsize = fsize
 
         if self.input_data.get_value(InputType.COLOUR_MODE) == 'g':
-            plotsettings.cpal = GREYSCALE_COLOURMAP
+            plotsettings.cpal = GREYSCALE_PALETTE
 
         return plotsettings
 

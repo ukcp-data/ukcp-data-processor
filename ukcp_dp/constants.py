@@ -72,9 +72,23 @@ FONT_SIZE_SMALL = 4
 FONT_SIZE_MEDIUM = 7
 FONT_SIZE_LARGE = 10
 
-GREYSCALE_COLOURMAP = 'brewer_Greys_09'
-QUALITIVE_COLOURMAP = 'viridis'
-OVERLAY_COLOURMAP = 'jet'
+# colours
+GREYSCALE_PALETTE = 'brewer_Greys_09'
+COLOUR_PALETTE = 'jet'
+
+
+ENSEMBLE_COLOUR_PALETTE = 'jet'
+ENSEMBLE_GREYSCALE_PALETTE = 'brewer_Greys_09'
+ENSEMBLE_LOWLIGHT = '#ECECEC'
+
+# Met Office - Spring Green, Summer Blue, Autumn Orange
+QUANTILE_COLOURS = ['#50B9A4', '#007AA9', '#E47452']
+QUANTILE_GREYSCALE = '#313131'
+
+# Met Office - Core Green, Spring Green, Summer Blue, Autumn Orange,
+# Winter Grey
+SCENARIO_COLOURS = ['#B9DC0C', '#50B9A4', '#007AA9', '#E47452', '#A1A0AA']
+SCENARIO_GREYSCALE_PALETTE = 'brewer_Greys_09'
 
 TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 
