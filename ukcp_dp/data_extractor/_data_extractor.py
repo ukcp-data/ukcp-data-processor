@@ -114,6 +114,13 @@ class DataExtractor():
             cube_climatology = cube_climatology.collapsed(
                 'time', iris.analysis.MEAN)
 
+        # we need to remove these to be able to make the anomaly
+        for coord in ['month', 'month_number', 'season']:
+            try:
+                cube_climatology.remove_coord(coord)
+            except iris.exceptions.CoordinateNotFoundError:
+                pass
+
         percent_anomalies = ['hussAnom', 'prAnom', 'rain5DayAccumMaxAnom',
                              'petAnom']
         if self.input_data.get_value(InputType.VARIABLE) in percent_anomalies:
