@@ -1,7 +1,10 @@
 from _graph_plotter import GraphPlotter
-from ukcp_dp.constants import DATA_SOURCE_PROB, InputType
+from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, SCENARIO_COLOURS, \
+    SCENARIO_GREYSCALE_PALETTE
 import iris
 import iris.quickplot as qplt
+import matplotlib.cm as cmx
+import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 import numpy as np
 
