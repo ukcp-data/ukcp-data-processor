@@ -23,8 +23,11 @@ def get_file_lists(input_data):
 
     @return a dict of lists of files, including their full paths
         key - 'main' or 'overlay'
-        value - for main, a list of lists of file paths
-              - for overlay, a list of file paths
+        value - a dict where
+            key: (str) variable name
+            value: list of lists where:
+                each list is a list of files per scenario, per variable,
+                including their full paths
     """
     log.info('get_file_lists')
     file_list = {}
@@ -45,7 +48,7 @@ def get_file_lists(input_data):
             file_list_overlay = _get_land_prob_file_list(input_data)
 
         if len(file_list_overlay) == 1:
-            file_list['overlay'] = file_list_overlay[0]
+            file_list['overlay'] = file_list_overlay
         # else: we do not currently deal with more than one scenario for an
         # overlay
     return file_list
@@ -59,13 +62,17 @@ def _get_land_prob_file_list(input_data):
 
     @param input_data (InputData): an InputData object
 
-    @return a list of lists of files, including their full paths
+    @return a dict where
+        key: (str) variable name
+        value: list of lists where:
+            each list is a list of files per scenario, per variable, including
+            their full paths
     """
-    variable = input_data.get_value(InputType.VARIABLE)
+    variables = input_data.get_value(InputType.VARIABLE)
 
     spatial_representation = _get_land_prob_spatial_representation(input_data)
 
-    file_list = []
+    file_lists_per_variable = {}
 
     dataset_id = ('ukcp18-{data_source}-uk-{spatial_representation}-'
                   '{temporal_type}'.format(
@@ -74,27 +81,35 @@ def _get_land_prob_file_list(input_data):
                       temporal_type=input_data.get_value(
                           InputType.TEMPORAL_AVERAGE_TYPE)))
 
-    for scenario in input_data.get_value(InputType.SCENARIO):
-        file_path = _get_land_prob_file_path(
-            input_data, scenario, spatial_representation, variable)
+    for variable in variables:
+        # generate a list of files for each variable
 
-        if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'ann':
-            # current thinking is that there will only be one file, but I'm not
-            # sure of the date format yet
-            file_list.append([os.path.join(file_path, '*')])
-            continue
+        file_list_per_scenario = []
+        for scenario in input_data.get_value(InputType.SCENARIO):
+            # generate a list of files for each scenario
+            file_path = _get_land_prob_file_path(
+                input_data, scenario, spatial_representation, variable)
 
-        scenario_file_list = []
+            if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'ann':
+                # current thinking is that there will only be one file, but
+                # I'm not sure of the date format yet
+                file_list_per_scenario.append([os.path.join(file_path, '*')])
+                continue
 
-        for year in range(input_data.get_value(InputType.YEAR_MINIMUM),
-                          (input_data.get_value(InputType.YEAR_MAXIMUM) + 1)):
-            file_name = _get_land_prob_file_name(
-                dataset_id, input_data, scenario, variable, year)
-            scenario_file_list.append(os.path.join(file_path, file_name))
+            scenario_file_list = []
 
-        file_list.append(scenario_file_list)
+            for year in range(input_data.get_value(InputType.YEAR_MINIMUM),
+                              (input_data.get_value(InputType.YEAR_MAXIMUM)
+                               + 1)):
+                file_name = _get_land_prob_file_name(
+                    dataset_id, input_data, scenario, variable, year)
+                scenario_file_list.append(os.path.join(file_path, file_name))
 
-    return file_list
+            file_list_per_scenario.append(scenario_file_list)
+
+        file_lists_per_variable[variable] = file_list_per_scenario
+
+    return file_lists_per_variable
 
 
 def _get_land_prob_spatial_representation(input_data):
@@ -123,7 +138,7 @@ def _get_land_prob_file_path(input_data, scenario, spatial_representation,
         spatial_representation,
         'uk',
         scenario,
-        'percentile',
+        input_data.get_value(InputType.DATA_TYPE),
         variable,
         input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
         VERSION)
@@ -143,11 +158,12 @@ def _get_land_prob_file_name(dataset_id, input_data, scenario, variable, year):
             year=year, mon_day=SEASON_END_DATE)
 
     file_name = ('{variable}_{scenario}_{dataset_id}_'
-                 'percentile_{temporal_type}_{start_data}-'
+                 '{data_type}_{temporal_type}_{start_data}-'
                  '{end_date}.nc'.format(
                      variable=variable,
                      scenario=scenario,
                      dataset_id=dataset_id,
+                     data_type=input_data.get_value(InputType.DATA_TYPE),
                      temporal_type=input_data.get_value(
                          InputType.TEMPORAL_AVERAGE_TYPE),
                      start_data=start_date,
@@ -161,20 +177,37 @@ def _get_file_list_type_2(input_data):
 
     @param input_data (InputData): an InputData object
 
-    @return a list of files, including their full paths
+    @return a dict where
+        key: (str) variable name
+        value: list of lists where:
+            each list is a list of files per scenario, per variable, including
+            their full paths
     """
-    file_list = []
+    variables = input_data.get_value(InputType.VARIABLE)
 
-    ensemble_set = input_data.get_value(InputType.ENSEMBLE)
+    file_lists_per_variable = {}
 
-    for ensemble in ensemble_set:
-        file_list.append(_get_file_list_for_ensemble(input_data, ensemble))
+    for variable in variables:
+        # generate a list of files for each variable
 
-    # TODO there should be one list per scenario
-    return [file_list]
+        file_list_per_scenario = []
+        for scenario in input_data.get_value(InputType.SCENARIO):
+            # generate a list of files for each scenario
+
+            ensemble_file_list = []
+            for ensemble in input_data.get_value(InputType.ENSEMBLE):
+                # generate a list of files for each ensemble
+                ensemble_file_list.append(_get_file_list_for_ensemble(
+                    input_data, variable, scenario, ensemble))
+
+            file_list_per_scenario.append(ensemble_file_list)
+
+        file_lists_per_variable[variable] = file_list_per_scenario
+
+    return file_lists_per_variable
 
 
-def _get_file_list_for_ensemble(input_data, ensemble):
+def _get_file_list_for_ensemble(input_data, variable, scenario, ensemble):
     spatial_representation = input_data.get_value(
         InputType.SPATIAL_REPRESENTATION)
     if spatial_representation == 'river_basin':
@@ -189,11 +222,8 @@ def _get_file_list_for_ensemble(input_data, ensemble):
                       temporal_type=input_data.get_value(
                           InputType.TEMPORAL_AVERAGE_TYPE)))
 
-    # TODO
-    scenario = input_data.get_value(InputType.SCENARIO)[0]
-
     # we need to use the variable root and calculate the anomaly later
-    variable = input_data.get_value(InputType.VARIABLE).split('Anom')[0]
+    variable = variable.split('Anom')[0]
     file_name = ('{variable}_{scenario}_{dataset_id}_{ensemble}_'
                  '{temporal_type}_*'.format(
                      variable=variable,

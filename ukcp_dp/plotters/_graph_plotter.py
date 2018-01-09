@@ -1,5 +1,4 @@
 from _base_plotter import BasePlotter
-import matplotlib.cm as mpl_cm
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
 from ukcp_dp.constants import InputType
@@ -15,19 +14,14 @@ class GraphPlotter(BasePlotter):
     to plot the map.
     """
 
-    def _generate_plot(self, output_path, title):
+    def _generate_plot(self, output_path, plotsettings, title):
         """
         Override base class method.
 
         @param output_path (str): the full path to the file
+        @param plotsettings (StandardMap): an object containing plot settings
         @param title (str): a title for the plot
         """
-        plotsettings = self._get_plot_settings(
-            self.input_data.get_value(InputType.IMAGE_SIZE),
-            self.input_data.get_font_size(),
-            self.input_data.get_value(InputType.VARIABLE),
-            self.input_data.get_value(InputType.SHOW_BOUNDARIES))
-
         # First create the figure
         fig, _, _ = plotgeneral.start_standard_figure(plotsettings)
 

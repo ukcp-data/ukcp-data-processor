@@ -22,9 +22,13 @@ class DataExtractor():
         """
         Initialise the DataExtractor.
 
-        @param file_lists dict, a dict with two lists of files
+        @param a dict of lists of files, including their full paths
             key - 'main' or 'overlay'
-            value - list(str) a list of file names
+            value - a dict where
+                key: (str) variable name
+                value: list of lists where:
+                    each list is a list of files per scenario, including their
+                    full paths
         @param input_data (InputData) an object containing user defined values
         """
         self.file_lists = file_lists
@@ -38,7 +42,7 @@ class DataExtractor():
 
         The data are based on the selection criteria from the input_data.
 
-        @return an iris cube list
+        @return an iris cube list, one cube per scenario, per variable
         """
         log.info('get_cubes')
         return self.cubes
@@ -62,39 +66,43 @@ class DataExtractor():
         If the variable type is an anomaly then then a climatology may be need
         to be produced in order to generate the anomalies.
 
-        @return an iris cube list containing the main data
+        @return an iris cube list containing the main data, one cube per
+            scenario, per variable
         """
-        variable = self.input_data.get_value(InputType.VARIABLE)
         cubes = iris.cube.CubeList()
 
-        for file_list in self.file_lists['main']:
+        for variable in self.file_lists['main'].keys():
+            # for each variable there is a list of files per scenario
+            for file_list in self.file_lists['main'][variable]:
 
-            if (variable.endswith('Anom') and
-                    self.input_data.get_value(InputType.DATA_SOURCE) !=
-                    DATA_SOURCE_PROB):
-                cube = self._get_anomaly_cube(file_list)
+                if (variable.endswith('Anom') and
+                        self.input_data.get_value(InputType.DATA_SOURCE) !=
+                        DATA_SOURCE_PROB):
+                    # we need anomalies so lets calculate them
+                    # TODO we may get these directly from file in future
+                    cube = self._get_anomaly_cube(file_list, variable)
 
-            else:
-                # we can use the values directly from the file
-                cube = self._get_cube(file_list)
+                else:
+                    # we can use the values directly from the file
+                    cube = self._get_cube(file_list)
 
-            # do we need to convert percentiles?
-            if self.input_data.get_value(InputType.CONVERT_TO_PERCENTILES):
-                cube = (self._convert_to_percentiles_from_ensembles(cube))
+                # do we need to convert percentiles?
+                if self.input_data.get_value(InputType.CONVERT_TO_PERCENTILES):
+                    cube = (self._convert_to_percentiles_from_ensembles(cube))
 
-            if variable in TEMP_ANOMS:
-                # this in an anomaly so set the units to Celsius, otherwise
-                # they will get converted later and that would be bad
-                cube.units = cf_units.Unit("Celsius")
-                log.debug('updated cube units to Celsius')
+                if variable in TEMP_ANOMS:
+                    # this in an anomaly so set the units to Celsius, otherwise
+                    # they will get converted later and that would be bad
+                    cube.units = cf_units.Unit("Celsius")
+                    log.debug('updated cube units to Celsius')
 
-            cubes.append(cube)
+                cubes.append(cube)
 
         log.debug(cubes)
 
         return cubes
 
-    def _get_anomaly_cube(self, file_list):
+    def _get_anomaly_cube(self, file_list, variable):
         # anomalies have been selected for something other than LS1,
         # therefore we need to calculate the climatology using the
         # baseline and then the anomalies
@@ -123,7 +131,7 @@ class DataExtractor():
 
         percent_anomalies = ['hussAnom', 'prAnom', 'rain5DayAccumMaxAnom',
                              'petAnom']
-        if self.input_data.get_value(InputType.VARIABLE) in percent_anomalies:
+        if variable in percent_anomalies:
             preferred_unit = cf_units.Unit("%")
         else:
             preferred_unit = None
@@ -149,16 +157,20 @@ class DataExtractor():
 
         @return an iris cube, maybe 'None'
         """
-        variable = self.input_data.get_value(InputType.VARIABLE)
         overlay_cube = None
         if (self.input_data.get_value(InputType.DATA_SOURCE) !=
                 DATA_SOURCE_PROB and
             self.input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is
                 True):
-            overlay_cube = (self._get_cube(
-                self.file_lists['overlay'], overlay_probability_levels=True))
-            if variable in TEMP_ANOMS:
-                overlay_cube.units = cf_units.Unit("Celsius")
+
+            for variable in self.file_lists['overlay'].keys():
+                # for each variable there is a list of files per scenario
+                for file_list in self.file_lists['overlay'][variable]:
+
+                    overlay_cube = (self._get_cube(
+                        file_list, overlay_probability_levels=True))
+                    if variable in TEMP_ANOMS:
+                        overlay_cube.units = cf_units.Unit("Celsius")
 
         log.debug('Overlay cube: {}'.format(overlay_cube))
 
@@ -353,7 +365,6 @@ class DataExtractor():
 
         @return a str containing the title
         """
-#         return ''
         if (self.input_data.get_value(
                 InputType.TEMPORAL_AVERAGE_TYPE) == ANNUAL
                 or self.input_data.get_value(InputType.TIME_PERIOD) == 'all'):
@@ -362,8 +373,8 @@ class DataExtractor():
                      'for'.format(
                          temporal_type=self.input_data.get_value_label(
                              InputType.TEMPORAL_AVERAGE_TYPE),
-                         variable=self.input_data.get_value_label(
-                             InputType.VARIABLE)))
+                         variable=" and ".join(self.input_data.get_value_label(
+                             InputType.VARIABLE))))
         else:
             title = ('Demonstration Version - {temporal_type} average '
                      '{variable} for\n'
@@ -372,8 +383,8 @@ class DataExtractor():
                              InputType.TEMPORAL_AVERAGE_TYPE),
                          time_period=self.input_data.get_value_label(
                              InputType.TIME_PERIOD),
-                         variable=self.input_data.get_value_label(
-                             InputType.VARIABLE)))
+                         variable=" and ".join(self.input_data.get_value_label(
+                             InputType.VARIABLE))))
 
         if (self.input_data.get_value(InputType.YEAR_MINIMUM) ==
                 self.input_data.get_value(InputType.YEAR_MAXIMUM)):

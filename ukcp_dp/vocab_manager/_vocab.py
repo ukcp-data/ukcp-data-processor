@@ -11,6 +11,7 @@ COLLECTION_LABELS = {
     'data_format': 'Data Format',
     'ensemble': 'Ensemble',
     'data_source': 'Data Source',
+    'data_type': 'Data Type',
     'font_size': 'Font Size',
     'image_format': 'Image Format',
     'image_size': 'Image Size',
@@ -61,7 +62,9 @@ VOCAB = {'data_source': {
             },
          'variable': {
             'tasmax': 'Maximum surface air temperature',
+            'tasmaxAnom': 'Maximum surface air temperature anomaly',
             'tasmin': 'Minimum surface air temperature',
+            'tasminAnom': 'Minimum surface air temperature anomaly',
             'tas': 'Surface air temperature',
             'tasAnom': 'Surface air temperature anomaly',
             'pr': 'Precipitation',
@@ -132,6 +135,10 @@ VOCAB = {'data_source': {
             'none': "Don't save the data",
             'csv': 'CSV',
             'netcdf': 'CF-netCDF'
+            },
+         'data_type': {
+             'percentile': 'percentile',
+             'sample': 'sample'
             },
          'ensemble': {
             'r1i1p1': 'r1i1p1',

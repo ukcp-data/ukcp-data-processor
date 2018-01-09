@@ -8,8 +8,9 @@ InputType = enum(
     COLOUR_MODE='colour_mode',
     CONVERT_TO_PERCENTILES='convert_to_percentiles',
     DATA_FORMAT='data_format',
-    ENSEMBLE='ensemble',
     DATA_SOURCE='data_source',
+    DATA_TYPE='data_type',
+    ENSEMBLE='ensemble',
     FONT_SIZE='font_size',
     HIGHLIGHTED_ENSEMBLE_MEMBERS='highlighted_ensemble_members',
     IMAGE_FORMAT='image_format',
@@ -32,6 +33,7 @@ INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
                             InputType.CONVERT_TO_PERCENTILES,
                             InputType.DATA_FORMAT,
                             InputType.DATA_SOURCE,
+                            InputType.DATA_TYPE,
                             InputType.FONT_SIZE,
                             InputType.IMAGE_FORMAT,
                             InputType.IMAGE_SIZE,
@@ -41,14 +43,14 @@ INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
                             InputType.SPATIAL_REPRESENTATION,
                             InputType.TEMPORAL_AVERAGE_TYPE,
                             InputType.TIME_PERIOD,
-                            InputType.VARIABLE,
                             InputType.YEAR,
                             InputType.YEAR_MINIMUM,
                             InputType.YEAR_MAXIMUM]
 
 INPUT_TYPES_MULTI_VALUE = [InputType.ENSEMBLE,
                            InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS,
-                           InputType.SCENARIO
+                           InputType.SCENARIO,
+                           InputType.VARIABLE
                            ]
 
 INPUT_TYPES = INPUT_TYPES_SINGLE_VALUE + INPUT_TYPES_MULTI_VALUE
@@ -56,6 +58,7 @@ INPUT_TYPES.append(InputType.AREA)
 
 DATA_SELECTION_TYPES = [InputType.BASELINE,
                         InputType.DATA_SOURCE,
+                        InputType.DATA_TYPE,
                         InputType.ENSEMBLE,
                         InputType.OVERLAY_PROBABILITY_LEVELS,
                         InputType.SCENARIO,
@@ -90,6 +93,10 @@ QUANTILE_GREYSCALE = '#313131'
 SCENARIO_COLOURS = ['#B9DC0C', '#50B9A4', '#007AA9', '#E47452', '#A1A0AA']
 SCENARIO_GREYSCALE_PALETTE = 'brewer_Greys_09'
 
+# Met Office - Autumn Orange
+CONTOUR_COLOUR = '#E47452'
+CONTOUR_GREYSCALE = '#313131'
+
 TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 
 MONTHLY = 'mon'
@@ -102,6 +109,7 @@ DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 
 # Plot types
 PlotType = enum(CDF_PLOT='CDF_PLOT',
+                JP_PLOT='JP_PLOT',
                 PDF_PLOT='PDF_PLOT',
                 PLUME_PLOT='PLUME_PLOT',
                 POSTAGE_STAMP_MAPS='POSTAGE_STAMP_MAPS',

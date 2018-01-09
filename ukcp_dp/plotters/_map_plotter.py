@@ -13,20 +13,17 @@ class MapPlotter(BasePlotter):
     plotsettings, fig, metadata_bbox) method to plot the map.
     """
 
-    def _generate_plot(self, output_path, title):
+    def _generate_plot(self, output_path, plotsettings, title):
         """
         Override base class method.
 
         @param output_path (str): the full path to the file
+        @param plotsettings (StandardMap): an object containing plot settings
         @param title (str): a title for the plot
         """
+        # TODO we can only produce a map for a single scenario and variable
         cube = self.cube_list[0]
 
-        plotsettings = self._get_plot_settings(
-            self.input_data.get_value(InputType.IMAGE_SIZE),
-            self.input_data.get_font_size(),
-            self.input_data.get_value(InputType.VARIABLE),
-            self.input_data.get_value(InputType.SHOW_BOUNDARIES))
         reg = regs.reg_from_cube(cube)
         plotsettings.set_xylims(reg)
 

@@ -1,4 +1,5 @@
 from _cdf_plotter import CdfPlotter
+from _jp_plotter import JpPlotter
 from _pdf_plotter import PdfPlotter
 from _plume_plotter import PlumePlotter
 from _postage_stamp_map_plotter import PostageStampMapPlotter
@@ -21,6 +22,8 @@ def write_plot(plot_type, output_path, input_data, cube_list, overlay_cube,
 
     if plot_type == PlotType.CDF_PLOT:
         plotter = CdfPlotter()
+    elif plot_type == PlotType.JP_PLOT:
+        plotter = JpPlotter()
     elif plot_type == PlotType.PDF_PLOT:
         plotter = PdfPlotter()
     elif plot_type == PlotType.PLUME_PLOT:

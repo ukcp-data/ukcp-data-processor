@@ -18,7 +18,7 @@ class BasePlotter():
     This class should be extended with a
     _generate_plot(self, output_path, title) method to plot
     the data.
-    The following variable are available to overriding methods:
+    The following variables are available to overriding methods:
         self.input_data
         self.cube_list
         self.overlay_cube
@@ -31,7 +31,7 @@ class BasePlotter():
 
         @param input_data (InputData): an object containing user defined values
         @param cube_list (iris cube list): a list of cubes containing the
-            selected data
+            selected data, one cube per scenario, per variable
         @param overlay_cube (iris cube): a cube containing the data for
             the overlay
         @param output_path (str): the full path to the file
@@ -40,16 +40,26 @@ class BasePlotter():
         log.info('generate_plot')
         # an object containing user defined values
         self.input_data = input_data
+        # an iris cube list containing one cube per scenario, per variable
         self.cube_list = cube_list
         self.overlay_cube = overlay_cube
 
-        self._generate_plot(output_path, title)
+        # The plot settings are customised to the first variable in the list
+        # We may want to change this in the future
+        plotsettings = self._get_plot_settings(
+            self.input_data.get_value(InputType.IMAGE_SIZE),
+            self.input_data.get_font_size(),
+            self.input_data.get_value(InputType.VARIABLE)[0],
+            self.input_data.get_value(InputType.SHOW_BOUNDARIES))
 
-    def _generate_plot(self, output_path, title):
+        self._generate_plot(output_path, plotsettings, title)
+
+    def _generate_plot(self, output_path, plotsettings, title):
         """
         This method should be overridden to produce the plots.
 
         @param output_path (str): the full path to the file
+        @param plotsettings (StandardMap): an object containing plot settings
         @param title (str): a title for the plot
         """
         pass
