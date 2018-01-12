@@ -1,5 +1,5 @@
 from _graph_plotter import GraphPlotter
-from ukcp_dp.constants import InputType, CONTOUR_COLOUR, CONTOUR_GREYSCALE
+from ukcp_dp.constants import InputType, CONTOUR_LINE, CONTOUR_FILL
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,16 +28,18 @@ class JpPlotter(GraphPlotter):
         y = self.cube_list[1].data
         y_label = self.cube_list[1].name()
 
-        h, xedges, yedges = np.histogram2d(x, y, bins=20)
+        h, xedges, yedges = np.histogram2d(x, y, bins=10)
         xbins = xedges[:-1] + (xedges[1] - xedges[0]) / 2
         ybins = yedges[:-1] + (yedges[1] - yedges[0]) / 2
-
         h = h.T
 
-        if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
-            CS = plt.contour(xbins, ybins, h, colors=CONTOUR_COLOUR)
-        else:
-            CS = plt.contour(xbins, ybins, h, colors=CONTOUR_GREYSCALE)
-        CS.clabel(fmt='%1.0f')
+        levels = [10, 50, 90]
+        # fill the contours
+        plt.contourf(xbins, ybins, h, levels, colors=CONTOUR_FILL,
+                     extend='max')
+
+        # now add the lines
+        plt.contour(xbins, ybins, h, levels, colors=CONTOUR_LINE)
+
         plt.xlabel(x_label)
         plt.ylabel(y_label)
