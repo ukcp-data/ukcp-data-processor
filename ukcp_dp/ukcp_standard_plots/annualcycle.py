@@ -570,10 +570,11 @@ def regenerate_data_for_UKannualcycle(source,datelimits, vartag, UKweights=None,
          # Read in the shapefile, and get the weights in the grid cells
          print "Reading in UK shapefile..." ; sys.stdout.flush()
          #UKreg = regs.get_uk_shapefile_region()
-         UKreg = regs.get_ukcp_shapefile_regions("uk")[0]
+         #UKreg = regs.get_ukcp_shapefile_regions("uk")[0]
+         UKreg = regs.get_ukcp_shapefile_regions("countryplus", region_names=["UK"])[0]
          print "Calculating grid cell weights..." ; sys.stdout.flush()
          UKweights = regs.get_cube_shapefileregion_weights(data_here, UKreg, weightfn="area",
-                                                           mask=lsm_mask_reshaped,take_cube_shape=True)
+                                                           mask=lsm_mask_reshaped, take_cube_shape=True)
          
 
       # Finally, get the area-weighted average:
@@ -687,14 +688,14 @@ def uk_seasonalcycle_forcpmselectionfromgcm(vartag, gcm_monthlyLTA, obs_monthlyL
 
 
 #-------------------------------------------------------------------------------------
-def uk_seasonalcycle_tas_pr_forevaluation(gcm_tas_monLTA =None,cpm_tas_monLTA =None,obs_tas_monLTA =None,
-                                          gcm_tas_monLTSD=None,cpm_tas_monLTSD=None,obs_tas_monLTSD=None,
-                                          gcm_pr_monLTA  =None,cpm_pr_monLTA  =None,obs_pr_monLTA  =None,
-                                          gcm_pr_monLTSD =None,cpm_pr_monLTSD =None,obs_pr_monLTSD =None,
-                                          style="shade",outdevs=["x11"], outfiletag=None):
+def uk_seasonalcycle_tas_pr_forevaluation(gcm_tas_monLTA =None,cpm_tas_monLTA =None,obs1_tas_monLTA =None,obs2_tas_monLTA =None,
+                                          gcm_tas_monLTSD=None,cpm_tas_monLTSD=None,obs1_tas_monLTSD=None,obs2_tas_monLTSD=None,
+                                          gcm_pr_monLTA  =None,cpm_pr_monLTA  =None,obs1_pr_monLTA  =None,obs2_pr_monLTA  =None,
+                                          gcm_pr_monLTSD =None,cpm_pr_monLTSD =None,obs1_pr_monLTSD =None,obs2_pr_monLTSD =None,
+                                          style="shade",outdevs=["x11"], outdir='/project/ukcp18/model_evaluation/',outfiletag=None):
     '''
     Make a 4-panel plot of the mean annual cycle (seasonality)
-    of GCM PPE members, CPM PPE members and obs
+    of GCM PPE members, CPM PPE members and obs (at least one, optionally 2 sets of obs data)
     for UK-mean temperature and precip,
     demonstrating both the bias in the mean and in the interannual variability.
     
@@ -712,12 +713,12 @@ def uk_seasonalcycle_tas_pr_forevaluation(gcm_tas_monLTA =None,cpm_tas_monLTA =N
     # Set up constants defining the three different styles:
     CMSIZES = dict(shade=(20,20), lines=(20,20), idlines=(23,20))
     LEGEND_LOCS  = dict(shade=None,    lines=None,    idlines=(1.05,-0.8) )
-    GCM_TAS_COLS = dict(shade=["red"], lines=["red"], 
-                        idlines=["red", "lightcoral",     "lime",      "forestgreen",
-                                 "blue","cornflowerblue", "darkviolet","magenta"      ] )
-    CPM_TAS_COLS = dict(shade=["blue"], lines=["blue"],  idlines=GCM_TAS_COLS["idlines"] )
-    GCM_PR_COLS  = dict(shade=["red" ], lines=["red" ],  idlines=GCM_TAS_COLS["idlines"] )
-    CPM_PR_COLS  = dict(shade=["blue"], lines=["blue"],  idlines=GCM_TAS_COLS["idlines"] )
+    IDLINES_COLS = ["red", "lightcoral",     "lime",      "forestgreen",
+                                 "blue","cornflowerblue", "darkviolet","magenta" ]
+    GCM_TAS_COLS = dict(shade=["red"],        lines=["red"],         idlines=IDLINES_COLS )
+    CPM_TAS_COLS = dict(shade=["orange"],     lines=["orange"],      idlines=IDLINES_COLS )
+    GCM_PR_COLS  = dict(shade=["blue" ],      lines=["blue" ],       idlines=IDLINES_COLS )
+    CPM_PR_COLS  = dict(shade=["darkorchid"], lines=["darkorchid"],  idlines=IDLINES_COLS )
     LTYS = dict(shade=["-"], lines=["-"], idlines=["-","--",":"])
     QUANTS  = dict(shade=[2.5, 25, 50, 75, 97.5], lines=None,idlines=None)
     LALPHAS = dict(shade=0.2, lines=0.2, idlines=1.0 )
@@ -727,8 +728,8 @@ def uk_seasonalcycle_tas_pr_forevaluation(gcm_tas_monLTA =None,cpm_tas_monLTA =N
 
 
     # Set up the output filename:
-    OUTDIR = '/project/ukcp18/model_evaluation/'
-    outfile_base = OUTDIR+"SciRept_eval_seasonalcycle_tas_pr"
+    #OUTDIR = '/project/ukcp18/model_evaluation/'
+    outfile_base = outdir+"SciRept_eval_seasonalcycle_tas_pr"
     if outfiletag is not None:
         outfile_base += outfiletag
     outfiles = [outfile_base + "." + dev for dev in outdevs]
@@ -746,7 +747,8 @@ def uk_seasonalcycle_tas_pr_forevaluation(gcm_tas_monLTA =None,cpm_tas_monLTA =N
     gcm_pr_style =dict(cols=GCM_PR_COLS[ style], lw=1, ltys=LTYS[style], alphaline=LALPHAS[style], quants=QUANTS[style], alphashade=0.2)
     cpm_pr_style =dict(cols=CPM_PR_COLS[ style], lw=1, ltys=LTYS[style], alphaline=LALPHAS[style], quants=QUANTS[style], alphashade=0.2)
 
-    obs_style    =dict(col="black",lw=1,lty="-")
+    obs1_style    =dict(col="black",lw=1,lty="-")
+    obs2_style    =dict(col="black",lw=1,lty="--")
 
 
     legend_loc = LEGEND_LOCS[style] #(1.05, -0.8)  if style=="idlines" else None
@@ -759,11 +761,11 @@ def uk_seasonalcycle_tas_pr_forevaluation(gcm_tas_monLTA =None,cpm_tas_monLTA =N
 
     # Top-left:
     ax = fig.add_subplot(2,2,1)
-    ax = annualcycle_panel(ppe_cube_in=gcm_tas_monLTA, obs_cube_in=obs_tas_monLTA, fig=fig, ax=ax,
+    ax = annualcycle_panel(ppe_cube_in=gcm_tas_monLTA, obs_cube_in=obs1_tas_monLTA, fig=fig, ax=ax,
                            preferred_unit=cf_units.Unit("Celsius"),
                            moncoord="month_number",membercoord="realization",
                            ppe_style=gcm_tas_style,
-                           obs_style=obs_style,  
+                           obs_style=obs1_style,  
                            ylab="UK mean temperature, $^\circ$C", ylims=None,
                            marlft=None, marrgt=None, martop=None, marbot=None, 
                            marwsp=None, marhsp=None,xlabfmt="m",
@@ -772,20 +774,30 @@ def uk_seasonalcycle_tas_pr_forevaluation(gcm_tas_monLTA =None,cpm_tas_monLTA =N
                            preferred_unit=cf_units.Unit("Celsius"),
                            moncoord="month_number",membercoord="realization",
                            ppe_style=cpm_tas_style,
-                           obs_style=obs_style,  
+                           obs_style=obs1_style,  
                            ylab="UK mean temperature, $^\circ$C", ylims=None,
                            marlft=None, marrgt=None, martop=None, marbot=None, 
                            marwsp=None, marhsp=None,xlabfmt="m",
                            outfnames=None )
+    if obs2_tas_monLTA is not None:
+       ax = annualcycle_panel(ppe_cube_in=None, obs_cube_in=obs2_tas_monLTA, fig=fig, ax=ax,
+                              preferred_unit=cf_units.Unit("Celsius"),
+                              moncoord="month_number",membercoord="realization",
+                              ppe_style=gcm_tas_style,
+                              obs_style=obs2_style,  
+                              ylab="UK mean temperature, $^\circ$C", ylims=None,
+                              marlft=None, marrgt=None, martop=None, marbot=None, 
+                              marwsp=None, marhsp=None,xlabfmt="m",
+                              outfnames=None )
     
 
     # Top-right (note we add the legend from the GCM plot here)
     ax = fig.add_subplot(2,2,2)
-    ax = annualcycle_panel(ppe_cube_in=gcm_tas_monLTSD, obs_cube_in=obs_tas_monLTSD, fig=fig, ax=ax,
+    ax = annualcycle_panel(ppe_cube_in=gcm_tas_monLTSD, obs_cube_in=obs1_tas_monLTSD, fig=fig, ax=ax,
                            preferred_unit=cf_units.Unit("Celsius"),
                            moncoord="month_number",membercoord="realization",
                            ppe_style=gcm_tas_style,
-                           obs_style=obs_style,  
+                           obs_style=obs1_style,  
                            ylab='Interannual variability ($\sigma$)\nof UK mean temperature,$^\circ$C',
                            ylims=None,
                            marlft=None, marrgt=None, martop=None, marbot=None, 
@@ -795,20 +807,30 @@ def uk_seasonalcycle_tas_pr_forevaluation(gcm_tas_monLTA =None,cpm_tas_monLTA =N
                            preferred_unit=cf_units.Unit("Celsius"),
                            moncoord="month_number",membercoord="realization",
                            ppe_style=cpm_tas_style,
-                           obs_style=obs_style,  
+                           obs_style=obs1_style,  
                            ylab='Interannual variability ($\sigma$)\nof UK mean temperature,$^\circ$C',
                            ylims=None,
                            marlft=None, marrgt=None, martop=None, marbot=None, 
                            marwsp=None, marhsp=None,xlabfmt="m",
                            outfnames=None )
+    if obs2_tas_monLTSD is not None:
+       ax = annualcycle_panel(ppe_cube_in=None, obs_cube_in=obs2_tas_monLTSD, fig=fig, ax=ax,
+                              preferred_unit=cf_units.Unit("Celsius"),
+                              moncoord="month_number",membercoord="realization",
+                              ppe_style=gcm_tas_style,
+                              obs_style=obs2_style,  
+                              ylab="UK mean temperature, $^\circ$C", ylims=None,
+                              marlft=None, marrgt=None, martop=None, marbot=None, 
+                              marwsp=None, marhsp=None,xlabfmt="m",
+                              outfnames=None )
 
     # Bottom-left:
     ax = fig.add_subplot(2,2,3)
-    ax = annualcycle_panel(ppe_cube_in=gcm_pr_monLTA, obs_cube_in=obs_pr_monLTA, fig=fig, ax=ax,
+    ax = annualcycle_panel(ppe_cube_in=gcm_pr_monLTA, obs_cube_in=obs1_pr_monLTA, fig=fig, ax=ax,
                            preferred_unit=cf_units.Unit("mm/day"),
                            moncoord="month_number",membercoord="realization",
                            ppe_style=gcm_pr_style,
-                           obs_style=obs_style,  
+                           obs_style=obs1_style,  
                            ylab="UK mean precipitation, mm/day", ylims=None,
                            marlft=None, marrgt=None, martop=None, marbot=None, 
                            marwsp=None, marhsp=None,xlabfmt="m",
@@ -817,20 +839,30 @@ def uk_seasonalcycle_tas_pr_forevaluation(gcm_tas_monLTA =None,cpm_tas_monLTA =N
                            preferred_unit=cf_units.Unit("mm/day"),
                            moncoord="month_number",membercoord="realization",
                            ppe_style=cpm_pr_style,
-                           obs_style=obs_style,  
+                           obs_style=obs1_style,  
                            ylab="UK mean precipitation, mm/day", ylims=None,
                            marlft=None, marrgt=None, martop=None, marbot=None, 
                            marwsp=None, marhsp=None,xlabfmt="m",
                            outfnames=None )
+    if obs2_pr_monLTA is not None:
+       ax = annualcycle_panel(ppe_cube_in=None, obs_cube_in=obs2_pr_monLTA, fig=fig, ax=ax,
+                              preferred_unit=cf_units.Unit("mm/day"),
+                              moncoord="month_number",membercoord="realization",
+                              ppe_style=gcm_pr_style,
+                              obs_style=obs2_style,  
+                              ylab="UK mean precipitation, mm/day", ylims=None,
+                              marlft=None, marrgt=None, martop=None, marbot=None, 
+                              marwsp=None, marhsp=None,xlabfmt="m",
+                              outfnames=None )
 
 
     # Bottom-right:
     ax = fig.add_subplot(2,2,4)
-    ax = annualcycle_panel(ppe_cube_in=gcm_pr_monLTSD, obs_cube_in=obs_pr_monLTSD, fig=fig, ax=ax,
+    ax = annualcycle_panel(ppe_cube_in=gcm_pr_monLTSD, obs_cube_in=obs1_pr_monLTSD, fig=fig, ax=ax,
                            preferred_unit=cf_units.Unit("mm/day"),
                            moncoord="month_number",membercoord="realization",
                            ppe_style=gcm_pr_style,
-                           obs_style=obs_style,  
+                           obs_style=obs1_style,  
                            ylab='Interannual variability ($\sigma$)\nof UK mean precip, mm/day',
                            ylims=None,
                            marlft=None, marrgt=None, martop=None, marbot=None, 
@@ -840,12 +872,25 @@ def uk_seasonalcycle_tas_pr_forevaluation(gcm_tas_monLTA =None,cpm_tas_monLTA =N
                            preferred_unit=cf_units.Unit("mm/day"),
                            moncoord="month_number",membercoord="realization",
                            ppe_style=cpm_pr_style,
-                           obs_style=obs_style,  
+                           obs_style=obs1_style,  
                            ylab='Interannual variability ($\sigma$)\nof UK mean precip, mm/day',
                            ylims=None,
                            marlft=None, marrgt=None, martop=None, marbot=None, 
                            marwsp=None, marhsp=None,xlabfmt="m",
                            outfnames=None )
+    if obs2_pr_monLTSD is not None:
+       ax = annualcycle_panel(ppe_cube_in=None, obs_cube_in=obs2_pr_monLTSD, fig=fig, ax=ax,
+                              preferred_unit=cf_units.Unit("mm/day"),
+                              moncoord="month_number",membercoord="realization",
+                              ppe_style=gcm_pr_style,
+                              obs_style=obs2_style,  
+                              ylab="UK mean precipitation, mm/day", ylims=None,
+                              marlft=None, marrgt=None, martop=None, marbot=None, 
+                              marwsp=None, marhsp=None,xlabfmt="m",
+                              outfnames=None )
+
+
+
 
     if style=="idlines":
         fig.subplots_adjust(left  = 0.07,  bottom = 0.08,

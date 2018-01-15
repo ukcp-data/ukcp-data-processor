@@ -17,12 +17,27 @@ Contents:
 * Paths to ancilary files, such as land-sea masks
 
 
+* utility function  pdt_to_ncdate() 
+  for converting from iris.time.PartialDateTime  objects to netcdftime.datetime objects.
+  (This is needed when comparing requested dates when loading data)
+
+
 * gcm_filenames() gets a list of GCM PPE filenames ready for loading
-                  (with a test_gcm_filenames() function)
+
+
+* gcm_callback() is an iris callback function to ensure that
+   * cube data is converted to masked arrays of 32-bit floats 
+   * time dimensions have bounds
+   * a forecast_period coord is removed is present
+
+* `make_cube_standarddims()` ensures that all cubes read in have dimensions of 
+   * (realization, time, lat, lon), 
+   * or (realization, time, level, lat, lon)  if soil levels are present.
+
+
+
 
 * load_gcm_data() general GCM PPE data loading function
-                  (with a test_load_gcm_data() function)
-
 
 
 * get_eobs_filenames() gets a list of filenames of the E-OBS data
@@ -35,16 +50,14 @@ Contents:
 * load_eobs_data()  and  load_ncic5km_data()  are wrappers to...
 
 * load_obs_data() is a general function for reading the E-OBS and NCIC obs data
-                  (with test_load_eobs_data() and test_load_ncic5km_data() functions)
-
 
 * load_ncic_ukmean() dedicated function for reading in the NCIC UK-mean data 
-                    (with a test_load_ncic_ukmean() function)
 
 
 --------------------------------------------------------
 '''
 import os
+import sys
 import glob
 import iris
 import cf_units 
@@ -52,9 +65,6 @@ import common_analysis as common
 import datetime as dt
 import numpy as np
 import itertools
-
-from settings import INPUT_DIR
-
 #=========================================================================
 
 # Main data locations here.
@@ -68,6 +78,11 @@ GCM_SUITES = (dict(name="u-an398", startdate=iris.time.PartialDateTime(1899,12,1
               dict(name="DUMMY",   startdate=iris.time.PartialDateTime(3000,12,1)) )
 # Defining this as a tuple keeps it ordered.
 # Note the additional dummy suite, so we can always check the start date of the "next" suite.
+#
+# Note that the start dates are fixed - but you CANNOT assume the end dates are!
+# For example, some u-ap977 runs end in 2005-12, but other run to 2006-02.
+
+
 NSUITES = len(GCM_SUITES) - 1
 
 
@@ -79,7 +94,6 @@ OLD_GCM_SUITES = (dict(name="u-ak048",startdate=iris.time.PartialDateTime(1899,1
 
 
 GCM_COUPLED_MAIN= '/project/spice/qump_hadgem3/GA7/COUPLED/' #u-an398/'
-GCM_COUPLED_MAIN= INPUT_DIR + "/"
 GCM_COUPLED_ALT =             '/project/ukcp18/GA7/COUPLED/' #u-an398/'
 
 GCM_COUPLED_MONTHLY_TAG = "netcdf/monthly/"
@@ -94,9 +108,15 @@ ALT_VBLS = ["heaviside","ua","uas","va","vas"]
 # - we need to exclude them when reading.
 GCM_EXCLUDED_MEMBERS = [1100103]   # Failed early on, too unstable
 
+# These are an additional set of members we'd usually want to exclude,
+# but we still want the option to look at them sometimes.
+GCM_USUALLY_EXCLUDED = [1100696, 1100939, 1102549, 1102829]
+# This can be passed to the  exclusionlist  argument of  load_gcm_data().
+
+
 # These were excluded by David Sexton for the old runs - see email 18/05/2017
 # It remains to be seen if we want to hard-code their exclusion 
-# for the new runs.
+# for the new runs (but see above)
 #GCM_EXCLUDED_MEMBERS += [1102829, 1102549, 1100939] # weak AMOC, ran slowly
 #GCM_EXCLUDED_MEMBERS += [1102884]                   # strong SST warm bias
 
@@ -131,7 +151,21 @@ LANDFRAC_N216_FILE = '/project/spice/qump_hadgem3/GA7/COUPLED/masks/qrparm.landf
 
 
 
+#==============================================================================
+def pdt_to_ncdate(pdt):
+    '''
+    Handy utility function to convert
+    a iris.PartialDateTime (pdt) to a netcdf datetime object
+    (using year, month and day only).
+    
+    This is used to compare requested dates,
+    to find if one date range is outside another
+    (pdt's cannot be ordered themselves)
 
+    '''
+    ncdate = cf_units.netcdftime.datetime(pdt.year, pdt.month, pdt.day)
+    return ncdate
+#==============================================================================
 
 
 
@@ -252,71 +286,118 @@ def gcm_filenames(timeres,vartag, suite_index=None, memberslist=None,
 #-----------------------------------------------------------------------------
 
 
-def test_gcm_filenames():
-    '''
-    This isn't a very thorough test function, but it will do for now.
-    '''
-    print "Testing gcm_filenames() function:"
-    print "············································"
 
-    print "Air temperature monthly filenames:"
-    fnames = gcm_filenames("monthly","tas")
-    print "\n".join(fnames)
-    assert len(fnames) > 0
-    print "············································"
-
-    selmember = 1101935
-    print "Air temperature monthly filenames for member ",selmember,":"
-    fnames = gcm_filenames("monthly","tas",memberslist=[selmember])
-    print "\n".join(fnames)
-    assert len(fnames) > 0
-    print "············································"
-
-    selmembers = [1100000, 1102305, 1102914]
-    print "Air temperature monthly filenames for members ",selmembers,":"
-    fnames = gcm_filenames("monthly","tas",memberslist=selmembers)
-    print "\n".join(fnames)
-    assert len(fnames) > 0
-    print "············································"
-
-    fnames = gcm_filenames("daily","tasmax")
-    print "Air temperature maximum daily filenames:"
-    print "\n".join(fnames)
-    assert len(fnames) > 0
-    print "············································"
-
-    selmember = 1101935
-    print "Air temperature maximum  daily filenames for member ",selmember,":"
-    fnames = gcm_filenames("daily","tasmax",memberslist=[selmember])
-    print "\n".join(fnames)
-    assert len(fnames) > 0
-    print "············································"
-
-    try:
-        fnames = gcm_filenames("rubbish","tas")
-    except UserWarning:
-        print "Correctly rejected rubbish for the timeres argument."
-    print "············································"
-
-    fnames = gcm_filenames("monthly","rubbish")
-    print "Rubbish monthly filenames:"
-    print "\n".join(fnames)
-    assert len(fnames) == 0
-    print "(Correctly got no filenames)"
-    print "············································"
-    
-    print "Note: We're not testing for the presence or completeness of variables here."
-    return
 
 
 
 #--------------------------------------------------------------------------------------------
-def dtype_callback(cube, field, filename):
+def gcm_callback(cube, field, filename):
     '''
     Ensure cubes read in are converted
-    to use maked arrays of 32-bit floats.
+    to use maked arrays of 32-bit floats,
+    
+    and do a couple of other bits of tidying,
+    which ensure that things all concatenate/merge
+    properly in all edge cases...
     '''
-    cube.data = np.ma.asarray(cube.data, dtype=np.float32)
+    # Remove forecast period coord too, 
+    # as it can prevent concatenation...
+    try:
+        cube.remove_coord('forecast_period')
+    except CoordinateNotFoundError:
+        pass
+
+    # And add time coord bounds if not present:
+    if not cube.coord('time').has_bounds():
+        cube.coord('time').guess_bounds()
+
+    # Now do the datatype conversion:
+    if cube.data.dtype != np.float32:
+        # Add mask and change data type:
+        print "---> Changing cube data type from file "+filename+"...", # <-- no newline
+        cube.data = np.ma.asarray(cube.data, dtype=np.float32)
+        print "---> Done."
+        sys.stdout.flush() 
+        
+    else:
+        # Just mask it:
+        cube.data = np.ma.array(cube.data)
+#--------------------------------------------------------------------------------------------
+
+
+
+
+
+
+#--------------------------------------------------------------------------------------------
+def make_cube_standarddims(cube): 
+    '''
+    Ensure a cube has dimensions of
+       realization,time,lat,lon
+    by promoting scalar realization and time coords where necessary,
+    and transposing the cube around
+    so they're in the right order.
+
+    A special case is where cubes have an additional
+    dimension e.g. describing vertical levels.
+    We currently test for this explicitly for the soil level case,
+    but not for other cases yet (e.g. atmospheric levels).
+    It isn't clear that we'll be reading in multiple atmospheric levels
+    into single cubes at this stage, 
+    so other cases might not be necessary.
+    '''
+    #print "INPUT CUBE:"
+    #print cube
+
+    level_name = "soil_model_level_number"
+    got_levels =  level_name in set([c.name() for c in cube.dim_coords])
+
+    n_ok_dims = 5 if got_levels else 4
+
+    if cube.ndim < n_ok_dims:  # Not got enough dims
+        if len(cube.coord_dims("time")) == 0: 
+            print "Promoting scalar time coord to dim coord..." ; sys.stdout.flush() 
+            cube = iris.util.new_axis(cube, scalar_coord="time")
+
+        if len(cube.coord_dims("realization")) == 0: 
+            print "Promoting scalar realization coord to dim coord..." ; sys.stdout.flush() 
+            cube = iris.util.new_axis(cube, scalar_coord="realization")
+    else:
+        pass
+    #print "RESULTING CUBE:"
+    #print cube
+
+    # They could end up in the wrong order,
+    # e.g. if realization is already a dimcoord, but time was a scalar.
+    # So, if necessary, transpose it all into the correct order!
+    if got_levels:
+        # Special case: vertical levels too!
+        cube_coord_dims = [cube.coord_dims('realization')[0],
+                           cube.coord_dims('time'       )[0],
+                           cube.coord_dims(level_name   )[0],
+                           cube.coord_dims('latitude'   )[0],
+                           cube.coord_dims('longitude'  )[0] ]
+        if cube_coord_dims != [0,1,2,3,4]:
+            #print "Transposing..."
+            cube.transpose(cube_coord_dims)
+    else:
+        # Usual case: 4 dims
+        cube_coord_dims = [cube.coord_dims('realization')[0],
+                           cube.coord_dims('time'       )[0],
+                           cube.coord_dims('latitude'   )[0],
+                           cube.coord_dims('longitude'  )[0] ]
+        if cube_coord_dims != [0,1,2,3]:
+            #print "Transposing..."
+            cube.transpose(cube_coord_dims)
+
+    #print "FINAL CUBE:"
+    #print cube
+    
+    #print "Done!"
+    return cube
+
+
+
 #--------------------------------------------------------------------------------------------
 
 
@@ -439,6 +520,7 @@ def load_gcm_data(timeres,vartag, datelimits=None,
                                          tcoord.units.calendar)[0]  for tcoord in tcoordlims]
             realization = acube.coord('realization').points[0]
             print acube.__repr__(), realization, dtlims
+            sys.stdout.flush() 
         raise UserWarning("Refusing to let you try to load GCM data without a date constraint")
 
 
@@ -447,7 +529,7 @@ def load_gcm_data(timeres,vartag, datelimits=None,
         if datelimits.lower()=="all":
             dateconstraint = None
             if verbose:
-                print "All dates requested; not constrainting on time."
+                print "All dates requested; not constrainting on time." ;  sys.stdout.flush() 
         else:
             raise UserWarning("datelimits should be 'all' or a 2-element iterable, in load_gcm_data()")
     else:
@@ -458,19 +540,16 @@ def load_gcm_data(timeres,vartag, datelimits=None,
             if all([type(dtlim) is int                       for dtlim in datelimits]):
                 if verbose:
                     print "datelimits provided as integers, interpreting as years..."
-
-                dateconstraint = iris.Constraint(time = lambda t:
-                                         datelimits[0] <= t.point.year <= datelimits[1])
-#                datelimits = [iris.time.PartialDateTime(year=dtlim,month=1,day=1) \
-#                                  for dtlim in datelimits]
+                    sys.stdout.flush() 
+                datelimits = [iris.time.PartialDateTime(year=dtlim,month=1,day=1) \
+                                  for dtlim in datelimits]
             else:
                 raise UserWarning("Not all date limits were iris.time.PartialDateTime objects or ints!")
         
-
-        else:
-            # Sorted out date limits, now make Constraint:
-            dateconstraint = iris.Constraint(time = lambda t: 
+        # Sorted out date limits, now make Constraint:
+        dateconstraint = iris.Constraint(time = lambda t: 
                                          datelimits[0] <= t.point <= datelimits[1])
+
 
 
     # Sorted out constraints, now putting them together...
@@ -480,42 +559,72 @@ def load_gcm_data(timeres,vartag, datelimits=None,
     else:
         theconstraint = dateconstraint
     
+    
 
     # Get the filenames from the two suites separately:
     filenames_of_suites = [gcm_filenames(timeres,vartag, suite_index=i, memberslist=memberslist, 
                                exclusionlist=exclusionlist, verbose=verbose) for i in range(NSUITES) ]
-    #filenames0 = gcm_filenames(timeres,vartag, suite_index=0, memberslist=memberslist, 
-    #                           exclusionlist=exclusionlist, verbose=verbose)
-    #filenames1 = gcm_filenames(timeres,vartag, suite_index=1, memberslist=memberslist, 
-    #                           exclusionlist=exclusionlist, verbose=verbose)
     
-    # Files from the first suite (1899-12 to 1971-02) need trimming
-    # so they only go to 1970-11
-    # (so we take 1970-12 onwards from the second suite only)
-
     # Each suite goes on for a few months after the next suite starts,
     # so they need these last extra dates trimming off.
     # Make a list of Constraints for taking the date to be before the next suite's start date:
-    suitedates_constraints = [iris.Constraint(time = lambda cell: cell < GCM_SUITES[i+1]["startdate"]) for i in range(NSUITES)]
-    #suitedates_constraint = iris.Constraint(time = lambda cell: cell < iris.time.PartialDateTime(1970,12,1))
-    #suitedates_constraint = iris.Constraint(time = lambda cell: cell < iris.time.PartialDateTime(2005,12,1))
+    suitedates_constraints = [iris.Constraint(time = lambda t: t.point < GCM_SUITES[i+1]["startdate"]) for i in range(NSUITES)]
+
+
+
+
+    # But the requested dates allow us to pre-filter the suites,
+    # which can save a lot of time...
+    # Let's set this up here to avoid repitition.
+    skipsuite = [False] * NSUITES
+    for i in range(NSUITES):
+        skipsuite[i] = pdt_to_ncdate(datelimits[0]) > GCM_SUITES[i+1]["startdate"] \
+                    or pdt_to_ncdate(datelimits[1]) < GCM_SUITES[i  ]["startdate"] 
+        if verbose: 
+            print "Skip suite ",i,"?",skipsuite[i] ; sys.stdout.flush() 
+
+
+
 
 
     # Finally: load the data.
     if returnCL:
         if verbose:
-            print "Loading data to be returned as a CubeList..."
+            print "Loading data to be returned as a CubeList..." ; sys.stdout.flush() 
         # Load the data such that a CubeList is returned:
         thedata = iris.cube.CubeList()
         with iris.FUTURE.context(cell_datetime_objects=True):    
             for i in range(NSUITES):
-                thedata.extend( iris.load(filenames_of_suites[i], 
-                                          theconstraint & suitedates_constraints[i], 
-                                          callback=dtype_callback) )
-            #thedata =       iris.load(filenames0, theconstraint & suitedates_constraint, callback=dtype_callback)
-            #thedata.extend( iris.load(filenames1, theconstraint,                         callback=dtype_callback) )
+                if skipsuite[i]:
+                    print "Date range doesn't include this suite, skipping..."
+                    sys.stdout.flush() 
+                    continue
+
+                incubelist =  iris.load(filenames_of_suites[i], 
+                                        theconstraint & suitedates_constraints[i], 
+                                        callback=gcm_callback)
+                # If these were always CubeLists,
+                # we could just say    thedata.extend( incubelist )
+                # but as we need to ensure the correct dimensions,
+                # we're going to split it into each cube anyway,
+                # so we'll end up doing thedata.append instead of .extend...
+
+                # This could actually still be a single cube, 
+                # so we should test:
+                if type(incubelist) is iris.cube.CubeList:
+                    # Usual case: incubelist is actually a CubeList:
+                    for incube in incubelist:
+                        thedata.append( make_cube_standarddims(incube) )
+                elif type(incubelist) is iris.cube.Cube:
+                    # Alternatively: it could be a single cube.
+                    thedata.append( make_cube_standarddims(incubelist) )
+                else:
+                    raise UserWarning("Result of iris.load is of type "+str(type(incubelist)) \
+                                          +"which isn't iris.cube.Cube or iris.cube.CubeList!")
+            del(incube)
+
         if verbose:
-            print "Read data into CubeList with the following limits:"
+            print "Read data into CubeList with the following limits:" ; sys.stdout.flush() 
             for i,acube in enumerate(thedata):
                 tcoordlims = [acube.coord('time')[0], acube.coord('time')[-1] ]
                 dtlims = [cf_units.num2date( tcoord.points,
@@ -523,65 +632,54 @@ def load_gcm_data(timeres,vartag, datelimits=None,
                                              tcoord.units.calendar)[0]  for tcoord in tcoordlims]
                 realizations = acube.coord('realization').points
                 print i,":",acube.__repr__(), " Dates:",dtlims," Realizations:",realizations
+                sys.stdout.flush() 
 
             
     else:
-        if verbose: print "Attempting to loading data into a single Cube..."
+        if verbose: print "Attempting to load data into a single Cube..."
         # The usual case: try to load the data in as a single Cube:
         # (although it's a bit more complicated than that,
         #  as we have to get the data from the two suites separately)
         thedata_insuites = iris.cube.CubeList()
         if verbose:
             print "Read data into cubes for each suite:"
+            sys.stdout.flush() 
         with iris.FUTURE.context(cell_datetime_objects=True):    
             for i in range(NSUITES):
                 if verbose:
                     print "Suite ",i,": ("+GCM_SUITES[i]["name"]+"):"
-                #import code ; code.interact(local=locals())
+                    sys.stdout.flush() 
+                if skipsuite[i]:
+                    print "Date range doesn't include this suite, skipping..." ; sys.stdout.flush() 
+                    continue
+
+                #NB uncomment this line if cubes not loading and you want to test things interactively here:
+                #import code ; code.interact(local=locals()) 
+                # incube = iris.load_cube(filenames_of_suites[i], theconstraint & suitedates_constraints[i], callback=ukcpio.gcm_callback) 
                 try:
-                    thedata_insuites.append( iris.load_cube(filenames_of_suites[i], 
-                                                            theconstraint & suitedates_constraints[i],
-                                                            callback=dtype_callback) )
+                    incube = iris.load_cube(filenames_of_suites[i], 
+                                            theconstraint & suitedates_constraints[i],
+                                            callback=gcm_callback) 
+                    incube = make_cube_standarddims(incube)
                     if verbose:
-                        print "   ",thedata_insuites[i].__repr__()
+                        print "   ",incube.__repr__()
+                    thedata_insuites.append( incube )
+                    del(incube)
                      #
                 except iris.exceptions.ConstraintMismatchError as cause:
-                    if verbose:
-                        print "     (No data)"
+                    if verbose:   print "     (No data)"
                     print "     Didn't get any data from suite ",i,  \
                         ", with iris.exceptions.ConstraintMismatchError:" ,cause
-            #
-            # First suite:
-            #try:
-            #    thedata0 = iris.load_cube(filenames0, theconstraint & suitedates_constraint, callback=dtype_callback)
-            #except iris.exceptions.ConstraintMismatchError as cause:
-            #    print "Didn't get any data from suite 0, with iris.exceptions.ConstraintMismatchError:" ,cause
-            #    thedata0 = None
-            ## Second suite:
-            #try:
-            #    thedata1 = iris.load_cube(filenames1, theconstraint,                         callback=dtype_callback)
-            #except iris.exceptions.ConstraintMismatchError as cause:
-            #    print "Didn't get any data from suite 1, with iris.exceptions.ConstraintMismatchError:" ,cause
-            #    thedata1 = None
+                    sys.stdout.flush() 
+
+
         # Combine what we've got:
-        #if thedata0 is None:
-        #    thedata = thedata1
-        #elif thedata1 is None:
-        #    thedata = thedata0
-        #else:
-        #    thedata = iris.cube.CubeList([thedata0,thedata1]).concatenate_cube()
         thedata = thedata_insuites.concatenate_cube()
    
         if verbose:
-            #print "Read data into cubes for each suite:"
-            #print "First suite ("+GCM_SUITES[0]["name"]+"):"
-            #print "   ",thedata0.__repr__()
-            #print "Second suite ("+GCM_SUITES[1]["name"]+"):"
-            #print "   ",thedata1.__repr__()
-            #print "Third suite ("+GCM_SUITES[2]["name"]+"):"
-            #print "   ",thedata1.__repr__()
             print "Resulting single Cube:"
             print "   ",thedata.__repr__()
+            sys.stdout.flush() 
             tcoordlims = [thedata.coord('time')[0], thedata.coord('time')[-1] ]
             dtlims = [cf_units.num2date( tcoord.points,
                                          tcoord.units.name,
@@ -589,6 +687,7 @@ def load_gcm_data(timeres,vartag, datelimits=None,
             realizations = thedata.coord('realization').points
             print "Date range:  ", dtlims
             print "Realizations:", realizations
+            sys.stdout.flush() 
     
     
     return thedata
@@ -597,112 +696,6 @@ def load_gcm_data(timeres,vartag, datelimits=None,
 #-------------------------------------------------------------------
 
 
-def test_load_gcm_data():
-    '''
-    This isn't a very thorough test function, but it will do for now.
-    '''
-    print "Testing load_gcm_data() function:"
-    vartag  = "tas"
-    timeres = "monthly"
-    verbose = True
-    dtlims_ok = [ iris.time.PartialDateTime(year=1900,month=1,day=1),
-                  iris.time.PartialDateTime(year=1910,month=1,day=1) ]
-    dtlims_bad = [iris.time.PartialDateTime(year=1900,month=1,day=1),
-                  iris.time.PartialDateTime(year=1990,month=1,day=1) ]
-    dtlims_transition = [iris.time.PartialDateTime(1969,6,1), 
-                         iris.time.PartialDateTime(1980,6,1) ]
-    dtlims_suite1 = [iris.time.PartialDateTime(1980,1,1), 
-                     iris.time.PartialDateTime(1983,1,1) ]
-    members_suite1= [1100000,1102753,1102914,1101649]
-    members_exclude= [1100000,1102753,1102914,1101649]
-    print "············································"
-
-    print "Reading in without any constraint:"
-    try:
-        acube = load_gcm_data(timeres,vartag, datelimits=None,  returnCL=False, verbose=verbose)
-    except UserWarning:
-        print "Correctly refused to work."
-    print "············································"
-
-    print "Trying to read in data with sensible date limits:"
-    acube = load_gcm_data(timeres,vartag, datelimits=dtlims_ok,  returnCL=False, verbose=verbose)
-    print "That worked fine."
-    print "············································"
-
-    print "Trying to read in data with bad date limits:"
-    try:
-        acube = load_gcm_data(timeres,vartag, datelimits=dtlims_bad,  returnCL=False, verbose=verbose)
-    except iris.exceptions.ConstraintMismatchError:
-        print "Correctly failed."
-    print "············································"
-
-    print "Trying to read in all dates into a single Cube:"
-    try:
-        acube = load_gcm_data(timeres,vartag, datelimits="all",  returnCL=False, verbose=verbose)
-    except iris.exceptions.ConstraintMismatchError:
-        print "Correctly failed."
-    print "············································"
-
-    selmember = 1101843
-    print "Trying to read in all dates from member",selmember," into a single Cube:"
-    acube = load_gcm_data(timeres,vartag, datelimits="all", memberslist=[selmember], returnCL=False, verbose=verbose)
-    print "That worked fine."
-    print "············································"
-
-    print "Trying to read all dates into a CubeList:"
-    acubelist = load_gcm_data(timeres,vartag, datelimits="all",  returnCL=True, verbose=verbose)
-    print "That worked fine."
-    print "············································"
-
-    print "Trying to read in data with sensible date limits into a CubeList:"
-    acubelist = load_gcm_data(timeres,vartag, datelimits=dtlims_ok,  returnCL=True, verbose=verbose)
-    assert len(acubelist)==1
-    print "That worked fine."
-    print "············································"
-    
-
-
-    print "Trying to read in data across first suite only:"
-    dtlims = [ iris.time.PartialDateTime(year=1899,month=12,day=1),
-               iris.time.PartialDateTime(year=1913,month=12,day=1) ]
-    acube = load_gcm_data(timeres,vartag, datelimits=dtlims_transition, memberslist=[1100000],  returnCL=False, verbose=verbose)
-    print "That worked fine."
-    print "············································"
-
-    print "Trying to read in data across second uite only:"
-    dtlims = [ iris.time.PartialDateTime(year=1975,month=12,day=1),
-               iris.time.PartialDateTime(year=1990,month=12,day=1) ]
-    acube = load_gcm_data(timeres,vartag, datelimits=dtlims_transition, memberslist=[1100000],  returnCL=False, verbose=verbose)
-    print "That worked fine."
-    print "············································"
-
-    print "Trying to read in data across third suite only:"
-    dtlims = [ iris.time.PartialDateTime(year=2006,month=12,day=1),
-               iris.time.PartialDateTime(year=2013,month=12,day=1) ]
-    acube = load_gcm_data(timeres,vartag, datelimits=dtlims_transition, memberslist=[1100000],  returnCL=False, verbose=verbose)
-    print "That worked fine."
-    print "············································"
-
-    print "Trying to read in data across all 3 suites:"
-    dtlims = [ iris.time.PartialDateTime(year=1899,month=12,day=1),
-               iris.time.PartialDateTime(year=2013,month=12,day=1) ]
-    acube = load_gcm_data(timeres,vartag, datelimits=dtlims_transition, memberslist=[1100000],  returnCL=False, verbose=verbose)
-    print "That worked fine."
-    print "············································"
-
-
-
-    print "Trying to exclude some members:"
-    acube = load_gcm_data(timeres,vartag, datelimits=dtlims_ok, exclusionlist=members_exclude, returnCL=False, verbose=verbose)
-    print "That worked fine."
-    print "············································"
-
-
-
-
-
-    print "Note: We're not testing for the presence or completeness of variables here."
-    return
 
 #===============================================================================================
 
@@ -1029,134 +1022,6 @@ def load_obs_data(source,timeres,vartag, yearlimits=None, datelimits=None, other
     return thedata
 
 
-#----------------------------------------------------------------------------
-
-
-def test_load_eobs_data():
-    '''
-    Just some examples really
-    '''
-    print "Testing load_eobs_data() function:"
-    
-    print "----------------------------------------"
-    print "Loading precip data for 1951-1970:"
-    d = load_eobs_data("monthly","pr",  yearlimits=[1951,1970], verbose=True)
-    print "Done"
-    print "Time coord:"
-    print d.coord('time')
-    print "----------------------------------------"
-
-    print "----------------------------------------"
-    print "Trying to load the same as daily data:"
-    try:
-        d = load_eobs_data("daily","pr", yearlimits=[1951,1970], verbose=True)
-    except UserWarning:
-        print "Correctly failed to load daily data."
-    print "----------------------------------------"
-
-    print "----------------------------------------"
-    print "Requesting temperature data partially outside date range:"
-    d = load_eobs_data("monthly","tas",  yearlimits=[1940,1959], verbose=True)
-    print "Done"
-    print "Time coord:"
-    print d.coord('time')
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Requesting data fully outside date range:"
-    try:
-        d = load_eobs_data("monthly","tas", yearlimits=[1899,1940], verbose=True)
-    except UserWarning:
-        print "Correctly failed to find files outside date range"
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Requesting 1981-10-25 to 1984-01-24 only:"
-    dtlims = [dt.date(1981,10,25), dt.date(1984, 1,24)]
-    d = load_eobs_data("monthly","tas", datelimits=dtlims,  verbose=True)
-    print "Time coord:"
-    print d.coord('time')
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Requesting DJFs only:"
-    djfconstraint = iris.Constraint(time = lambda t: t.point.month in [12,1,2])
-    d = load_eobs_data("monthly","tas", otherconstraint=djfconstraint,  verbose=True)
-    print "Time coord:"
-    print d.coord('time')
-    print "----------------------------------------"
-
-    print "Done with testing load_eobs_data()..."
-    return
-
-
-#----------------------------------------------------------------------------
-
-
-def test_load_ncic5km_data():
-    '''
-    Just some examples really
-    '''
-    print "Testing load_ncic5km_data() function:"
-    
-    print "----------------------------------------"
-    print "Loading precip data for 1961-1980:"
-    d = load_ncic5km_data("monthly","pr",  yearlimits=[1961,1980], verbose=True)
-    print "Done"
-    print "Time coord:"
-    print d.coord('time')
-    print "----------------------------------------"
-
-    print "----------------------------------------"
-    print "Loading the same period as daily data:"
-    d = load_ncic5km_data("daily","pr", yearlimits=[1961,1980], verbose=True)
-    print "Done"
-    print "Time coord:"
-    print d.coord('time')
-    print "----------------------------------------"
-
-    print "----------------------------------------"
-    print "Requesting temperature data partially outside date range:"
-    d = load_ncic5km_data("monthly","tas",  yearlimits=[1899,1915], verbose=True)
-    print "Done"
-    print "Time coord:"
-    print d.coord('time')
-    print "----------------------------------------"
-
-    print "----------------------------------------"
-    print "Requesting data fully outside date range:"
-    try:
-        d = load_ncic5km_data("daily","tas", yearlimits=[1899,1915], verbose=True)
-    except UserWarning:
-        print "Correctly failed to find files outside date range"
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Requesting daily data 1981-10-25 to 1984-01-24 only:"
-    dtlims = [dt.date(1981,10,25), dt.date(1984, 1,24)]
-    d = load_ncic5km_data("daily","tas", datelimits=dtlims,  verbose=True)
-    print "Time coord:"
-    print d.coord('time')
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Requesting DJFs only:"
-    djfconstraint = iris.Constraint(time = lambda t: t.point.month in [12,1,2])
-    d = load_ncic5km_data("monthly","tas", otherconstraint=djfconstraint,  verbose=True)
-    print "Time coord:"
-    print d.coord('time')
-    print "----------------------------------------"
-
-    print "Done with testing load_ncic5km_data()..."
-    return
-
-
-
 #==============================================================================================
 
 
@@ -1353,118 +1218,6 @@ def load_ncic_ukmean(timeres,vartag,yearlimits=None,datelimits=None, verbose=Fal
 
     return thecube
 
-#-------------------------------------------------------------------------
-
-def test_load_ncic_ukmean():
-    ''' Some simple tests '''
-    print "Testing load_ncic_ukmean() function:"
-    
-    print "----------------------------------------"
-    print "Loading UK-mean monthly tas:"
-    d = load_ncic_ukmean("monthly","tas")
-    print "Done. Cube:"
-    print d
-    print "----------------------------------------"
-
-
-
-    print "----------------------------------------"
-    print "Loading UK-mean monthly tas from 1981-2000:"
-    d = load_ncic_ukmean("monthly","tas", yearlimits=[1981,2000])
-    print "Done. Cube:"
-    print d
-    print "Time coord range:"
-    print d.coord('time')[0]
-    print d.coord('time')[-1]
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Trying to load UK-mean monthly tas from 1881-1900:"
-    try:
-        d = load_ncic_ukmean("monthly","tas", yearlimits=[1881,1900])
-    except UserWarning:
-        print "Correctly failed to load data outside year range."
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Loading UK-mean monthly tas from Oct 1981 to  Jan 2000:"
-    datelims = [iris.time.PartialDateTime(1981,10,1),
-                iris.time.PartialDateTime(2000, 1,31)]
-    d = load_ncic_ukmean("monthly","tas", datelimits=datelims)
-    print "Done. Cube:"
-    print d
-    print "Time coord range:"
-    print d.coord('time')[0]
-    print d.coord('time')[-1]
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Trying to laod UK-mean monthly tas from Aug 2018 to May 2050:"
-    datelims = [iris.time.PartialDateTime(2018, 8,1),
-                iris.time.PartialDateTime(2050, 5,31)]
-    try:
-        d = load_ncic_ukmean("monthly","tas", datelimits=datelims)
-    except UserWarning:
-        print "Correctly failed to load data outside date range."
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Loading UK-mean seasonal tas:"
-    d = load_ncic_ukmean("seasonal","tas")
-    print "Done. Cube:"
-    print d
-    print "Time coord range:"
-    print d.coord('time')[0]
-    print d.coord('time')[-1]
-    print "Data:"
-    print d.data
-    print "Attempting to add auxcoords..."
-    common.add_coord_categories(d)
-    print d
-    print "----------------------------------------"
-
-    print "----------------------------------------"
-    print "Loading UK-mean annual tas:"
-    d = load_ncic_ukmean("annual","tas")
-    print "Done. Cube:"
-    print d
-    print "Time coord range:"
-    print d.coord('time')[0]
-    print d.coord('time')[-1]
-    print "Data:"
-    print d.data
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Loading UK-mean monthly tasmax:"
-    d = load_ncic_ukmean("monthly","tasmax")
-    print "Done. Cube:"
-    print d
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Loading UK-mean monthly tasmin:"
-    d = load_ncic_ukmean("monthly","tasmin")
-    print "Done. Cube:"
-    print d
-    print "----------------------------------------"
-
-
-    print "----------------------------------------"
-    print "Loading UK-mean monthly precip:"
-    d = load_ncic_ukmean("monthly","pr")
-    print "Done. Cube:"
-    print d
-    print "----------------------------------------"
-
-    print "Done with testing load_ncic_ukmean(()..."
-    return
 #=================================================================
 
 
@@ -1479,12 +1232,9 @@ def test_load_ncic_ukmean():
 
 #=========================================================================
 if __name__=="__main__":
-    print "Testing io.py module from ukcp_common_analysis package:"
-    print "============================================================"
-    test_gcm_filenames()
-    print "============================================================"
-    test_load_gcm_data()
-    print "============================================================"
-    print "Done"
+    print "====================================================================================="
+    print "You have tried to run   ukcp_common_analysis.io   from the command line."
+    print "This does nothing. Try importing the module and using its functions in your own work!"
+    print "====================================================================================="
 
 #=========================================================================

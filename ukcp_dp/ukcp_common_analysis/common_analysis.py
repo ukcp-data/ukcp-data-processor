@@ -410,6 +410,14 @@ def add_coord_categories(acube,timecoordname="time", theseasons=('djf','mam','jj
     You might want to add *multiple* seasonal coords 
     based on different season definitions (e.g. NDJ,FMA,MJJ,ASO; or JFM,AMJ,JAS,OND)
     this is currently best done manually yourself!!
+
+    ------------------------------------------------------------------------
+    WARNING: In  iris 1.13, Lizzie says that there's a bug 
+             in the implentation of iris.coord_categorisation.add_day_of_year(),
+             in that it doesn't.
+             We're not adding day-of-year yet, 
+             but bear this in mindif you're thinking about it!
+    ------------------------------------------------------------------------
     '''
     try:
         iris.coord_categorisation.add_year(acube,timecoordname, name="year")
@@ -601,6 +609,7 @@ def get_monthlymean_timeseries(acube, timecoordname="time"):
 
 #===========================================================================
 def make_climatology(acube, timecoordname='time',year_range=None, 
+                     seasonyear_range = None,
                      climtype="annual", operation=iris.analysis.MEAN):
     '''
     Make a "climatology", i.e. a statistic calculated over a long period of time.
@@ -622,10 +631,17 @@ def make_climatology(acube, timecoordname='time',year_range=None,
     which is linked to time, year, and season or month & month_number AuxCoords.
      
     The climatology will be calculated over all timesteps in acube by default.
-    Alternatively, you can provide a 2-element tuple/list yo year_range,
+    Alternatively, you can provide a 2-element tuple/list to year_range,
     specifying the subset of years to include;
     an intermediate cube will be extracted covering that range.
     Note that the years selected will go from year_range[0] to year_range[1] INCLUSIVE.
+
+    Alternatively, you can do the same thing to a season_year coordinate,
+    by giving that 2-element tuple/list to the seasonyear_range argument instead.
+    This means that Decembers will be kept with the subsequent year
+    (e.g. Dec 1980 is in season_year 1981),
+    which is what we usually want to do for UKCP18...
+
     '''
 
     if year_range is not None:
@@ -637,6 +653,19 @@ def make_climatology(acube, timecoordname='time',year_range=None,
         year_constraint = iris.Constraint(year=lambda cell: \
                                               year_range[0] <= cell <= year_range[1] )
         thiscube = acube.extract(year_constraint)
+    else:
+        thiscube = acube
+
+
+    if seasonyear_range is not None:
+        try:
+            iris.coord_categorisation.add_season_year(acube,timecoordname, name="season_year")
+        except ValueError:
+            pass
+        # Now extract the subset of years:
+        seasyear_constraint = iris.Constraint(season_year=lambda cell: \
+                                                  seasonyear_range[0] <= cell <= seasonyear_range[1] )
+        thiscube = acube.extract(seasyear_constraint)
     else:
         thiscube = acube
 

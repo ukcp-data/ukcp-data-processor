@@ -93,32 +93,41 @@ REG_BI_DATA = dict(lons=(-15, 5),lats=(48,63))
 REG_NAE_TEST     = dict(lons=( -80,40), lats=(10,75) )
 REG_NAE_BIG_TEST = dict(lons=(-100,30), lats=( 0,90) )
 
-# A region focusing on Europe, i.e. without so much Atlantic.
-REG_EUROPE       = dict(lons=(-30,30), lats=(30,75) )
-REG_EUROPE_TIGHT = dict(lons=(-20,30), lats=(30,75) )
+# A region focusing on Europe, i.e. without so much Atlantic/Africa
+REG_EUROPE        = dict(lons=(-30,30), lats=(30,75) )
+REG_EUROPE_TIGHT  = dict(lons=(-20,30), lats=(30,75) ) # keeps NAfrica, cuts through Iceland
+REG_EUROPE_TIGHT1 = dict(lons=(-25,30), lats=(35,75) ) # Cuts NAfrica, covers Iceland
+REG_EUROPE_TIGHT2 = dict(lons=(-25,30), lats=(35,72) ) # Cuts NAfrica, covers Iceland, less sea above Norway
+REG_EUROPE_TIGHT3 = dict(lons=(-12,30), lats=(35,72) ) # Cuts NAfrica & Iceland, less sea above Norway
 
 
 # Shapefile locations & other metadata:
-#UKSHAPES_COUNTRIES  = '/project/ukcp18/shapefiles_uk/BritishIsles'
-#UKSHAPES_REGIONS    = '/project/ukcp18/shapefiles_uk/UK_Admin'
-#UKSHAPES_CATCHMENTS = '/project/ukcp18/shapefiles_riverbasins/ERC_Catch_Dissolve_NG'
-
-UKSHAPES = dict(uk        =dict(sourcefile = shpreader.natural_earth(resolution='10m',  #'110m',
-                                                                     category  ='cultural', 
-                                                                     name      ='admin_0_countries'),
-                                attr_key   = "NAME",
-                                projection = ccrs.PlateCarree()),
+UKSHAPES = dict(# The countryplus set includes the UK as well as other sub-UK countries:
+                countryplus =dict(sourcefile = '/project/ukcp18/shapefiles_uk/BritishIslesPlus',
+                                  projection = projns.UKCP_OSGB,
+                                  attr_key   = "Region"),
+                # This includes 16 subnational administrative regions:
                 admin     =dict(sourcefile = '/project/ukcp18/shapefiles_uk/UK_Admin',
                                 projection = projns.UKCP_OSGB,
                                 attr_key   = "Region"),
+                # This includes the 4 constituent countries of the UK,
+                # plus the Channel Islands and the Isle of Man
                 countries =dict(sourcefile = '/project/ukcp18/shapefiles_uk/BritishIsles',
                                 projection = projns.UKCP_OSGB,
                                 attr_key   = "Region"),
-                catchments=dict(sourcefile = '/project/ukcp18/shapefiles_riverbasins/ERC_Catch_Dissolve_NG',
-                                projection = projns.UKCP_OSGB,
-                                attr_key   = "BASINNAME")
+                # This contains river basin regions:
+                riverbasins=dict(sourcefile = '/project/ukcp18/shapefiles_riverbasins/ERC_Catch_Dissolve_NG2',
+                                 projection = projns.UKCP_OSGB,
+                                 attr_key   = "BASINNAME"),
+                # Including the cartopy standard Natural Earth version too,
+                # mostly just for reference and comparison.
+                ukNaturalEarth=dict(sourcefile = shpreader.natural_earth(resolution='10m',  #'110m',
+                                                                         category  ='cultural', 
+                                                                         name      ='admin_0_countries'),
+                                    attr_key   = "NAME",
+                                    projection = ccrs.PlateCarree()),
                 )
-                
+
 
 
 
@@ -640,28 +649,6 @@ def get_cube_shapefileregions_weights(cube, shapefile_regions,
 
 #=========================================================================
 # Wrappers to easily get UK/regional averages:
-def NOT_IN_USE_get_uk_shapefile_region():
-    '''
-    Wrapper to get_shapefile_region, 
-    specifying sensible parameters
-    to get a shapefile of the UK.
-
-    SUPERCEDED BY CALLING get_ukcp_shapefile_regions("uk")[0]
-
-    '''
-    sourcefile = shpreader.natural_earth(resolution= '10m',  #'110m',
-                                         category  = 'cultural', 
-                                         name      = 'admin_0_countries')
-    shapefreg = get_shapefile_regions(sourcefile=sourcefile, attr_key="NAME",
-                                      attr_vals=["United Kingdom"],
-                                      projection=ccrs.PlateCarree() )[0]
-    return shapefreg
-#-------------------------------------------------------------------------
-
-
-
-
-
 
 
 #-------------------------------------------------------------------------
@@ -672,17 +659,15 @@ def get_ukcp_shapefile_regions(regionset, region_names=None):
     
     regionset is a string, converted to lower-case automatically,
     corresponding to one of the keys in the UKSHAPES dictionary
-    (e.g. "uk", "admin", "countries", "catchments")
+    (e.g. "countryplus", "admin", "countries", "riverbasins")
 
     region_names is an optional list of strings.
     Leave this as None for the default:  bring back all regions in the shapefiles.
-                                        (or just the UK if regionset=="uk")
     Or provide a list of strings to be used to pull out
     just those selected regions from the shapefile.
 
     Note this ALWAYS returns a LIST of cartopy.io.shapereader.Record objects
-    -- for the "uk" case, or if len(region_names)=1, 
-    you'll probably want to just take element [0].
+    -- if len(region_names)=1,  you'll probably want to just take element [0].
     '''
     regionset = regionset.lower()
     try:
@@ -696,7 +681,7 @@ def get_ukcp_shapefile_regions(regionset, region_names=None):
     sourcefile = regiondata['sourcefile']
     projection = regiondata['projection']
     attr_key   = regiondata['attr_key']
-    if regionset == "uk":
+    if regionset == "ukNaturalEarth":
         region_names = ["United Kingdom"]
 
     shapefregs = get_shapefile_regions(sourcefile=sourcefile, attr_key=attr_key,
@@ -721,11 +706,10 @@ def get_ukcp_regionalaverages(acube, regionset, region_names=None, weights=None,
     
     regionset is a string, converted to lower-case automatically,
     corresponding to one of the keys in the UKSHAPES dictionary
-    (e.g. "uk", "admin", "countries", "catchments")
+    (e.g. "countryplus", "admin", "countries", "riverbasins")
     
     region_names is an optional list of strings.
     Leave this as None for the default:  bring back all regions in the shapefiles.
-                                        (or just the UK if regionset=="uk")
     Or provide a list of strings to be used to pull out
     just those selected regions from the shapefile.
 
@@ -789,7 +773,13 @@ def get_uk_areaaverage(acube):
     '''
     print "Reading shapefile..."
     #reg = get_uk_shapefile_region()
-    reg = get_ukcp_shapefile_regions("uk")[0]
+    #reg = get_ukcp_shapefile_regions("uk")[0]
+
+    # An alternative would be to use the Natural Earth shapefiles:
+    #reg = get_ukcp_shapefile_regions("ukNaturalEarth")[0]
+    # but this is our standard approach:
+    reg = get_ukcp_shapefile_regions("countryplus", region_names=["UK"])[0]
+
     print "Getting weights..."
     weights = get_cube_shapefileregion_weights(acube, reg, weightfn="area",
                                                mask=None,take_cube_shape=True)

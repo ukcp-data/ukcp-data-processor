@@ -184,7 +184,7 @@ class StandardMap(object):
         thestr  = ""
         thestr += "StandardMap object:" + self.tag +"\n"
         thestr += "  Plot as filled contours? cont = "+str(self.cont) +"\n"
-        thestr += "  Value range:          vrange = ["+str(self.vrange[0])+","+str(self.vrange[1])+"]" +"\n"
+        thestr += "  Value range:          vrange = "+str(self.vrange) +"\n" #str(self.vrange[0])+","+str(self.vrange[1])+"]" +"\n"
         thestr += "  Value step:           vstep  = "+str(self.vstep) +"\n"
         thestr += "  Value divergence point  vmid = "+str(self.vmid)  +"\n"
         thestr += "  Colour palette name:    cpal = "+self.cpal +"\n"
@@ -431,6 +431,7 @@ UKCP_NAE_SEAS_MEAN_BIAS_TEMP.cpal = UKCP_TEMP_ANOM.cpal
 # Will probably still want to change these:
 UKCP_NAE_SEAS_MEAN_BIAS_TEMP.vrange = [-10,6]
 UKCP_NAE_SEAS_MEAN_BIAS_TEMP.vstep  = 1.0
+UKCP_NAE_SEAS_MEAN_BIAS_TEMP.vmid   = 0.0
 
 
 UKCP_NAE_SEAS_MEAN_BIAS_PRECIP = UKCP_NAE_SEAS.copy()
@@ -451,22 +452,25 @@ UKCP_NAE_SEAS_MEAN_BIAS_PRECIP.vmid   = 0.0
 
 UKCP_EUR_SEAS_MEAN_BIAS_TEMP = UKCP_NAE_SEAS_MEAN_BIAS_TEMP.copy()
 UKCP_EUR_SEAS_MEAN_BIAS_TEMP.tag = "UKCP_EUR_seas_temp_bias"
-UKCP_EUR_SEAS_MEAN_BIAS_TEMP.set_xylims(regs.REG_EUROPE_TIGHT)
+UKCP_EUR_SEAS_MEAN_BIAS_TEMP.set_xylims(regs.REG_EUROPE_TIGHT3)
 UKCP_EUR_SEAS_MEAN_BIAS_TEMP.proj = projns.UKCP_EUR_LATLON
 UKCP_EUR_SEAS_MEAN_BIAS_TEMP.cmsize = [12,13]
 UKCP_EUR_SEAS_MEAN_BIAS_TEMP.set_margins(left  = 0.01,  bottom = 0.17,
                                          right = 0.99,  top    = 0.99,
                                          wspace= 0.03,  hspace = 0.03 )
+UKCP_EUR_SEAS_MEAN_BIAS_TEMP.vrange = [-10,4]
+
 
 UKCP_EUR_SEAS_MEAN_BIAS_PRECIP = UKCP_NAE_SEAS_MEAN_BIAS_PRECIP.copy()
 UKCP_EUR_SEAS_MEAN_BIAS_PRECIP.tag = "UKCP_EUR_seas_precip_bias"
-UKCP_EUR_SEAS_MEAN_BIAS_PRECIP.set_xylims(regs.REG_EUROPE_TIGHT)
+UKCP_EUR_SEAS_MEAN_BIAS_PRECIP.set_xylims(regs.REG_EUROPE_TIGHT3)
 UKCP_EUR_SEAS_MEAN_BIAS_PRECIP.proj = projns.UKCP_EUR_LATLON
 UKCP_EUR_SEAS_MEAN_BIAS_PRECIP.cmsize = [12,13]
 UKCP_EUR_SEAS_MEAN_BIAS_PRECIP.set_margins(left  = 0.01,  bottom = 0.17,
                                            right = 0.99,  top    = 0.99,
                                            wspace= 0.03,  hspace = 0.03 )
-UKCP_EUR_SEAS_MEAN_BIAS_PRECIP.vrange = [-100.0, 140.0]
+#UKCP_EUR_SEAS_MEAN_BIAS_PRECIP.vrange = [-100.0, 140.0]
+UKCP_EUR_SEAS_MEAN_BIAS_PRECIP.vrange = [-80.0, 140.0]
 
 
 
