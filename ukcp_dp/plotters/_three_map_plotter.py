@@ -1,4 +1,5 @@
 from _map_plotter import MapPlotter
+from ukcp_dp.constants import InputType
 import iris
 import matplotlib.gridspec as gridspec
 import ukcp_dp.ukcp_standard_plots.mapper as maps
@@ -73,6 +74,11 @@ class ThreeMapPlotter(MapPlotter):
                                         ax=ax, barlab=None,
                                         bar_orientation="none",
                                         outfnames=None)
+
+        if self.input_data.get_value(InputType.SHOW_BOUNDARIES) is not None:
+            self.plot_overlay(
+                self.input_data.get_value(InputType.SHOW_BOUNDARIES))
+
         ax.set_title(title)
 
         return result

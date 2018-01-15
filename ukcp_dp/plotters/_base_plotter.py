@@ -213,14 +213,8 @@ class BasePlotter():
 
         plotsettings.bar_orientation = 'horizontal'
 
-        # decide what, if any, boundaries to draw
+        # remove country boarders, we may put them back later
         plotsettings.countrylcol = None
-        if show_boundaries == 'country':
-            plotsettings.countrylcol = 'grey'
-        elif show_boundaries == 'admin_region':
-            plotsettings.regionlcol = 'grey'
-        elif show_boundaries == 'river_basin':
-            plotsettings.riverslcol = 'blue'
 
         # 100 dots per cm
         plotsettings.dpi = 100

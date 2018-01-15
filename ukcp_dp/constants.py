@@ -96,6 +96,16 @@ SCENARIO_GREYSCALE_PALETTE = 'brewer_Greys_09'
 CONTOUR_LINE = '#000000'
 CONTOUR_FILL = ['#D3D3D3', '#9E9E9E', '#6C6C6C']
 
+OVERLAY_COLOUR = 'black'
+OVERLAY_LINE_WIDTH = 0.3
+
+OVERLAY_ADMIN = ('/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'
+                 '/public/shapefiles/UK_Admin')
+OVERLAY_COUNTRY = ('/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'
+                   '/public/shapefiles/BritishIsles')
+OVERLAY_RIVER = ('/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'
+                 '/public/shapefiles/BritishIsles')
+
 TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 
 MONTHLY = 'mon'
