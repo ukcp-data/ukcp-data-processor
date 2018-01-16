@@ -113,6 +113,11 @@ class BasePlotter():
         else:
             data_selection_types.remove(InputType.YEAR)
 
+        # only show if True
+        if (self.input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS)
+                is False):
+            data_selection_types.remove(InputType.OVERLAY_PROBABILITY_LEVELS)
+
         for dst in data_selection_types:
             name = get_collection_label(dst)
             try:

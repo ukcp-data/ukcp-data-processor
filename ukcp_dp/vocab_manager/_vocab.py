@@ -299,6 +299,11 @@ ENSEMBLE_MEMBER_SET = {
     'cpm': []  # TODO
 }
 
+# Labels for use on plot axes
+VAR_LABELS = {
+    'tasAnom': 'Temperature anomaly, $^\circ$C',
+    'prAnom': 'Precipitation rate anomaly, %'}
+
 
 def get_collection_label(collection):
     """
@@ -382,3 +387,17 @@ def get_ensemble_member_set(data_source):
         return ENSEMBLE_MEMBER_SET[data_source]
     except KeyError:
         return
+
+
+def get_var_label(var_id):
+    """
+    Get a label that could be used on a plot, for the given var_id
+
+    @param var_id (str): the variable id
+
+    @return a str containing a label for the variable
+    """
+    try:
+        return VAR_LABELS[var_id]
+    except KeyError:
+        return var_id
