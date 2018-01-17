@@ -1,14 +1,20 @@
 from _graph_plotter import GraphPlotter
-import iris
-import iris.quickplot as qplt
-import matplotlib.colors as colors
-import matplotlib.cm as cmx
-import matplotlib.pyplot as plt
 from ukcp_dp.constants import DATA_SOURCE_PROB, ENSEMBLE_COLOUR_PALETTE, \
-    ENSEMBLE_GREYSCALE_PALETTE, ENSEMBLE_LOWLIGHT, InputType, \
-    QUANTILE_COLOURS, QUANTILE_GREYSCALE
+    ENSEMBLE_GREYSCALE_PALETTE, ENSEMBLE_LOWLIGHT, \
+    ENSEMBLE_LOWLIGHT_GREYSCALE, PERCENTILES_COLOURS, PERCENTILES_GREYSCALE, \
+    InputType
+from ukcp_dp.vocab_manager import get_var_label
+import calendar
+import cf_units
+import datetime as dt
+import iris
+import matplotlib.cm as cmx
+import matplotlib.colors as colors
+import matplotlib.pyplot as plt
 
 import logging
+
+
 log = logging.getLogger(__name__)
 
 
@@ -25,26 +31,38 @@ class PlumePlotter(GraphPlotter):
 
         """
         log.debug('_generate_graph')
+        ax = plt.gca()
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
             # plot the percentiles
-            self._plot_probability_levels(self.cube_list[0])
+            self._plot_probability_levels(self.cube_list[0], ax)
 
         else:
-            # plot the ensemble members
-            self._plot_ensemble(self.cube_list[0])
-
             if self.overlay_cube is not None:
+                # plot the ensemble members
+                self._plot_ensemble(self.cube_list[0], ax, True)
                 # add overlay
-                self._plot_probability_levels(self.overlay_cube)
+                self._plot_probability_levels_fill(self.overlay_cube, ax)
+            else:
+                # plot the ensemble members
+                self._plot_ensemble(self.cube_list[0], ax, False)
 
-        # clear the title field
-        plt.title('')
+        # set the limits on the x axis, time axis
+        set_x_limits(self.cube_list[0], ax)
 
-    def _plot_probability_levels(self, cube):
+        # add axis labels
+        plt.xlabel('Year')
+        y_id = self.cube_list[0].attributes['var_id']
+        if not y_id.endswith('Anom'):
+            y_id += 'Anom'
+        y_label = get_var_label(y_id)
+        plt.ylabel(y_label)
+
+    def _plot_probability_levels(self, cube, ax):
         # extract 10th, 50th and 90th percentiles
         linestyle = ['dashed', 'dashdot', 'dotted']
+        t_points = get_time_series(cube, 'percentile')
 
         percentiles = [10, 50, 90]
         for i, percentile in enumerate(percentiles):
@@ -59,15 +77,29 @@ class PlumePlotter(GraphPlotter):
             label = '{}th Percentile'.format(percentile)
 
             if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
-                qplt.plot(percentile_cube, label=label,
-                          color=QUANTILE_COLOURS[i])
+                # colour plot
+                ax.plot(t_points, percentile_cube.data, label=label,
+                        color=PERCENTILES_COLOURS[i])
             else:
-                qplt.plot(percentile_cube, label=label,
-                          color=QUANTILE_GREYSCALE,
-                          linestyle=linestyle[i])
+                # greyscale plot
+                ax.plot(t_points, percentile_cube.data, label=label,
+                        color=PERCENTILES_GREYSCALE,
+                        linestyle=linestyle[i])
 
-    def _plot_ensemble(self, cube):
+    def _plot_probability_levels_fill(self, cube, ax):
+        # plot a shaded area between the 10th and 90th percentiles
+        t_points = get_time_series(cube, 'percentile')
 
+        lovals = cube.extract(iris.Constraint(percentile=10))
+        hivals = cube.extract(iris.Constraint(percentile=90))
+
+        ax.fill_between(t_points, lovals.data, y2=hivals.data,
+                        edgecolor="none", linewidth=0,
+                        facecolor='grey', alpha=0.3, zorder=0,
+                        label='10th to 90th Percentile')
+
+    def _plot_ensemble(self, cube, ax, include_overlay):
+        # Line plots of ensembles, highlighting selected members
         highlighted_ensemble_members = self.input_data.get_value(
             InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
 
@@ -79,6 +111,14 @@ class PlumePlotter(GraphPlotter):
             vmin=0, vmax=len(highlighted_ensemble_members))
         scalar_map = cmx.ScalarMappable(norm=c_norm, cmap=cmap)
 
+        if (include_overlay or
+                self.input_data.get_value(InputType.COLOUR_MODE) == 'g'):
+            lowlight_colour = ENSEMBLE_LOWLIGHT_GREYSCALE
+        else:
+            lowlight_colour = ENSEMBLE_LOWLIGHT
+
+        t_points = get_time_series(cube, 'Ensemble member')
+
         highlighted_counter = 1
         for ensemble_slice in cube.slices_over('Ensemble member'):
             # TODO hack to get name
@@ -89,8 +129,104 @@ class PlumePlotter(GraphPlotter):
             if ensemble_name in highlighted_ensemble_members:
                 colour_val = scalar_map.to_rgba(highlighted_counter)
                 highlighted_counter += 1
-                qplt.plot(ensemble_slice, label=ensemble_name,
-                          color=colour_val,
-                          zorder=highlighted_counter)
+                ax.plot(t_points, ensemble_slice.data, label=ensemble_name,
+                        color=colour_val, zorder=2)
             else:
-                qplt.plot(ensemble_slice, color=ENSEMBLE_LOWLIGHT, zorder=0)
+                ax.plot(t_points, ensemble_slice.data,
+                        color=lowlight_colour, zorder=1)
+
+
+def get_time_series(cube, slice_and_sel_coord):
+    # Convert the time coord into fractions of years,
+    # so we can easily use it for plotting:
+    tcoord = cube.slices_over(slice_and_sel_coord).next().coord('time')
+    if tcoord.units.calendar is not None:
+        tsteps = list(tcoord.units.num2date(tcoord.points))
+
+        if (isinstance(tsteps[0], dt.date) or
+                isinstance(tsteps[0], dt.datetime)):
+            tpoints = [t.year + t.timetuple().tm_yday /
+                       (366.0 if calendar.isleap(t.year) else 365.0)
+                       for t in tsteps]
+
+        elif (isinstance(tsteps[0], cf_units.netcdftime.datetime) or
+                isinstance(tsteps[0],
+                           cf_units.netcdftime._netcdftime.Datetime360Day)):
+            if tcoord.units.calendar == "360_day":
+                tpoints = [t.year + t.dayofyr / 360.0 for t in tsteps]
+            else:
+                raise Exception("Got time points as netcdftime objects, "
+                                "but NOT on a 360-day calendar.")
+
+        else:
+            log.warn("Using num2date on the time coord points didn't give "
+                     "standard or netcdf date/datetime objects. The time "
+                     "coord units were:{units}, num2date gave objects of type "
+                     "{type}".format(units=tcoord.units, type=type(tsteps[0])))
+            raise Exception("Unrecognised time coord data type, cannot plot")
+
+    else:
+        # Non-date time coord, like a year! Simples!
+        log.info("Time coord points are not date-like objects, ASSUMEING they "
+                 "are in year-fractions.")
+        tpoints = tcoord.points
+
+    return tpoints
+
+
+def set_x_limits(cube, ax):
+    # Get x-axis limits from the Cube's time coord.
+    tcoord = cube.coord('time')
+    # Do this differently for datetime-like coords vs integer coords:
+    if tcoord.units.calendar is not None:
+        if tcoord.units.name.startswith('hour'):
+            # Can't easily use dt.timedelta objects with netcdfdatetimes,
+            # which is likely to be what these are.
+            # Place the limits at +/-1 year around the first & last time points
+            xlims = [tcoord.units.num2date(tcoord.points[0] - 24 * 360),
+                     tcoord.units.num2date(tcoord.points[-1] + 24 * 360)]
+        elif tcoord.units.name.startswith('day'):
+            # Can't easily use dt.timedelta objects with netcdfdatetimes,
+            # which is likely to be what these are.
+            # Place the limits at +/-1 year around the first & last time points
+            xlims = [tcoord.units.num2date(tcoord.points[0] - 360),
+                     tcoord.units.num2date(tcoord.points[-1] + 360)]
+        else:
+            raise Exception("Time coord units are " + str(tcoord.units)
+                            + " but I can only handle days and hours!")
+    else:
+        # x-axis will be in units of integer years.
+        # Place the limits at +/-1 year around the first & last time points:
+        log.info("Time coord points are not date-like objects, ASSUMEING they "
+                 "are in year-fractions.")
+        tsteps = tcoord.points
+        xlims = [tsteps[0] - 1.0,
+                 tsteps[-1] + 1.0]
+
+    # Now we've got proposed x-axis limits (as some data type),
+    # we convert those x-axis limits into fractions of years.
+    if isinstance(xlims[0], dt.date) or isinstance(xlims[0], dt.datetime):
+        xlims_touse = [t.year + t.timetuple().tm_yday /
+                       (366.0 if calendar.isleap(t.year) else 365.0)
+                       for t in xlims]
+
+    elif (isinstance(xlims[0], cf_units.netcdftime.datetime) or
+            isinstance(xlims[0],
+                       cf_units.netcdftime._netcdftime.Datetime360Day)):
+        # Strictly-speaking, this might not be on a 360-day calendar,
+        # but in practice we're unlikely to get this kind of object
+        # unless a 360-day calendar is involved.
+        log.info("Time axis limits specified with netcdftime.datetime "
+                 "objects, ASSUMEING they're on a 360-day calendar.")
+        xlims_touse = [t.year + t.dayofyr / 360.0 for t in xlims]
+
+    elif isinstance(xlims[0], float) or isinstance(xlims[0], int):
+        xlims_touse = xlims
+
+    else:
+        raise Exception("Unacceptable format for x-limits! Please use "
+                        "standard or netcdf date/datetime objects, or ints or "
+                        "floats.")
+
+    # Finally, apply the limits:
+    ax.set_xlim(xlims_touse)
