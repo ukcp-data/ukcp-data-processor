@@ -114,6 +114,7 @@ SEASONAL = 'seas'
 ANNUAL = 'ann'
 
 DATA_SOURCE_PROB = 'land-prob'
+DATA_SOURCE_PROB_MIN_YEAR = 1961
 
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 

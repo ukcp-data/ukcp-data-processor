@@ -1,4 +1,7 @@
-from ukcp_dp.constants import DATA_SOURCE_PROB, InputType
+from ukcp_dp.constants import DATA_SOURCE_PROB, DATA_SOURCE_PROB_MIN_YEAR, \
+    InputType
+from ukcp_dp.vocab_manager import get_collection_terms, \
+    get_collection_term_label
 
 import logging
 log = logging.getLogger(__name__)
@@ -15,6 +18,7 @@ class Validator():
         self._validate_boundary_overlay()
         self._validate_colour_mode()
         self._validate_highlighted_ensemble_members()
+        self._validate_time_period()
 
         return self.input_data
 
@@ -110,10 +114,37 @@ class Validator():
                                                min=InputType.YEAR_MINIMUM,
                                                max=InputType.YEAR_MAXIMUM))
 
+        if (year_max is not None and year_min is not None):
+            # a minimum of 20 years must be selected
+            # we include the year_min but not the year_max
+            if year_max - year_min + 1 < 20:
+                raise Exception("A minimum of 20 years must be selected")
+
         if (year is not None):
             # if year is set then set min and max to equal year
             self.input_data.set_value(InputType.YEAR_MINIMUM, year)
             self.input_data.set_value(InputType.YEAR_MAXIMUM, year)
+
+        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_PROB):
+            if (self.input_data.get_value(InputType.YEAR_MINIMUM) <
+                    DATA_SOURCE_PROB_MIN_YEAR):
+                raise Exception("The minimum year must be equal or greater "
+                                "than {}".format(DATA_SOURCE_PROB_MIN_YEAR))
+            else:
+                min_allowed_year = min(get_collection_terms('year_minimum'))
+                if (self.input_data.get_value(InputType.YEAR_MINIMUM) <
+                        min_allowed_year):
+                    raise Exception(
+                        "The minimum year must be equal or greater than {}".
+                        format(min_allowed_year))
+
+        max_allowed_year = max(get_collection_terms('year_maximum'))
+        if (self.input_data.get_value(InputType.YEAR_MAXIMUM) >
+                max_allowed_year):
+            raise Exception(
+                "The maximum year must be equal or less than {}".
+                format(max_allowed_year))
 
     def _validate_boundary_overlay(self):
         try:
@@ -127,3 +158,20 @@ class Validator():
         except KeyError:
             self.input_data._set_values(InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS,
                                         [])
+
+    def _validate_time_period(self):
+        # if a temporal average type is set then check the time period is valid
+        # for that type
+        try:
+            temporal_average_type = self.input_data.get_value(
+                InputType.TEMPORAL_AVERAGE_TYPE)
+        except KeyError:
+            return
+
+        time_period = self.input_data.get_value(InputType.TIME_PERIOD)
+        allowed_time_periods = get_collection_terms(temporal_average_type)
+        if time_period not in allowed_time_periods:
+            type_label = get_collection_term_label(
+                InputType.TEMPORAL_AVERAGE_TYPE, temporal_average_type)
+            raise Exception("{time_period} is not a {type_label} value".format(
+                time_period=time_period, type_label=type_label))

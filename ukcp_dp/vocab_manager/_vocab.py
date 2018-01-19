@@ -301,7 +301,9 @@ ENSEMBLE_MEMBER_SET = {
 
 # Labels for use on plot axes
 VAR_LABELS = {
+    'tas': 'Temperature, $^\circ$C',
     'tasAnom': 'Temperature anomaly, $^\circ$C',
+    'pr': 'Precipitation rate, mm/day',
     'prAnom': 'Precipitation rate anomaly, %'}
 
 
