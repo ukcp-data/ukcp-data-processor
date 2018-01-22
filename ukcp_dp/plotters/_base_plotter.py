@@ -71,11 +71,7 @@ class BasePlotter():
         image_size = self.input_data.get_value(InputType.IMAGE_SIZE)
 
         # select a logo
-        if image_size == 600:
-            logo = ('/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'
-                    '/public/img/UKCP_logo75px.jpg')
-            v_offset = 357
-        elif image_size == 900:
+        if image_size == 900:
             logo = ('/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'
                     '/public/img/UKCP_logo100px.jpg')
             v_offset = 544
@@ -223,10 +219,7 @@ class BasePlotter():
 
         # 100 dots per cm
         plotsettings.dpi = 100
-        if cmsize == 600:
-            # using 100 dpi set size to 600x400
-            plotsettings.cmsize = [15.24, 10.16]
-        elif cmsize == 900:
+        if cmsize == 900:
             # using 100 dpi set size to 900x600
             plotsettings.cmsize = [22.86, 15.24]
         elif cmsize == 1200:
@@ -284,22 +277,7 @@ def _wrap(text, font_size):
 
 
 def _get_line_adjuster():
-    line_adjuster = {600:
-                     {
-                         's':
-                         {1: -0.12,
-                          2: -0.06,
-                          3: 0},
-                         'm':
-                         {1: -0.08,
-                          2: 0.02,
-                          3: 0.12},
-                         'l':
-                         {1: -0.04,
-                          2: 0.22,
-                          3: 0.44}
-                     },
-                     900:
+    line_adjuster = {900:
                      {
                          's':
                          {1: -0.08,
