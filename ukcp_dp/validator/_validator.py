@@ -1,7 +1,7 @@
 from ukcp_dp.constants import DATA_SOURCE_PROB, DATA_SOURCE_PROB_MIN_YEAR, \
-    InputType
+    DATA_SOURCE_RCM, DATA_SOURCE_RCM_MIN_YEAR, InputType, MONTHLY, SEASONAL
 from ukcp_dp.vocab_manager import get_collection_terms, \
-    get_collection_term_label
+    get_collection_term_label, get_ensemble_member_set
 
 import logging
 log = logging.getLogger(__name__)
@@ -19,6 +19,7 @@ class Validator():
         self._validate_colour_mode()
         self._validate_highlighted_ensemble_members()
         self._validate_time_period()
+        self._validate_baseline()
 
         return self.input_data
 
@@ -117,7 +118,7 @@ class Validator():
         if (year_max is not None and year_min is not None):
             # a minimum of 20 years must be selected
             # we include the year_min but not the year_max
-            if year_max - year_min + 1 < 20:
+            if year_max - year_min < 20:
                 raise Exception("A minimum of 20 years must be selected")
 
         if (year is not None):
@@ -127,17 +128,18 @@ class Validator():
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
-            if (self.input_data.get_value(InputType.YEAR_MINIMUM) <
-                    DATA_SOURCE_PROB_MIN_YEAR):
-                raise Exception("The minimum year must be equal or greater "
-                                "than {}".format(DATA_SOURCE_PROB_MIN_YEAR))
-            else:
-                min_allowed_year = min(get_collection_terms('year_minimum'))
-                if (self.input_data.get_value(InputType.YEAR_MINIMUM) <
-                        min_allowed_year):
-                    raise Exception(
-                        "The minimum year must be equal or greater than {}".
-                        format(min_allowed_year))
+            min_allowed_year = DATA_SOURCE_PROB_MIN_YEAR
+        elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_RCM):
+            min_allowed_year = DATA_SOURCE_RCM_MIN_YEAR
+        else:
+            min_allowed_year = min(get_collection_terms('year_minimum'))
+
+        if (self.input_data.get_value(InputType.YEAR_MINIMUM) <
+                min_allowed_year):
+            raise Exception(
+                "The minimum year must be equal or greater than {}".
+                format(min_allowed_year))
 
         max_allowed_year = max(get_collection_terms('year_maximum'))
         if (self.input_data.get_value(InputType.YEAR_MAXIMUM) >
@@ -153,11 +155,25 @@ class Validator():
             self.input_data.set_value(InputType.SHOW_BOUNDARIES, 'none')
 
     def _validate_highlighted_ensemble_members(self):
+        # if no value is set, then set as an empty list
         try:
             self.input_data.get_value(InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
         except KeyError:
             self.input_data._set_values(InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS,
                                         [])
+
+        allowed_ensembles = get_ensemble_member_set(
+            self.input_data.get_value(InputType.DATA_SOURCE))
+        if allowed_ensembles is None:
+            return
+
+        for ensemble in self.input_data.get_value(
+                InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS):
+
+            if ensemble not in allowed_ensembles:
+                raise Exception("Invalid {value_type}: {value}.".format(
+                    value_type=InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS,
+                    value=ensemble))
 
     def _validate_time_period(self):
         # if a temporal average type is set then check the time period is valid
@@ -170,8 +186,32 @@ class Validator():
 
         time_period = self.input_data.get_value(InputType.TIME_PERIOD)
         allowed_time_periods = get_collection_terms(temporal_average_type)
+
+        # special case for all
+        if ((temporal_average_type == MONTHLY or
+                temporal_average_type == SEASONAL)
+                and time_period == 'all'):
+            return
+
         if time_period not in allowed_time_periods:
             type_label = get_collection_term_label(
                 InputType.TEMPORAL_AVERAGE_TYPE, temporal_average_type)
             raise Exception("{time_period} is not a {type_label} value".format(
                 time_period=time_period, type_label=type_label))
+
+    def _validate_baseline(self):
+        # only a subset of values are allowed for RCM
+        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_RCM):
+            try:
+                baseline = self.input_data.get_value(InputType.BASELINE)
+            except KeyError:
+                return
+            allowed_baselines = get_collection_terms(InputType.BASELINE)
+            # the first one is not allowed for RCM
+            allowed_baselines.pop(0)
+
+            if (baseline not in allowed_baselines):
+                raise Exception("Invalid {value_type}: {value}.".format(
+                    value_type=InputType.BASELINE,
+                    value=baseline))
