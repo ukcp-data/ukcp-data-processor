@@ -60,7 +60,7 @@ class Validator():
     def _validate_colour_mode(self):
         try:
             self.input_data.get_value(InputType.COLOUR_MODE)
-        except KeyError():
+        except KeyError:
             # Not set, lets be kind and set it to 'c'
             self.input_data.set_value(InputType.COLOUR_MODE, 'c')
 
