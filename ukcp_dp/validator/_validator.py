@@ -23,6 +23,13 @@ class Validator():
 
         return self.input_data
 
+    def _validate_data_source(self):
+        # this must always be set
+        try:
+            self.input_data.get_value(InputType.DATA_SOURCE)
+        except KeyError:
+            raise Exception('{} not set'.format(InputType.DATA_SOURCE))
+
     def _validate_spatial_rep(self):
         try:
             spatial_rep = self.input_data.get_value(
@@ -51,7 +58,9 @@ class Validator():
                     self.input_data.get_area_type())
 
     def _validate_colour_mode(self):
-        if self.input_data.get_value(InputType.COLOUR_MODE) is None:
+        try:
+            self.input_data.get_value(InputType.COLOUR_MODE)
+        except KeyError():
             # Not set, lets be kind and set it to 'c'
             self.input_data.set_value(InputType.COLOUR_MODE, 'c')
 
