@@ -17,6 +17,7 @@ class Validator():
         self._validate_time_slice()
         self._validate_boundary_overlay()
         self._validate_colour_mode()
+        self._validate_ensemble_members()
         self._validate_highlighted_ensemble_members()
         self._validate_time_period()
         self._validate_baseline()
@@ -163,26 +164,42 @@ class Validator():
         except KeyError:
             self.input_data.set_value(InputType.SHOW_BOUNDARIES, 'none')
 
+    def _validate_ensemble_members(self):
+        try:
+            ensembles = self.input_data.get_value(InputType.ENSEMBLE)
+        except KeyError:
+            return
+        self._validate_ensembles(ensembles, InputType.ENSEMBLE)
+
     def _validate_highlighted_ensemble_members(self):
         # if no value is set, then set as an empty list
         try:
-            self.input_data.get_value(InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
+            ensembles = self.input_data.get_value(
+                InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
         except KeyError:
             self.input_data._set_values(InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS,
                                         [])
+            return
 
+        self._validate_ensembles(ensembles,
+                                 InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
+
+    def _validate_ensembles(self, ensembles, input_type):
         allowed_ensembles = get_ensemble_member_set(
             self.input_data.get_value(InputType.DATA_SOURCE))
         if allowed_ensembles is None:
-            return
+            raise Exception("Unable to get list of valid ensembles for {}".
+                            format(self.input_data.get_value(
+                                InputType.DATA_SOURCE)))
 
-        for ensemble in self.input_data.get_value(
-                InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS):
-
+        for ensemble in ensembles:
             if ensemble not in allowed_ensembles:
-                raise Exception("Invalid {value_type}: {value}.".format(
-                    value_type=InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS,
-                    value=ensemble))
+                raise Exception(
+                    "Invalid {value_type} for {data_source}: {value}.".format(
+                        value_type=input_type,
+                        data_source=self.input_data.get_value(
+                            InputType.DATA_SOURCE),
+                        value=ensemble))
 
     def _validate_time_period(self):
         # if a temporal average type is set then check the time period is valid
