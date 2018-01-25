@@ -31,6 +31,10 @@ class MapPlotter(BasePlotter):
         reg = regs.reg_from_cube(cube)
         plotsettings.set_xylims(reg)
 
+        # Turn off grid lines for maps
+        plotsettings.dxgrid = 1000
+        plotsettings.dygrid = 1000
+
         # First create the figure
         fig, _, _ = plotgeneral.start_standard_figure(plotsettings)
 
