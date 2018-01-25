@@ -24,6 +24,10 @@ class PostageStampMapPlotter(MapPlotter):
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
         log.debug('_generate_subplots')
+
+        # as these are tiny maps we need to reduce the coast line width
+        plotsettings.coastlw = 0.4
+
         gs_top = metadata_bbox.y0 - 0.06
         gs_left = 0.02
         gs_right = 0.98
