@@ -1,8 +1,7 @@
 from _graph_plotter import GraphPlotter
-from ukcp_dp.constants import DATA_SOURCE_PROB, ENSEMBLE_COLOUR_PALETTE, \
-    ENSEMBLE_GREYSCALE_PALETTE, ENSEMBLE_LOWLIGHT, \
-    ENSEMBLE_LOWLIGHT_GREYSCALE, PERCENTILES_COLOURS, PERCENTILES_GREYSCALE, \
-    InputType
+from ukcp_dp.constants import DATA_SOURCE_PROB, ENSEMBLE_COLOURS, \
+    ENSEMBLE_GREYSCALES, ENSEMBLE_LOWLIGHT, \
+    PERCENTILE_LINE_COLOUR, PERCENTILE_FILL, InputType
 from ukcp_dp.vocab_manager import get_var_label
 import calendar
 import cf_units
@@ -36,90 +35,63 @@ class PlumePlotter(GraphPlotter):
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
             # plot the percentiles
-            self._plot_probability_levels(self.cube_list[0], ax)
+            self._plot_probability_levels(self.cube_list[0], ax, True)
 
         else:
             if self.overlay_cube is not None:
                 # plot the ensemble members
-                self._plot_ensemble(self.cube_list[0], ax, True)
+                self._plot_ensemble(self.cube_list[0], ax)
                 # add overlay
-                self._plot_probability_levels_fill(self.overlay_cube, ax)
+                self._plot_probability_levels(self.overlay_cube, ax, False)
             else:
                 # plot the ensemble members
-                self._plot_ensemble(self.cube_list[0], ax, False)
+                self._plot_ensemble(self.cube_list[0], ax)
 
         # set the limits on the x axis, time axis
         set_x_limits(self.cube_list[0], ax)
 
         # add axis labels
-        plt.xlabel('Year')
+        plt.xlabel('Date')
         y_id = self.cube_list[0].attributes['var_id']
         if not y_id.endswith('Anom'):
             y_id += 'Anom'
         y_label = get_var_label(y_id)
         plt.ylabel(y_label)
 
-    def _plot_probability_levels(self, cube, ax):
-        # extract 10th, 50th and 90th percentiles
-        linestyle = ['dashed', 'dashdot', 'dotted']
-        t_points = get_time_series(cube, 'percentile')
-
-        percentiles = [10, 50, 90]
-        for i, percentile in enumerate(percentiles):
-            percentile_cube = cube.extract(
-                iris.Constraint(percentile=percentile))
-
-            if percentile_cube is None:
-                raise Exception(
-                    'Attempted to plot the {}th percentile, but no data found'.
-                    format(percentile))
-
-            label = '{}th Percentile'.format(percentile)
-
-            if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
-                # colour plot
-                ax.plot(t_points, percentile_cube.data, label=label,
-                        color=PERCENTILES_COLOURS[i])
-            else:
-                # greyscale plot
-                ax.plot(t_points, percentile_cube.data, label=label,
-                        color=PERCENTILES_GREYSCALE,
-                        linestyle=linestyle[i])
-
-    def _plot_probability_levels_fill(self, cube, ax):
+    def _plot_probability_levels(self, cube, ax, plot_fifty):
         # plot a shaded area between the 10th and 90th percentiles
+
         t_points = get_time_series(cube, 'percentile')
 
+        # plot a line for the 50th
+        if plot_fifty is True:
+            percentile_cube = cube.extract(
+                iris.Constraint(percentile=50))
+            ax.plot(t_points, percentile_cube.data, label='50th Percentile',
+                    color=PERCENTILE_LINE_COLOUR)
+
+        # fill between the 10th and 90th
         lovals = cube.extract(iris.Constraint(percentile=10))
         hivals = cube.extract(iris.Constraint(percentile=90))
 
         ax.fill_between(t_points, lovals.data, y2=hivals.data,
                         edgecolor="none", linewidth=0,
-                        facecolor='grey', alpha=0.3, zorder=0,
+                        facecolor=PERCENTILE_FILL, zorder=0,
                         label='10th to 90th Percentile')
 
-    def _plot_ensemble(self, cube, ax, include_overlay):
+    def _plot_ensemble(self, cube, ax):
         # Line plots of ensembles, highlighting selected members
         highlighted_ensemble_members = self.input_data.get_value(
             InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
 
         if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
-            cmap = ENSEMBLE_COLOUR_PALETTE
+            colours = ENSEMBLE_COLOURS
         else:
-            cmap = ENSEMBLE_GREYSCALE_PALETTE
-        c_norm = colors.Normalize(
-            vmin=0, vmax=len(highlighted_ensemble_members))
-        scalar_map = cmx.ScalarMappable(norm=c_norm, cmap=cmap)
-
-        if (include_overlay or
-                self.input_data.get_value(InputType.COLOUR_MODE) == 'g'):
-            lowlight_colour = ENSEMBLE_LOWLIGHT_GREYSCALE
-        else:
-            lowlight_colour = ENSEMBLE_LOWLIGHT
+            colours = ENSEMBLE_GREYSCALES
 
         t_points = get_time_series(cube, 'Ensemble member')
 
-        highlighted_counter = 1
+        highlighted_counter = 0
         for ensemble_slice in cube.slices_over('Ensemble member'):
             # TODO hack to get name
             ensemble_name = 'r1i1p{}'.format(int(
@@ -127,13 +99,13 @@ class PlumePlotter(GraphPlotter):
 
             # highlighted ensembles should be included in the legend
             if ensemble_name in highlighted_ensemble_members:
-                colour_val = scalar_map.to_rgba(highlighted_counter)
+                colour_val = colours[highlighted_counter]
                 highlighted_counter += 1
                 ax.plot(t_points, ensemble_slice.data, label=ensemble_name,
                         color=colour_val, zorder=2)
             else:
                 ax.plot(t_points, ensemble_slice.data,
-                        color=lowlight_colour, zorder=1)
+                        color=ENSEMBLE_LOWLIGHT, zorder=1)
 
 
 def get_time_series(cube, slice_and_sel_coord):

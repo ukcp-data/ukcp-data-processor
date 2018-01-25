@@ -181,6 +181,10 @@ class Validator():
                                         [])
             return
 
+        if len(ensembles) > 5:
+            raise Exception(
+                "The maximum number of highlighted ensemble members is 5")
+
         self._validate_ensembles(ensembles,
                                  InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
 
