@@ -1,6 +1,7 @@
 import os
 
-from ukcp_dp.constants import DATA_DIR, DATA_SOURCE_PROB, InputType
+from ukcp_dp.constants import DATA_DIR, DATA_SOURCE_PROB, \
+    DATA_SOURCE_PROB_MIN_YEAR, InputType
 
 import logging
 log = logging.getLogger(__name__)
@@ -74,6 +75,16 @@ def _get_land_prob_file_list(input_data):
 
     file_lists_per_variable = {}
 
+    # if this is a selection for on overlay then the dates will not have been
+    # validated against this dataset. Check the dates and adjust the minimum if
+    # needed
+    year_maximum = input_data.get_value(InputType.YEAR_MAXIMUM)
+    year_minimum = input_data.get_value(InputType.YEAR_MINIMUM)
+    if year_maximum < DATA_SOURCE_PROB_MIN_YEAR:
+        return {}
+    elif year_minimum < DATA_SOURCE_PROB_MIN_YEAR:
+        year_minimum = DATA_SOURCE_PROB_MIN_YEAR
+
     dataset_id = ('ukcp18-{data_source}-uk-{spatial_representation}-'
                   '{temporal_type}'.format(
                       data_source=DATA_SOURCE_PROB,
@@ -98,9 +109,7 @@ def _get_land_prob_file_list(input_data):
 
             scenario_file_list = []
 
-            for year in range(input_data.get_value(InputType.YEAR_MINIMUM),
-                              (input_data.get_value(InputType.YEAR_MAXIMUM)
-                               + 1)):
+            for year in range(year_minimum, (year_maximum + 1)):
                 file_name = _get_land_prob_file_name(
                     dataset_id, input_data, scenario, variable, year)
                 scenario_file_list.append(os.path.join(file_path, file_name))
