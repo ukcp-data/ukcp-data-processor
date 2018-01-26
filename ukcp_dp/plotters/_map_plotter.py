@@ -75,12 +75,13 @@ class MapPlotter(BasePlotter):
         """
         pass
 
-    def _is_landscape(self, cube):
+    def _is_landscape(self, cube, scaling_factor=1):
         """
         Return True if the range of the x coordinates is larger than the range
-        of the y coordinates.
+        of the y coordinates multiplied by a scaling factor.
 
         @param cube (iris cube): a cube containing the selected data
+        @param scaling_factor(int): a value to multiply the y range by
 
         @return a boolean, True if orientation is landscape
         """
@@ -89,7 +90,7 @@ class MapPlotter(BasePlotter):
         x_coords = cube.coord('projection_x_coordinate').points
         x_range = max(x_coords) - min(x_coords)
 
-        if y_range > x_range:
+        if y_range * scaling_factor > x_range:
             return False
         return True
 

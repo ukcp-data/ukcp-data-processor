@@ -31,7 +31,7 @@ class ThreeMapPlotter(MapPlotter):
         gs_left = 0.02
         gs_right = 0.98
 
-        if self._is_landscape(cube) is True:
+        if self._is_landscape(cube, 1.25) is True:
             gs = gridspec.GridSpec(2, 2)
             gs.update(top=gs_top, bottom=0.02, left=gs_left, right=gs_right)
             grid = [gs[0, 0], gs[0, 1], gs[1, 0], gs[1, 1]]
