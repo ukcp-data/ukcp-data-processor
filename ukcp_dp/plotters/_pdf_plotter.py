@@ -1,6 +1,6 @@
 from _graph_plotter import GraphPlotter
 from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, SCENARIO_COLOURS, \
-    SCENARIO_GREYSCALE_PALETTE
+    SCENARIO_GREYSCALES
 import iris
 import iris.quickplot as qplt
 import matplotlib.cm as cmx
@@ -31,10 +31,13 @@ class PdfPlotter(GraphPlotter):
         for _ in self.cube_list:
             count += 1
 
-        if self.input_data.get_value(InputType.COLOUR_MODE) == 'g':
-            cmap = SCENARIO_GREYSCALE_PALETTE
-            c_norm = colors.Normalize(vmin=0, vmax=count)
-            scalar_map = cmx.ScalarMappable(norm=c_norm, cmap=cmap)
+        if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
+            colours = SCENARIO_COLOURS
+            linestyle = ['solid', 'solid', 'solid', 'solid', 'solid']
+
+        else:
+            colours = SCENARIO_GREYSCALES
+            linestyle = ['solid', 'dashed', 'dotted', 'solid', 'dashed']
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
@@ -43,14 +46,10 @@ class PdfPlotter(GraphPlotter):
                 # plot the percentiles
                 cube.data.sort()
 
-                if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
-                    colour_val = SCENARIO_COLOURS[i]
-                else:
-                    colour_val = scalar_map.to_rgba(i + 1)
-
                 cube = self._add_dx(cube)
                 qplt.plot(self.cube_list, self.cube_list.coord(
-                    'relative probability'), color=colour_val)
+                    'relative probability'), linestyle=linestyle[i],
+                    color=colours[i])
 
         # clear the title field
         plt.title('')

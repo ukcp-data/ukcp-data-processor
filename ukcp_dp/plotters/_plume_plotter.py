@@ -2,7 +2,7 @@ from _graph_plotter import GraphPlotter
 from ukcp_dp.constants import DATA_SOURCE_PROB, ENSEMBLE_COLOURS, \
     ENSEMBLE_GREYSCALES, ENSEMBLE_LOWLIGHT, \
     PERCENTILE_LINE_COLOUR, PERCENTILE_FILL, InputType
-from ukcp_dp.vocab_manager import get_var_label
+from ukcp_dp.vocab_manager import get_var_label, get_collection_term_label
 import calendar
 import cf_units
 import datetime as dt
@@ -86,8 +86,10 @@ class PlumePlotter(GraphPlotter):
 
         if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
             colours = ENSEMBLE_COLOURS
+            linestyle = ['solid', 'solid', 'solid', 'solid', 'solid']
         else:
             colours = ENSEMBLE_GREYSCALES
+            linestyle = ['solid', 'dashed', 'dotted', 'solid', 'dashed']
 
         t_points = get_time_series(cube, 'Ensemble member')
 
@@ -99,12 +101,15 @@ class PlumePlotter(GraphPlotter):
 
             # highlighted ensembles should be included in the legend
             if ensemble_name in highlighted_ensemble_members:
-                colour_val = colours[highlighted_counter]
+                ensemble_label = get_collection_term_label(
+                    InputType.ENSEMBLE, ensemble_name)
+                ax.plot(t_points, ensemble_slice.data, label=ensemble_label,
+                        linestyle=linestyle[highlighted_counter],
+                        color=colours[highlighted_counter], zorder=2)
                 highlighted_counter += 1
-                ax.plot(t_points, ensemble_slice.data, label=ensemble_name,
-                        color=colour_val, zorder=2)
             else:
                 ax.plot(t_points, ensemble_slice.data,
+                        linestyle='dotted',
                         color=ENSEMBLE_LOWLIGHT, zorder=1)
 
 

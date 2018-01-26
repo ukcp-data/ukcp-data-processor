@@ -5,7 +5,8 @@ import matplotlib.colors as colors
 import matplotlib.cm as cmx
 import matplotlib.pyplot as plt
 from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, SCENARIO_COLOURS, \
-    SCENARIO_GREYSCALE_PALETTE
+    SCENARIO_GREYSCALES
+from ukcp_dp.vocab_manager import get_collection_term_label
 
 import logging
 log = logging.getLogger(__name__)
@@ -30,10 +31,13 @@ class CdfPlotter(GraphPlotter):
         for _ in self.cube_list:
             count += 1
 
-        if self.input_data.get_value(InputType.COLOUR_MODE) == 'g':
-            cmap = SCENARIO_GREYSCALE_PALETTE
-            c_norm = colors.Normalize(vmin=0, vmax=count)
-            scalar_map = cmx.ScalarMappable(norm=c_norm, cmap=cmap)
+        if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
+            colours = SCENARIO_COLOURS
+            linestyle = ['solid', 'solid', 'solid', 'solid', 'solid']
+
+        else:
+            colours = SCENARIO_GREYSCALES
+            linestyle = ['solid', 'dashed', 'dotted', 'solid', 'dashed']
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
@@ -41,14 +45,10 @@ class CdfPlotter(GraphPlotter):
             for i, scenario_cube in enumerate(self.cube_list):
                 scenario_cube.data.sort()
 
-                if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
-                    colour_val = SCENARIO_COLOURS[i]
-                else:
-                    colour_val = scalar_map.to_rgba(i + 1)
-
+                label = get_collection_term_label(
+                    InputType.SCENARIO, scenario_cube.attributes['scenario'])
                 qplt.plot(scenario_cube, scenario_cube.dim_coords[0],
-                          label=scenario_cube.attributes['scenario'],
-                          color=colour_val)
+                          label=label, linestyle=linestyle[i], color=colours[i])
 
         # clear the title field
         plt.title('')
