@@ -1,3 +1,6 @@
+from os import path
+
+
 def enum(**named_values):
     return type('Enum', (), named_values)
 
@@ -93,12 +96,14 @@ CONTOUR_FILL = ['#D3D3D3', '#9E9E9E', '#6C6C6C']
 OVERLAY_COLOUR = 'black'
 OVERLAY_LINE_WIDTH = 0.3
 
-OVERLAY_ADMIN = ('public/shapefiles/UK_Admin')
-OVERLAY_COUNTRY = ('public/shapefiles/BritishIsles')
-OVERLAY_RIVER = ('public/shapefiles/BritishIsles')
+ROOT_DIR = '/usr/local/cows_venv_py27/cows_venv/lib/python2.7/site-packages'
 
-LOGO_SMALL = ('public/img/UKCP_logo100px.jpg')
-LOGO_LARGE = ('public/img/UKCP_logo150px.jpg')
+OVERLAY_ADMIN = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK_Admin')
+OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/BritishIsles')
+OVERLAY_RIVER = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/river_basins')
+
+LOGO_SMALL = path.join(ROOT_DIR, 'ukcp_dp/public/img/UKCP_logo100px.jpg')
+LOGO_LARGE = path.join(ROOT_DIR, 'ukcp_dp/public/img/UKCP_logo150px.jpg')
 
 TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 
