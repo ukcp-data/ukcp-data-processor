@@ -1,5 +1,6 @@
 from matplotlib.transforms import Bbox
-from ukcp_dp.constants import DATA_SELECTION_TYPES, InputType
+from ukcp_dp.constants import DATA_SELECTION_TYPES, InputType, \
+    LOGO_SMALL, LOGO_LARGE
 from ukcp_dp.ukcp_standard_plots import standards_class as stds
 from ukcp_dp.vocab_manager import get_collection_label
 import matplotlib.cbook as cbook
@@ -71,12 +72,10 @@ class BasePlotter():
 
         # select a logo
         if image_size == 900:
-            logo = ('/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'
-                    '/public/img/UKCP_logo100px.jpg')
+            logo = LOGO_SMALL
             v_offset = 544
         else:
-            logo = ('/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'
-                    '/public/img/UKCP_logo150px.jpg')
+            logo = LOGO_LARGE
             v_offset = 718
 
         datafile = cbook.get_sample_data(logo, asfileobj=False)

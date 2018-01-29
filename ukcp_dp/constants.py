@@ -93,12 +93,12 @@ CONTOUR_FILL = ['#D3D3D3', '#9E9E9E', '#6C6C6C']
 OVERLAY_COLOUR = 'black'
 OVERLAY_LINE_WIDTH = 0.3
 
-OVERLAY_ADMIN = ('/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'
-                 '/public/shapefiles/UK_Admin')
-OVERLAY_COUNTRY = ('/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'
-                   '/public/shapefiles/BritishIsles')
-OVERLAY_RIVER = ('/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'
-                 '/public/shapefiles/BritishIsles')
+OVERLAY_ADMIN = ('public/shapefiles/UK_Admin')
+OVERLAY_COUNTRY = ('public/shapefiles/BritishIsles')
+OVERLAY_RIVER = ('public/shapefiles/BritishIsles')
+
+LOGO_SMALL = ('public/img/UKCP_logo100px.jpg')
+LOGO_LARGE = ('public/img/UKCP_logo150px.jpg')
 
 TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 
