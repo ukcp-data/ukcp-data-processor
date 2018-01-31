@@ -1,17 +1,16 @@
-from _graph_plotter import GraphPlotter
-from ukcp_dp.constants import DATA_SOURCE_PROB, ENSEMBLE_COLOURS, \
-    ENSEMBLE_GREYSCALES, ENSEMBLE_LOWLIGHT, \
-    PERCENTILE_LINE_COLOUR, PERCENTILE_FILL, InputType
-from ukcp_dp.vocab_manager import get_var_label, get_collection_term_label
 import calendar
+import logging
+
+from _graph_plotter import GraphPlotter
 import cf_units
 import datetime as dt
 import iris
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
-
-import logging
+from ukcp_dp.constants import DATA_SOURCE_PROB, ENSEMBLE_COLOURS, \
+    ENSEMBLE_GREYSCALES, ENSEMBLE_LOWLIGHT, \
+    PERCENTILE_LINE_COLOUR, PERCENTILE_FILL, InputType
 
 
 log = logging.getLogger(__name__)
@@ -55,7 +54,8 @@ class PlumePlotter(GraphPlotter):
         y_id = self.cube_list[0].attributes['var_id']
         if not y_id.endswith('Anom'):
             y_id += 'Anom'
-        y_label = get_var_label(y_id)
+        y_label = self.vocab.get_collection_term_label(
+            InputType.VARIABLE, y_id)
         plt.ylabel(y_label)
 
     def _plot_probability_levels(self, cube, ax, plot_fifty):
@@ -101,7 +101,7 @@ class PlumePlotter(GraphPlotter):
 
             # highlighted ensembles should be included in the legend
             if ensemble_name in highlighted_ensemble_members:
-                ensemble_label = get_collection_term_label(
+                ensemble_label = self.vocab.get_collection_term_label(
                     InputType.ENSEMBLE, ensemble_name)
                 ax.plot(t_points, ensemble_slice.data, label=ensemble_label,
                         linestyle=linestyle[highlighted_counter],

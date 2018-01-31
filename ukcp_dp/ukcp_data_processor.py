@@ -7,6 +7,7 @@ the entry point for this package.
 
 """
 
+from iris.cube import CubeList
 from ukcp_dp._input_data import InputData
 from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, PlotType
 from ukcp_dp.data_extractor import DataExtractor, get_probability_levels
@@ -14,7 +15,7 @@ from ukcp_dp.file_finder import get_file_lists
 from ukcp_dp.file_writers import write_file
 from ukcp_dp.plotters import write_plot as plotter_write_plot
 from ukcp_dp.validator import Validator
-from iris.cube import CubeList
+from ukcp_dp.vocab_manager import Vocab
 
 
 class UKCPDataProcessor(object):
@@ -24,8 +25,17 @@ class UKCPDataProcessor(object):
         self.input_data = None
         self.overlay_cube = None
         self.plot_type = None
-        self.validator = Validator()
+        self.vocab = Vocab()
+        self.validator = Validator(self.vocab)
         self.validated = False
+
+    def get_vocab(self):
+        """
+        Get the instance of the Vocab class.
+
+        @return a Vocab object
+        """
+        return self.vocab
 
     def set_inputs(self, inputs, allowed_values=None):
         """
@@ -46,7 +56,7 @@ class UKCPDataProcessor(object):
             value(list or string or int) - these are the values that the input
                 are validated against
         """
-        self.input_data = InputData()
+        self.input_data = InputData(self.vocab)
         self.input_data.set_inputs(inputs, allowed_values)
 
         return self.input_data
@@ -96,7 +106,8 @@ class UKCPDataProcessor(object):
             title = self.title
 
         plotter_write_plot(plot_type, output_path, self.input_data,
-                           self.cube_list, self.overlay_cube, title)
+                           self.cube_list, self.overlay_cube, title,
+                           self.vocab)
         self.plot_type = plot_type
 
         return

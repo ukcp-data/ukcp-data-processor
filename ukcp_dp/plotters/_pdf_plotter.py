@@ -1,14 +1,16 @@
+import logging
+
 from _graph_plotter import GraphPlotter
-from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, SCENARIO_COLOURS, \
-    SCENARIO_GREYSCALES
 import iris
 import iris.quickplot as qplt
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 import numpy as np
+from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, SCENARIO_COLOURS, \
+    SCENARIO_GREYSCALES
 
-import logging
+
 log = logging.getLogger(__name__)
 
 
@@ -25,11 +27,6 @@ class PdfPlotter(GraphPlotter):
 
         """
         log.debug('_generate_graph')
-
-        # there must be a better way to do this
-        count = 0
-        for _ in self.cube_list:
-            count += 1
 
         if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
             colours = SCENARIO_COLOURS
@@ -50,6 +47,9 @@ class PdfPlotter(GraphPlotter):
                 qplt.plot(self.cube_list, self.cube_list.coord(
                     'relative probability'), linestyle=linestyle[i],
                     color=colours[i])
+
+        plt.xlabel(self.vocab.get_collection_term_label(
+            InputType.VARIABLE, self.cube_list[0].attributes['var_id']))
 
         # clear the title field
         plt.title('')

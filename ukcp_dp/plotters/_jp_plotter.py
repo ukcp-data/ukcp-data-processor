@@ -1,11 +1,11 @@
-from _graph_plotter import GraphPlotter
-from mpl_toolkits.axes_grid.anchored_artists import AnchoredText
-from ukcp_dp.constants import InputType, CONTOUR_LINE, CONTOUR_FILL
-from ukcp_dp.vocab_manager import get_var_label
-import matplotlib.pyplot as plt
-import numpy as np
-
 import logging
+
+from _graph_plotter import GraphPlotter
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid.anchored_artists import AnchoredText
+import numpy as np
+from ukcp_dp.constants import InputType, CONTOUR_LINE, CONTOUR_FILL
+
 
 log = logging.getLogger(__name__)
 
@@ -26,10 +26,12 @@ class JpPlotter(GraphPlotter):
 
         x = self.cube_list[0].data
         x_id = self.cube_list[0].attributes['var_id']
-        x_label = get_var_label(x_id)
+        x_label = self.vocab.get_collection_term_label(
+            InputType.VARIABLE, x_id)
         y = self.cube_list[1].data
         y_id = self.cube_list[1].attributes['var_id']
-        y_label = get_var_label(y_id)
+        y_label = self.vocab.get_collection_term_label(
+            InputType.VARIABLE, y_id)
 
         h, xedges, yedges = np.histogram2d(x, y, bins=10)
         xbins = xedges[:-1] + (xedges[1] - xedges[0]) / 2

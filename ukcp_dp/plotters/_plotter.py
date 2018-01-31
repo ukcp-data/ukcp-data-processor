@@ -8,7 +8,7 @@ from ukcp_dp.constants import PlotType
 
 
 def write_plot(plot_type, output_path, input_data, cube_list, overlay_cube,
-               title):
+               title, vocab):
     """
     Generate a plot based on the plot type.
 
@@ -18,6 +18,7 @@ def write_plot(plot_type, output_path, input_data, cube_list, overlay_cube,
     @param cubes (list(iris cube)): a list of cubes containing the
         selected data
     @param title (str): a title for the plot
+    @param vocab (Vocab): an instance of the ukcp_dp Vocab class
     """
 
     if plot_type == PlotType.CDF_PLOT:
@@ -36,6 +37,6 @@ def write_plot(plot_type, output_path, input_data, cube_list, overlay_cube,
         raise Exception('Invalid plot type: {}'.format(plot_type))
 
     plotter.generate_plot(input_data, cube_list, overlay_cube, output_path,
-                          title)
+                          title, vocab)
 
     return

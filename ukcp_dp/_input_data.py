@@ -1,8 +1,6 @@
 from constants import InputType, INPUT_TYPES, INPUT_TYPES_SINGLE_VALUE, \
     INPUT_TYPES_MULTI_VALUE, FONT_SIZE_SMALL, FONT_SIZE_MEDIUM, \
     FONT_SIZE_LARGE
-from ukcp_dp.vocab_manager import get_collection_term_label, \
-    get_collection_term_value
 
 
 class InputData(object):
@@ -13,10 +11,13 @@ class InputData(object):
 
     """
 
-    def __init__(self):
+    def __init__(self, vocab):
         """
         Initialise the class.
+
+        @param vocab (Vocab): an instance of the ukcp_dp Vocab class
         """
+        self.vocab = vocab
         self.validated_inputs = {}
         self.allowed_values = {}
 
@@ -82,7 +83,7 @@ class InputData(object):
 
             user_set_value = True
 
-        label = get_collection_term_label(value_type, value)
+        label = self.vocab.get_collection_term_label(value_type, value)
         if label is None:
             if user_set_value is True:
                 # we do not insist that the value is in the vocabulary if it is
@@ -119,7 +120,7 @@ class InputData(object):
 
         labels = []
         for value in values:
-            label = get_collection_term_label(value_type, value)
+            label = self.vocab.get_collection_term_label(value_type, value)
 
             if label is None:
                 raise Exception("Unknown {value_type}: {value}.".format(
@@ -184,7 +185,7 @@ class InputData(object):
             if area_type not in ['bbox', 'point']:
                 raise Exception("Unknown area: {}.".format(area))
 
-            area_type_label = get_collection_term_label(
+            area_type_label = self.vocab.get_collection_term_label(
                 InputType.AREA, area_type)
             self.validated_inputs[InputType.AREA] = [
                 area_type, area_type_label, area, area]
@@ -194,20 +195,21 @@ class InputData(object):
             area_type, area_name = area.split('|', 1)
 
             # check the area type
-            area_type_label = get_collection_term_label(
+            area_type_label = self.vocab.get_collection_term_label(
                 InputType.AREA, area_type)
             if area_type_label is None:
                 raise Exception("Unknown area type: {}.".format(area_type))
 
             # check the area name
-            get_collection_term_value(area_type, area_name)
-            area_label = get_collection_term_label(area_type, area_name)
+            area_label = self.vocab.get_collection_term_label(
+                area_type, area_name)
             if (area_label is None):
 
                 # currently the names are stored as 'labels' in the shape files
                 # so need to convert the label to the value
                 area_label = area_name
-                area_name = get_collection_term_value(area_type, area_name)
+                area_name = self.vocab.get_collection_term_value(
+                    area_type, area_name)
                 if area_name is None:
                     raise Exception("Unknown area name: {}.".format(area_name))
 

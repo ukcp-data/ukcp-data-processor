@@ -1,10 +1,12 @@
+import logging
+
 from _map_plotter import MapPlotter
-from ukcp_dp.constants import InputType
 import iris
 import matplotlib.gridspec as gridspec
+from ukcp_dp.constants import InputType
 import ukcp_dp.ukcp_standard_plots.mapper as maps
 
-import logging
+
 log = logging.getLogger(__name__)
 
 
@@ -26,6 +28,13 @@ class ThreeMapPlotter(MapPlotter):
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
         log.debug('_generate_subplots')
+
+        if (self.input_data.get_value(InputType.SHOW_BOUNDARIES) is not None
+                and self.input_data.get_value(InputType.SHOW_BOUNDARIES) !=
+                'none'):
+            plotsettings.coastlw = 0
+        else:
+            plotsettings.coastlw = 0.3
 
         gs_top = metadata_bbox.y0 - 0.06
         gs_left = 0.02
@@ -75,7 +84,9 @@ class ThreeMapPlotter(MapPlotter):
                                         bar_orientation="none",
                                         outfnames=None)
 
-        if self.input_data.get_value(InputType.SHOW_BOUNDARIES) is not None:
+        if (self.input_data.get_value(InputType.SHOW_BOUNDARIES) is not None
+                and self.input_data.get_value(InputType.SHOW_BOUNDARIES) !=
+                'none'):
             self.plot_overlay(
                 self.input_data.get_value(InputType.SHOW_BOUNDARIES))
 

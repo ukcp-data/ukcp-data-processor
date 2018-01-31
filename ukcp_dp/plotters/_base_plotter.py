@@ -1,13 +1,14 @@
+import logging
+
+import matplotlib.cbook as cbook
+import matplotlib.gridspec as gridspec
+import matplotlib.image as image
 from matplotlib.transforms import Bbox
 from ukcp_dp.constants import DATA_SELECTION_TYPES, InputType, \
     LOGO_SMALL, LOGO_LARGE
 from ukcp_dp.ukcp_standard_plots import standards_class as stds
-from ukcp_dp.vocab_manager import get_collection_label
-import matplotlib.cbook as cbook
-import matplotlib.gridspec as gridspec
-import matplotlib.image as image
 
-import logging
+
 log = logging.getLogger(__name__)
 
 
@@ -25,7 +26,7 @@ class BasePlotter():
     """
 
     def generate_plot(self, input_data, cube_list, overlay_cube, output_path,
-                      title):
+                      title, vocab):
         """
         Generate a plot.
 
@@ -36,6 +37,7 @@ class BasePlotter():
             the overlay
         @param output_path (str): the full path to the file
         @param title (str): a title for the plot
+        @param vocab (Vocab): an instance of the ukcp_dp Vocab class
         """
         log.info('generate_plot')
         # an object containing user defined values
@@ -43,6 +45,7 @@ class BasePlotter():
         # an iris cube list containing one cube per scenario, per variable
         self.cube_list = cube_list
         self.overlay_cube = overlay_cube
+        self.vocab = vocab
 
         # The plot settings are customised to the first variable in the list
         # We may want to change this in the future
@@ -113,7 +116,7 @@ class BasePlotter():
             data_selection_types.remove(InputType.OVERLAY_PROBABILITY_LEVELS)
 
         for dst in data_selection_types:
-            name = get_collection_label(dst)
+            name = self.vocab.get_collection_label(dst)
             try:
                 value = self.input_data.get_value_label(dst)
                 if isinstance(value, list):
@@ -211,6 +214,9 @@ class BasePlotter():
                 plotsettings = stds.UKCP_PRECIP.copy()
 
         plotsettings.bar_orientation = 'horizontal'
+
+        plotsettings.default_barlabel = self.vocab.get_collection_term_label(
+            InputType.VARIABLE, var_id)
 
         # remove country boarders, we may put them back later
         plotsettings.countrylcol = None

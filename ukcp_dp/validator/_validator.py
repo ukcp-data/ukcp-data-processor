@@ -1,13 +1,17 @@
+import logging
+
 from ukcp_dp.constants import DATA_SOURCE_PROB, DATA_SOURCE_PROB_MIN_YEAR, \
     DATA_SOURCE_RCM, DATA_SOURCE_RCM_MIN_YEAR, InputType, MONTHLY, SEASONAL
-from ukcp_dp.vocab_manager import get_collection_terms, \
-    get_collection_term_label, get_ensemble_member_set
+from ukcp_dp.vocab_manager import get_ensemble_member_set
 
-import logging
+
 log = logging.getLogger(__name__)
 
 
 class Validator():
+    def __init__(self, vocab):
+        self.vocab = vocab
+
     def validate(self, input_data):
         log.debug('validate')
         self.input_data = input_data
@@ -143,7 +147,8 @@ class Validator():
                 DATA_SOURCE_RCM):
             min_allowed_year = DATA_SOURCE_RCM_MIN_YEAR
         else:
-            min_allowed_year = min(get_collection_terms('year_minimum'))
+            min_allowed_year = min(
+                self.vocab.get_collection_terms('year_minimum'))
 
         if (self.input_data.get_value(InputType.YEAR_MINIMUM) <
                 min_allowed_year):
@@ -151,7 +156,7 @@ class Validator():
                 "The minimum year must be equal or greater than {}".
                 format(min_allowed_year))
 
-        max_allowed_year = max(get_collection_terms('year_maximum'))
+        max_allowed_year = max(self.vocab.get_collection_terms('year_maximum'))
         if (self.input_data.get_value(InputType.YEAR_MAXIMUM) >
                 max_allowed_year):
             raise Exception(
@@ -215,7 +220,8 @@ class Validator():
             return
 
         time_period = self.input_data.get_value(InputType.TIME_PERIOD)
-        allowed_time_periods = get_collection_terms(temporal_average_type)
+        allowed_time_periods = self.vocab.get_collection_terms(
+            temporal_average_type)
 
         # special case for all
         if ((temporal_average_type == MONTHLY or
@@ -224,7 +230,7 @@ class Validator():
             return
 
         if time_period not in allowed_time_periods:
-            type_label = get_collection_term_label(
+            type_label = self.vocab.get_collection_term_label(
                 InputType.TEMPORAL_AVERAGE_TYPE, temporal_average_type)
             raise Exception("{time_period} is not a {type_label} value".format(
                 time_period=time_period, type_label=type_label))
@@ -237,7 +243,8 @@ class Validator():
                 baseline = self.input_data.get_value(InputType.BASELINE)
             except KeyError:
                 return
-            allowed_baselines = get_collection_terms(InputType.BASELINE)
+            allowed_baselines = self.vocab.get_collection_terms(
+                InputType.BASELINE)
             # the first one is not allowed for RCM
             allowed_baselines.pop(0)
 

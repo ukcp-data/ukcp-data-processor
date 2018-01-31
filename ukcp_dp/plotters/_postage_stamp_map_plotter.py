@@ -1,8 +1,11 @@
+import logging
+
 from _map_plotter import MapPlotter
 import matplotlib.gridspec as gridspec
+from ukcp_dp.constants import InputType
 import ukcp_dp.ukcp_standard_plots.mapper as maps
 
-import logging
+
 log = logging.getLogger(__name__)
 
 
@@ -109,8 +112,10 @@ class PostageStampMapPlotter(MapPlotter):
                                             outfnames=None)
             # TODO need a better way to generate the title
             # add a title
-            title = 'r1i1p{n}'.format(
+            ensemble_name = 'r1i1p{n}'.format(
                 n=int(ensemble.coord('Ensemble member').points[0] + 1))
+            title = self.vocab.get_collection_term_label(
+                InputType.ENSEMBLE, ensemble_name)
             ax.set_title(title)
 
         # add the sub plot to contain the bar
