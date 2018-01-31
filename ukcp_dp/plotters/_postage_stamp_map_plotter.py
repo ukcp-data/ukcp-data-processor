@@ -42,6 +42,8 @@ class PostageStampMapPlotter(MapPlotter):
         if self._is_landscape(cube) is True:
             if ensemble_count == 20:
                 gs = gridspec.GridSpec(4, 6)
+                gs.update(top=gs_top, bottom=0.02, left=gs_left,
+                          right=gs_right)
                 grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
                         gs[0, 5],
                         gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
@@ -52,21 +54,19 @@ class PostageStampMapPlotter(MapPlotter):
 
             elif ensemble_count == 15:
                 gs = gridspec.GridSpec(3, 6)
+                gs.update(top=gs_top, bottom=0.02, left=gs_left,
+                          right=gs_right)
                 grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
                         gs[0, 5],
                         gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
                         gs[1, 5],
                         gs[2, 0], gs[2, 1], gs[2, 2]]
             else:
-                # TODO need info about CPM ensemble members
-                gs = gridspec.GridSpec(3, 6)
+                gs = gridspec.GridSpec(2, 5)
+                gs.update(top=gs_top, bottom=0.13, left=gs_left,
+                          right=gs_right)
                 grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
-                        gs[0, 5],
-                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
-                        gs[1, 5],
-                        gs[2, 0], gs[2, 1], gs[2, 2]]
-
-            gs.update(top=gs_top, bottom=0.02, left=gs_left, right=gs_right)
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4]]
 
         else:  # portrait
             if ensemble_count == 20:
@@ -88,13 +88,11 @@ class PostageStampMapPlotter(MapPlotter):
                         gs[1, 5], gs[1, 6]]
 
             else:
-                # TODO need info about CPM ensemble members
-                gs = gridspec.GridSpec(2, 8)
-                gs.update(top=gs_top, bottom=0.1, left=gs_left, right=gs_right)
+                gs = gridspec.GridSpec(2, 5)
+                gs.update(top=gs_top, bottom=0.13, left=gs_left,
+                          right=gs_right)
                 grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
-                        gs[0, 5], gs[0, 6], gs[0, 7],
-                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
-                        gs[1, 5], gs[1, 6]]
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4]]
 
         # define the location for the colour bar
         bar_gs = gridspec.GridSpec(1, 2)
