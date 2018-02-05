@@ -28,9 +28,6 @@ class PostageStampMapPlotter(MapPlotter):
         """
         log.debug('_generate_subplots')
 
-        # as these are tiny maps we need to reduce the coast line width
-        plotsettings.coastlw = 0.4
-
         gs_top = metadata_bbox.y0 - 0.06
         gs_left = 0.02
         gs_right = 0.98
@@ -115,6 +112,9 @@ class PostageStampMapPlotter(MapPlotter):
             title = self.vocab.get_collection_term_label(
                 InputType.ENSEMBLE, ensemble_name)
             ax.set_title(title)
+
+            # add a coast line
+            self.plot_overlay('')
 
         # add the sub plot to contain the bar
         ax = fig.add_subplot(bar_grid)

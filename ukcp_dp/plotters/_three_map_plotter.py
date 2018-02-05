@@ -29,13 +29,6 @@ class ThreeMapPlotter(MapPlotter):
         """
         log.debug('_generate_subplots')
 
-        if (self.input_data.get_value(InputType.SHOW_BOUNDARIES) is not None
-                and self.input_data.get_value(InputType.SHOW_BOUNDARIES) !=
-                'none'):
-            plotsettings.coastlw = 0
-        else:
-            plotsettings.coastlw = 0.3
-
         gs_top = metadata_bbox.y0 - 0.06
         gs_left = 0.02
         gs_right = 0.98
@@ -84,11 +77,7 @@ class ThreeMapPlotter(MapPlotter):
                                         bar_orientation="none",
                                         outfnames=None)
 
-        if (self.input_data.get_value(InputType.SHOW_BOUNDARIES) is not None
-                and self.input_data.get_value(InputType.SHOW_BOUNDARIES) !=
-                'none'):
-            self.plot_overlay(
-                self.input_data.get_value(InputType.SHOW_BOUNDARIES))
+        self.plot_overlay(self.input_data.get_value(InputType.SHOW_BOUNDARIES))
 
         ax.set_title(title)
 

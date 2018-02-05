@@ -99,7 +99,9 @@ OVERLAY_LINE_WIDTH = 0.3
 ROOT_DIR = '/usr/local/cows_venv_py27/cows_venv/lib/python2.7/site-packages'
 
 OVERLAY_ADMIN = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK_Admin')
-OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/BritishIsles')
+OVERLAY_COASTLINE = path.join(
+    ROOT_DIR, 'ukcp_dp/public/shapefiles/UKCoastline')
+OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK')
 OVERLAY_RIVER = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/river_basins')
 
 LOGO_SMALL = path.join(ROOT_DIR, 'ukcp_dp/public/img/UKCP_logo100px.jpg')

@@ -1,6 +1,6 @@
 from _base_plotter import BasePlotter
 from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, \
-    OVERLAY_ADMIN, OVERLAY_COUNTRY, OVERLAY_RIVER
+    OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER
 import matplotlib.pyplot as plt
 import numpy as np
 import shapefile as shp
@@ -107,7 +107,7 @@ class MapPlotter(BasePlotter):
         elif overlay == 'river_basin':
             sf = shp.Reader(OVERLAY_RIVER)
         else:
-            return
+            sf = shp.Reader(OVERLAY_COASTLINE)
 
         for shape in list(sf.iterShapes()):
             npoints = len(shape.points)  # total points

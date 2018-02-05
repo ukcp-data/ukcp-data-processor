@@ -218,6 +218,9 @@ class BasePlotter():
         plotsettings.default_barlabel = self.vocab.get_collection_term_label(
             InputType.VARIABLE, var_id)
 
+        # remove coast line, it is added back later with any over layers
+        plotsettings.coastlw = 0
+
         # remove country boarders, we may put them back later
         plotsettings.countrylcol = None
 
