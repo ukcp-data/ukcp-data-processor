@@ -185,6 +185,26 @@ class Vocab(object):
         'anglian': 'Anglian'
     },
 
+        'spatial_representation_group': {
+        '60km': '60km grid',
+        '25km': '25km grid',
+        '12km': '12km grid',
+        '2km': '2.2km grid',
+        'aggregated_areas': 'Spatially Aggregated Areas'
+    },
+        'variable_group': {
+        'temp': 'Temperature',
+        'rain': 'Rainfall',
+        'press': 'Pressure',
+        'hum': 'Humidity',
+        'wind': 'Wind speed',
+    },
+        'output': {
+        'graphs': 'Graphs',
+        'maps': 'Maps',
+        'data': 'Download data only',
+    },
+
         'convert_to_percentiles': {
         True: 'True',
         False: 'False'
@@ -239,21 +259,26 @@ class Vocab(object):
     COLLECTION_LABELS = {
         'area_type': 'Area',
         'baseline': 'Baseline',
+        'climate_change_type': 'Climate Change Type',
         'data_format': 'Data Format',
-        'ensemble': 'Ensemble',
         'data_source': 'Data Source',
         'data_type': 'Data Type',
+        'ensemble': 'Ensemble',
         'font_size': 'Font Size',
         'image_format': 'Image Format',
         'image_size': 'Image Size',
         'legend_position': 'Legend Position',
+        'output': 'Output',
         'overlay_probability_levels': 'Overlay Probability Levels',
+        'period': 'Date Range',
         'scenario': 'Scenario',
         'show_boundaries': 'Show Boundaries',
         'spatial_representation': 'Spatial Representation',
+        'spatial_representation_group': 'Spatial Representation',
         'temporal_average_type': 'Temporal Average Type',
         'time_period': 'Time Period',
         'variable': 'Variable',
+        'variable_group': 'Variable',
         'year': 'Year',
         'year_minimum': 'Year Minimum',
         'year_maximum': 'Year Maximum'
@@ -266,9 +291,9 @@ class Vocab(object):
         self.vocab['year_maximum'] = _get_range(1900, 2101)
         self.vocab['highlighted_ensemble_members'] = self.vocab['ensemble']
 
-        self.variables = self.load_json_variables()
+        self.variables = self._load_json_variables()
 
-    def load_json_variables(self):
+    def _load_json_variables(self):
         # TODO quick hack to get UKCP18_CVs
         var_file = path.join(
             ROOT_DIR, 'ukcp_dp/vocab_manager/UKCP18_variable.json')
