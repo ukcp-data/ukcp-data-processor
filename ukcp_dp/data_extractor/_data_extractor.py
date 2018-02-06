@@ -365,6 +365,8 @@ class DataExtractor():
 
         @return a str containing the title
         """
+        variable = " and ".join(self.input_data.get_value_label(
+            InputType.VARIABLE)).encode('utf-8')
         if (self.input_data.get_value(
                 InputType.TEMPORAL_AVERAGE_TYPE) == ANNUAL
                 or self.input_data.get_value(InputType.TIME_PERIOD) == 'all'):
@@ -373,8 +375,7 @@ class DataExtractor():
                      'for'.format(
                          temporal_type=self.input_data.get_value_label(
                              InputType.TEMPORAL_AVERAGE_TYPE),
-                         variable=" and ".join(self.input_data.get_value_label(
-                             InputType.VARIABLE))))
+                         variable=variable))
         else:
             title = ('Demonstration Version - {temporal_type} average '
                      '{variable} for\n'
@@ -383,8 +384,7 @@ class DataExtractor():
                              InputType.TEMPORAL_AVERAGE_TYPE),
                          time_period=self.input_data.get_value_label(
                              InputType.TIME_PERIOD),
-                         variable=" and ".join(self.input_data.get_value_label(
-                             InputType.VARIABLE))))
+                         variable=variable))
 
         if (self.input_data.get_value(InputType.YEAR_MINIMUM) ==
                 self.input_data.get_value(InputType.YEAR_MAXIMUM)):
@@ -418,7 +418,7 @@ class DataExtractor():
             title = "{t} in {area}".format(
                 t=title, area=self.input_data.get_area_label())
 
-        return title
+        return title.decode('utf-8')
 
     def _get_resolution_m(self, cube):
         resolution = cube.attributes['resolution']

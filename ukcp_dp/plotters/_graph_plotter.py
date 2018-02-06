@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from _base_plotter import BasePlotter
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
