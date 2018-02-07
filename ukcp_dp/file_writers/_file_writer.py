@@ -45,7 +45,7 @@ def _write_csv_cube(cube, title, output_data_file):
     line_out = [0] * (len(dim_names) + 1)
 
     # write the title
-    output_data_file.write(title.replace('\n', ' '))
+    output_data_file.write(title.encode('utf-8').replace('\n', ' '))
     output_data_file.write('\n')
 
     # write the header
