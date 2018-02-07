@@ -1,11 +1,17 @@
+import logging
+
 from _base_plotter import BasePlotter
 from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, \
-    OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER
+    OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER, \
+    OVERLAY_COASTLINE_SMALL
 import matplotlib.pyplot as plt
 import numpy as np
 import shapefile as shp
 import ukcp_dp.ukcp_common_analysis.regions as regs
 import ukcp_dp.ukcp_standard_plots.plotting_general as plotgeneral
+
+
+log = logging.getLogger(__name__)
 
 
 class MapPlotter(BasePlotter):
@@ -94,7 +100,7 @@ class MapPlotter(BasePlotter):
             return False
         return True
 
-    def plot_overlay(self, overlay):
+    def plot_overlay(self, overlay, hi_res=True):
         """
         Add an overlay to a map.
 
@@ -107,7 +113,13 @@ class MapPlotter(BasePlotter):
         elif overlay == 'river_basin':
             sf = shp.Reader(OVERLAY_RIVER)
         else:
-            sf = shp.Reader(OVERLAY_COASTLINE)
+            overlay = 'coast_line'
+            if hi_res is True:
+                sf = shp.Reader(OVERLAY_COASTLINE)
+            else:
+                sf = shp.Reader(OVERLAY_COASTLINE_SMALL)
+
+        log.debug('adding overlay for {}'.format(overlay))
 
         for shape in list(sf.iterShapes()):
             npoints = len(shape.points)  # total points
@@ -130,3 +142,4 @@ class MapPlotter(BasePlotter):
 
                 plt.plot(x_lon, y_lat, color=OVERLAY_COLOUR,
                          linewidth=OVERLAY_LINE_WIDTH)
+        log.debug('overlay added')

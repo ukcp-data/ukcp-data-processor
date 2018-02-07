@@ -97,6 +97,13 @@ class PostageStampMapPlotter(MapPlotter):
         bar_gs.update(top=0.23, bottom=0.08, left=gs_left, right=gs_right)
 
         for i, ensemble in enumerate(cube.slices_over('Ensemble member')):
+            # TODO need a better way to get the ensemble_name
+            ensemble_name = 'r1i1p{n}'.format(
+                n=int(ensemble.coord('Ensemble member').points[0] + 1))
+
+            log.debug('generating postage stamp map for ensemble {}'.
+                      format(ensemble_name))
+
             ax = fig.add_subplot(grid[i], projection=plotsettings.proj)
 
             # Setting bar_orientation="none" here to override (prevent) drawing
@@ -105,16 +112,13 @@ class PostageStampMapPlotter(MapPlotter):
                                             ax=ax, barlab=None,
                                             bar_orientation="none",
                                             outfnames=None)
-            # TODO need a better way to generate the title
             # add a title
-            ensemble_name = 'r1i1p{n}'.format(
-                n=int(ensemble.coord('Ensemble member').points[0] + 1))
             title = self.vocab.get_collection_term_label(
                 InputType.ENSEMBLE, ensemble_name)
             ax.set_title(title)
 
             # add a coast line
-            self.plot_overlay('')
+            self.plot_overlay('', False)
 
         # add the sub plot to contain the bar
         ax = fig.add_subplot(bar_grid)

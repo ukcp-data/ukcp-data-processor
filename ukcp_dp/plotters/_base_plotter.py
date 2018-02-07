@@ -54,8 +54,7 @@ class BasePlotter():
         plotsettings = self._get_plot_settings(
             self.input_data.get_value(InputType.IMAGE_SIZE),
             self.input_data.get_font_size(),
-            self.input_data.get_value(InputType.VARIABLE)[0],
-            self.input_data.get_value(InputType.SHOW_BOUNDARIES))
+            self.input_data.get_value(InputType.VARIABLE)[0])
 
         self._generate_plot(output_path, plotsettings, title)
 
@@ -197,7 +196,7 @@ class BasePlotter():
         ax.set_yticks([])
         return bbox
 
-    def _get_plot_settings(self, cmsize, fsize, var_id, show_boundaries):
+    def _get_plot_settings(self, cmsize, fsize, var_id):
         """
         Get the plot settings based on the variable being plotted.
 

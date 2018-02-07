@@ -101,6 +101,8 @@ ROOT_DIR = '/usr/local/cows_venv_py27/cows_venv/lib/python2.7/site-packages'
 OVERLAY_ADMIN = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK_Admin')
 OVERLAY_COASTLINE = path.join(
     ROOT_DIR, 'ukcp_dp/public/shapefiles/UKCoastline')
+OVERLAY_COASTLINE_SMALL = path.join(
+    ROOT_DIR, 'ukcp_dp/public/shapefiles/UKCoastlineSmall')
 OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK')
 OVERLAY_RIVER = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/river_basins')
 
