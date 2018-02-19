@@ -138,8 +138,11 @@ class UKCPDataProcessor(object):
                 DATA_SOURCE_PROB)):
             cubes = CubeList()
             for cube in self.cube_list:
-                # extract 10th, 50th and 90th percentiles
+                # the cube contains all of the percentiles but we only plotted
+                # three of them, therefore extract 10th, 50th and 90th
+                # percentiles
                 cubes.append(get_probability_levels(cube))
-            self.plot_type = None
 
-        write_file(cubes, self.title, output_data_file_path)
+        write_file(cubes, self.overlay_cube, self.title, output_data_file_path,
+                   self.input_data, self.plot_type, self.vocab)
+        self.plot_type = None
