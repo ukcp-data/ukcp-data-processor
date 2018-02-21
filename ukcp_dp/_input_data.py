@@ -27,6 +27,43 @@ class InputData(object):
                                        allowed_values=self.allowed_values))
         return x
 
+    def get_user_inputs(self):
+        """
+        Get a dictionary representing the labels of the values set by the user.
+
+        @return dict
+            key(str) - the label of the collection
+            value(str) - the label of the value
+        """
+        input_labels = {}
+        for key in self.validated_inputs:
+            key_label = self.vocab.get_collection_label(key)
+            value = self.validated_inputs[key][1]
+            if (len(value) == 0):
+                continue
+            if isinstance(value, list):
+                value = ','.join(value)
+            input_labels[key_label] = value.encode('utf-8')
+
+        # remove extra year values
+        if ((self.validated_inputs.get(InputType.YEAR) ==
+                self.validated_inputs.get(InputType.YEAR_MINIMUM)) and
+                (self.validated_inputs.get(InputType.YEAR) ==
+                 self.validated_inputs.get(InputType.YEAR_MAXIMUM))):
+            try:
+                input_labels.pop(self.vocab.get_collection_label(
+                    InputType.YEAR_MINIMUM))
+                input_labels.pop(self.vocab.get_collection_label(
+                    InputType.YEAR_MAXIMUM))
+            except KeyError:
+                pass
+        else:
+            try:
+                input_labels.pop(InputType.YEAR)
+            except KeyError:
+                pass
+        return input_labels
+
     def set_inputs(self, inputs, allowed_values=None):
         """
         Set the input values.
@@ -138,7 +175,10 @@ class InputData(object):
         @return the value for the value_type
 
         """
-        return(self.validated_inputs[value_type][0])
+        value = self.validated_inputs.get(value_type)
+        if isinstance(value, list):
+            return value[0]
+        return value
 
     def get_value_label(self, value_type):
         """

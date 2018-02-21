@@ -14,7 +14,7 @@ from ukcp_dp.ukcp_standard_plots import standards_class as stds
 log = logging.getLogger(__name__)
 
 
-class BasePlotter():
+class BasePlotter(object):
     """
     The base class for plotters.
 
@@ -113,6 +113,8 @@ class BasePlotter():
 
         # only show if True
         if (self.input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS)
+                is None or
+                self.input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS)
                 is False):
             data_selection_types.remove(InputType.OVERLAY_PROBABILITY_LEVELS)
 

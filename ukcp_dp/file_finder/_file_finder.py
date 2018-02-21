@@ -42,7 +42,10 @@ def get_file_lists(input_data):
         file_list['main'] = _get_file_list_type_2(input_data)
 
     # the file list for an overlay of probability levels
-    if input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is True:
+    if (input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is not None
+            and
+            input_data.get_value(
+                InputType.OVERLAY_PROBABILITY_LEVELS) is True):
         if input_data.get_value(InputType.DATA_SOURCE) == DATA_SOURCE_PROB:
             file_list_overlay = file_list['main']
         else:

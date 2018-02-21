@@ -27,17 +27,17 @@ def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
     elif plot_type == PlotType.CDF_PLOT:
         csv_writer = CdfCsvWriter()
         csv_writer.write_csv(input_data, cube_list, output_data_file_path,
-                             title, vocab, overlay_cube)
+                             vocab, overlay_cube)
 
     elif plot_type == PlotType.PLUME_PLOT:
         csv_writer = PlumeCsvWriter()
         csv_writer.write_csv(input_data, cube_list, output_data_file_path,
-                             title, vocab, overlay_cube)
+                             vocab, overlay_cube)
 
     elif plot_type == PlotType.JP_PLOT:
         csv_writer = JpCsvWriter()
         csv_writer.write_csv(input_data, cube_list, output_data_file_path,
-                             title, vocab, overlay_cube)
+                             vocab, overlay_cube)
 
     else:
         write_default_csv(cube_list, title, output_data_file_path)

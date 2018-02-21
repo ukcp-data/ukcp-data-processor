@@ -19,7 +19,6 @@ class Validator():
         self._validate_convert_to_percentiles()
         self._validate_overlay_probability_levels()
         self._validate_time_slice()
-        self._validate_boundary_overlay()
         self._validate_colour_mode()
         self._validate_ensemble_members()
         self._validate_highlighted_ensemble_members()
@@ -30,19 +29,16 @@ class Validator():
 
     def _validate_data_source(self):
         # this must always be set
-        try:
-            self.input_data.get_value(InputType.DATA_SOURCE)
-        except KeyError:
+        if self.input_data.get_value(InputType.DATA_SOURCE) is None:
             raise Exception('{} not set'.format(InputType.DATA_SOURCE))
 
     def _validate_spatial_rep(self):
-        try:
-            spatial_rep = self.input_data.get_value(
-                InputType.SPATIAL_REPRESENTATION)
-            # TODO
+        spatial_rep = self.input_data.get_value(
+            InputType.SPATIAL_REPRESENTATION)
+# TODO
 #                 raise Exception("Invalid {value_type}: {value}.".format(
 # value_type=InputType.SPATIAL_REPRESENTATION, value=spatial_rep))
-        except KeyError:
+        if spatial_rep is None:
             # Not set, lets be kind and set it
             if self.input_data.get_area_type() in ['bbox', 'point']:
                 if (self.input_data.get_value(InputType.DATA_SOURCE) ==
@@ -63,54 +59,32 @@ class Validator():
                     self.input_data.get_area_type())
 
     def _validate_colour_mode(self):
-        try:
-            self.input_data.get_value(InputType.COLOUR_MODE)
-        except KeyError:
+        if self.input_data.get_value(InputType.COLOUR_MODE) is None:
             # Not set, lets be kind and set it to 'c'
             self.input_data.set_value(InputType.COLOUR_MODE, 'c')
 
     def _validate_convert_to_percentiles(self):
-        try:
-            convert_to_percentiles = self.input_data.get_value(
-                InputType.CONVERT_TO_PERCENTILES)
-            if not isinstance(convert_to_percentiles, bool):
-                raise Exception("Invalid {value_type}: {value}.".format(
-                    value_type=InputType.CONVERT_TO_PERCENTILES,
-                    value=convert_to_percentiles))
-
-        except KeyError:
-            # Not set, lets be kind and set it to False
-            self.input_data.set_value(InputType.CONVERT_TO_PERCENTILES, False)
+        convert_to_percentiles = self.input_data.get_value(
+            InputType.CONVERT_TO_PERCENTILES)
+        if ((convert_to_percentiles is not None) and
+                (not isinstance(convert_to_percentiles, bool))):
+            raise Exception("Invalid {value_type}: {value}.".format(
+                value_type=InputType.CONVERT_TO_PERCENTILES,
+                value=convert_to_percentiles))
 
     def _validate_overlay_probability_levels(self):
-        try:
-            overlay_probability_levels = self.input_data.get_value(
-                InputType.OVERLAY_PROBABILITY_LEVELS)
-            if not isinstance(overlay_probability_levels, bool):
-                raise Exception("Invalid {value_type}: {value}.".format(
-                    value_type=InputType.OVERLAY_PROBABILITY_LEVELS,
-                    value=overlay_probability_levels))
-
-        except KeyError:
-            # Not set, lets be kind and set it to False
-            self.input_data.set_value(
-                InputType.OVERLAY_PROBABILITY_LEVELS, False)
+        overlay_probability_levels = self.input_data.get_value(
+            InputType.OVERLAY_PROBABILITY_LEVELS)
+        if ((overlay_probability_levels is not None) and
+                (not isinstance(overlay_probability_levels, bool))):
+            raise Exception("Invalid {value_type}: {value}.".format(
+                value_type=InputType.OVERLAY_PROBABILITY_LEVELS,
+                value=overlay_probability_levels))
 
     def _validate_time_slice(self):
-        try:
-            year = self.input_data.get_value(InputType.YEAR)
-        except KeyError:
-            year = None
-
-        try:
-            year_min = self.input_data.get_value(InputType.YEAR_MINIMUM)
-        except KeyError:
-            year_min = None
-
-        try:
-            year_max = self.input_data.get_value(InputType.YEAR_MAXIMUM)
-        except KeyError:
-            year_max = None
+        year = self.input_data.get_value(InputType.YEAR)
+        year_min = self.input_data.get_value(InputType.YEAR_MINIMUM)
+        year_max = self.input_data.get_value(InputType.YEAR_MAXIMUM)
 
         if (year_max is not None and year_min is None):
             # if max is set then min must be set
@@ -163,25 +137,16 @@ class Validator():
                 "The maximum year must be equal or less than {}".
                 format(max_allowed_year))
 
-    def _validate_boundary_overlay(self):
-        try:
-            self.input_data.get_value(InputType.SHOW_BOUNDARIES)
-        except KeyError:
-            self.input_data.set_value(InputType.SHOW_BOUNDARIES, 'none')
-
     def _validate_ensemble_members(self):
-        try:
-            ensembles = self.input_data.get_value(InputType.ENSEMBLE)
-        except KeyError:
-            return
-        self._validate_ensembles(ensembles, InputType.ENSEMBLE)
+        ensembles = self.input_data.get_value(InputType.ENSEMBLE)
+        if ensembles is not None:
+            self._validate_ensembles(ensembles, InputType.ENSEMBLE)
 
     def _validate_highlighted_ensemble_members(self):
         # if no value is set, then set as an empty list
-        try:
-            ensembles = self.input_data.get_value(
-                InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
-        except KeyError:
+        ensembles = self.input_data.get_value(
+            InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
+        if ensembles is None:
             self.input_data._set_values(InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS,
                                         [])
             return
@@ -213,10 +178,9 @@ class Validator():
     def _validate_time_period(self):
         # if a temporal average type is set then check the time period is valid
         # for that type
-        try:
-            temporal_average_type = self.input_data.get_value(
-                InputType.TEMPORAL_AVERAGE_TYPE)
-        except KeyError:
+        temporal_average_type = self.input_data.get_value(
+            InputType.TEMPORAL_AVERAGE_TYPE)
+        if temporal_average_type is None:
             return
 
         time_period = self.input_data.get_value(InputType.TIME_PERIOD)
@@ -239,9 +203,8 @@ class Validator():
         # only a subset of values are allowed for RCM
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_RCM):
-            try:
-                baseline = self.input_data.get_value(InputType.BASELINE)
-            except KeyError:
+            baseline = self.input_data.get_value(InputType.BASELINE)
+            if baseline is None:
                 return
             allowed_baselines = self.vocab.get_collection_terms(
                 InputType.BASELINE)

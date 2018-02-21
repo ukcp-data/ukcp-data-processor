@@ -87,7 +87,10 @@ class DataExtractor():
                     cube = self._get_cube(file_list)
 
                 # do we need to convert percentiles?
-                if self.input_data.get_value(InputType.CONVERT_TO_PERCENTILES):
+                if ((self.input_data.get_value(
+                        InputType.CONVERT_TO_PERCENTILES) is not None) and
+                        (self.input_data.get_value(
+                            InputType.CONVERT_TO_PERCENTILES) is True)):
                     cube = (self._convert_to_percentiles_from_ensembles(cube))
 
                 if variable in TEMP_ANOMS:
@@ -160,6 +163,8 @@ class DataExtractor():
         overlay_cube = None
         if (self.input_data.get_value(InputType.DATA_SOURCE) !=
                 DATA_SOURCE_PROB and
+            self.input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is
+                not None and
             self.input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is
                 True):
 
@@ -246,6 +251,7 @@ class DataExtractor():
 
     def _convert_to_percentiles_from_ensembles(self, cube):
         # generate the 10th,50th and 90th percentiles for the ensembles
+        log.debug("convert to percentiles")
         result = cube.collapsed('Ensemble member', iris.analysis.PERCENTILE,
                                 percent=[10, 50, 90])
         result.coord(
@@ -343,11 +349,11 @@ class DataExtractor():
             year_max = int(self.input_data.get_value(
                 InputType.BASELINE).split('-')[1])
         else:
-            try:
+            if self.input_data.get_value(InputType.YEAR) is not None:
                 # year
                 year_min = self.input_data.get_value(InputType.YEAR)
                 year_max = self.input_data.get_value(InputType.YEAR) + 1
-            except KeyError:
+            else:
                 # year_minimum, year_maximum
                 year_min = self.input_data.get_value(InputType.YEAR_MINIMUM)
                 year_max = self.input_data.get_value(InputType.YEAR_MAXIMUM)

@@ -5,7 +5,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class BaseCsvWriter():
+class BaseCsvWriter(object):
     """
     The base class for CSV writers.
 
@@ -20,8 +20,8 @@ class BaseCsvWriter():
         self.header
     """
 
-    def write_csv(self, input_data, cube_list,
-                  output_data_file_path, title, vocab, overlay_cube=None):
+    def write_csv(self, input_data, cube_list, output_data_file_path, vocab,
+                  overlay_cube=None):
         """
         Write a CSV file.
 
@@ -29,7 +29,6 @@ class BaseCsvWriter():
         @param cube_list (iris cube list): a list of cubes containing the
             selected data, one cube per scenario, per variable
         @param output_data_file_path (str): the full path to the file
-        @param title (str): a title for the plot
         @param vocab (Vocab): an instance of the ukcp_dp Vocab class
         @param overlay_cube (iris cube): a cube containing the data for
             the overlay
@@ -45,8 +44,8 @@ class BaseCsvWriter():
         self.header = []
 
         self._write_csv()
-        _write_data_dict(title, self.data_dict, self.header,
-                         output_data_file_path)
+        _write_data_dict(self.input_data.get_user_inputs(), self.data_dict,
+                         self.header, output_data_file_path)
 
     def _write_csv(self):
         """
@@ -56,12 +55,21 @@ class BaseCsvWriter():
         pass
 
 
-def _write_data_dict(title, data_dict, header, output_data_file_path):
+def _write_data_dict(user_inputs, data_dict, header, output_data_file_path):
     """
     Write out the column headers and data_dict.
     """
+    header_string = ','.join(header)
+    header_length = len(header_string.split('\n')) + \
+        len(user_inputs.keys()) + 1
     with open(output_data_file_path, 'w') as output_data_file:
-        output_data_file.write(','.join(header))
+        output_data_file.write('header length,{}\n'.format(header_length))
+        keys = user_inputs.keys()
+        keys.sort()
+        for key in keys:
+            output_data_file.write('{key},{value}\n'.format(
+                key=key, value=user_inputs[key]))
+        output_data_file.write(header_string)
         output_data_file.write('\n')
         for key, values in data_dict.items():
             line_out = '{key},{values}\n'.format(

@@ -260,11 +260,14 @@ class Vocab(object):
         'area_type': 'Area',
         'baseline': 'Baseline',
         'climate_change_type': 'Climate Change Type',
+        'colour_mode': 'Colour Mode',
+        'convert_to_percentiles': 'Convert To Percentiles',
         'data_format': 'Data Format',
         'data_source': 'Data Source',
         'data_type': 'Data Type',
         'ensemble': 'Ensemble',
         'font_size': 'Font Size',
+        'highlighted_ensemble_members': 'Highlighted Ensemble Members',
         'image_format': 'Image Format',
         'image_size': 'Image Size',
         'legend_position': 'Legend Position',
@@ -364,7 +367,7 @@ class Vocab(object):
         try:
             return self.COLLECTION_LABELS[collection]
         except KeyError:
-            return
+            return collection
 
 
 def _get_range(min_value, max_value):
@@ -414,7 +417,4 @@ def get_months():
 
 
 def get_ensemble_member_set(data_source):
-    try:
-        return ENSEMBLE_MEMBER_SET[data_source]
-    except KeyError:
-        return
+    return ENSEMBLE_MEMBER_SET.get(data_source)

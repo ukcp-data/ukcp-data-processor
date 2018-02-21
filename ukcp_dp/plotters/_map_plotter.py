@@ -106,6 +106,9 @@ class MapPlotter(BasePlotter):
 
         @param overlay (str): the name of the overlay
         """
+        if overlay is None:
+            overlay = 'coast_line'
+
         if overlay == 'country':
             sf = shp.Reader(OVERLAY_COUNTRY)
         elif overlay == 'admin_region':
