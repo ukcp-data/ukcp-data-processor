@@ -48,8 +48,8 @@ class PdfPlotter(GraphPlotter):
                     'relative probability'), linestyle=linestyle[i],
                     color=colours[i])
 
-        plt.xlabel(self.vocab.get_collection_term_label(
-            InputType.VARIABLE, self.cube_list[0].attributes['var_id']))
+        plt.xlabel(self.input_data.get_value_label(
+            InputType.VARIABLE)[0].encode('utf-8'))
 
         # clear the title field
         plt.title('')

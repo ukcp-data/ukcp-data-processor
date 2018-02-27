@@ -25,13 +25,9 @@ class JpPlotter(GraphPlotter):
         log.debug('_generate_graph')
 
         x = self.cube_list[0].data
-        x_id = self.cube_list[0].attributes['var_id']
-        x_label = self.vocab.get_collection_term_label(
-            InputType.VARIABLE, x_id)
+        x_id = self.input_data.get_value(InputType.VARIABLE)[0]
         y = self.cube_list[1].data
-        y_id = self.cube_list[1].attributes['var_id']
-        y_label = self.vocab.get_collection_term_label(
-            InputType.VARIABLE, y_id)
+        y_id = self.input_data.get_value(InputType.VARIABLE)[1]
 
         h, xedges, yedges = np.histogram2d(x, y, bins=10)
         xbins = xedges[:-1] + (xedges[1] - xedges[0]) / 2
@@ -47,8 +43,10 @@ class JpPlotter(GraphPlotter):
         # now add the lines
         plt.contour(xbins, ybins, h, levels, colors=CONTOUR_LINE)
 
-        plt.xlabel(x_label)
-        plt.ylabel(y_label)
+        plt.xlabel(self.input_data.get_value_label(
+            InputType.VARIABLE)[0].encode('utf-8'))
+        plt.ylabel(self.input_data.get_value_label(
+            InputType.VARIABLE)[1].encode('utf-8'))
 
         legend_box = [plt.Rectangle((0, 0), 1, 1, fc=pc.get_facecolor()[0])
                       for pc in contour_fill.collections]

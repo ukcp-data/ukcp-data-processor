@@ -51,12 +51,8 @@ class PlumePlotter(GraphPlotter):
 
         # add axis labels
         plt.xlabel('Date')
-        y_id = self.cube_list[0].attributes['var_id']
-        if not y_id.endswith('Anom'):
-            y_id += 'Anom'
-        y_label = self.vocab.get_collection_term_label(
-            InputType.VARIABLE, y_id)
-        plt.ylabel(y_label)
+        plt.ylabel(self.input_data.get_value_label(
+            InputType.VARIABLE)[0].encode('utf-8'))
 
     def _plot_probability_levels(self, cube, ax, plot_fifty):
         # plot a shaded area between the 10th and 90th percentiles
