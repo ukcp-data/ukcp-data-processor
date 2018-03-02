@@ -2,8 +2,9 @@ import logging
 
 from _map_plotter import MapPlotter
 import matplotlib.gridspec as gridspec
-from ukcp_dp.constants import InputType
+from ukcp_dp.constants import DATA_SOURCE_GCM, InputType
 import ukcp_dp.ukcp_standard_plots.mapper as maps
+from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
 log = logging.getLogger(__name__)
@@ -96,10 +97,11 @@ class PostageStampMapPlotter(MapPlotter):
         bar_grid = bar_gs[0, 1]
         bar_gs.update(top=0.23, bottom=0.08, left=gs_left, right=gs_right)
 
-        for i, ensemble in enumerate(cube.slices_over('Ensemble member')):
+        for i, ensemble_slice in enumerate(
+                cube.slices_over('Ensemble member')):
             # TODO need a better way to get the ensemble_name
-            ensemble_name = 'r1i1p{n}'.format(
-                n=int(ensemble.coord('Ensemble member').points[0] + 1))
+            ensemble_name = get_ensemble_member_set(DATA_SOURCE_GCM)[
+                int(ensemble_slice.coord('Ensemble member').points[0])]
 
             log.debug('generating postage stamp map for ensemble {}'.
                       format(ensemble_name))
@@ -108,7 +110,8 @@ class PostageStampMapPlotter(MapPlotter):
 
             # Setting bar_orientation="none" here to override (prevent) drawing
             # the colour bar:
-            result = maps.plot_standard_map(ensemble, plotsettings, fig=fig,
+            result = maps.plot_standard_map(ensemble_slice, plotsettings,
+                                            fig=fig,
                                             ax=ax, barlab=None,
                                             bar_orientation="none",
                                             outfnames=None)

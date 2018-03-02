@@ -1,14 +1,17 @@
+import logging
+
+import cf_units
+import iris
+from iris.cube import CubeList
+import iris.plot as iplt
+import iris.quickplot as qplt
 from ukcp_dp.constants import ANNUAL, DATA_SOURCE_PROB, InputType, \
     MONTHLY, SEASONAL, TEMP_ANOMS
 from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
     make_anomaly
 from ukcp_dp.vocab_manager import get_months
-import cf_units
-import iris
-import iris.plot as iplt
-import iris.quickplot as qplt
 
-import logging
+
 log = logging.getLogger(__name__)
 
 
@@ -35,6 +38,7 @@ class DataExtractor():
         self.input_data = input_data
         self.cubes = self._get_main_cubes()
         self.overlay_cube = self._get_overlay_cube()
+        log.debug('DataExtractor __init__ finished')
 
     def get_cubes(self):
         """
@@ -69,18 +73,21 @@ class DataExtractor():
         @return an iris cube list containing the main data, one cube per
             scenario, per variable
         """
+        log.debug('_get_main_cubes')
         cubes = iris.cube.CubeList()
 
         for variable in self.file_lists['main'].keys():
             # for each variable there is a list of files per scenario
-            for file_list in self.file_lists['main'][variable]:
+            for i, file_list in enumerate(self.file_lists['main'][variable]):
 
                 if (variable.endswith('Anom') and
                         self.input_data.get_value(InputType.DATA_SOURCE) !=
                         DATA_SOURCE_PROB):
                     # we need anomalies so lets calculate them
                     # TODO we may get these directly from file in future
-                    cube = self._get_anomaly_cube(file_list, variable)
+                    cube = self._get_anomaly_cube(
+                        file_list, self.file_lists['baseline'][variable][i],
+                        variable)
 
                 else:
                     # we can use the values directly from the file
@@ -105,13 +112,14 @@ class DataExtractor():
 
         return cubes
 
-    def _get_anomaly_cube(self, file_list, variable):
+    def _get_anomaly_cube(self, file_list, baseline_file_list, variable):
+        log.debug('_get_anomaly_cube')
         # anomalies have been selected for something other than LS1,
         # therefore we need to calculate the climatology using the
         # baseline and then the anomalies
         cube_absoute = self._get_cube(file_list)
 
-        cube_baseline = self._get_cube(file_list, baseline=True)
+        cube_baseline = self._get_cube(baseline_file_list, baseline=True)
 
         cube_climatology = make_climatology(
             cube_baseline, climtype=self.input_data.get_value_label(
@@ -160,6 +168,7 @@ class DataExtractor():
 
         @return an iris cube, maybe 'None'
         """
+        log.debug('_get_overlay_cube')
         overlay_cube = None
         if (self.input_data.get_value(InputType.DATA_SOURCE) !=
                 DATA_SOURCE_PROB and
@@ -194,19 +203,26 @@ class DataExtractor():
 
         @return an iris cube
         """
+        log.debug('_get_cube')
         # Load the cubes
         cubes = iris.load(file_list)
+
+        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_PROB) or overlay_probability_levels is True:
+            unfiltered_cubes = cubes
+            cubes = CubeList()
+            for cube in unfiltered_cubes:
+                if cube.name() != 'time_bnds':
+                    cubes.append(cube)
 
         # Remove attribute ensemble_member_id to allow us to merge cubes
         if (self.input_data.get_value(InputType.DATA_SOURCE) !=
                 DATA_SOURCE_PROB):
             for cube in cubes:
                 try:
-                    del cube.metadata.attributes['ensemble_member']
+                    del cube.metadata.attributes['ensemble_member_id']
                 except KeyError:
                     pass
-
-        cubes = iris.cube.CubeList(cubes)
 
         cube = cubes.concatenate_cube()
 
@@ -259,6 +275,7 @@ class DataExtractor():
         return result
 
     def _get_spatial_selector(self, cube):
+        log.debug('_get_spatial_selector')
         # generate an area constraint
         area_constraint = None
 
@@ -307,6 +324,7 @@ class DataExtractor():
         return area_constraint
 
     def _get_temporal_selector(self):
+        log.debug('_get_temporal_selector')
         # generate a temporal constraint
         temporal_constraint = None
         temporal_average_type = self.input_data.get_value(
@@ -339,6 +357,7 @@ class DataExtractor():
         return temporal_constraint
 
     def _time_slice_selector(self, baseline):
+        log.debug('_time_slice_selector')
         # generate a time slice constraint
         time_slice_constraint = None
         year_max = None
@@ -371,6 +390,7 @@ class DataExtractor():
 
         @return a str containing the title
         """
+        log.debug('get_title')
         variable = " and ".join(self.input_data.get_value_label(
             InputType.VARIABLE)).encode('utf-8')
         if (self.input_data.get_value(
@@ -427,6 +447,7 @@ class DataExtractor():
         return title.decode('utf-8')
 
     def _get_resolution_m(self, cube):
+        log.debug('_get_resolution_m')
         resolution = cube.attributes['resolution']
         try:
             return int(resolution.split('km')[0]) * 1000
@@ -440,6 +461,7 @@ def get_probability_levels(cube):
 
     @return a cube containing the 10, 50 and 90 percentiles
     """
+    log.debug('get_probability_levels')
     percentile_cubes = iris.cube.CubeList()
     percentile_cubes.append(cube.extract(iris.Constraint(percentile=10)))
     percentile_cubes.append(cube.extract(iris.Constraint(percentile=50)))

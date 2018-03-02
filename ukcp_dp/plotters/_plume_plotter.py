@@ -8,9 +8,10 @@ import iris
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
-from ukcp_dp.constants import DATA_SOURCE_PROB, ENSEMBLE_COLOURS, \
-    ENSEMBLE_GREYSCALES, ENSEMBLE_LOWLIGHT, \
+from ukcp_dp.constants import DATA_SOURCE_GCM, DATA_SOURCE_PROB, \
+    ENSEMBLE_COLOURS, ENSEMBLE_GREYSCALES, ENSEMBLE_LOWLIGHT, \
     PERCENTILE_LINE_COLOUR, PERCENTILE_FILL, InputType
+from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
 log = logging.getLogger(__name__)
@@ -51,8 +52,7 @@ class PlumePlotter(GraphPlotter):
 
         # add axis labels
         plt.xlabel('Date')
-        plt.ylabel(self.input_data.get_value_label(
-            InputType.VARIABLE)[0].encode('utf-8'))
+        plt.ylabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
 
     def _plot_probability_levels(self, cube, ax, plot_fifty):
         # plot a shaded area between the 10th and 90th percentiles
@@ -92,8 +92,8 @@ class PlumePlotter(GraphPlotter):
         highlighted_counter = 0
         for ensemble_slice in cube.slices_over('Ensemble member'):
             # TODO hack to get name
-            ensemble_name = 'r1i1p{}'.format(int(
-                ensemble_slice.coord('Ensemble member').points[0]) + 1)
+            ensemble_name = get_ensemble_member_set(DATA_SOURCE_GCM)[
+                int(ensemble_slice.coord('Ensemble member').points[0])]
 
             # highlighted ensembles should be included in the legend
             if ensemble_name in highlighted_ensemble_members:

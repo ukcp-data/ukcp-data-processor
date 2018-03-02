@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 class JpCsvWriter(BaseCsvWriter):
     """
-    The CDF CSV writer class.
+    The joint probability CSV writer class.
 
     This class extends BaseCsvWriter with a _write_csv(self).
     """

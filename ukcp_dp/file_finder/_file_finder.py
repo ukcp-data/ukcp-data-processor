@@ -8,12 +8,13 @@ log = logging.getLogger(__name__)
 
 
 # month and day
-MONTH_START_DATE = '0101'
-MONTH_END_DATE = '1201'
+MONTH_START_DATE = '1201'
+MONTH_END_DATE = '1130'
 SEASON_START_DATE = '1201'
 SEASON_END_DATE = '1130'
-
-VERSION = 'v20170331'
+LAND_PROB_START_DATE = '19601201'
+LAND_PROB_END_DATE = '20991130'
+VERSION = 'latest'
 
 
 def get_file_lists(input_data):
@@ -40,6 +41,7 @@ def get_file_lists(input_data):
     elif (input_data.get_value(InputType.DATA_SOURCE) in
             ['land-gcm', 'land-rcm']):
         file_list['main'] = _get_file_list_type_2(input_data)
+        file_list['baseline'] = _get_file_list_for_baseline(input_data)
 
     # the file list for an overlay of probability levels
     if (input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is not None
@@ -88,13 +90,6 @@ def _get_land_prob_file_list(input_data):
     elif year_minimum < DATA_SOURCE_PROB_MIN_YEAR:
         year_minimum = DATA_SOURCE_PROB_MIN_YEAR
 
-    dataset_id = ('ukcp18-{data_source}-uk-{spatial_representation}-'
-                  '{temporal_type}'.format(
-                      data_source=DATA_SOURCE_PROB,
-                      spatial_representation=spatial_representation,
-                      temporal_type=input_data.get_value(
-                          InputType.TEMPORAL_AVERAGE_TYPE)))
-
     for variable in variables:
         # generate a list of files for each variable
 
@@ -114,7 +109,8 @@ def _get_land_prob_file_list(input_data):
 
             for year in range(year_minimum, (year_maximum + 1)):
                 file_name = _get_land_prob_file_name(
-                    dataset_id, input_data, scenario, variable, year)
+                    input_data, scenario, spatial_representation, variable,
+                    year)
                 scenario_file_list.append(os.path.join(file_path, file_name))
 
             file_list_per_scenario.append(scenario_file_list)
@@ -131,7 +127,7 @@ def _get_land_prob_spatial_representation(input_data):
     if spatial_representation == 'river_basin':
         spatial_representation = 'river'
     elif spatial_representation == 'admin_region':
-        spatial_representation = 'admin'
+        spatial_representation = 'region'
     elif spatial_representation == 'country':
         pass
     else:
@@ -147,8 +143,8 @@ def _get_land_prob_file_path(input_data, scenario, spatial_representation,
     file_path = os.path.join(
         DATA_DIR,
         DATA_SOURCE_PROB,
-        spatial_representation,
         'uk',
+        spatial_representation,
         scenario,
         input_data.get_value(InputType.DATA_TYPE),
         variable,
@@ -157,10 +153,15 @@ def _get_land_prob_file_path(input_data, scenario, spatial_representation,
     return file_path
 
 
-def _get_land_prob_file_name(dataset_id, input_data, scenario, variable, year):
-    if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
+def _get_land_prob_file_name(input_data, scenario, spatial_representation,
+                             variable, year):
+    # the year starts in December, so subtract 1 from the year
+    if spatial_representation != '25km':
+        start_date = LAND_PROB_START_DATE
+        end_date = LAND_PROB_END_DATE
+    elif input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
         start_date = '{year}{mon_day}'.format(
-            year=year, mon_day=MONTH_START_DATE)
+            year=year - 1, mon_day=MONTH_START_DATE)
         end_date = '{year}{mon_day}'.format(
             year=year, mon_day=MONTH_END_DATE)
     else:  # 'seas'
@@ -169,12 +170,13 @@ def _get_land_prob_file_name(dataset_id, input_data, scenario, variable, year):
         end_date = '{year}{mon_day}'.format(
             year=year, mon_day=SEASON_END_DATE)
 
-    file_name = ('{variable}_{scenario}_{dataset_id}_'
-                 '{data_type}_{temporal_type}_{start_data}-'
-                 '{end_date}.nc'.format(
+    file_name = ('{variable}_{scenario}_{data_source}_uk_'
+                 '{spatial_representation}_{data_type}_{temporal_type}_'
+                 '{start_data}-{end_date}.nc'.format(
                      variable=variable,
                      scenario=scenario,
-                     dataset_id=dataset_id,
+                     data_source=DATA_SOURCE_PROB,
+                     spatial_representation=spatial_representation,
                      data_type=input_data.get_value(InputType.DATA_TYPE),
                      temporal_type=input_data.get_value(
                          InputType.TEMPORAL_AVERAGE_TYPE),
@@ -195,6 +197,31 @@ def _get_file_list_type_2(input_data):
             each list is a list of files per scenario, per variable, including
             their full paths
     """
+    year_minimum = input_data.get_value(InputType.YEAR_MINIMUM)
+    year_maximum = input_data.get_value(InputType.YEAR_MAXIMUM)
+    return _get_file_list_type_for_year(input_data, year_minimum, year_maximum)
+
+
+def _get_file_list_for_baseline(input_data):
+    """
+    Get a list of files for the baseline based on the data provided in the
+    input data.
+
+    @param input_data (InputData): an InputData object
+
+    @return a dict where
+        key: (str) variable name
+        value: list of lists where:
+            each list is a list of files per scenario, per variable, including
+            their full paths
+    """
+    baseline = input_data.get_value(InputType.BASELINE)
+    year_minimum,  year_maximum = baseline.split('-')
+    return _get_file_list_type_for_year(input_data, int(year_minimum),
+                                        int(year_maximum))
+
+
+def _get_file_list_type_for_year(input_data, year_minimum, year_maximum):
     variables = input_data.get_value(InputType.VARIABLE)
 
     file_lists_per_variable = {}
@@ -209,8 +236,9 @@ def _get_file_list_type_2(input_data):
             ensemble_file_list = []
             for ensemble in input_data.get_value(InputType.ENSEMBLE):
                 # generate a list of files for each ensemble
-                ensemble_file_list.append(_get_file_list_for_ensemble(
-                    input_data, variable, scenario, ensemble))
+                for year in range(year_minimum, (year_maximum + 1)):
+                    ensemble_file_list.append(_get_file_list_for_ensemble(
+                        input_data, variable, scenario, ensemble, year))
 
             file_list_per_scenario.append(ensemble_file_list)
 
@@ -219,38 +247,51 @@ def _get_file_list_type_2(input_data):
     return file_lists_per_variable
 
 
-def _get_file_list_for_ensemble(input_data, variable, scenario, ensemble):
+def _get_file_list_for_ensemble(input_data, variable, scenario, ensemble,
+                                year):
     spatial_representation = input_data.get_value(
         InputType.SPATIAL_REPRESENTATION)
     if spatial_representation == 'river_basin':
         spatial_representation = 'river'
     elif spatial_representation == 'admin_region':
-        spatial_representation = 'admin'
+        spatial_representation = 'region'
 
-    dataset_id = ('ukcp18-{data_source}-uk-{spatial_representation}-'
-                  '{temporal_type}'.format(
-                      data_source=input_data.get_value(InputType.DATA_SOURCE),
-                      spatial_representation=spatial_representation,
-                      temporal_type=input_data.get_value(
-                          InputType.TEMPORAL_AVERAGE_TYPE)))
+    # the year starts in December, so subtract 1 from the year
+    if spatial_representation != '60km' and spatial_representation != '12km':
+        start_date = LAND_PROB_START_DATE
+        end_date = LAND_PROB_END_DATE
+    elif input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
+        start_date = '{year}{mon_day}'.format(
+            year=year - 1, mon_day='1215')
+        end_date = '{year}{mon_day}'.format(
+            year=year, mon_day='1115')
+    else:  # 'seas'
+        start_date = '{year}{mon_day}'.format(
+            year=year - 1, mon_day=SEASON_START_DATE)
+        end_date = '{year}{mon_day}'.format(
+            year=year, mon_day=SEASON_END_DATE)
 
     # we need to use the variable root and calculate the anomaly later
     variable = variable.split('Anom')[0]
-    file_name = ('{variable}_{scenario}_{dataset_id}_{ensemble}_'
-                 '{temporal_type}_*'.format(
+    file_name = ('{variable}_{scenario}_{data_source}_uk_{spatial_'
+                 'representation}_{ensemble}_{temporal_type}_{start_data}-'
+                 '{end_date}.nc'.format(
                      variable=variable,
                      scenario=scenario,
-                     dataset_id=dataset_id,
+                     data_source=input_data.get_value(InputType.DATA_SOURCE),
+                     spatial_representation=spatial_representation,
                      source=input_data.get_value(InputType.DATA_SOURCE),
                      ensemble=ensemble,
                      temporal_type=input_data.get_value(
-                         InputType.TEMPORAL_AVERAGE_TYPE)))
+                         InputType.TEMPORAL_AVERAGE_TYPE),
+                     start_data=start_date,
+                     end_date=end_date))
 
     file_path = os.path.join(
         DATA_DIR,
         input_data.get_value(InputType.DATA_SOURCE),
-        input_data.get_value(InputType.SPATIAL_REPRESENTATION),
         'uk',
+        input_data.get_value(InputType.SPATIAL_REPRESENTATION),
         scenario,
         ensemble,
         variable,

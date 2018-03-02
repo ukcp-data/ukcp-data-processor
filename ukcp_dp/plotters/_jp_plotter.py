@@ -43,10 +43,8 @@ class JpPlotter(GraphPlotter):
         # now add the lines
         plt.contour(xbins, ybins, h, levels, colors=CONTOUR_LINE)
 
-        plt.xlabel(self.input_data.get_value_label(
-            InputType.VARIABLE)[0].encode('utf-8'))
-        plt.ylabel(self.input_data.get_value_label(
-            InputType.VARIABLE)[1].encode('utf-8'))
+        plt.xlabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
+        plt.ylabel(self.input_data.get_value_label(InputType.VARIABLE)[1])
 
         legend_box = [plt.Rectangle((0, 0), 1, 1, fc=pc.get_facecolor()[0])
                       for pc in contour_fill.collections]

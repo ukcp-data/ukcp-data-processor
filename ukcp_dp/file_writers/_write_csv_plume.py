@@ -1,10 +1,10 @@
 import logging
 
 import iris
-from ukcp_dp.constants import DATA_SOURCE_PROB
+from ukcp_dp.constants import DATA_SOURCE_GCM, DATA_SOURCE_PROB
 from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
-
+from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 log = logging.getLogger(__name__)
 
@@ -39,15 +39,15 @@ class PlumeCsvWriter(BaseCsvWriter):
         """
         Write out the data, in CSV format, associated with a plume plot.
         """
-
         for cube in self.cube_list:
             # there should only be one cube
             for ensemble_slice in cube.slices_over('Ensemble member'):
                 # TODO hack to get name
-                ensemble_name = 'r1i1p{}'.format(int(
-                    ensemble_slice.coord('Ensemble member').points[0]) + 1)
+                ensemble_name = get_ensemble_member_set(DATA_SOURCE_GCM)[
+                    int(ensemble_slice.coord('Ensemble member').points[0])]
                 ensemble_label = self.vocab.get_collection_term_label(
                     InputType.ENSEMBLE, ensemble_name)
+
                 # the plume plot will be of the first variable
                 var = self.input_data.get_value_label(
                     InputType.VARIABLE)[0].encode('utf-8')

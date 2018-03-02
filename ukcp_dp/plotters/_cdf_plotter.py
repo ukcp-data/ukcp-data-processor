@@ -47,8 +47,7 @@ class CdfPlotter(GraphPlotter):
                           label=label, linestyle=linestyle[i],
                           color=colours[i])
 
-        plt.xlabel(self.input_data.get_value_label(
-            InputType.VARIABLE)[0].encode('utf-8'))
+        plt.xlabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
 
         # clear the title field
         plt.title('')
