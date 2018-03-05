@@ -27,6 +27,12 @@ class PlumeCsvWriter(BaseCsvWriter):
         else:
             self._write_csv_plume_other()
 
+        # now write the data
+        output_data_file_path = self._get_full_file_name()
+        self._write_data_dict(output_data_file_path)
+
+        return [output_data_file_path]
+
     def _write_csv_plume_land_prob(self):
         """
         Write out the data, in CSV format, associated with a plume plot for

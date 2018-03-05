@@ -2,6 +2,7 @@ import logging
 import os
 
 import iris
+from ukcp_dp.constants import DataType
 from ukcp_dp.file_writers._write_csv import write_csv_file
 
 
@@ -9,15 +10,18 @@ log = logging.getLogger(__name__)
 
 
 def write_file(cube_list, overlay_cube, title, output_data_file_path,
-               input_data, plot_type, vocab):
+               data_type, input_data, plot_type, vocab):
     log.debug(cube_list)
-    _, file_extension = os.path.splitext(output_data_file_path)
 
-    if file_extension == '.csv':
-        write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
-                       input_data, plot_type, vocab)
+    if data_type is None:
+        _, file_extension = os.path.splitext(output_data_file_path)
 
-    elif file_extension == '.nc':
+    if data_type == DataType.CSV or file_extension == '.csv':
+        return write_csv_file(
+            cube_list, overlay_cube, title, output_data_file_path, input_data,
+            plot_type, vocab)
+
+    elif data_type == DataType.NET_CDF or file_extension == '.nc':
         _write_netcdf_file(cube_list, output_data_file_path)
 
     else:

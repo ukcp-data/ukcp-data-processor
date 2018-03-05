@@ -39,3 +39,9 @@ class JpCsvWriter(BaseCsvWriter):
                     self.data_dict[str(y)].append(str(value))
                 except KeyError:
                     self.data_dict[str(y)] = [str(value)]
+
+        # now write the data
+        output_data_file_path = self._get_full_file_name()
+        self._write_data_dict(output_data_file_path)
+
+        return [output_data_file_path]

@@ -130,3 +130,7 @@ PlotType = enum(CDF_PLOT='CDF_PLOT',
                 PLUME_PLOT='PLUME_PLOT',
                 POSTAGE_STAMP_MAPS='POSTAGE_STAMP_MAPS',
                 THREE_MAPS='THREE_MAPS')
+
+# Data types
+DataType = enum(CSV='csv',
+                NET_CDF='netcdf')
