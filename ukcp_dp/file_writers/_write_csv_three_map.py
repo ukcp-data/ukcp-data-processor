@@ -20,6 +20,10 @@ class ThreeMapCsvWriter(BaseCsvWriter):
         """
         cube = self.cube_list[0]
 
+        # add axis titles to the header
+        self.header.append('x-axis,Eastings (BNG)\n')
+        self.header.append('y-axis,Northings (BNG)\n')
+
         # add the x values to the header
         self.header.append('--')
         write_header = True

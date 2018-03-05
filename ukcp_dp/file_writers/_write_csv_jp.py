@@ -1,6 +1,7 @@
 import logging
 
 import numpy as np
+from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 
 
@@ -26,6 +27,14 @@ class JpCsvWriter(BaseCsvWriter):
         xbins = xedges[:-1] + (xedges[1] - xedges[0]) / 2
         ybins = yedges[:-1] + (yedges[1] - yedges[0]) / 2
         h = h.T
+
+        # add axis titles to the header
+        x = self.input_data.get_value_label(
+            InputType.VARIABLE)[0].encode('utf-8')
+        y = self.input_data.get_value_label(
+            InputType.VARIABLE)[1].encode('utf-8')
+        self.header.append(('x-axis,{}\n').format(x))
+        self.header.append(('y-axis,{}\n').format(y))
 
         # add the x values to the header
         self.header.append('--')
