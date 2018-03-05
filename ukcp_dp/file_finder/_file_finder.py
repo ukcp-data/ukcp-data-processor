@@ -14,6 +14,8 @@ SEASON_START_DATE = '1201'
 SEASON_END_DATE = '1130'
 LAND_PROB_START_DATE = '19601201'
 LAND_PROB_END_DATE = '20991130'
+LAND_GCM_START_DATE = '19001215'
+LAND_GCM_END_DATE = '20991115'
 VERSION = 'latest'
 
 
@@ -107,7 +109,7 @@ def _get_land_prob_file_list(input_data):
 
             scenario_file_list = []
 
-            for year in range(year_minimum, (year_maximum + 1)):
+            for year in range(year_minimum, (year_maximum)):
                 file_name = _get_land_prob_file_name(
                     input_data, scenario, spatial_representation, variable,
                     year)
@@ -236,7 +238,7 @@ def _get_file_list_type_for_year(input_data, year_minimum, year_maximum):
             ensemble_file_list = []
             for ensemble in input_data.get_value(InputType.ENSEMBLE):
                 # generate a list of files for each ensemble
-                for year in range(year_minimum, (year_maximum + 1)):
+                for year in range(year_minimum, (year_maximum)):
                     ensemble_file_list.append(_get_file_list_for_ensemble(
                         input_data, variable, scenario, ensemble, year))
 
@@ -258,8 +260,8 @@ def _get_file_list_for_ensemble(input_data, variable, scenario, ensemble,
 
     # the year starts in December, so subtract 1 from the year
     if spatial_representation != '60km' and spatial_representation != '12km':
-        start_date = LAND_PROB_START_DATE
-        end_date = LAND_PROB_END_DATE
+        start_date = LAND_GCM_START_DATE
+        end_date = LAND_GCM_END_DATE
     elif input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
         start_date = '{year}{mon_day}'.format(
             year=year - 1, mon_day='1215')
