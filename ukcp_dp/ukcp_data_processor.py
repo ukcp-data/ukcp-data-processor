@@ -112,7 +112,7 @@ class UKCPDataProcessor(object):
 
         return
 
-    def write_data_files(self, output_data_file_path):
+    def write_data_files(self, output_data_file_path, data_type=None):
         """
         Write the data to a file.
 
@@ -121,6 +121,7 @@ class UKCPDataProcessor(object):
         of the selected data.
 
         @param output_data_file_path (str): the full path to the file
+        @param data_type (DataType): the type of the output data
         """
         if self.cube_list is None:
             self.select_data()
@@ -143,6 +144,9 @@ class UKCPDataProcessor(object):
                 # percentiles
                 cubes.append(get_probability_levels(cube))
 
-        write_file(cubes, self.overlay_cube, self.title, output_data_file_path,
-                   self.input_data, self.plot_type, self.vocab)
+        output_file_list = write_file(cubes, self.overlay_cube, self.title,
+                                      output_data_file_path, data_type,
+                                      self.input_data, self.plot_type,
+                                      self.vocab)
         self.plot_type = None
+        return output_file_list
