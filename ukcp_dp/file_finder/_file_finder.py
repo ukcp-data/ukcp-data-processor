@@ -42,7 +42,7 @@ def get_file_lists(input_data):
 
     elif (input_data.get_value(InputType.DATA_SOURCE) in
             ['land-gcm', 'land-rcm']):
-        file_list['main'] = _get_file_list_type_2(input_data)
+        file_list['main'] = _get_cm_file_list(input_data)
         file_list['baseline'] = _get_file_list_for_baseline(input_data)
 
     # the file list for an overlay of probability levels
@@ -101,15 +101,15 @@ def _get_land_prob_file_list(input_data):
             file_path = _get_land_prob_file_path(
                 input_data, scenario, spatial_representation, variable)
 
-            if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'ann':
-                # current thinking is that there will only be one file, but
-                # I'm not sure of the date format yet
+            if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'ann'
+                    or spatial_representation != '25km'):
+                # current thinking is that there will only be one file
                 file_list_per_scenario.append([os.path.join(file_path, '*')])
                 continue
 
             scenario_file_list = []
 
-            for year in range(year_minimum, (year_maximum)):
+            for year in range(year_minimum, (year_maximum + 1)):
                 file_name = _get_land_prob_file_name(
                     input_data, scenario, spatial_representation, variable,
                     year)
@@ -158,10 +158,7 @@ def _get_land_prob_file_path(input_data, scenario, spatial_representation,
 def _get_land_prob_file_name(input_data, scenario, spatial_representation,
                              variable, year):
     # the year starts in December, so subtract 1 from the year
-    if spatial_representation != '25km':
-        start_date = LAND_PROB_START_DATE
-        end_date = LAND_PROB_END_DATE
-    elif input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
+    if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
         start_date = '{year}{mon_day}'.format(
             year=year - 1, mon_day=MONTH_START_DATE)
         end_date = '{year}{mon_day}'.format(
@@ -187,7 +184,7 @@ def _get_land_prob_file_name(input_data, scenario, spatial_representation,
     return file_name
 
 
-def _get_file_list_type_2(input_data):
+def _get_cm_file_list(input_data):
     """
     Get a list of files based on the data provided in the input data.
 
@@ -201,7 +198,8 @@ def _get_file_list_type_2(input_data):
     """
     year_minimum = input_data.get_value(InputType.YEAR_MINIMUM)
     year_maximum = input_data.get_value(InputType.YEAR_MAXIMUM)
-    return _get_file_list_type_for_year(input_data, year_minimum, year_maximum)
+    return _get_cm_file_list_for_range(
+        input_data, year_minimum, year_maximum)
 
 
 def _get_file_list_for_baseline(input_data):
@@ -219,17 +217,21 @@ def _get_file_list_for_baseline(input_data):
     """
     baseline = input_data.get_value(InputType.BASELINE)
     year_minimum,  year_maximum = baseline.split('-')
-    return _get_file_list_type_for_year(input_data, int(year_minimum),
-                                        int(year_maximum))
+    return _get_cm_file_list_for_range(input_data, int(year_minimum),
+                                       int(year_maximum))
 
 
-def _get_file_list_type_for_year(input_data, year_minimum, year_maximum):
+def _get_cm_file_list_for_range(input_data, year_minimum, year_maximum):
     variables = input_data.get_value(InputType.VARIABLE)
+
+    spatial_representation = _get_cm_spatial_representation(input_data)
 
     file_lists_per_variable = {}
 
     for variable in variables:
         # generate a list of files for each variable
+        # we need to use the variable root and calculate the anomaly later
+        variable = variable.split('Anom')[0]
 
         file_list_per_scenario = []
         for scenario in input_data.get_value(InputType.SCENARIO):
@@ -237,10 +239,24 @@ def _get_file_list_type_for_year(input_data, year_minimum, year_maximum):
 
             ensemble_file_list = []
             for ensemble in input_data.get_value(InputType.ENSEMBLE):
+                file_path = _get_cm_file_path(
+                    input_data, spatial_representation, variable, scenario,
+                    ensemble)
+                if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
+                        'ann'
+                        or (spatial_representation != '12km'
+                            and spatial_representation != '60km')):
+                    # current thinking is that there will only be one file
+                    ensemble_file_list.append(os.path.join(file_path, '*'))
+                    continue
+
                 # generate a list of files for each ensemble
-                for year in range(year_minimum, (year_maximum)):
-                    ensemble_file_list.append(_get_file_list_for_ensemble(
-                        input_data, variable, scenario, ensemble, year))
+                for year in range(year_minimum, (year_maximum + 1)):
+                    file_name = _get_cm_file_name(
+                        input_data, spatial_representation, variable, scenario,
+                        ensemble, year)
+                    ensemble_file_list.append(
+                        os.path.join(file_path, file_name))
 
             file_list_per_scenario.append(ensemble_file_list)
 
@@ -249,20 +265,38 @@ def _get_file_list_type_for_year(input_data, year_minimum, year_maximum):
     return file_lists_per_variable
 
 
-def _get_file_list_for_ensemble(input_data, variable, scenario, ensemble,
-                                year):
+def _get_cm_spatial_representation(input_data):
     spatial_representation = input_data.get_value(
         InputType.SPATIAL_REPRESENTATION)
+
     if spatial_representation == 'river_basin':
         spatial_representation = 'river'
     elif spatial_representation == 'admin_region':
         spatial_representation = 'region'
+    return spatial_representation
+
+
+def _get_cm_file_path(input_data, spatial_representation, variable, scenario,
+                      ensemble):
+    file_path = os.path.join(
+        DATA_DIR,
+        input_data.get_value(InputType.DATA_SOURCE),
+        'uk',
+        spatial_representation,
+        scenario,
+        ensemble,
+        variable,
+        input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+        VERSION)
+
+    return file_path
+
+
+def _get_cm_file_name(input_data, spatial_representation, variable, scenario,
+                      ensemble, year):
 
     # the year starts in December, so subtract 1 from the year
-    if spatial_representation != '60km' and spatial_representation != '12km':
-        start_date = LAND_GCM_START_DATE
-        end_date = LAND_GCM_END_DATE
-    elif input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
+    if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
         start_date = '{year}{mon_day}'.format(
             year=year - 1, mon_day='1215')
         end_date = '{year}{mon_day}'.format(
@@ -289,16 +323,4 @@ def _get_file_list_for_ensemble(input_data, variable, scenario, ensemble,
                      start_data=start_date,
                      end_date=end_date))
 
-    file_path = os.path.join(
-        DATA_DIR,
-        input_data.get_value(InputType.DATA_SOURCE),
-        'uk',
-        input_data.get_value(InputType.SPATIAL_REPRESENTATION),
-        scenario,
-        ensemble,
-        variable,
-        input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
-        VERSION,
-        file_name)
-
-    return file_path
+    return file_name
