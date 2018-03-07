@@ -25,7 +25,7 @@ def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
     log.info('Writing data to csv file')
 
     if plot_type is None:
-        write_default_csv(cube_list, title, output_data_file_path)
+        return write_default_csv(cube_list, title, output_data_file_path)
 
     elif plot_type == PlotType.CDF_PLOT:
         csv_writer = CdfCsvWriter()
@@ -43,8 +43,7 @@ def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
         csv_writer = PostageStampMapCsvWriter()
 
     else:
-        write_default_csv(cube_list, title, output_data_file_path)
-        return
+        return write_default_csv(cube_list, title, output_data_file_path)
 
     return csv_writer.write_csv(input_data, cube_list, output_data_file_path,
                                 vocab, plot_type, overlay_cube)

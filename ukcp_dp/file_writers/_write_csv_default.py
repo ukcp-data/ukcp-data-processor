@@ -1,4 +1,6 @@
 import logging
+import os
+from time import gmtime, strftime
 
 import iris
 
@@ -7,9 +9,13 @@ log = logging.getLogger(__name__)
 
 
 def write_csv(cube_list, title, output_data_file_path):
+    timestamp = strftime("%Y-%m-%dT%H-%M-%S", gmtime())
+    file_name = '{timestamp}.csv'.format(timestamp=timestamp)
+    output_data_file_path = os.path.join(output_data_file_path, file_name)
     with open(output_data_file_path, 'w') as output_data_file:
         for cube in cube_list:
             _write_csv_cube(cube, title, output_data_file)
+    return [output_data_file_path]
 
 
 def _write_csv_cube(cube, title, output_data_file):
