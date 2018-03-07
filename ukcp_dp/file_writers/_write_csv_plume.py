@@ -21,27 +21,29 @@ class PlumeCsvWriter(BaseCsvWriter):
         Write out the data, in CSV format, associated with a plume plot.
         """
         self.header.append('Date')
+        key_list = []
+
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
-            self._write_csv_plume_land_prob()
+            self._write_csv_plume_land_prob(key_list)
         else:
-            self._write_csv_plume_other()
+            self._write_csv_plume_other(key_list)
 
         # now write the data
         output_data_file_path = self._get_full_file_name()
-        self._write_data_dict(output_data_file_path)
+        self._write_data_dict(output_data_file_path, key_list)
 
         return [output_data_file_path]
 
-    def _write_csv_plume_land_prob(self):
+    def _write_csv_plume_land_prob(self, key_list):
         """
         Write out the data, in CSV format, associated with a plume plot for
         land_prob data.
         """
         for cube in self.cube_list:
-            self._get_percentiles(cube)
+            self._get_percentiles(cube, key_list)
 
-    def _write_csv_plume_other(self):
+    def _write_csv_plume_other(self, key_list):
         """
         Write out the data, in CSV format, associated with a plume plot.
         """
@@ -59,18 +61,18 @@ class PlumeCsvWriter(BaseCsvWriter):
                     InputType.VARIABLE)[0].encode('utf-8')
                 self.header.append('{var}({ensemble})'.format(
                     ensemble=ensemble_label, var=var))
-                self._read_time_cube(ensemble_slice)
+                self._read_time_cube(ensemble_slice, key_list)
 
         # now add the data from the overlay
         if self.overlay_cube is not None:
             percentile_cube = self.overlay_cube.extract(
                 iris.Constraint(percentile=10))
-            self._get_percentiles(percentile_cube)
+            self._get_percentiles(percentile_cube, key_list)
             percentile_cube = self.overlay_cube.extract(
                 iris.Constraint(percentile=90))
-            self._get_percentiles(percentile_cube)
+            self._get_percentiles(percentile_cube, key_list)
 
-    def _get_percentiles(self, cube):
+    def _get_percentiles(self, cube, key_list):
         """
         Update the data dict and header with data from the cube.
         The cube is sliced over percentile then time.
@@ -82,9 +84,9 @@ class PlumeCsvWriter(BaseCsvWriter):
                 InputType.VARIABLE)[0].encode('utf-8')
             self.header.append('{var}({percentile}th Percentile)'.format(
                 percentile=percentile, var=var))
-            self._read_time_cube(_slice)
+            self._read_time_cube(_slice, key_list)
 
-    def _read_time_cube(self, cube):
+    def _read_time_cube(self, cube, key_list):
         """
         Slice the cube over 'time' and update data_dict
         """
@@ -94,4 +96,5 @@ class PlumeCsvWriter(BaseCsvWriter):
             try:
                 self.data_dict[time_str].append(str(_slice.data))
             except KeyError:
+                key_list.append(time_str)
                 self.data_dict[time_str] = [str(_slice.data)]

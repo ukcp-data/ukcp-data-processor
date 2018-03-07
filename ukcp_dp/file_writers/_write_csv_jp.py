@@ -41,16 +41,18 @@ class JpCsvWriter(BaseCsvWriter):
         for x in xbins:
             self.header.append(str(x))
 
+        key_list = []
         # add a line of data for each y value
         for i, y in enumerate(sorted(ybins, reverse=True)):
             for value in h[len(h) - (1 + i)]:
                 try:
                     self.data_dict[str(y)].append(str(value))
                 except KeyError:
+                    key_list.append(str(y))
                     self.data_dict[str(y)] = [str(value)]
 
         # now write the data
         output_data_file_path = self._get_full_file_name()
-        self._write_data_dict(output_data_file_path)
+        self._write_data_dict(output_data_file_path, key_list)
 
         return [output_data_file_path]

@@ -67,7 +67,7 @@ class BaseCsvWriter(object):
         """
         pass
 
-    def _write_data_dict(self, output_data_file_path):
+    def _write_data_dict(self, output_data_file_path, key_list):
         """
         Write out the column headers and data_dict.
         """
@@ -85,9 +85,10 @@ class BaseCsvWriter(object):
                     key=key, value=user_inputs[key]))
             output_data_file.write(header_string)
             output_data_file.write('\n')
-            for key, values in self.data_dict.items():
+
+            for key in key_list:
                 line_out = '{key},{values}\n'.format(
-                    key=key, values=','.join(values))
+                    key=key, values=','.join(self.data_dict[key]))
                 output_data_file.write(line_out)
 
     def _get_full_file_name(self, file_name_suffix=None):

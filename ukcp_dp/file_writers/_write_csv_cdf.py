@@ -19,6 +19,7 @@ class CdfCsvWriter(BaseCsvWriter):
         Write out the data, in CSV format, associated with a CDF plot.
         """
         self.header.append('Percentile')
+        key_list = []
 
         for cube in self.cube_list:
             scenario = self.vocab.get_collection_term_label(
@@ -28,15 +29,15 @@ class CdfCsvWriter(BaseCsvWriter):
                 InputType.VARIABLE)[0].encode('utf-8')
             self.header.append('{var}({scenario})'.format(
                 scenario=scenario, var=var))
-            self._read_percentile_cube(cube)
+            self._read_percentile_cube(cube, key_list)
 
         # now write the data
         output_data_file_path = self._get_full_file_name()
-        self._write_data_dict(output_data_file_path)
+        self._write_data_dict(output_data_file_path, key_list)
 
         return [output_data_file_path]
 
-    def _read_percentile_cube(self, cube):
+    def _read_percentile_cube(self, cube, key_list):
         """
         Slice the cube over 'percentile' and update data_dict
         """
@@ -45,5 +46,6 @@ class CdfCsvWriter(BaseCsvWriter):
                 self.data_dict[str(_slice.coord('percentile').points[0])
                                ].append(str(_slice.data))
             except KeyError:
+                key_list.append(str(_slice.coord('percentile').points[0]))
                 self.data_dict[str(_slice.coord('percentile').points[0])] = [
                     str(_slice.data)]

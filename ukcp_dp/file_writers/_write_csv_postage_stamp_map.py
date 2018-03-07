@@ -1,15 +1,17 @@
 import logging
 
 import iris
+from ukcp_dp.constants import DATA_SOURCE_GCM
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
 log = logging.getLogger(__name__)
 
 
-class ThreeMapCsvWriter(BaseCsvWriter):
+class PostageStampMapCsvWriter(BaseCsvWriter):
     """
-    The three map CSV writer class.
+    The postage stamp map CSV writer class.
 
     This class extends BaseCsvWriter with a _write_csv(self).
     """
@@ -30,14 +32,13 @@ class ThreeMapCsvWriter(BaseCsvWriter):
         output_file_list = []
         key_list = []
 
-        # extract 10th, 50th and 90th percentiles
-        percentiles = [10, 50, 90]
-        for percentile in percentiles:
-            percentile_cube = cube.extract(
-                iris.Constraint(percentile=percentile))
+        for ensemble_slice in cube.slices_over('Ensemble member'):
+            # TODO need a better way to get the ensemble_name
+            ensemble_name = get_ensemble_member_set(DATA_SOURCE_GCM)[
+                int(ensemble_slice.coord('Ensemble member').points[0])]
 
             # rows of data
-            for projection_y_slice in percentile_cube.slices_over(
+            for projection_y_slice in ensemble_slice.slices_over(
                     'projection_y_coordinate'):
                 y_coord = str(projection_y_slice.coord(
                     'projection_y_coordinate').points[0])
@@ -60,7 +61,7 @@ class ThreeMapCsvWriter(BaseCsvWriter):
                 write_header = False
 
             output_data_file_path = self._get_full_file_name(
-                '_{}'.format(percentile))
+                '_{}'.format(ensemble_name))
             self._write_data_dict(output_data_file_path, key_list)
             output_file_list.append(output_data_file_path)
 

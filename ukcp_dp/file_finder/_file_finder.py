@@ -43,7 +43,9 @@ def get_file_lists(input_data):
     elif (input_data.get_value(InputType.DATA_SOURCE) in
             ['land-gcm', 'land-rcm']):
         file_list['main'] = _get_cm_file_list(input_data)
-        file_list['baseline'] = _get_file_list_for_baseline(input_data)
+
+        if input_data.get_value(InputType.BASELINE) is not None:
+            file_list['baseline'] = _get_file_list_for_baseline(input_data)
 
     # the file list for an overlay of probability levels
     if (input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is not None

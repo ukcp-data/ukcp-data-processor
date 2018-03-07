@@ -6,6 +6,8 @@ from ukcp_dp.file_writers._write_csv_default import write_csv as \
     write_default_csv
 from ukcp_dp.file_writers._write_csv_jp import JpCsvWriter
 from ukcp_dp.file_writers._write_csv_plume import PlumeCsvWriter
+from ukcp_dp.file_writers._write_csv_postage_stamp_map import \
+    PostageStampMapCsvWriter
 from ukcp_dp.file_writers._write_csv_three_map import ThreeMapCsvWriter
 
 
@@ -36,6 +38,9 @@ def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
 
     elif plot_type == PlotType.THREE_MAPS:
         csv_writer = ThreeMapCsvWriter()
+
+    elif plot_type == PlotType.POSTAGE_STAMP_MAPS:
+        csv_writer = PostageStampMapCsvWriter()
 
     else:
         write_default_csv(cube_list, title, output_data_file_path)
