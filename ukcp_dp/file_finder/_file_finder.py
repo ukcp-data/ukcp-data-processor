@@ -233,7 +233,7 @@ def _get_cm_file_list_for_range(input_data, year_minimum, year_maximum):
     for variable in variables:
         # generate a list of files for each variable
         # we need to use the variable root and calculate the anomaly later
-        variable = variable.split('Anom')[0]
+        variable_prefix = variable.split('Anom')[0]
 
         file_list_per_scenario = []
         for scenario in input_data.get_value(InputType.SCENARIO):
@@ -242,8 +242,8 @@ def _get_cm_file_list_for_range(input_data, year_minimum, year_maximum):
             ensemble_file_list = []
             for ensemble in input_data.get_value(InputType.ENSEMBLE):
                 file_path = _get_cm_file_path(
-                    input_data, spatial_representation, variable, scenario,
-                    ensemble)
+                    input_data, spatial_representation, variable_prefix,
+                    scenario, ensemble)
                 if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
                         'ann'
                         or (spatial_representation != '12km'
@@ -255,8 +255,8 @@ def _get_cm_file_list_for_range(input_data, year_minimum, year_maximum):
                 # generate a list of files for each ensemble
                 for year in range(year_minimum, (year_maximum + 1)):
                     file_name = _get_cm_file_name(
-                        input_data, spatial_representation, variable, scenario,
-                        ensemble, year)
+                        input_data, spatial_representation, variable_prefix,
+                        scenario, ensemble, year)
                     ensemble_file_list.append(
                         os.path.join(file_path, file_name))
 
