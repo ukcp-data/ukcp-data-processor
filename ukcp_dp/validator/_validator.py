@@ -103,12 +103,6 @@ class Validator():
                                                min=InputType.YEAR_MINIMUM,
                                                max=InputType.YEAR_MAXIMUM))
 
-        if (year_max is not None and year_min is not None):
-            # a minimum of 20 years must be selected
-            # we include the year_min but not the year_max
-            if year_max - year_min < 20:
-                raise Exception("A minimum of 20 years must be selected")
-
         if (year is not None):
             # if year is set then set min and max to equal year
             self.input_data.set_value(InputType.YEAR_MINIMUM, year)
