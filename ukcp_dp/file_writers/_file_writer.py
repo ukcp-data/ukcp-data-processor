@@ -22,6 +22,9 @@ def write_file(cube_list, overlay_cube, title, output_data_file_path,
     elif data_format == DataFormat.NET_CDF:
         return _write_netcdf_file(cube_list, output_data_file_path, plot_type)
 
+    else:
+        raise Exception('Invalid data format: {}'.format(data_format))
+
     log.debug('Finished writing file(s)')
 
 

@@ -1,7 +1,8 @@
 from ukcp_dp.ukcp_data_processor import UKCPDataProcessor
-from constants import DataFormat, PlotType, InputType
+from constants import DataFormat, ImageFormat, PlotType, InputType
 
 __version__ = "0.1.0"
 
 
-__all__ = ['UKCPDataProcessor', 'DataFormat', 'InputType', 'PlotType']
+__all__ = ['UKCPDataProcessor', 'DataFormat', 'ImageFormat', 'InputType',
+           'PlotType']

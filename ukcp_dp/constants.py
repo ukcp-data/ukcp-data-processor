@@ -34,6 +34,7 @@ InputType = enum(
 INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
                             InputType.COLOUR_MODE,
                             InputType.CONVERT_TO_PERCENTILES,
+                            InputType.DATA_FORMAT,
                             InputType.DATA_SOURCE,
                             InputType.DATA_TYPE,
                             InputType.FONT_SIZE,
@@ -133,3 +134,8 @@ PlotType = enum(CDF_PLOT='CDF_PLOT',
 # Data formats
 DataFormat = enum(CSV='csv',
                 NET_CDF='netcdf')
+
+# Image formats
+ImageFormat = enum(JPG='jpg',
+                PDF='pdf',
+                PNG='png')
