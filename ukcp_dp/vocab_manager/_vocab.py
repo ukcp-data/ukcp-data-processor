@@ -202,7 +202,7 @@ class Vocab(object):
         'output': {
         'graphs': 'Graphs',
         'maps': 'Maps',
-        'data': 'Download data only',
+        'data': 'Data only',
     },
 
         'convert_to_percentiles': {
