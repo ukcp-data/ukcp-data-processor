@@ -3,6 +3,7 @@ import logging
 import numpy as np
 from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._utils import convert_to_2dp
 
 
 log = logging.getLogger(__name__)
@@ -39,17 +40,19 @@ class JpCsvWriter(BaseCsvWriter):
         # add the x values to the header
         self.header.append('--')
         for x in xbins:
-            self.header.append(str(x))
+            self.header.append(convert_to_2dp(x))
 
         key_list = []
         # add a line of data for each y value
         for i, y in enumerate(sorted(ybins, reverse=True)):
+            y = convert_to_2dp(y)
             for value in h[len(h) - (1 + i)]:
+                value = convert_to_2dp(value)
                 try:
-                    self.data_dict[str(y)].append(str(value))
+                    self.data_dict[y].append(value)
                 except KeyError:
-                    key_list.append(str(y))
-                    self.data_dict[str(y)] = [str(value)]
+                    key_list.append(y)
+                    self.data_dict[y] = [value]
 
         # now write the data
         output_data_file_path = self._get_full_file_name()

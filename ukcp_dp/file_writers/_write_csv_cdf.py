@@ -2,6 +2,7 @@ import logging
 
 from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._utils import convert_to_2dp
 
 
 log = logging.getLogger(__name__)
@@ -42,10 +43,10 @@ class CdfCsvWriter(BaseCsvWriter):
         Slice the cube over 'percentile' and update data_dict
         """
         for _slice in cube.slices_over('percentile'):
+            x = convert_to_2dp(_slice.data)
+            y = convert_to_2dp(_slice.coord('percentile').points[0])
             try:
-                self.data_dict[str(_slice.coord('percentile').points[0])
-                               ].append(str(_slice.data))
+                self.data_dict[y].append(x)
             except KeyError:
-                key_list.append(str(_slice.coord('percentile').points[0]))
-                self.data_dict[str(_slice.coord('percentile').points[0])] = [
-                    str(_slice.data)]
+                key_list.append(y)
+                self.data_dict[y] = [x]

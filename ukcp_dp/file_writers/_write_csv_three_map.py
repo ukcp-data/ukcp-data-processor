@@ -2,6 +2,7 @@ import logging
 
 import iris
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._utils import convert_to_2dp
 
 
 log = logging.getLogger(__name__)
@@ -50,13 +51,12 @@ class ThreeMapCsvWriter(BaseCsvWriter):
                             'projection_x_coordinate').points[0])
                         self.header.append(x_coord)
 
+                    value = convert_to_2dp(projection_x_slice.data)
                     try:
-                        self.data_dict[y_coord].append(
-                            str(projection_x_slice.data))
+                        self.data_dict[y_coord].append(value)
                     except KeyError:
                         key_list = [y_coord] + key_list
-                        self.data_dict[y_coord] = [
-                            str(projection_x_slice.data)]
+                        self.data_dict[y_coord] = [value]
                 write_header = False
 
             output_data_file_path = self._get_full_file_name(

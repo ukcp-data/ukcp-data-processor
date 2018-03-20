@@ -4,7 +4,9 @@ import iris
 from ukcp_dp.constants import DATA_SOURCE_GCM, DATA_SOURCE_PROB
 from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._utils import convert_to_2dp
 from ukcp_dp.vocab_manager import get_ensemble_member_set
+
 
 log = logging.getLogger(__name__)
 
@@ -91,10 +93,12 @@ class PlumeCsvWriter(BaseCsvWriter):
         Slice the cube over 'time' and update data_dict
         """
         for _slice in cube.slices_over('time'):
+            value = convert_to_2dp(_slice.data)
             with iris.FUTURE.context(cell_datetime_objects=True):
-                time_str = str(_slice.coord('time').cell(0).point)
+                time_str = _slice.coord('time').cell(
+                    0).point.strftime('%Y-%m-%d')
             try:
-                self.data_dict[time_str].append(str(_slice.data))
+                self.data_dict[time_str].append(value)
             except KeyError:
                 key_list.append(time_str)
-                self.data_dict[time_str] = [str(_slice.data)]
+                self.data_dict[time_str] = [value]
