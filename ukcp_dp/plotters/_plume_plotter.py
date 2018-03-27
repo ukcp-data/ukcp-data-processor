@@ -97,8 +97,9 @@ class PlumePlotter(GraphPlotter):
 
             # highlighted ensembles should be included in the legend
             if ensemble_name in highlighted_ensemble_members:
-                ensemble_label = self.vocab.get_collection_term_label(
-                    InputType.ENSEMBLE, ensemble_name)
+                ensemble_label = "Member: {}".format(
+                    self.vocab.get_collection_term_label(
+                        InputType.ENSEMBLE, ensemble_name))
                 ax.plot(t_points, ensemble_slice.data, label=ensemble_label,
                         linestyle=linestyle[highlighted_counter],
                         color=colours[highlighted_counter], zorder=2)

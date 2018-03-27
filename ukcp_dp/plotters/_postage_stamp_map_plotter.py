@@ -116,8 +116,8 @@ class PostageStampMapPlotter(MapPlotter):
                                             bar_orientation="none",
                                             outfnames=None)
             # add a title
-            title = self.vocab.get_collection_term_label(
-                InputType.ENSEMBLE, ensemble_name)
+            title = "Member: {}".format(self.vocab.get_collection_term_label(
+                InputType.ENSEMBLE, ensemble_name))
             ax.set_title(title)
 
             # add a coast line
