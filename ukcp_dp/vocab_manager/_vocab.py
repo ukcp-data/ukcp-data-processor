@@ -254,6 +254,37 @@ class Vocab(object):
         True: 'True',
         False: 'False'
     },
+        'sampling_method': {
+        'all': 'all',
+        'id': 'id',
+        'random': 'random',
+        'subset': 'subset',
+    },
+        'sampling_subset_count': {
+        '1': '1',
+        '2': '2'
+    },
+        'sampling_percentile_1': {
+        5: '5',
+        10: '10',
+        15: '15',
+        20: '20',
+        25: '25',
+        30: '30',
+        35: '35',
+        40: '40',
+        45: '45',
+        50: '50',
+        55: '55',
+        60: '60',
+        65: '65',
+        70: '70',
+        75: '75',
+        80: '80',
+        85: '85',
+        90: '90',
+        95: '95'
+    },
     }
 
     COLLECTION_LABELS = {
@@ -274,6 +305,16 @@ class Vocab(object):
         'output': 'Output',
         'overlay_probability_levels': 'Overlay Probability Levels',
         'period': 'Date Range',
+        'random_sampling_count': 'Random Sampling Count',
+        'sampling_id': 'Sampling IDs',
+        'sampling_method': 'Sampling Method',
+        'sampling_percentile_1': 'Sampling Percentile 1',
+        'sampling_percentile_2': 'Sampling Percentile 2',
+        'sampling_subset_count': 'Sampling Subset Count',
+        'sampling_temporal_average_1': 'Sampling Temporal Average 1',
+        'sampling_temporal_average_2': 'Sampling Temporal Average 2',
+        'sampling_variable_1': 'Sampling Variable 1',
+        'sampling_variable_2': 'Sampling Variable 2',
         'scenario': 'Scenario',
         'show_boundaries': 'Show Boundaries',
         'spatial_representation': 'Spatial Representation',
@@ -292,9 +333,17 @@ class Vocab(object):
         self.vocab['year'] = _get_range(1900, 2101)
         self.vocab['year_minimum'] = _get_range(1900, 2101)
         self.vocab['year_maximum'] = _get_range(1900, 2101)
+        self.vocab['sampling_id'] = _get_range(1, 4001)
+        self.vocab['random_sampling_count'] = _get_range(100, 4001)
         self.vocab['highlighted_ensemble_members'] = self.vocab['ensemble']
+        self.vocab['sampling_percentile_2'] = self.vocab[
+            'sampling_percentile_1']
+        self.vocab['sampling_temporal_average_1'] = self.vocab['time_period']
+        self.vocab['sampling_temporal_average_2'] = self.vocab['time_period']
 
         self.variables = self._load_json_variables()
+        self.vocab['sampling_variable_1'] = self.vocab['variable']
+        self.vocab['sampling_variable_2'] = self.vocab['variable']
 
     def _load_json_variables(self):
         # TODO quick hack to get UKCP18_CVs

@@ -20,6 +20,16 @@ InputType = enum(
     IMAGE_SIZE='image_size',
     LEGEND_POSITION='legend_position',
     OVERLAY_PROBABILITY_LEVELS='overlay_probability_levels',
+    RANDOM_SAMPLING_COUNT='random_sampling_count',
+    SAMPLING_METHOD='sampling_method',
+    SAMPLING_ID='sampling_id',
+    SAMPLING_SUBSET_COUNT='sampling_subset_count',
+    SAMPLING_PERCENTILE_1='sampling_percentile_1',
+    SAMPLING_PERCENTILE_2='sampling_percentile_2',
+    SAMPLING_TEMPORAL_AVERAGE_1='sampling_temporal_average_1',
+    SAMPLING_TEMPORAL_AVERAGE_2='sampling_temporal_average_2',
+    SAMPLING_VARIABLE_1='sampling_variable_1',
+    SAMPLING_VARIABLE_2='sampling_variable_2',
     SCENARIO='scenario',
     SHOW_BOUNDARIES='show_boundaries',
     SPATIAL_REPRESENTATION='spatial_representation',
@@ -42,6 +52,15 @@ INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
                             InputType.IMAGE_SIZE,
                             InputType.LEGEND_POSITION,
                             InputType.OVERLAY_PROBABILITY_LEVELS,
+                            InputType.RANDOM_SAMPLING_COUNT,
+                            InputType.SAMPLING_METHOD,
+                            InputType.SAMPLING_SUBSET_COUNT,
+                            InputType.SAMPLING_PERCENTILE_1,
+                            InputType.SAMPLING_PERCENTILE_2,
+                            InputType.SAMPLING_TEMPORAL_AVERAGE_1,
+                            InputType.SAMPLING_TEMPORAL_AVERAGE_2,
+                            InputType.SAMPLING_VARIABLE_1,
+                            InputType.SAMPLING_VARIABLE_2,
                             InputType.SHOW_BOUNDARIES,
                             InputType.SPATIAL_REPRESENTATION,
                             InputType.TEMPORAL_AVERAGE_TYPE,
@@ -52,6 +71,7 @@ INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
 
 INPUT_TYPES_MULTI_VALUE = [InputType.ENSEMBLE,
                            InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS,
+                           InputType.SAMPLING_ID,
                            InputType.SCENARIO,
                            InputType.VARIABLE
                            ]
@@ -133,9 +153,9 @@ PlotType = enum(CDF_PLOT='CDF_PLOT',
 
 # Data formats
 DataFormat = enum(CSV='csv',
-                NET_CDF='netcdf')
+                  NET_CDF='netcdf')
 
 # Image formats
 ImageFormat = enum(JPG='jpg',
-                PDF='pdf',
-                PNG='png')
+                   PDF='pdf',
+                   PNG='png')

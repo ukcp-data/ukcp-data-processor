@@ -15,7 +15,7 @@ from ukcp_dp.vocab_manager import get_months
 log = logging.getLogger(__name__)
 
 
-class DataExtractor():
+class DataExtractor(object):
     """
     Extract data from a list of files and filter it based on user selection
     criteria.
@@ -203,7 +203,7 @@ class DataExtractor():
 
         @return an iris cube
         """
-        log.debug('_get_cube')
+        log.debug('_get_cube from {} files'.format(len(file_list)))
         # Load the cubes
         cubes = iris.load(file_list)
 
@@ -223,6 +223,11 @@ class DataExtractor():
                     del cube.metadata.attributes['ensemble_member_id']
                 except KeyError:
                     pass
+
+        if len(cubes) == 0:
+            log.warn('No data was retrieved from the following files:{}'.
+                     format(file_list))
+            raise Exception('No data found for given selection options')
 
         cube = cubes.concatenate_cube()
 

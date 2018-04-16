@@ -1,6 +1,5 @@
 import logging
 
-import iris
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 from ukcp_dp.file_writers._utils import convert_to_2dp
 
@@ -8,16 +7,16 @@ from ukcp_dp.file_writers._utils import convert_to_2dp
 log = logging.getLogger(__name__)
 
 
-class ThreeMapCsvWriter(BaseCsvWriter):
+class SampleCsvWriter(BaseCsvWriter):
     """
-    The three map CSV writer class.
+    The sample data CSV writer class.
 
     This class extends BaseCsvWriter with a _write_csv(self).
     """
 
     def _write_csv(self):
         """
-        Write out the data, in CSV format, associated with three maps.
+        Write out the data, in CSV format, associated with sample.
         """
         cube = self.cube_list[0]
 
@@ -30,15 +29,11 @@ class ThreeMapCsvWriter(BaseCsvWriter):
         write_header = True
         output_file_list = []
 
-        # extract 10th, 50th and 90th percentiles
-        percentiles = [10, 50, 90]
-        for percentile in percentiles:
+        for sample_slice in cube.slices_over('sample'):
             key_list = []
-            percentile_cube = cube.extract(
-                iris.Constraint(percentile=percentile))
-
+            sample_id = int(sample_slice.coord('sample').points[0])
             # rows of data
-            for projection_y_slice in percentile_cube.slices_over(
+            for projection_y_slice in sample_slice.slices_over(
                     'projection_y_coordinate'):
                 y_coord = str(projection_y_slice.coord(
                     'projection_y_coordinate').points[0])
@@ -52,6 +47,7 @@ class ThreeMapCsvWriter(BaseCsvWriter):
                         self.header.append(x_coord)
 
                     value = convert_to_2dp(projection_x_slice.data)
+
                     try:
                         self.data_dict[y_coord].append(value)
                     except KeyError:
@@ -60,7 +56,7 @@ class ThreeMapCsvWriter(BaseCsvWriter):
                 write_header = False
 
             output_data_file_path = self._get_full_file_name(
-                '_{}'.format(percentile))
+                '_{}'.format(sample_id))
             self._write_data_dict(output_data_file_path, key_list)
             output_file_list.append(output_data_file_path)
 

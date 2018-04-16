@@ -14,6 +14,7 @@ from ukcp_dp.data_extractor import DataExtractor, get_probability_levels
 from ukcp_dp.file_finder import get_file_lists
 from ukcp_dp.file_writers import write_file
 from ukcp_dp.plotters import write_plot as plotter_write_plot
+from ukcp_dp.processors import SamplingProcessor
 from ukcp_dp.validator import Validator
 from ukcp_dp.vocab_manager import Vocab
 
@@ -84,9 +85,16 @@ class UKCPDataProcessor(object):
         self.title = data_extractor.get_title()
         self.cube_list = data_extractor.get_cubes()
         self.overlay_cube = data_extractor.get_overlay_cube()
+
+        if self.input_data.get_value(InputType.SAMPLING_METHOD) is not None:
+            sampling_processor = SamplingProcessor(
+                self.cube_list, self.input_data)
+            self.cube_list = sampling_processor.get_cubes()
+
         return self.cube_list
 
-    def write_plot(self, plot_type, output_path, title=None):
+    def write_plot(self, plot_type, output_path, image_format=None,
+                   title=None):
         """
         Generate a plot.
 
@@ -96,23 +104,31 @@ class UKCPDataProcessor(object):
 
         @param plot_type (PlotType): the type of plot to generate
         @param output_path (str): the full path to the file
+        @param image_format (ImageFormat): the format of the image to generate.
+            If None the value from the inputs will be used.
         @param title (str): optional. If a title is not provided one will be
             generated.
         """
         if self.cube_list is None:
             self.select_data()
 
+        if image_format is None:
+            image_format = self.input_data.get_value(InputType.IMAGE_FORMAT)
+
+        if image_format is None:
+            raise Exception("image_format cannot be None")
+
         if title is None:
             title = self.title
 
-        plotter_write_plot(plot_type, output_path, self.input_data,
-                           self.cube_list, self.overlay_cube, title,
-                           self.vocab)
+        image_file = plotter_write_plot(plot_type, output_path, image_format,
+                                        self.input_data, self.cube_list,
+                                        self.overlay_cube, title, self.vocab)
         self.plot_type = plot_type
 
-        return
+        return image_file
 
-    def write_data_files(self, output_data_file_path, data_type=None):
+    def write_data_files(self, output_data_file_path, data_format=None):
         """
         Write the data to a file.
 
@@ -121,8 +137,21 @@ class UKCPDataProcessor(object):
         of the selected data.
 
         @param output_data_file_path (str): the full path to the file
-        @param data_type (DataType): the type of the output data
+        @param data_format (DataFormat): the type of the output data.
+            If None the value from the inputs will be used.
         """
+        # validate the value of data_type
+        if data_format is None:
+            data_format = self.input_data.get_value(InputType.DATA_FORMAT)
+
+        if data_format is None:
+            raise Exception("data_format cannot be None")
+
+        if (self.vocab.get_collection_term_label(
+                InputType.DATA_FORMAT, data_format) is None):
+            raise Exception("Unknown {value_type}: {value}.".format(
+                value_type=InputType.DATA_FORMAT, value=data_format))
+
         if self.cube_list is None:
             self.select_data()
 
@@ -145,7 +174,7 @@ class UKCPDataProcessor(object):
                 cubes.append(get_probability_levels(cube))
 
         output_file_list = write_file(cubes, self.overlay_cube, self.title,
-                                      output_data_file_path, data_type,
+                                      output_data_file_path, data_format,
                                       self.input_data, self.plot_type,
                                       self.vocab)
         self.plot_type = None

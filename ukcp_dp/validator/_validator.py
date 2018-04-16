@@ -8,7 +8,7 @@ from ukcp_dp.vocab_manager import get_ensemble_member_set
 log = logging.getLogger(__name__)
 
 
-class Validator():
+class Validator(object):
     def __init__(self, vocab):
         self.vocab = vocab
 
@@ -24,6 +24,7 @@ class Validator():
         self._validate_highlighted_ensemble_members()
         self._validate_time_period()
         self._validate_baseline()
+        self._validate_sampling()
 
         return self.input_data
 
@@ -209,3 +210,65 @@ class Validator():
                 raise Exception("Invalid {value_type}: {value}.".format(
                     value_type=InputType.BASELINE,
                     value=baseline))
+
+    def _validate_sampling(self):
+        # if a sampling method is set then check the dependencies are valid
+        sampling_method = self.input_data.get_value(InputType.SAMPLING_METHOD)
+
+        if sampling_method is None or sampling_method == 'all':
+            return
+
+        if sampling_method == 'id':
+            sampling_id = self.input_data.get_value(
+                InputType.SAMPLING_ID)
+            if sampling_id is None:
+                raise Exception("{} must be set".format(
+                    InputType.SAMPLING_ID))
+            if len(sampling_id) != len(set(sampling_id)):
+                raise Exception("{} must not contain duplicates".format(
+                    InputType.SAMPLING_ID))
+            if len(sampling_id) < 100 or len(sampling_id) > 4000:
+                raise Exception("{} must contain between 100 and 4000 values".
+                                format(InputType.SAMPLING_ID))
+
+        if sampling_method == 'random':
+            random_sampling_count = self.input_data.get_value(
+                InputType.RANDOM_SAMPLING_COUNT)
+            if random_sampling_count is None:
+                raise Exception("{} must be set".format(
+                    InputType.RANDOM_SAMPLING_COUNT))
+
+        if sampling_method == 'subset':
+            sampling_subset_count = self.input_data.get_value(
+                InputType.SAMPLING_SUBSET_COUNT)
+            if sampling_subset_count is None:
+                raise Exception("{} must be set".format(
+                    InputType.SAMPLING_SUBSET_COUNT))
+
+            if (self.input_data.get_value(InputType.SAMPLING_PERCENTILE_1)
+                    is None):
+                raise Exception("{} must be set".format(
+                    InputType.SAMPLING_PERCENTILE_1))
+            if (self.input_data.get_value(
+                    InputType.SAMPLING_TEMPORAL_AVERAGE_1) is None):
+                raise Exception("{} must be set".format(
+                    InputType.SAMPLING_TEMPORAL_AVERAGE_1))
+            if (self.input_data.get_value(InputType.SAMPLING_VARIABLE_1)
+                    is None):
+                raise Exception("{} must be set".format(
+                    InputType.SAMPLING_VARIABLE_1))
+
+            if (self.input_data.get_value(
+                    InputType.SAMPLING_SUBSET_COUNT) == 2):
+                if (self.input_data.get_value(InputType.SAMPLING_PERCENTILE_2)
+                        is None):
+                    raise Exception("{} must be set".format(
+                        InputType.SAMPLING_PERCENTILE_2))
+                if (self.input_data.get_value(
+                        InputType.SAMPLING_TEMPORAL_AVERAGE_2) is None):
+                    raise Exception("{} must be set".format(
+                        InputType.SAMPLING_TEMPORAL_AVERAGE_2))
+                if (self.input_data.get_value(InputType.SAMPLING_VARIABLE_2)
+                        is None):
+                    raise Exception("{} must be set".format(
+                        InputType.SAMPLING_VARIABLE_2))

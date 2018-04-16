@@ -31,9 +31,9 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
         self.header.append('--')
         write_header = True
         output_file_list = []
-        key_list = []
 
         for ensemble_slice in cube.slices_over('Ensemble member'):
+            key_list = []
             # TODO need a better way to get the ensemble_name
             ensemble_name = get_ensemble_member_set(DATA_SOURCE_GCM)[
                 int(ensemble_slice.coord('Ensemble member').points[0])]

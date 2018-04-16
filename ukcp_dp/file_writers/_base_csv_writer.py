@@ -91,6 +91,9 @@ class BaseCsvWriter(object):
                     key=key, values=','.join(self.data_dict[key]))
                 output_data_file.write(line_out)
 
+        # reset the data dict
+        self.data_dict = collections.OrderedDict()
+
     def _get_full_file_name(self, file_name_suffix=None):
         if file_name_suffix is None:
             file_name_suffix = ''

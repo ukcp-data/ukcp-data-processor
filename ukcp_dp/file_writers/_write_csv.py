@@ -1,6 +1,6 @@
 import logging
 
-from ukcp_dp.constants import PlotType
+from ukcp_dp.constants import InputType, PlotType
 from ukcp_dp.file_writers._write_csv_cdf import CdfCsvWriter
 from ukcp_dp.file_writers._write_csv_default import write_csv as \
     write_default_csv
@@ -8,6 +8,7 @@ from ukcp_dp.file_writers._write_csv_jp import JpCsvWriter
 from ukcp_dp.file_writers._write_csv_plume import PlumeCsvWriter
 from ukcp_dp.file_writers._write_csv_postage_stamp_map import \
     PostageStampMapCsvWriter
+from ukcp_dp.file_writers._write_csv_sample import SampleCsvWriter
 from ukcp_dp.file_writers._write_csv_three_map import ThreeMapCsvWriter
 
 
@@ -24,23 +25,28 @@ def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
     """
     log.info('Writing data to csv file')
 
-    if plot_type is None:
-        return write_default_csv(cube_list, title, output_data_file_path)
+    if plot_type is not None:
 
-    elif plot_type == PlotType.CDF_PLOT:
-        csv_writer = CdfCsvWriter()
+        if plot_type == PlotType.CDF_PLOT:
+            csv_writer = CdfCsvWriter()
 
-    elif plot_type == PlotType.PLUME_PLOT:
-        csv_writer = PlumeCsvWriter()
+        elif plot_type == PlotType.PLUME_PLOT:
+            csv_writer = PlumeCsvWriter()
 
-    elif plot_type == PlotType.JP_PLOT:
-        csv_writer = JpCsvWriter()
+        elif plot_type == PlotType.JP_PLOT:
+            csv_writer = JpCsvWriter()
 
-    elif plot_type == PlotType.THREE_MAPS:
-        csv_writer = ThreeMapCsvWriter()
+        elif plot_type == PlotType.THREE_MAPS:
+            csv_writer = ThreeMapCsvWriter()
 
-    elif plot_type == PlotType.POSTAGE_STAMP_MAPS:
-        csv_writer = PostageStampMapCsvWriter()
+        elif plot_type == PlotType.POSTAGE_STAMP_MAPS:
+            csv_writer = PostageStampMapCsvWriter()
+
+    elif input_data.get_value(InputType.SAMPLING_METHOD) is not None:
+        # a bit of a fudge, need to rename plot_type
+        plot_type = 'sampling_{}'.format(
+            input_data.get_value(InputType.SAMPLING_METHOD).lower())
+        csv_writer = SampleCsvWriter()
 
     else:
         return write_default_csv(cube_list, title, output_data_file_path)
