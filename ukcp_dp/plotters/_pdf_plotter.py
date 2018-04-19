@@ -30,23 +30,22 @@ class PdfPlotter(GraphPlotter):
 
         if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
             colours = SCENARIO_COLOURS
-            linestyle = ['solid', 'solid', 'solid', 'solid', 'solid']
 
         else:
             colours = SCENARIO_GREYSCALES
-            linestyle = ['solid', 'dashed', 'dotted', 'solid', 'dashed']
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
 
-            for i, cube in enumerate(self.cube_list):
+            for cube in self.cube_list:
                 # plot the percentiles
                 cube.data.sort()
 
                 cube = self._add_dx(cube)
                 qplt.plot(self.cube_list, self.cube_list.coord(
-                    'relative probability'), linestyle=linestyle[i],
-                    color=colours[i])
+                    'relative probability'),
+                    linestyle=colours[cube.attributes['scenario']][1],
+                    color=colours[cube.attributes['scenario']][0])
 
         plt.xlabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
 

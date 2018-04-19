@@ -94,9 +94,9 @@ DATA_SELECTION_TYPES = [InputType.BASELINE,
                         InputType.YEAR_MAXIMUM
                         ]
 
-FONT_SIZE_SMALL = 4
-FONT_SIZE_MEDIUM = 7
-FONT_SIZE_LARGE = 10
+FONT_SIZE_SMALL = 6
+FONT_SIZE_MEDIUM = 9
+FONT_SIZE_LARGE = 14
 
 # colours
 
@@ -107,9 +107,18 @@ ENSEMBLE_LOWLIGHT = '#8C8C8C'
 PERCENTILE_LINE_COLOUR = '#000000'
 PERCENTILE_FILL = '#DCDCDC'
 
-SCENARIO_COLOURS = ['#000000', '#0032A0', '#C80000', '#00B478', '#E1C800']
-SCENARIO_GREYSCALES = ['#000000', '#000000', '#000000', '#8C8C8C', '#8C8C8C']
-
+SCENARIO_COLOURS = {'rcp26': ['#0032A0', 'solid'],
+                    'rcp45': ['#00B478', 'solid'],
+                    'rcp60': ['#E1C800', 'solid'],
+                    'rcp85': ['#C80000', 'solid'],
+                    'a1b': ['#000000', 'solid']
+                    }
+SCENARIO_GREYSCALES = {'rcp26': ['#8C8C8C', 'dashed'],
+                       'rcp45': ['#8C8C8C', 'solid'],
+                       'rcp60': ['#000000', 'dotted'],
+                       'rcp85': ['#000000', 'dashed'],
+                       'a1b': ['#000000', 'solid']
+                       }
 CONTOUR_LINE = '#000000'
 CONTOUR_FILL = ['#D3D3D3', '#9E9E9E', '#6C6C6C']
 

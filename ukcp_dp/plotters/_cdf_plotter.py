@@ -29,23 +29,22 @@ class CdfPlotter(GraphPlotter):
 
         if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
             colours = SCENARIO_COLOURS
-            linestyle = ['solid', 'solid', 'solid', 'solid', 'solid']
 
         else:
             colours = SCENARIO_GREYSCALES
-            linestyle = ['solid', 'dashed', 'dotted', 'solid', 'dashed']
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
 
-            for i, scenario_cube in enumerate(self.cube_list):
+            for scenario_cube in self.cube_list:
                 scenario_cube.data.sort()
 
                 label = self.vocab.get_collection_term_label(
                     InputType.SCENARIO, scenario_cube.attributes['scenario'])
-                qplt.plot(scenario_cube, scenario_cube.dim_coords[0],
-                          label=label, linestyle=linestyle[i],
-                          color=colours[i])
+                qplt.plot(
+                    scenario_cube, scenario_cube.dim_coords[0], label=label,
+                    linestyle=colours[scenario_cube.attributes['scenario']][1],
+                    color=colours[scenario_cube.attributes['scenario']][0])
 
         plt.xlabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
 
