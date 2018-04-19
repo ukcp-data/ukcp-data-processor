@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import logging
+import math
 
 import matplotlib.cbook as cbook
 import matplotlib.gridspec as gridspec
@@ -78,9 +79,12 @@ class BasePlotter(object):
         if image_size == 900:
             logo = LOGO_SMALL
             v_offset = 544
-        else:
+        elif image_size == 1200:
             logo = LOGO_LARGE
             v_offset = 718
+        else:
+            logo = LOGO_LARGE
+            v_offset = 1518
 
         datafile = cbook.get_sample_data(logo, asfileobj=False)
         im = image.imread(datafile)
@@ -130,20 +134,22 @@ class BasePlotter(object):
                 pass
 
         # now work out how to display the plot details
-        count = len(plot_details)
-        if count > 6:
-            count = 6
+        line_count = len(plot_details)
+        column_two_line_count = 5
+        if line_count > 5:
+            line_count = int(math.ceil(line_count / 2.0))
+            column_two_line_count = line_count
 
         # unable to format the alignment of the column header, it is included
         # as a normal row
         cell_text = [['Plot Details', '']]
 
         # populate the cells
-        for i in range(0, count):
+        for i in range(0, line_count):
             cell = [_wrap(plot_details[i],
                           self.input_data.get_value(InputType.FONT_SIZE))]
             try:
-                cell.append(_wrap(plot_details[i + 6],
+                cell.append(_wrap(plot_details[i + column_two_line_count],
                                   self.input_data.get_value(
                                       InputType.FONT_SIZE)))
             except IndexError:
@@ -163,7 +169,7 @@ class BasePlotter(object):
                              loc='upper right')
 
         the_table.auto_set_font_size(False)
-        the_table.set_fontsize(self.input_data.get_font_size())
+        the_table.set_fontsize(self.input_data.get_font_size() - 2)
 
         line_adjuster = _get_line_adjuster()
 
@@ -235,6 +241,9 @@ class BasePlotter(object):
         elif cmsize == 1200:
             # using 100 dpi set size to 1200x800
             plotsettings.cmsize = [30.48, 20.32]
+        elif cmsize == 2400:
+            # using 100 dpi set size to 2400x1600
+            plotsettings.cmsize = [60.96, 40.64]
 
         plotsettings.fsize = fsize
 
@@ -325,6 +334,27 @@ def _get_line_adjuster():
                           3: 0.4,
                           4: 0.6,
                           5: 0.8}
+                     },
+                     2400:
+                     {
+                         's':
+                         {1: -0.04,
+                          2: 0.0,
+                          3: 0.08,
+                          4: 0.16,
+                          5: 0.24},
+                         'm':
+                         {1: 0,
+                          2: 0.07,
+                          3: 0.15,
+                          4: 0.3,
+                          5: 0.45},
+                         'l':
+                         {1: 0.04,
+                          2: 0.1,
+                          3: 0.2,
+                          4: 0.3,
+                          5: 0.4}
                      },
                      }
     return line_adjuster

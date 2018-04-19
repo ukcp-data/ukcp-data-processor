@@ -148,7 +148,7 @@ class Vocab(object):
         'all': 'All countries',
         'channel_islands': 'Channel Islands',
         'england': 'England',
-        'ireland': 'Republic of  Ireland',
+        'england_and_wales': 'England and Wales',
         'isle_of_man': 'Isle of Man',
         'northern_ireland': 'Northern Ireland',
         'scotland': 'Scotland',
@@ -166,8 +166,6 @@ class Vocab(object):
         'tweed': 'Tweed',
         'forth': 'Forth',
         'humber': 'Humber',
-        'channel_islands': 'Channel Islands',
-        'republic_of_ireland': 'Republic of Ireland',
         'solway': 'Solway',
         'north_highland': 'North Highland',
         'north_west_england': 'North West England',
@@ -177,10 +175,9 @@ class Vocab(object):
         'severn': 'Severn',
         'dee': 'Dee',
         'west_highland': 'West Highland',
-        'isle_of_man': 'Isle of Man',
         'south_west_england': 'South West England',
         'neagh_bann': 'Neagh Bann',
-        'west_wales': 'West Wales',
+        'western_wales': 'Western Wales',
         'north_east_scotland': 'North East Scotland',
         'anglian': 'Anglian'
     },
@@ -236,7 +233,8 @@ class Vocab(object):
     },
         'image_size': {
         900: '900 x 600',
-        1200: '1200 x 800'
+        1200: '1200 x 800',
+        2400: '2400 x 1600'
     },
         'legend_position': {
         1: '1',
