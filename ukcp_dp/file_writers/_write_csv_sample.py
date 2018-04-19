@@ -1,5 +1,6 @@
 import logging
 
+from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 from ukcp_dp.file_writers._utils import convert_to_2dp
 
@@ -18,46 +19,28 @@ class SampleCsvWriter(BaseCsvWriter):
         """
         Write out the data, in CSV format, associated with sample.
         """
-        cube = self.cube_list[0]
 
-        # add axis titles to the header
-        self.header.append('x-axis,Eastings (BNG)\n')
-        self.header.append('y-axis,Northings (BNG)\n')
+        # add the label to the header
+        self.header.append('sample id')
+        key_list = []
 
-        # add the x values to the header
-        self.header.append('--')
-        write_header = True
-        output_file_list = []
+        for i, cube in enumerate(self.cube_list):
+            variable = self.input_data.get_value_label(
+                InputType.VARIABLE)[i].encode('utf-8')
+            # add the variable label to the header
+            self.header.append(variable)
 
-        for sample_slice in cube.slices_over('sample'):
-            key_list = []
-            sample_id = int(sample_slice.coord('sample').points[0])
-            # rows of data
-            for projection_y_slice in sample_slice.slices_over(
-                    'projection_y_coordinate'):
-                y_coord = str(projection_y_slice.coord(
-                    'projection_y_coordinate').points[0])
+            for sample_slice in cube.slices_over('sample'):
+                sample_id = int(sample_slice.coord('sample').points[0])
+                value = convert_to_2dp(sample_slice.data)
 
-                # columns of data
-                for projection_x_slice in projection_y_slice.slices_over(
-                        'projection_x_coordinate'):
-                    if write_header is True:
-                        x_coord = str(projection_x_slice.coord(
-                            'projection_x_coordinate').points[0])
-                        self.header.append(x_coord)
+                try:
+                    self.data_dict[sample_id].append(value)
+                except KeyError:
+                    key_list.append(sample_id)
+                    self.data_dict[sample_id] = [value]
 
-                    value = convert_to_2dp(projection_x_slice.data)
+        output_data_file_path = self._get_full_file_name()
+        self._write_data_dict(output_data_file_path, key_list)
 
-                    try:
-                        self.data_dict[y_coord].append(value)
-                    except KeyError:
-                        key_list = [y_coord] + key_list
-                        self.data_dict[y_coord] = [value]
-                write_header = False
-
-            output_data_file_path = self._get_full_file_name(
-                '_{}'.format(sample_id))
-            self._write_data_dict(output_data_file_path, key_list)
-            output_file_list.append(output_data_file_path)
-
-        return output_file_list
+        return [output_data_file_path]

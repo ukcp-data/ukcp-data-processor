@@ -142,8 +142,8 @@ class Validator(object):
         ensembles = self.input_data.get_value(
             InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
         if ensembles is None:
-            self.input_data._set_values(InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS,
-                                        [])
+            self.input_data.set_values(
+                InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS, [])
             return
 
         if len(ensembles) > 5:

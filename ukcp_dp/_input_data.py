@@ -93,7 +93,7 @@ class InputData(object):
                 if input_type in INPUT_TYPES_SINGLE_VALUE:
                     self.set_value(input_type, inputs[input_type])
                 elif input_type in INPUT_TYPES_MULTI_VALUE:
-                    self._set_values(input_type, inputs[input_type])
+                    self.set_values(input_type, inputs[input_type])
                 elif input_type == InputType.AREA:
                     self._set_area(inputs[InputType.AREA])
             except KeyError:
@@ -133,7 +133,7 @@ class InputData(object):
 
         self.validated_inputs[value_type] = [value, label]
 
-    def _set_values(self, value_type, values):
+    def set_values(self, value_type, values):
         """
         Set the value for the given type.
 
