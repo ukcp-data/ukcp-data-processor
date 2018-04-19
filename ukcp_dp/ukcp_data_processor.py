@@ -88,7 +88,7 @@ class UKCPDataProcessor(object):
 
         if self.input_data.get_value(InputType.SAMPLING_METHOD) is not None:
             sampling_processor = SamplingProcessor(
-                self.cube_list, self.input_data)
+                self.cube_list, self.input_data, self.vocab)
             self.cube_list = sampling_processor.get_cubes()
 
         return self.cube_list
