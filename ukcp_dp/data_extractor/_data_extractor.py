@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 
 import cf_units
@@ -317,7 +318,7 @@ class DataExtractor(object):
             area_constraint = x_constraint & y_constraint
 
         elif (self.input_data.get_area_type() in
-              ['costal_point', 'gauge_point']):
+              ['coast_point', 'gauge_point']):
             # coordinates are coming in as lat, long
             # TODO half_grid_size = ?
             half_grid_size = 0.05
@@ -465,13 +466,13 @@ class DataExtractor(object):
                 t=title, x1=grid_x1, y1=grid_y1, x2=grid_x2, y2=grid_y2)
 
         elif (self.input_data.get_area_type() in
-              ['costal_point', 'gauge_point']):
+              ['coast_point', 'gauge_point']):
             # coordinates are coming in as lat, long
-            latitude = (self.cubes[0].coord('latitude'))
+            latitude = round(self.cubes[0].coord('latitude').points[0], 2)
 #                          .bounds[0][0]) TODO
-            longitude = (self.cubes[0].coord('longitude'))
+            longitude = round(self.cubes[0].coord('longitude').points[0], 2)
 #                          .bounds[0][0]) TODO
-            title = "{t} for grid square {latitude}, {longitude}".format(
+            title = "{t} for grid square {latitude}°, {longitude}°".format(
                 t=title, latitude=latitude, longitude=longitude)
 
         else:
