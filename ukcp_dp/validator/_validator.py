@@ -55,6 +55,12 @@ class Validator(object):
                         DATA_SOURCE_PROB):
                     self.input_data.set_value(
                         InputType.SPATIAL_REPRESENTATION, '25km')
+
+            elif (self.input_data.get_area_type() in
+                  ['coast_point', 'gauge_point']):
+                # TODO What should this be?
+                pass
+
             else:
                 self.input_data.set_value(
                     InputType.SPATIAL_REPRESENTATION,

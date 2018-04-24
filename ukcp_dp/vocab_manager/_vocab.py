@@ -21,8 +21,8 @@ class Vocab(object):
         'country': 'Country',
         'admin_region': 'Administrative Region',
         'river_basin': 'River Basin',
-        'coast': 'Coast',
-        'marine_gauge': 'Marine Gauge'
+        'coast_point': 'Coast',
+        'gauge_point': 'Marine Gauge'
     },
         'baseline': {
         '1961-1990': '1961 - 1990',

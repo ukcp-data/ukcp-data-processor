@@ -197,7 +197,8 @@ class InputData(object):
         aggregated area.
 
         Having called set_area it is possible to retrieve the area type:
-            'point', 'bbox', 'country', 'admin_region' or 'river_basin'
+            'point', 'bbox', 'coast_point', 'gauge_point', 'country',
+            'admin_region' or 'river_basin'
         The area type label:
             'Country', 'Administrative Region' or 'River Basin'
         The areas
@@ -205,9 +206,11 @@ class InputData(object):
         And the area labels
             'Wales' etc.
 
-        @param area (list or str): For a point and bbox the data should be
-            provided as a list:
+        @param area (list or str): For a point, coast_point, gauge_point and
+            bbox the data should be provided as a list:
                 ['point',x,y]
+                ['coast_point',lat,long]
+                ['gauge_point',lat,long]
                 ['bbox',southern boundary, eastern boundary, northern boundary,
                 western boundary]
             For a spatially aggregated area the data should be provided as a
@@ -222,7 +225,8 @@ class InputData(object):
             # ['point',430311.27,253673.63]
             area_type = area.pop(0)
 
-            if area_type not in ['bbox', 'point']:
+            if (area_type not in
+                    ['bbox', 'point', 'coast_point', 'gauge_point']):
                 raise Exception("Unknown area: {}.".format(area))
 
             area_type_label = self.vocab.get_collection_term_label(
