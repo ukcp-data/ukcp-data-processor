@@ -1,7 +1,8 @@
 import logging
 
 from ukcp_dp.constants import DATA_SOURCE_PROB, DATA_SOURCE_PROB_MIN_YEAR, \
-    DATA_SOURCE_RCM, DATA_SOURCE_RCM_MIN_YEAR, InputType, MONTHLY, SEASONAL
+    DATA_SOURCE_MARINE, DATA_SOURCE_MARINE_MIN_YEAR, DATA_SOURCE_RCM, \
+    DATA_SOURCE_RCM_MIN_YEAR, InputType, MONTHLY, SEASONAL
 from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
@@ -112,6 +113,9 @@ class Validator(object):
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB):
             min_allowed_year = DATA_SOURCE_PROB_MIN_YEAR
+        elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_MARINE):
+            min_allowed_year = DATA_SOURCE_MARINE_MIN_YEAR
         elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_RCM):
             min_allowed_year = DATA_SOURCE_RCM_MIN_YEAR

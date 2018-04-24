@@ -1,7 +1,8 @@
 import logging
 
 import iris
-from ukcp_dp.constants import DATA_SOURCE_GCM, DATA_SOURCE_PROB
+from ukcp_dp.constants import DATA_SOURCE_GCM, DATA_SOURCE_MARINE, \
+    DATA_SOURCE_PROB
 from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 from ukcp_dp.file_writers._utils import convert_to_2dp
@@ -26,10 +27,12 @@ class PlumeCsvWriter(BaseCsvWriter):
         key_list = []
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_PROB):
-            self._write_csv_plume_land_prob(key_list)
+                DATA_SOURCE_PROB or
+                self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_MARINE):
+            self._write_csv_plume_percentiles(key_list)
         else:
-            self._write_csv_plume_other(key_list)
+            self._write_csv_plume_ensemble(key_list)
 
         # now write the data
         output_data_file_path = self._get_full_file_name()
@@ -37,15 +40,15 @@ class PlumeCsvWriter(BaseCsvWriter):
 
         return [output_data_file_path]
 
-    def _write_csv_plume_land_prob(self, key_list):
+    def _write_csv_plume_percentiles(self, key_list):
         """
         Write out the data, in CSV format, associated with a plume plot for
-        land_prob data.
+        land_prob and marine-sim data.
         """
         for cube in self.cube_list:
             self._get_percentiles(cube, key_list)
 
-    def _write_csv_plume_other(self, key_list):
+    def _write_csv_plume_ensemble(self, key_list):
         """
         Write out the data, in CSV format, associated with a plume plot.
         """

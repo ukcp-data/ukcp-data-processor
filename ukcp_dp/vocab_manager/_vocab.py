@@ -12,7 +12,7 @@ class Vocab(object):
         'land-gcm': 'Global simulations',
         'land-rcm': 'Regional simulations',
         'hires_uk': 'High-resolution simulations',
-        'marine': 'Marine projections',
+        'marine-sim': 'Marine simulations',
         'observations': 'Observations'
     },
         'area_type': {
@@ -20,7 +20,9 @@ class Vocab(object):
         'point': ' Point',
         'country': 'Country',
         'admin_region': 'Administrative Region',
-        'river_basin': 'River Basin'
+        'river_basin': 'River Basin',
+        'coast': 'Coast',
+        'marine_gauge': 'Marine Gauge'
     },
         'baseline': {
         '1961-1990': '1961 - 1990',
@@ -50,7 +52,8 @@ class Vocab(object):
         '2km': '2.2km grid',
         'country': 'Country',
         'admin_region': 'Administrative Region',
-        'river_basin': 'River Basin'
+        'river_basin': 'River Basin',
+        'coast': 'Coast'
     },
         'mon': {
         'jan': 'January',
@@ -97,7 +100,8 @@ class Vocab(object):
     },
         'period': {
         '1900-2100': '1900-2100',
-        '1961-2100': '1961-2100'
+        '1961-2100': '1961-2100',
+        '2007-2100': '2007-2100'
     },
         'data_type': {
         'percentile': 'percentile',
@@ -194,6 +198,7 @@ class Vocab(object):
         'rain': 'Rainfall',
         'press': 'Pressure',
         'hum': 'Humidity',
+        'sea': 'Sea level',
         'wind': 'Wind speed',
     },
         'output': {

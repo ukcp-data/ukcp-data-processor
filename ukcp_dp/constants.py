@@ -149,6 +149,8 @@ DATA_SOURCE_PROB_MIN_YEAR = 1961
 DATA_SOURCE_GCM = 'land-gcm'
 DATA_SOURCE_RCM = 'land-rcm'
 DATA_SOURCE_RCM_MIN_YEAR = 1980
+DATA_SOURCE_MARINE = 'marine-sim'
+DATA_SOURCE_MARINE_MIN_YEAR = 2007
 
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 

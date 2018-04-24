@@ -6,7 +6,7 @@ from iris.cube import CubeList
 import iris.plot as iplt
 import iris.quickplot as qplt
 from ukcp_dp.constants import ANNUAL, DATA_SOURCE_PROB, InputType, \
-    MONTHLY, SEASONAL, TEMP_ANOMS
+    MONTHLY, SEASONAL, TEMP_ANOMS, DATA_SOURCE_MARINE
 from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
     make_anomaly
 from ukcp_dp.vocab_manager import get_months
@@ -81,8 +81,8 @@ class DataExtractor(object):
             for i, file_list in enumerate(self.file_lists['main'][variable]):
 
                 if (variable.endswith('Anom') and
-                        self.input_data.get_value(InputType.DATA_SOURCE) !=
-                        DATA_SOURCE_PROB):
+                        self.input_data.get_value(InputType.DATA_SOURCE) not in
+                        [DATA_SOURCE_PROB, DATA_SOURCE_MARINE]):
                     # we need anomalies so lets calculate them
                     # TODO we may get these directly from file in future
                     cube = self._get_anomaly_cube(
@@ -285,18 +285,37 @@ class DataExtractor(object):
         area_constraint = None
 
         if self.input_data.get_area_type() == 'point':
-            # coordinates are coming in as OSGB, x, y
-            resolution = self._get_resolution_m(cube)
-            half_grid_size = resolution / 2
-            bng_x = self.input_data.get_area()[0]
-            bng_y = self.input_data.get_area()[1]
-            x_constraint = iris.Constraint(
-                projection_x_coordinate=lambda cell:
-                (bng_x - half_grid_size) <= cell < (bng_x + half_grid_size))
-            y_constraint = iris.Constraint(
-                projection_y_coordinate=lambda cell:
-                (bng_y - half_grid_size) <= cell < (bng_y + half_grid_size))
-            area_constraint = x_constraint & y_constraint
+            if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                    DATA_SOURCE_MARINE):
+                # coordinates are coming in as lat, long
+                # TODO half_grid_size = ?
+                half_grid_size = 0.05
+                latitude = self.input_data.get_area()[0]
+                longitude = self.input_data.get_area()[1]
+                latitude_constraint = iris.Constraint(
+                    latitude=lambda cell:
+                    (latitude - half_grid_size) <= cell <
+                        (latitude + half_grid_size))
+                longitude_constraint = iris.Constraint(
+                    longitude=lambda cell:
+                    (longitude - half_grid_size) <= cell <
+                        (longitude + half_grid_size))
+                area_constraint = latitude_constraint & longitude_constraint
+            else:
+                # coordinates are coming in as OSGB, x, y
+                resolution = self._get_resolution_m(cube)
+                half_grid_size = resolution / 2
+                bng_x = self.input_data.get_area()[0]
+                bng_y = self.input_data.get_area()[1]
+                x_constraint = iris.Constraint(
+                    projection_x_coordinate=lambda cell:
+                    (bng_x - half_grid_size) <= cell <
+                        (bng_x + half_grid_size))
+                y_constraint = iris.Constraint(
+                    projection_y_coordinate=lambda cell:
+                    (bng_y - half_grid_size) <= cell <
+                        (bng_y + half_grid_size))
+                area_constraint = x_constraint & y_constraint
 
         elif self.input_data.get_area_type() == 'bbox':
             # coordinates are coming in as OSGB, w, s, e, n
@@ -428,12 +447,22 @@ class DataExtractor(object):
                 t=title, start_year=start_year, end_year=end_year)
 
         if self.input_data.get_area_type() == 'point':
-            grid_x = (self.cubes[0].coord('projection_x_coordinate')
-                      .bounds[0][0])
-            grid_y = (self.cubes[0].coord('projection_y_coordinate')
-                      .bounds[0][0])
-            title = "{t} for grid square {x}, {y}".format(
-                t=title, x=grid_x, y=grid_y)
+            if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                    DATA_SOURCE_MARINE):
+                # coordinates are coming in as lat, long
+                latitude = (self.cubes[0].coord('latitude'))
+#                           .bounds[0][0]) TODO
+                longitude = (self.cubes[0].coord('longitude'))
+#                           .bounds[0][0]) TODO
+                title = "{t} for grid square {latitude}, {longitude}".format(
+                    t=title, latitude=latitude, longitude=longitude)
+            else:
+                grid_x = (self.cubes[0].coord('projection_x_coordinate')
+                          .bounds[0][0])
+                grid_y = (self.cubes[0].coord('projection_y_coordinate')
+                          .bounds[0][0])
+                title = "{t} for grid square {x}, {y}".format(
+                    t=title, x=grid_x, y=grid_y)
 
         elif self.input_data.get_area_type() == 'bbox':
             x_bounds = self.cubes[0].coord('projection_x_coordinate').bounds
@@ -454,10 +483,7 @@ class DataExtractor(object):
     def _get_resolution_m(self, cube):
         log.debug('_get_resolution_m')
         resolution = cube.attributes['resolution']
-        try:
-            return int(resolution.split('km')[0]) * 1000
-        except Exception:
-            return
+        return int(resolution.split('km')[0]) * 1000
 
 
 def get_probability_levels(cube):

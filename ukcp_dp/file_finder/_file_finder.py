@@ -1,7 +1,8 @@
 import os
 
 from ukcp_dp.constants import DATA_DIR, DATA_SOURCE_PROB, \
-    DATA_SOURCE_PROB_MIN_YEAR, InputType
+    DATA_SOURCE_PROB_MIN_YEAR, DATA_SOURCE_GCM, DATA_SOURCE_RCM, \
+    DATA_SOURCE_MARINE, InputType
 
 import logging
 log = logging.getLogger(__name__)
@@ -37,11 +38,12 @@ def get_file_lists(input_data):
     file_list = {}
 
     # the main file list
-    if (input_data.get_value(InputType.DATA_SOURCE) == DATA_SOURCE_PROB):
-        file_list['main'] = _get_land_prob_file_list(input_data)
+    if (input_data.get_value(InputType.DATA_SOURCE) in
+            [DATA_SOURCE_PROB, DATA_SOURCE_MARINE]):
+        file_list['main'] = _get_prob_file_list(input_data)
 
     elif (input_data.get_value(InputType.DATA_SOURCE) in
-            ['land-gcm', 'land-rcm']):
+            [DATA_SOURCE_GCM, DATA_SOURCE_RCM]):
         file_list['main'] = _get_cm_file_list(input_data)
 
         if input_data.get_value(InputType.BASELINE) is not None:
@@ -55,7 +57,7 @@ def get_file_lists(input_data):
         if input_data.get_value(InputType.DATA_SOURCE) == DATA_SOURCE_PROB:
             file_list_overlay = file_list['main']
         else:
-            file_list_overlay = _get_land_prob_file_list(input_data)
+            file_list_overlay = _get_prob_file_list(input_data)
 
         if len(file_list_overlay) == 1:
             file_list['overlay'] = file_list_overlay
@@ -64,7 +66,7 @@ def get_file_lists(input_data):
     return file_list
 
 
-def _get_land_prob_file_list(input_data):
+def _get_prob_file_list(input_data):
     """
     Get a list of files based on the data provided in the input data. As this
     may be the file list for the overlay, some fields are not from the user
@@ -80,7 +82,7 @@ def _get_land_prob_file_list(input_data):
     """
     variables = input_data.get_value(InputType.VARIABLE)
 
-    spatial_representation = _get_land_prob_spatial_representation(input_data)
+    spatial_representation = _get_prob_spatial_representation(input_data)
 
     file_lists_per_variable = {}
 
@@ -100,7 +102,7 @@ def _get_land_prob_file_list(input_data):
         file_list_per_scenario = []
         for scenario in input_data.get_value(InputType.SCENARIO):
             # generate a list of files for each scenario
-            file_path = _get_land_prob_file_path(
+            file_path = _get_prob_file_path(
                 input_data, scenario, spatial_representation, variable)
 
             if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'ann'
@@ -112,7 +114,7 @@ def _get_land_prob_file_list(input_data):
             scenario_file_list = []
 
             for year in range(year_minimum, (year_maximum + 1)):
-                file_name = _get_land_prob_file_name(
+                file_name = _get_prob_file_name(
                     input_data, scenario, spatial_representation, variable,
                     year)
                 scenario_file_list.append(os.path.join(file_path, file_name))
@@ -124,7 +126,7 @@ def _get_land_prob_file_list(input_data):
     return file_lists_per_variable
 
 
-def _get_land_prob_spatial_representation(input_data):
+def _get_prob_spatial_representation(input_data):
     spatial_representation = input_data.get_value(
         InputType.SPATIAL_REPRESENTATION)
 
@@ -142,11 +144,11 @@ def _get_land_prob_spatial_representation(input_data):
     return spatial_representation
 
 
-def _get_land_prob_file_path(input_data, scenario, spatial_representation,
-                             variable):
+def _get_prob_file_path(input_data, scenario, spatial_representation,
+                        variable):
     file_path = os.path.join(
         DATA_DIR,
-        DATA_SOURCE_PROB,
+        input_data.get_value(InputType.DATA_SOURCE),
         'uk',
         spatial_representation,
         scenario,
@@ -157,8 +159,8 @@ def _get_land_prob_file_path(input_data, scenario, spatial_representation,
     return file_path
 
 
-def _get_land_prob_file_name(input_data, scenario, spatial_representation,
-                             variable, year):
+def _get_prob_file_name(input_data, scenario, spatial_representation,
+                        variable, year):
     # the year starts in December, so subtract 1 from the year
     if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
         start_date = '{year}{mon_day}'.format(

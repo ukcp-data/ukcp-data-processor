@@ -380,6 +380,24 @@
             "um_stash": "03237",
             "units": "%"
         },
+        "locParamTrend": {
+            "description": "Trend in skew surge location parameter",
+            "label_units": "m y-1",
+            "long_name": "Trend in skew surge location parameter",
+            "plot_label": "Trend in skew surge location parameter (m y-1)",
+            "strand": [
+                "land strand 1",
+                "land strand 2",
+                "land strand 3 12km",
+                "land strand 3 2km",
+                "marine",
+                "observations"
+            ],
+            "time_step": [
+                "n/a"
+            ],
+            "units": "m y-1"
+        },
         "pet": {
             "cmip6_cmor_tables_row_id": [
                 "??"
@@ -933,6 +951,24 @@
             ],
             "um_stash": "03223"
         },
+        "seaLevelAnom": {
+            "anomaly_type": "absolute_change",
+            "description": "Time-mean sea level",
+            "label_units": "m",
+            "long_name": "Local time-mean relative sea level anomaly",
+            "plot_label": "Time-mean sea level anomaly (m)",
+            "strand": [
+                "marine",
+                "observations"
+            ],
+            "time_averaging": [
+                "instantaneous"
+            ],
+            "time_step": [
+                "annual"
+            ],
+            "units": "m"
+        },
         "sfcWind": {
             "cmip6_cmor_tables_row_id": [
                 "1474",
@@ -1013,6 +1049,22 @@
                 "mon"
             ],
             "units": "m s-1"
+        },
+        "skewSurgeTrend": {
+            "description": "21st century Trend in extreme still water level due to storminess change alone",
+            "label_units": "m y-1",
+            "long_name": "21st century Trend in extreme still water level due to storminess change alone",
+            "plot_label": "21st century Trend in extreme still water level due to storminess change alone (m y-1)",
+            "strand": [
+                "observations"
+            ],
+            "time_averaging": [
+                "average rate over 2007-2099"
+            ],
+            "time_step": [
+                "n/a"
+            ],
+            "units": "m y-1"
         },
         "snd": {
             "cmip6_cmor_tables_row_id": [
@@ -1162,6 +1214,27 @@
             ],
             "time_step": [
                 "1hr"
+            ],
+            "units": "m"
+        },
+        "stillWaterReturnLevel": {
+            "description": "Still water return level",
+            "label_units": "m",
+            "long_name": "Still water return level",
+            "notes": [
+                "Return level to be plotted against return period. Log scale for return period. How will uncertainty be made available? Separate variable?"
+            ],
+            "plot_label": "Still water return level (m)",
+            "strand": [
+                "land strand 1",
+                "land strand 2",
+                "land strand 3 12km",
+                "land strand 3 2km",
+                "marine",
+                "observations"
+            ],
+            "time_step": [
+                "n/a"
             ],
             "units": "m"
         },
@@ -1672,6 +1745,50 @@
             "um_stash": "03236",
             "units": "degC"
         },
+        "tideAnom": {
+            "anomaly_type": "absolute_change",
+            "cmip6_standard_name": "sea_surface_height_above_mean_sea_level",
+            "description": "Sea surface elevation (tide)",
+            "label_units": "m",
+            "long_name": "Sea surface height above mean sea level due to modelled astronomical tide only",
+            "plot_label": "Sea surface elevation (tide) anomaly (m)",
+            "strand": [
+                "land strand 1",
+                "land strand 2",
+                "land strand 3 12km",
+                "land strand 3 2km",
+                "marine",
+                "observations"
+            ],
+            "time_step": [
+                "15min",
+                "1hr",
+                "6min"
+            ],
+            "units": "m"
+        },
+        "tideSurgeAnom": {
+            "anomaly_type": "absolute_change",
+            "cmip6_standard_name": "sea_surface_height_above_mean_sea_level",
+            "description": "Sea surface elevation (tide and surge)",
+            "label_units": "m",
+            "long_name": "Sea surface height above mean sea level due to modelled astronomical tide and meteorological surge",
+            "plot_label": "Sea surface elevation (tide and surge) anomaly (m)",
+            "strand": [
+                "land strand 1",
+                "land strand 2",
+                "land strand 3 12km",
+                "land strand 3 2km",
+                "marine",
+                "observations"
+            ],
+            "time_step": [
+                "15min",
+                "1hr",
+                "6min"
+            ],
+            "units": "m"
+        },
         "tpl": {
             "description": "Target protection level",
             "label_units": "m",
@@ -1708,6 +1825,17 @@
                 "use-by date"
             ],
             "units": "m"
+        },
+        "transverse_mercator": {
+            "false_easting": 400000.0,
+            "false_northing": -100000.0,
+            "grid_mapping_name": "transverse_mercator",
+            "latitude_of_projection_origin": 49.0,
+            "longitude_of_central_meridian": -2.0,
+            "longitude_of_prime_meridian": 0.0,
+            "scale_factor_at_central_meridian": 0.9996012717,
+            "semi_major_axis": 6377563.396,
+            "semi_minor_axis": 6356256.909
         },
         "twb": {
             "description": "Wet bulb temperature",

@@ -9,8 +9,8 @@ import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 from ukcp_dp.constants import DATA_SOURCE_GCM, DATA_SOURCE_PROB, \
-    ENSEMBLE_COLOURS, ENSEMBLE_GREYSCALES, ENSEMBLE_LOWLIGHT, \
-    PERCENTILE_LINE_COLOUR, PERCENTILE_FILL, InputType
+    DATA_SOURCE_MARINE, ENSEMBLE_COLOURS, ENSEMBLE_GREYSCALES, \
+    ENSEMBLE_LOWLIGHT, PERCENTILE_LINE_COLOUR, PERCENTILE_FILL, InputType
 from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
@@ -33,7 +33,9 @@ class PlumePlotter(GraphPlotter):
         ax = plt.gca()
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_PROB):
+                DATA_SOURCE_PROB or
+                self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_MARINE):
             # plot the percentiles
             self._plot_probability_levels(self.cube_list[0], ax, True)
 
@@ -66,14 +68,22 @@ class PlumePlotter(GraphPlotter):
             ax.plot(t_points, percentile_cube.data, label='50th Percentile',
                     color=PERCENTILE_LINE_COLOUR)
 
-        # fill between the 10th and 90th
-        lovals = cube.extract(iris.Constraint(percentile=10))
-        hivals = cube.extract(iris.Constraint(percentile=90))
+        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_PROB):
+            # fill between the 10th and 90th
+            lovals = cube.extract(iris.Constraint(percentile=10))
+            hivals = cube.extract(iris.Constraint(percentile=90))
+            label = '10th to 90th Percentile'
+        else:
+            # fill between the 10th and 90th
+            lovals = cube.extract(iris.Constraint(percentile=5))
+            hivals = cube.extract(iris.Constraint(percentile=95))
+            label = '5th to 95th Percentile'
 
         ax.fill_between(t_points, lovals.data, y2=hivals.data,
                         edgecolor="none", linewidth=0,
                         facecolor=PERCENTILE_FILL, zorder=0,
-                        label='10th to 90th Percentile')
+                        label=label)
 
     def _plot_ensemble(self, cube, ax):
         # Line plots of ensembles, highlighting selected members
