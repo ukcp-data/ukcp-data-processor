@@ -268,7 +268,6 @@ class Vocab(object):
         '2': '2'
     },
         'sampling_percentile_1': {
-        5: '5',
         10: '10',
         15: '15',
         20: '20',
@@ -286,7 +285,6 @@ class Vocab(object):
         80: '80',
         85: '85',
         90: '90',
-        95: '95'
     },
     }
 
@@ -356,7 +354,10 @@ class Vocab(object):
             variables = json.load(json_data)['variable']
         self.vocab['variable'] = {}
         for key in variables.keys():
-            self.vocab['variable'][key] = variables[key]['plot_label']
+            try:
+                self.vocab['variable'][key] = variables[key]['plot_label']
+            except KeyError:
+                pass
 
     def get_collection_terms(self, collection):
         """

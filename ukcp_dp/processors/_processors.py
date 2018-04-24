@@ -173,7 +173,7 @@ class SamplingProcessor(object):
     def _get_percentile_ids(self, cube, sampling_percentile):
         """
         Get a list of sample ids from the cube that represent the
-        sampling_percentile values + and - 5.
+        sampling_percentile values + and - 10.
         """
         samples = []
         for sample_slice in cube.slices_over('sample'):
@@ -185,8 +185,8 @@ class SamplingProcessor(object):
 
         # Work out which indices must be used to subset the data for a range of
         # percentages
-        low_index = (sampling_percentile - 5) * sample_count / 100
-        high_index = (sampling_percentile + 5) * sample_count / 100
+        low_index = (sampling_percentile - 10) * sample_count / 100
+        high_index = (sampling_percentile + 10) * sample_count / 100
 
         sample_ids = [i[1] for i in samples[low_index:high_index]]
         return sample_ids
