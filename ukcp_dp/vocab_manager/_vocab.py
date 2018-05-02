@@ -21,8 +21,8 @@ class Vocab(object):
         'country': 'Country',
         'admin_region': 'Administrative Region',
         'river_basin': 'River Basin',
-        'coast_point': 'Coast',
-        'gauge_point': 'Marine Gauge'
+        'coast_point': 'Coastal Location',
+        'gauge_point': 'Tide Gauge Point'
     },
         'baseline': {
         '1961-1990': '1961 - 1990',
@@ -191,7 +191,8 @@ class Vocab(object):
         '25km': '25km grid',
         '12km': '12km grid',
         '2km': '2.2km grid',
-        'aggregated_areas': 'Spatially Aggregated Areas'
+        'aggregated_areas': 'Spatially Aggregated Areas',
+        'coastal': 'Coastal'
     },
         'variable_group': {
         'temp': 'Temperature',
