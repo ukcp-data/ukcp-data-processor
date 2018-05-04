@@ -254,6 +254,10 @@ class Vocab(object):
         9: '9',
         10: '10'
     },
+        'order_by_mean': {
+        True: 'True',
+        False: 'False'
+    },
         'overlay_probability_levels': {
         True: 'True',
         False: 'False'

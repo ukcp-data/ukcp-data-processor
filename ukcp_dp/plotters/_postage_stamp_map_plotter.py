@@ -1,5 +1,7 @@
 import logging
 
+import iris
+
 from _map_plotter import MapPlotter
 import matplotlib.gridspec as gridspec
 from ukcp_dp.constants import DATA_SOURCE_GCM, InputType
@@ -97,34 +99,79 @@ class PostageStampMapPlotter(MapPlotter):
         bar_grid = bar_gs[0, 1]
         bar_gs.update(top=0.23, bottom=0.08, left=gs_left, right=gs_right)
 
-        for i, ensemble_slice in enumerate(
-                cube.slices_over('Ensemble member')):
-            # TODO need a better way to get the ensemble_name
-            ensemble_name = get_ensemble_member_set(DATA_SOURCE_GCM)[
-                int(ensemble_slice.coord('Ensemble member').points[0])]
+        if self.input_data.get_value(InputType.ORDER_BY_MEAN) is True:
+            # order by means
+            result = self._plot_maps_mean_order(cube, fig, grid, plotsettings)
 
-            log.debug('generating postage stamp map for ensemble {}'.
-                      format(ensemble_name))
-
-            ax = fig.add_subplot(grid[i], projection=plotsettings.proj)
-
-            # Setting bar_orientation="none" here to override (prevent) drawing
-            # the colour bar:
-            result = maps.plot_standard_map(ensemble_slice, plotsettings,
-                                            fig=fig,
-                                            ax=ax, barlab=None,
-                                            bar_orientation="none",
-                                            outfnames=None)
-            # add a title
-            title = "Member: {}".format(self.vocab.get_collection_term_label(
-                InputType.ENSEMBLE, ensemble_name))
-            ax.set_title(title)
-
-            # add a coast line
-            self.plot_overlay('', False)
+        else:
+            result = self._plot_maps_name_order(cube, fig, grid, plotsettings)
 
         # add the sub plot to contain the bar
         ax = fig.add_subplot(bar_grid)
         ax.axis('off')
+
+        return result
+
+    def _plot_maps_mean_order(self, cube, fig, grid, plotsettings):
+        # cube_means, key = ensemble id, value = mean
+        ensemble_cube_means = {}
+
+        ensemble_mean_cube = cube.collapsed(
+            ['projection_x_coordinate', 'projection_y_coordinate', 'latitude',
+             'longitude'], iris.analysis.MEAN)
+
+        for ensemble_slice in ensemble_mean_cube.slices_over(
+                'Ensemble member'):
+            ensemble_id = int(
+                ensemble_slice.coord('Ensemble member').points[0])
+            ensemble_cube_means[ensemble_id] = ensemble_slice.data.item()
+
+        # ensemble_cubes, key = mean, value = cube
+        ensemble_cubes = {}
+
+        for ensemble_slice in cube.slices_over('Ensemble member'):
+            ensemble_id = int(
+                ensemble_slice.coord('Ensemble member').points[0])
+            mean_value = ensemble_cube_means[ensemble_id]
+            ensemble_cubes[mean_value] = ensemble_slice
+
+        i = 0
+        for ensemble_mean in sorted(ensemble_cubes.keys()):
+            result = self._plot_map(
+                fig, grid, plotsettings, ensemble_cubes[ensemble_mean], i)
+            i += 1
+
+        return result
+
+    def _plot_maps_name_order(self, cube, fig, grid, plotsettings):
+        for i, ensemble_slice in enumerate(
+                cube.slices_over('Ensemble member')):
+            result = self._plot_map(fig, grid, plotsettings, ensemble_slice, i)
+        return result
+
+    def _plot_map(self, fig, grid, plotsettings, ensemble_cube, i):
+        # TODO need a better way to get the ensemble_name
+        ensemble_name = get_ensemble_member_set(DATA_SOURCE_GCM)[
+            int(ensemble_cube.coord('Ensemble member').points[0])]
+
+        log.debug('generating postage stamp map for ensemble {}'.
+                  format(ensemble_name))
+
+        ax = fig.add_subplot(grid[i], projection=plotsettings.proj)
+
+        # Setting bar_orientation="none" here to override (prevent) drawing
+        # the colour bar:
+        result = maps.plot_standard_map(ensemble_cube, plotsettings,
+                                        fig=fig,
+                                        ax=ax, barlab=None,
+                                        bar_orientation="none",
+                                        outfnames=None)
+        # add a title
+        title = "Member: {}".format(self.vocab.get_collection_term_label(
+            InputType.ENSEMBLE, ensemble_name))
+        ax.set_title(title)
+
+        # add a coast line
+        self.plot_overlay('', False)
 
         return result
