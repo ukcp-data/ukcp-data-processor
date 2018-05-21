@@ -8,7 +8,7 @@ import matplotlib.gridspec as gridspec
 import matplotlib.image as image
 from matplotlib.transforms import Bbox
 from ukcp_dp.constants import DATA_SELECTION_TYPES, InputType, \
-    LOGO_SMALL, LOGO_LARGE
+    LOGO_SMALL, LOGO_MEDIUM, LOGO_LARGE
 from ukcp_dp.ukcp_standard_plots import standards_class as stds
 
 
@@ -80,7 +80,7 @@ class BasePlotter(object):
             logo = LOGO_SMALL
             v_offset = 544
         elif image_size == 1200:
-            logo = LOGO_LARGE
+            logo = LOGO_MEDIUM
             v_offset = 718
         else:
             logo = LOGO_LARGE

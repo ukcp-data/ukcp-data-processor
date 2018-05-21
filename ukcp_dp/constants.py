@@ -19,6 +19,7 @@ InputType = enum(
     IMAGE_FORMAT='image_format',
     IMAGE_SIZE='image_size',
     LEGEND_POSITION='legend_position',
+    METHOD='method',
     ORDER_BY_MEAN='order_by_mean',
     OVERLAY_PROBABILITY_LEVELS='overlay_probability_levels',
     RANDOM_SAMPLING_COUNT='random_sampling_count',
@@ -52,6 +53,7 @@ INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
                             InputType.IMAGE_FORMAT,
                             InputType.IMAGE_SIZE,
                             InputType.LEGEND_POSITION,
+                            InputType.METHOD,
                             InputType.ORDER_BY_MEAN,
                             InputType.OVERLAY_PROBABILITY_LEVELS,
                             InputType.RANDOM_SAMPLING_COUNT,
@@ -85,6 +87,7 @@ DATA_SELECTION_TYPES = [InputType.BASELINE,
                         InputType.DATA_SOURCE,
                         InputType.DATA_TYPE,
                         InputType.ENSEMBLE,
+                        InputType.METHOD,
                         InputType.OVERLAY_PROBABILITY_LEVELS,
                         InputType.SCENARIO,
                         InputType.SPATIAL_REPRESENTATION,
@@ -138,6 +141,7 @@ OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK')
 OVERLAY_RIVER = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/river_basins')
 
 LOGO_SMALL = path.join(ROOT_DIR, 'ukcp_dp/public/img/UKCP_logo100px.jpg')
+LOGO_MEDIUM = path.join(ROOT_DIR, 'ukcp_dp/public/img/UKCP_logo150px.jpg')
 LOGO_LARGE = path.join(ROOT_DIR, 'ukcp_dp/public/img/UKCP_logo150px.jpg')
 
 TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
@@ -153,6 +157,10 @@ DATA_SOURCE_RCM = 'land-rcm'
 DATA_SOURCE_RCM_MIN_YEAR = 1980
 DATA_SOURCE_MARINE = 'marine-sim'
 DATA_SOURCE_MARINE_MIN_YEAR = 2007
+DATA_SOURCE_MARINE_MAX_YEAR = 2300
+OTHER_MAX_YEAR = 2100
+
+METHOD_EXPLORATORY = 'exploratory'
 
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 

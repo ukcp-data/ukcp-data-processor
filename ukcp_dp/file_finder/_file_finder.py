@@ -2,7 +2,9 @@ import os
 
 from ukcp_dp.constants import DATA_DIR, DATA_SOURCE_PROB, \
     DATA_SOURCE_PROB_MIN_YEAR, DATA_SOURCE_GCM, DATA_SOURCE_RCM, \
-    DATA_SOURCE_MARINE, InputType
+    DATA_SOURCE_MARINE, DATA_SOURCE_MARINE_MIN_YEAR, \
+    DATA_SOURCE_MARINE_MAX_YEAR, InputType, METHOD_EXPLORATORY, \
+    OTHER_MAX_YEAR
 
 import logging
 log = logging.getLogger(__name__)
@@ -107,8 +109,15 @@ def _get_prob_file_list(input_data):
 
             if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'ann'
                     or spatial_representation != '25km'):
-                # current thinking is that there will only be one file
-                file_list_per_scenario.append([os.path.join(file_path, '*')])
+                if (input_data.get_value(InputType.DATA_SOURCE) ==
+                        DATA_SOURCE_MARINE):
+                    file_name = _get_marine_file_name(
+                        input_data, scenario, variable)
+                else:
+                    # current thinking is that there will only be one file
+                    file_name = '*'
+                file_list_per_scenario.append(
+                    [os.path.join(file_path, file_name)])
                 continue
 
             scenario_file_list = []
@@ -183,6 +192,23 @@ def _get_prob_file_name(input_data, scenario, spatial_representation,
                      data_type=input_data.get_value(InputType.DATA_TYPE),
                      temporal_type=input_data.get_value(
                          InputType.TEMPORAL_AVERAGE_TYPE),
+                     start_data=start_date,
+                     end_date=end_date))
+    return file_name
+
+
+def _get_marine_file_name(input_data, scenario, variable):
+    start_date = DATA_SOURCE_MARINE_MIN_YEAR
+    if (input_data.get_value(InputType.METHOD) == METHOD_EXPLORATORY):
+        end_date = DATA_SOURCE_MARINE_MAX_YEAR
+    else:
+        end_date = OTHER_MAX_YEAR
+
+    file_name = ('{variable}_{data_source}_{scenario}_ann_'
+                 '{start_data}-{end_date}.nc'.format(
+                     variable=variable,
+                     scenario=scenario,
+                     data_source=DATA_SOURCE_MARINE,
                      start_data=start_date,
                      end_date=end_date))
     return file_name

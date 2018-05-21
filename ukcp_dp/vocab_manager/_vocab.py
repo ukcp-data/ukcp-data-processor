@@ -247,12 +247,14 @@ class Vocab(object):
         2: '2',
         3: '3',
         4: '4',
-        5: '5',
         6: '6',
         7: '7',
         8: '8',
         9: '9',
         10: '10'
+    },
+        'method': {
+        'exploratory': 'exploratory'
     },
         'order_by_mean': {
         True: 'True',
@@ -308,6 +310,7 @@ class Vocab(object):
         'image_format': 'Image Format',
         'image_size': 'Image Size',
         'legend_position': 'Legend Position',
+        'method': 'Method',
         'output': 'Output',
         'overlay_probability_levels': 'Overlay Probability Levels',
         'period': 'Date Range',
@@ -338,7 +341,7 @@ class Vocab(object):
         self.vocab = self.VOCAB
         self.vocab['year'] = _get_range(1900, 2101)
         self.vocab['year_minimum'] = _get_range(1900, 2101)
-        self.vocab['year_maximum'] = _get_range(1900, 2101)
+        self.vocab['year_maximum'] = _get_range(1900, 2301)
         self.vocab['sampling_id'] = _get_range(1, 4001)
         self.vocab['random_sampling_count'] = _get_range(100, 4001)
         self.vocab['highlighted_ensemble_members'] = self.vocab['ensemble']

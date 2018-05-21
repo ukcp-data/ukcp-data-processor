@@ -1,8 +1,10 @@
 import logging
 
 from ukcp_dp.constants import DATA_SOURCE_PROB, DATA_SOURCE_PROB_MIN_YEAR, \
-    DATA_SOURCE_MARINE, DATA_SOURCE_MARINE_MIN_YEAR, DATA_SOURCE_RCM, \
-    DATA_SOURCE_RCM_MIN_YEAR, InputType, MONTHLY, SEASONAL
+    DATA_SOURCE_MARINE, DATA_SOURCE_MARINE_MIN_YEAR, \
+    DATA_SOURCE_MARINE_MAX_YEAR, DATA_SOURCE_RCM, \
+    DATA_SOURCE_RCM_MIN_YEAR, InputType, MONTHLY, SEASONAL, \
+    METHOD_EXPLORATORY, OTHER_MAX_YEAR
 from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
@@ -135,7 +137,14 @@ class Validator(object):
                 "The minimum year must be equal or greater than {}".
                 format(min_allowed_year))
 
-        max_allowed_year = max(self.vocab.get_collection_terms('year_maximum'))
+        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_MARINE and
+                self.input_data.get_value(InputType.METHOD) ==
+                METHOD_EXPLORATORY):
+            max_allowed_year = DATA_SOURCE_MARINE_MAX_YEAR
+        else:
+            max_allowed_year = OTHER_MAX_YEAR
+
         if (self.input_data.get_value(InputType.YEAR_MAXIMUM) >
                 max_allowed_year):
             raise Exception(
