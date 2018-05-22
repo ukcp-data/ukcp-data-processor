@@ -4,7 +4,7 @@ from ukcp_dp.constants import DATA_SOURCE_PROB, DATA_SOURCE_PROB_MIN_YEAR, \
     DATA_SOURCE_MARINE, DATA_SOURCE_MARINE_MIN_YEAR, \
     DATA_SOURCE_MARINE_MAX_YEAR, DATA_SOURCE_RCM, \
     DATA_SOURCE_RCM_MIN_YEAR, InputType, MONTHLY, SEASONAL, \
-    METHOD_EXPLORATORY, OTHER_MAX_YEAR
+    METHOD_EXPLORATORY, OTHER_MAX_YEAR, AreaType
 from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
@@ -44,7 +44,8 @@ class Validator(object):
 # value_type=InputType.SPATIAL_REPRESENTATION, value=spatial_rep))
         if spatial_rep is None:
             # Not set, lets be kind and set it
-            if self.input_data.get_area_type() in ['bbox', 'point']:
+            if (self.input_data.get_area_type() in
+                    [AreaType.BBOX, AreaType.POINT]):
                 if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                         'land-gcm'):
                     self.input_data.set_value(
@@ -59,7 +60,7 @@ class Validator(object):
                         InputType.SPATIAL_REPRESENTATION, '25km')
 
             elif (self.input_data.get_area_type() in
-                  ['coast_point', 'gauge_point']):
+                  [AreaType.COAST_POINT, AreaType.GAUGE_POINT]):
                 # TODO What should this be?
                 pass
 

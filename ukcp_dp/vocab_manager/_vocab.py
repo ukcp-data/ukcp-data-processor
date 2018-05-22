@@ -6,108 +6,55 @@ from ukcp_dp.constants import ROOT_DIR
 
 class Vocab(object):
 
-    VOCAB = {'data_source': {
-        'land-prob': 'Land probabilistic projections',
-        'probabilistic': 'Probabilistic projections',
+    VOCAB = {'admin_region': {
+        # includes 'all', not in UKCP18_admin_region
+        'all': 'All administrative regions',
+        'channel_islands': 'Channel Islands',
+        'east_midlands': 'East Midlands',
+        'east_of_england': 'East of England',
+        'east_scotland': 'East Scotland',
+        'isle_of_man': 'Isle of Man',
+        'london': 'London',
+        'north_east_england': 'North East England',
+        'north_scotland': 'North Scotland',
+        'north_west_england': 'North West England',
+        'northern_ireland': 'Northern Ireland',
+        'south_east_england': 'South East England',
+        'south_west_england': 'South West England',
+        'wales': 'Wales',
+        'west_midlands': 'West Midlands',
+        'west_scotland': 'West Scotland',
+        'yorkshire_and_Humber': 'Yorkshire and Humber'
+    },
+        'country': {
+        # includes 'all', not in UKCP18_country
+        'all': 'All countries',
+        'channel_islands': 'Channel Islands',
+        'england': 'England',
+        'england_and_wales': 'England and Wales',
+        'isle_of_man': 'Isle of Man',
+        'northern_ireland': 'Northern Ireland',
+        'scotland': 'Scotland',
+        'uk': 'United Kingdom',
+        'wales': 'Wales'
+    },
+        'data_source': {
+        # equivalent to UKCP18_collection
         'land-gcm': 'Global simulations',
+        'land-prob': 'Land probabilistic projections',
         'land-rcm': 'Regional simulations',
-        'hires_uk': 'High-resolution simulations',
-        'marine-sim': 'Marine simulations',
-        'observations': 'Observations'
-    },
-        'area_type': {
-        'bbox': 'Bounding box',
-        'point': ' Point',
-        'country': 'Country',
-        'admin_region': 'Administrative Region',
-        'river_basin': 'River Basin',
-        'coast_point': 'Coastal Location',
-        'gauge_point': 'Tide Gauge Point'
-    },
-        'baseline': {
-        '1961-1990': '1961 - 1990',
-        '1981-2000': '1981 - 2000',
-        '1981-2010': '1981 - 2010',
-    },
-        'climate_change_type': {
-        'anomalies': 'Anomalies',
-        'absolute': 'Absolute values'
-    },
-        'scenario': {
-        'a1b': 'SRES A1B',
-        'rcp26': 'RCP 2.6',
-        'rcp45': 'RCP 4.5',
-        'rcp60': 'RCP 6.0',
-        'rcp85': 'RCP 8.5'
-    },
-        'temporal_average_type': {
-        'ann': 'Annual',
-        'seas': 'Seasonal',
-        'mon': 'Monthly'
-    },
-        'spatial_representation': {
-        '60km': '60km grid',
-        '25km': '25km grid',
-        '12km': '12km grid',
-        '2km': '2.2km grid',
-        'country': 'Country',
-        'admin_region': 'Administrative Region',
-        'river_basin': 'River Basin',
-        'coast': 'Coast'
-    },
-        'mon': {
-        'jan': 'January',
-        'feb': 'February',
-        'mar': 'March',
-        'apr': 'April',
-        'may': 'May',
-        'jun': 'June',
-        'jul': 'July',
-        'aug': 'August',
-        'sep': 'September',
-        'oct': 'October',
-        'nov': 'November',
-        'dec': 'December'
-    },
-        'seas': {
-        'djf': 'December January February',
-        'mam': 'March April May',
-        'jja': 'June July August',
-        'son': 'September October November'
-    },
-        'ann': {
-        'ann': 'annual'
-    },
-        'time_period': {
-        'jan': 'January',
-        'feb': 'February',
-        'mar': 'March',
-        'apr': 'April',
-        'may': 'May',
-        'jun': 'June',
-        'jul': 'July',
-        'aug': 'August',
-        'sep': 'September',
-        'oct': 'October',
-        'nov': 'November',
-        'dec': 'December',
-        'djf': 'December January February',
-        'mam': 'March April May',
-        'jja': 'June July August',
-        'son': 'September October November',
-        'ann': 'annual',
-        'all': 'all'
-    },
-        'period': {
-        '1900-2100': '1900-2100',
-        '1961-2100': '1961-2100',
-        '2007-2100': '2007-2100'
+        'marine-sim': 'Marine simulations'
     },
         'data_type': {
+        # equivalent to UKCP18_prob_data_type
+        # percentile not in UKCP18_prob_data_type
+        # sample is Sample in UKCP18_prob_data_type
         'percentile': 'percentile',
         'sample': 'sample'
     },
         'ensemble': {
+        # equivalent to UKCP18_ensemble_member
+        # UKCP18 values are full values
         'r001i1p00000': '00000',
         'r001i1p00090': '00090',
         'r001i1p00605': '00605',
@@ -129,85 +76,103 @@ class Vocab(object):
         'r001i1p02884': '02884',
         'r001i1p02914': '02914'
     },
-        'admin_region': {
-        'all': 'All administrative regions',
-        'north_east_england': 'North East England',
-        'north_west_england': 'North West England',
-        'yorkshire_and_Humber': 'Yorkshire and Humber',
-        'east_midlands': 'East Midlands',
-        'west_midlands': 'West Midlands',
-        'east_of_england': 'East of England',
-        'london': 'London',
-        'south_east_england': 'South East England',
-        'south_west_england': 'South West England',
-        'wales': 'Wales',
-        'east_scotland': 'East Scotland',
-        'west_scotland': 'West Scotland',
-        'north_scotland': 'North Scotland',
-        'northern_ireland': 'Northern Ireland',
-        'channel_islands': 'Channel Islands',
-        'isle_of_man': 'Isle of Man'
-    },
-        'country': {
-        'all': 'All countries',
-        'channel_islands': 'Channel Islands',
-        'england': 'England',
-        'england_and_wales': 'England and Wales',
-        'isle_of_man': 'Isle of Man',
-        'northern_ireland': 'Northern Ireland',
-        'scotland': 'Scotland',
-        'uk': 'United Kingdom',
-        'wales': 'Wales',
-    },
-        'river_basin': {
-        'all': 'All river basins',
-        'tay': 'Tay',
-        'orkney_and_shetlands': 'Orkney and Shetlands',
-        'clyde': 'Clyde',
-        'south_east_england': 'South East England',
-        'north_eastern_ireland': 'North Eastern Ireland',
-        'northumbria': 'Northumbria',
-        'tweed': 'Tweed',
-        'forth': 'Forth',
-        'humber': 'Humber',
-        'solway': 'Solway',
-        'north_highland': 'North Highland',
-        'north_west_england': 'North West England',
-        'argyll': 'Argyll',
-        'thames': 'Thames',
-        'north_western_ireland': 'North Western Ireland',
-        'severn': 'Severn',
-        'dee': 'Dee',
-        'west_highland': 'West Highland',
-        'south_west_england': 'South West England',
-        'neagh_bann': 'Neagh Bann',
-        'western_wales': 'Western Wales',
-        'north_east_scotland': 'North East Scotland',
-        'anglian': 'Anglian'
-    },
-
-        'spatial_representation_group': {
-        '60km': '60km grid',
-        '25km': '25km grid',
+        'spatial_representation': {
+        # equivalent to UKCP18_resolution
+        # no grid in UKCP18_resolution
+        # labels are plural in UKCP18_resolution
+        # admin_region is just region in UKCP18_resolution
         '12km': '12km grid',
         '2km': '2.2km grid',
-        'aggregated_areas': 'Spatially Aggregated Areas',
-        'coastal': 'Coastal'
+        '25km': '25km grid',
+        '60km': '60km grid',
+        'admin_region': 'Administrative Region',
+        'coast': 'Coast',
+        'country': 'Country',
+        'river_basin': 'River Basin'
     },
-        'variable_group': {
-        'temp': 'Temperature',
-        'rain': 'Rainfall',
-        'press': 'Pressure',
-        'hum': 'Humidity',
-        'sea': 'Sea level',
-        'wind': 'Wind speed',
+        'river_basin': {
+        # includes 'all', not in UKCP18_country
+        'all': 'All river basins',
+        'anglian': 'Anglian',
+        'argyll': 'Argyll',
+        'clyde': 'Clyde',
+        'dee': 'Dee',
+        'forth': 'Forth',
+        'humber': 'Humber',
+        'neagh_bann': 'Neagh Bann',
+        'north_east_scotland': 'North East Scotland',
+        'north_eastern_ireland': 'North Eastern Ireland',
+        'north_highland': 'North Highland',
+        'north_west_england': 'North West England',
+        'north_western_ireland': 'North Western Ireland',
+        'northumbria': 'Northumbria',
+        'orkney_and_shetlands': 'Orkney and Shetlands',
+        'severn': 'Severn',
+        'solway': 'Solway',
+        'south_east_england': 'South East England',
+        'south_west_england': 'South West England',
+        'tay': 'Tay',
+        'thames': 'Thames',
+        'tweed': 'Tweed',
+        'west_highland': 'West Highland',
+        'western_wales': 'Western Wales'
     },
-        'output': {
-        'graphs': 'Graphs',
-        'maps': 'Maps',
-        'data': 'Data only',
+        'scenario': {
+        # a1b is sres-a1b in UKCP18_scenario
+        'a1b': 'SRES A1B',
+        'rcp26': 'RCP 2.6',
+        'rcp45': 'RCP 4.5',
+        'rcp60': 'RCP 6.0',
+        'rcp85': 'RCP 8.5'
     },
 
+        # the following are not currently in UKCP18
+        'baseline': {
+        '1961-1990': '1961 - 1990',
+        '1981-2000': '1981 - 2000',
+        '1981-2010': '1981 - 2010',
+    },
+        'climate_change_type': {
+        'anomalies': 'Anomalies',
+        'absolute': 'Absolute values'
+    },
+        'temporal_average_type': {
+        'ann': 'Annual',
+        'seas': 'Seasonal',
+        'mon': 'Monthly'
+    },
+        'ann': {
+        'ann': 'annual'
+    },
+        'seas': {
+        'djf': 'December January February',
+        'mam': 'March April May',
+        'jja': 'June July August',
+        'son': 'September October November'
+    },
+        'mon': {
+        'jan': 'January',
+        'feb': 'February',
+        'mar': 'March',
+        'apr': 'April',
+        'may': 'May',
+        'jun': 'June',
+        'jul': 'July',
+        'aug': 'August',
+        'sep': 'September',
+        'oct': 'October',
+        'nov': 'November',
+        'dec': 'December'
+    },
+        'area_type': {
+        'bbox': 'Bounding box',
+        'point': ' Point',
+        'country': 'Country',
+        'admin_region': 'Administrative Region',
+        'river_basin': 'River Basin',
+        'coast_point': 'Coastal Location',
+        'gauge_point': 'Tide Gauge Point'
+    },
         'convert_to_percentiles': {
         True: 'True',
         False: 'False'
@@ -293,6 +258,35 @@ class Vocab(object):
         85: '85',
         90: '90',
     },
+
+        # vocabs just for facets
+        'period': {
+        '1900-2100': '1900-2100',
+        '1961-2100': '1961-2100',
+        '2007-2100': '2007-2100',
+        '2007-2300': '2007-2300'
+    },
+        'output': {
+        'graphs': 'Graphs',
+        'maps': 'Maps',
+        'data': 'Data only',
+    },
+        'spatial_representation_group': {
+        '60km': '60km grid',
+        '25km': '25km grid',
+        '12km': '12km grid',
+        '2km': '2.2km grid',
+        'aggregated_areas': 'Spatially Aggregated Areas',
+        'coastal': 'Coastal'
+    },
+        'variable_group': {
+        'temp': 'Temperature',
+        'rain': 'Rainfall',
+        'press': 'Pressure',
+        'hum': 'Humidity',
+        'sea': 'Sea level',
+        'wind': 'Wind speed'
+    },
     }
 
     COLLECTION_LABELS = {
@@ -340,13 +334,18 @@ class Vocab(object):
     def __init__(self):
         self.vocab = self.VOCAB
         self.vocab['year'] = _get_range(1900, 2101)
-        self.vocab['year_minimum'] = _get_range(1900, 2101)
+        self.vocab['year_minimum'] = _get_range(1900, 2301)
         self.vocab['year_maximum'] = _get_range(1900, 2301)
         self.vocab['sampling_id'] = _get_range(1, 4001)
         self.vocab['random_sampling_count'] = _get_range(100, 4001)
         self.vocab['highlighted_ensemble_members'] = self.vocab['ensemble']
         self.vocab['sampling_percentile_2'] = self.vocab[
             'sampling_percentile_1']
+        time_period = {'all': 'all'}
+        time_period.update(self.vocab['ann'])
+        time_period.update(self.vocab['seas'])
+        time_period.update(self.vocab['mon'])
+        self.vocab['time_period'] = time_period
         self.vocab['sampling_temporal_average_1'] = self.vocab['time_period']
         self.vocab['sampling_temporal_average_2'] = self.vocab['time_period']
 

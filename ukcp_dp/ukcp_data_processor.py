@@ -140,7 +140,7 @@ class UKCPDataProcessor(object):
         @param data_format (DataFormat): the type of the output data.
             If None the value from the inputs will be used.
         """
-        # validate the value of data_type
+        # validate the value of data_format
         if data_format is None:
             data_format = self.input_data.get_value(InputType.DATA_FORMAT)
 

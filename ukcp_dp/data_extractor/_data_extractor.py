@@ -7,7 +7,7 @@ from iris.cube import CubeList
 import iris.plot as iplt
 import iris.quickplot as qplt
 from ukcp_dp.constants import ANNUAL, DATA_SOURCE_PROB, InputType, \
-    MONTHLY, SEASONAL, TEMP_ANOMS, DATA_SOURCE_MARINE
+    MONTHLY, SEASONAL, TEMP_ANOMS, DATA_SOURCE_MARINE, AreaType
 from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
     make_anomaly
 from ukcp_dp.vocab_manager import get_months
@@ -285,7 +285,7 @@ class DataExtractor(object):
         # generate an area constraint
         area_constraint = None
 
-        if self.input_data.get_area_type() == 'point':
+        if self.input_data.get_area_type() == AreaType.POINT:
             # coordinates are coming in as OSGB, x, y
             resolution = self._get_resolution_m(cube)
             half_grid_size = resolution / 2
@@ -301,7 +301,7 @@ class DataExtractor(object):
                     (bng_y + half_grid_size))
             area_constraint = x_constraint & y_constraint
 
-        elif self.input_data.get_area_type() == 'bbox':
+        elif self.input_data.get_area_type() == AreaType.BBOX:
             # coordinates are coming in as OSGB, w, s, e, n
             resolution = self._get_resolution_m(cube)
             half_grid_size = resolution / 2
@@ -318,7 +318,7 @@ class DataExtractor(object):
             area_constraint = x_constraint & y_constraint
 
         elif (self.input_data.get_area_type() in
-              ['coast_point', 'gauge_point']):
+              [AreaType.COAST_POINT, AreaType.GAUGE_POINT]):
             # coordinates are coming in as lat, long
             # TODO half_grid_size = ?
             half_grid_size = 0.05
@@ -334,9 +334,9 @@ class DataExtractor(object):
                     (longitude + half_grid_size))
             area_constraint = latitude_constraint & longitude_constraint
 
-        elif (self.input_data.get_area_type() == 'admin_region' or
-                self.input_data.get_area_type() == 'country' or
-                self.input_data.get_area_type() == 'river_basin'):
+        elif (self.input_data.get_area_type() == AreaType.ADMIN_REGION or
+                self.input_data.get_area_type() == AreaType.COUNTRY or
+                self.input_data.get_area_type() == AreaType.RIVER_BASIN):
 
             if self.input_data.get_area() != 'all':
                 area_constraint = iris.Constraint(
@@ -447,7 +447,7 @@ class DataExtractor(object):
             title = '{t} {start_year} to {end_year}'.format(
                 t=title, start_year=start_year, end_year=end_year)
 
-        if self.input_data.get_area_type() == 'point':
+        if self.input_data.get_area_type() == AreaType.POINT:
             grid_x = (self.cubes[0].coord('projection_x_coordinate')
                       .bounds[0][0])
             grid_y = (self.cubes[0].coord('projection_y_coordinate')
@@ -455,7 +455,7 @@ class DataExtractor(object):
             title = "{t} for grid square {x}, {y}".format(
                 t=title, x=grid_x, y=grid_y)
 
-        elif self.input_data.get_area_type() == 'bbox':
+        elif self.input_data.get_area_type() == AreaType.BBOX:
             x_bounds = self.cubes[0].coord('projection_x_coordinate').bounds
             y_bounds = self.cubes[0].coord('projection_y_coordinate').bounds
             grid_x1 = (x_bounds[0][0])
@@ -466,7 +466,7 @@ class DataExtractor(object):
                 t=title, x1=grid_x1, y1=grid_y1, x2=grid_x2, y2=grid_y2)
 
         elif (self.input_data.get_area_type() in
-              ['coast_point', 'gauge_point']):
+              [AreaType.COAST_POINT, AreaType.GAUGE_POINT]):
             # coordinates are coming in as lat, long
             latitude = round(self.cubes[0].coord('latitude').points[0], 2)
 #                          .bounds[0][0]) TODO

@@ -3,7 +3,7 @@ import logging
 from _base_plotter import BasePlotter
 from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, \
     OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER, \
-    OVERLAY_COASTLINE_SMALL
+    OVERLAY_COASTLINE_SMALL, AreaType
 import matplotlib.pyplot as plt
 import numpy as np
 import shapefile as shp
@@ -109,11 +109,11 @@ class MapPlotter(BasePlotter):
         if overlay is None:
             overlay = 'coast_line'
 
-        if overlay == 'country':
+        if overlay == AreaType.COUNTRY:
             sf = shp.Reader(OVERLAY_COUNTRY)
-        elif overlay == 'admin_region':
+        elif overlay == AreaType.ADMIN_REGION:
             sf = shp.Reader(OVERLAY_ADMIN)
-        elif overlay == 'river_basin':
+        elif overlay == AreaType.RIVER_BASIN:
             sf = shp.Reader(OVERLAY_RIVER)
         else:
             overlay = 'coast_line'

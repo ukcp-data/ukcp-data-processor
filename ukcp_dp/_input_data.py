@@ -1,6 +1,6 @@
 from constants import InputType, INPUT_TYPES, INPUT_TYPES_SINGLE_VALUE, \
     INPUT_TYPES_MULTI_VALUE, FONT_SIZE_SMALL, FONT_SIZE_MEDIUM, \
-    FONT_SIZE_LARGE
+    FONT_SIZE_LARGE, AreaType
 
 
 class InputData(object):
@@ -226,7 +226,8 @@ class InputData(object):
             area_type = area.pop(0)
 
             if (area_type not in
-                    ['bbox', 'point', 'coast_point', 'gauge_point']):
+                    [AreaType.BBOX, AreaType.POINT, AreaType.COAST_POINT,
+                     AreaType.GAUGE_POINT]):
                 raise Exception("Unknown area: {}.".format(area))
 
             area_type_label = self.vocab.get_collection_term_label(

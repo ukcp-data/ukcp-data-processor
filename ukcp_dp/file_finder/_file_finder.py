@@ -4,7 +4,7 @@ from ukcp_dp.constants import DATA_DIR, DATA_SOURCE_PROB, \
     DATA_SOURCE_PROB_MIN_YEAR, DATA_SOURCE_GCM, DATA_SOURCE_RCM, \
     DATA_SOURCE_MARINE, DATA_SOURCE_MARINE_MIN_YEAR, \
     DATA_SOURCE_MARINE_MAX_YEAR, InputType, METHOD_EXPLORATORY, \
-    OTHER_MAX_YEAR
+    OTHER_MAX_YEAR, AreaType
 
 import logging
 log = logging.getLogger(__name__)
@@ -139,11 +139,11 @@ def _get_prob_spatial_representation(input_data):
     spatial_representation = input_data.get_value(
         InputType.SPATIAL_REPRESENTATION)
 
-    if spatial_representation == 'river_basin':
+    if spatial_representation == AreaType.RIVER_BASIN:
         spatial_representation = 'river'
-    elif spatial_representation == 'admin_region':
+    elif spatial_representation == AreaType.ADMIN_REGION:
         spatial_representation = 'region'
-    elif spatial_representation == 'country':
+    elif spatial_representation == AreaType.COUNTRY:
         pass
     else:
         # we cannot rely on the input value as this file list may be for the
@@ -299,9 +299,9 @@ def _get_cm_spatial_representation(input_data):
     spatial_representation = input_data.get_value(
         InputType.SPATIAL_REPRESENTATION)
 
-    if spatial_representation == 'river_basin':
+    if spatial_representation == AreaType.RIVER_BASIN:
         spatial_representation = 'river'
-    elif spatial_representation == 'admin_region':
+    elif spatial_representation == AreaType.ADMIN_REGION:
         spatial_representation = 'region'
     return spatial_representation
 

@@ -164,6 +164,15 @@ METHOD_EXPLORATORY = 'exploratory'
 
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 
+# Area types
+AreaType = enum(ADMIN_REGION='admin_region',
+                BBOX='bbox',
+                COAST_POINT='coast_point',
+                COUNTRY='country',
+                GAUGE_POINT='gauge_point',
+                POINT='point',
+                RIVER_BASIN='river_basin')
+
 # Plot types
 PlotType = enum(CDF_PLOT='CDF_PLOT',
                 JP_PLOT='JP_PLOT',
