@@ -77,19 +77,42 @@ class BasePlotter(object):
 
         # select a logo
         if image_size == 900:
+            # height = 600
             logo = LOGO_SMALL
-            v_offset = 544
+            v_offset = 551
         elif image_size == 1200:
+            # height = 800
             logo = LOGO_MEDIUM
-            v_offset = 718
-        else:
+            v_offset = 730
+        else:  # 2400
+            # height = 1600
             logo = LOGO_LARGE
-            v_offset = 1518
+            v_offset = 1464
 
         datafile = cbook.get_sample_data(logo, asfileobj=False)
         im = image.imread(datafile)
 
         fig.figimage(im, 5, v_offset, zorder=3)
+        self._add_funder_text(fig)
+
+    def _add_funder_text(self, fig):
+        """
+        Add a logo to the plot.
+        """
+        image_size = self.input_data.get_value(InputType.IMAGE_SIZE)
+
+        if image_size == 900:
+            x = 0.78
+            font_size = 10
+        elif image_size == 1200:
+            x = 0.80
+            font_size = 12
+        else:  # 2400
+            x = 0.85
+            font_size = 18
+
+        textstr = 'Funded by BEIS and Defra'
+        fig.text(x, 0.02, textstr, fontsize=font_size)
 
     def _add_metadata_text(self, fig):
         """

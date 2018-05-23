@@ -140,9 +140,15 @@ OVERLAY_COASTLINE_SMALL = path.join(
 OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK')
 OVERLAY_RIVER = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/river_basins')
 
-LOGO_SMALL = path.join(ROOT_DIR, 'ukcp_dp/public/img/UKCP_logo100px.jpg')
-LOGO_MEDIUM = path.join(ROOT_DIR, 'ukcp_dp/public/img/UKCP_logo150px.jpg')
-LOGO_LARGE = path.join(ROOT_DIR, 'ukcp_dp/public/img/UKCP_logo150px.jpg')
+LOGO_SMALL = path.join(
+    ROOT_DIR,
+    'ukcp_dp/public/img/MOHC_MASTER_black_mono_for_light_backg_RBG_100.jpg')
+LOGO_MEDIUM = path.join(
+    ROOT_DIR,
+    'ukcp_dp/public/img/MOHC_MASTER_black_mono_for_light_backg_RBG_150.jpg')
+LOGO_LARGE = path.join(
+    ROOT_DIR,
+    'ukcp_dp/public/img/MOHC_MASTER_black_mono_for_light_backg_RBG_300.jpg')
 
 TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 
