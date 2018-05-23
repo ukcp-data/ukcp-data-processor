@@ -119,12 +119,17 @@ class Vocab(object):
         'western_wales': 'Western Wales'
     },
         'scenario': {
-        # a1b is sres-a1b in UKCP18_scenario
-        'a1b': 'SRES A1B',
+        'sres-a1b': 'SRES A1B',
         'rcp26': 'RCP 2.6',
         'rcp45': 'RCP 4.5',
         'rcp60': 'RCP 6.0',
         'rcp85': 'RCP 8.5'
+    },
+        'temporal_average_type': {
+        # frequency in UKCP18_CVs
+        'ann': 'Annual',
+        'seas': 'Seasonal',
+        'mon': 'Monthly'
     },
 
         # the following are not currently in UKCP18
@@ -140,11 +145,6 @@ class Vocab(object):
         'data_type': {
         'percentile': 'percentile',
         'sample': 'sample'
-    },
-        'temporal_average_type': {
-        'ann': 'Annual',
-        'seas': 'Seasonal',
-        'mon': 'Monthly'
     },
         'ann': {
         'ann': 'annual'
