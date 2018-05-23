@@ -45,36 +45,38 @@ class Vocab(object):
         'land-rcm': 'Regional simulations',
         'marine-sim': 'Marine simulations'
     },
-        'data_type': {
-        # equivalent to UKCP18_prob_data_type
-        # percentile not in UKCP18_prob_data_type
-        # sample is Sample in UKCP18_prob_data_type
-        'percentile': 'percentile',
-        'sample': 'sample'
-    },
+
         'ensemble': {
         # equivalent to UKCP18_ensemble_member
         # UKCP18 values are full values
-        'r001i1p00000': '00000',
-        'r001i1p00090': '00090',
-        'r001i1p00605': '00605',
-        'r001i1p00834': '00834',
-        'r001i1p01113': '01113',
-        'r001i1p01554': '01554',
-        'r001i1p01649': '01649',
-        'r001i1p01843': '01843',
-        'r001i1p01935': '01935',
-        'r001i1p02089': '02089',
-        'r001i1p02123': '02123',
-        'r001i1p02242': '02242',
-        'r001i1p02305': '02305',
-        'r001i1p02335': '02335',
-        'r001i1p02491': '02491',
-        'r001i1p02753': '02753',
-        'r001i1p02832': '02832',
-        'r001i1p02868': '02868',
-        'r001i1p02884': '02884',
-        'r001i1p02914': '02914'
+        '01': '00000',
+        '02': '00605',
+        '03': '00834',
+        '04': '01113',
+        '05': '01554',
+        '06': '01649',
+        '07': '01843',
+        '08': '01935',
+        '09': '02123',
+        '10': '02242',
+        '11': '02305',
+        '12': '02335',
+        '13': '02491',
+        '14': '02832',
+        '15': '02868',
+        '16': 'bcc-csm1-1',
+        '17': 'CCSM4',
+        '18': 'CESM1-BGC',
+        '19': 'CanESM2',
+        '20': 'CMCC-CM',
+        '21': 'CNRM-CM5',
+        '22': 'EC-EARTH',
+        '23': 'ACCESS1-3',
+        '24': 'HadGEM2-ES',
+        '25': 'IPSL-CM5A-MR',
+        '26': 'MPI-ESM-MR',
+        '27': 'MRI-CGCM3',
+        '28': 'GFDL-ESM2G'
     },
         'spatial_representation': {
         # equivalent to UKCP18_resolution
@@ -86,7 +88,6 @@ class Vocab(object):
         '25km': '25km grid',
         '60km': '60km grid',
         'admin_region': 'Administrative Region',
-        'coast': 'Coast',
         'country': 'Country',
         'river_basin': 'River Basin'
     },
@@ -135,6 +136,10 @@ class Vocab(object):
         'climate_change_type': {
         'anomalies': 'Anomalies',
         'absolute': 'Absolute values'
+    },
+        'data_type': {
+        'percentile': 'percentile',
+        'sample': 'sample'
     },
         'temporal_average_type': {
         'ann': 'Annual',
@@ -454,21 +459,13 @@ MONTHS = [
 ]
 
 ENSEMBLE_MEMBER_SET = {
-    'land-gcm': ['r001i1p00000', 'r001i1p00090', 'r001i1p00605',
-                 'r001i1p00834', 'r001i1p01113', 'r001i1p01554',
-                 'r001i1p01649', 'r001i1p01843', 'r001i1p01935',
-                 'r001i1p02089', 'r001i1p02123', 'r001i1p02242',
-                 'r001i1p02305', 'r001i1p02335', 'r001i1p02491',
-                 'r001i1p02753', 'r001i1p02832', 'r001i1p02868',
-                 'r001i1p02884', 'r001i1p02914'],
-    'land-rcm': ['r001i1p00000', 'r001i1p00090', 'r001i1p01113',
-                 'r001i1p01554', 'r001i1p01649', 'r001i1p01843',
-                 'r001i1p01935', 'r001i1p02123', 'r001i1p02242',
-                 'r001i1p02305', 'r001i1p02335', 'r001i1p02491',
-                 'r001i1p02753', 'r001i1p02868', 'r001i1p02914'],
-    'cpm': ['r001i1p00000', 'r001i1p00090', 'r001i1p01554', 'r001i1p01935',
-            'r001i1p02123', 'r001i1p02242', 'r001i1p02305', 'r001i1p02335',
-            'r001i1p02491', 'r001i1p02914']
+    'land-gcm': ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
+                 '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+                 '21', '22', '23', '24', '25', '26', '27', '28'],
+    'land-rcm': ['01', '04', '05', '06', '07', '08', '09', '10', '11', '12',
+                 '13', '15'],
+    'cpm': ['01', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13',
+            '15']
 }
 
 
