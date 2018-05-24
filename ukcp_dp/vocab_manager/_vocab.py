@@ -143,6 +143,8 @@ class Vocab(object):
         'absolute': 'Absolute values'
     },
         'data_type': {
+        'cdf': 'cdf',
+        'pdf': 'pdf',
         'percentile': 'percentile',
         'sample': 'sample'
     },
