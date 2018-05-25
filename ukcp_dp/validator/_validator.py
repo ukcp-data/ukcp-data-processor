@@ -28,6 +28,7 @@ class Validator(object):
         self._validate_time_period()
         self._validate_baseline()
         self._validate_sampling()
+        self._validate_data_type()
 
         return self.input_data
 
@@ -292,3 +293,10 @@ class Validator(object):
                         is None):
                     raise Exception("{} must be set".format(
                         InputType.SAMPLING_VARIABLE_2))
+
+    def _validate_data_type(self):
+        if (self.input_data.get_value(InputType.DATA_SOURCE) !=
+                DATA_SOURCE_PROB):
+            return
+        if self.input_data.get_value(InputType.DATA_TYPE) is None:
+            raise Exception("{} must be set".format(InputType.DATA_TYPE))

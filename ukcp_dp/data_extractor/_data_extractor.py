@@ -206,7 +206,12 @@ class DataExtractor(object):
         """
         log.debug('_get_cube from {} files'.format(len(file_list)))
         # Load the cubes
-        cubes = iris.load(file_list)
+        try:
+            cubes = iris.load(file_list)
+        except IOError:
+            log.warn('No data was retrieved from the following files:{}'.
+                     format(file_list))
+            raise Exception('No data found for given selection options')
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB) or overlay_probability_levels is True:
