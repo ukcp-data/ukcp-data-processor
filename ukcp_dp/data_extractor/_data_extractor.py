@@ -396,7 +396,7 @@ class DataExtractor(object):
 
         elif temporal_average_type == SEASONAL:
             temporal_constraint = iris.Constraint(
-                clim_season=self.input_data.get_value(InputType.TIME_PERIOD))
+                season=self.input_data.get_value(InputType.TIME_PERIOD))
 
         else:
             raise Exception(
