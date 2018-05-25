@@ -248,6 +248,9 @@ class DataExtractor(object):
                 cube = cube.extract(time_slice_constraint)
 
         if cube is None:
+            if time_slice_constraint is not None:
+                log.warn('Time slice constraint resulted in no cubes being '
+                         'returned: {}'.format(time_slice_constraint))
             raise Exception('Selection constraints resulted in no data being'
                             ' selected')
 
@@ -258,6 +261,9 @@ class DataExtractor(object):
                 cube = cube.extract(temporal_constraint)
 
         if cube is None:
+            if temporal_constraint is not None:
+                log.warn('Temporal constraint resulted in no cubes being '
+                         'returned: {}'.format(temporal_constraint))
             raise Exception('Selection constraints resulted in no data being'
                             ' selected')
 
@@ -271,6 +277,9 @@ class DataExtractor(object):
             cube = cube.extract(area_constraint)
 
         if cube is None:
+            if area_constraint is not None:
+                log.warn('Area constraint resulted in no cubes being '
+                         'returned: {}'.format(area_constraint))
             raise Exception('Selection constraints resulted in no data being'
                             ' selected')
 
