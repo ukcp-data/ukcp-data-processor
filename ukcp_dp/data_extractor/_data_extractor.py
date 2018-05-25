@@ -348,13 +348,24 @@ class DataExtractor(object):
                     (longitude + half_grid_size))
             area_constraint = latitude_constraint & longitude_constraint
 
-        elif (self.input_data.get_area_type() == AreaType.ADMIN_REGION or
-                self.input_data.get_area_type() == AreaType.COUNTRY or
-                self.input_data.get_area_type() == AreaType.RIVER_BASIN):
-
+        elif self.input_data.get_area_type() == AreaType.ADMIN_REGION:
             if self.input_data.get_area() != 'all':
                 area_constraint = iris.Constraint(
-                    region=self.input_data.get_area())
+                    coord_values={
+                        'Administrative Region':
+                        self.input_data.get_area_label()})
+
+        elif self.input_data.get_area_type() == AreaType.COUNTRY:
+            if self.input_data.get_area() != 'all':
+                area_constraint = iris.Constraint(
+                    Country=self.input_data.get_area_label())
+
+        elif self.input_data.get_area_type() == AreaType.RIVER_BASIN:
+            if self.input_data.get_area() != 'all':
+                area_constraint = iris.Constraint(
+                    coord_values={
+                        'River Basin': self.input_data.get_area_label()})
+
         else:
             raise Exception(
                 "Unknown area type: {}.".format(
