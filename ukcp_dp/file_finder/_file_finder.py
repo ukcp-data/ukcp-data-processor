@@ -155,16 +155,30 @@ def _get_prob_spatial_representation(input_data):
 
 def _get_prob_file_path(input_data, scenario, spatial_representation,
                         variable):
-    file_path = os.path.join(
-        DATA_DIR,
-        input_data.get_value(InputType.DATA_SOURCE),
-        'uk',
-        spatial_representation,
-        scenario,
-        input_data.get_value(InputType.DATA_TYPE),
-        variable,
-        input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
-        VERSION)
+
+    if (input_data.get_value(InputType.DATA_SOURCE) ==
+                        DATA_SOURCE_MARINE):
+
+        file_path = os.path.join(
+            DATA_DIR, 
+            input_data.get_value(InputType.DATA_SOURCE),
+            'msl-proj*',
+            scenario,
+            variable,
+            VERSION)
+    else:
+                                  
+        file_path = os.path.join(
+            DATA_DIR,
+            input_data.get_value(InputType.DATA_SOURCE),
+            'uk',
+            spatial_representation,
+            scenario,
+            input_data.get_value(InputType.DATA_TYPE),
+            variable,
+            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+            VERSION)
+
     return file_path
 
 
