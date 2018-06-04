@@ -204,9 +204,10 @@ class DataExtractor(object):
 
         @return an iris cube
         """
-        log.debug('_get_cube from {} files'.format(len(file_list)))
-        for fpath in file_list:
-            log.debug(' - FILE: {}'.format(fpath))
+        if log.getEffectiveLevel() == logging.DEBUG:
+            log.debug('_get_cube from {} files'.format(len(file_list)))
+            for fpath in file_list:
+                log.debug(' - FILE: {}'.format(fpath))
 
         # Load the cubes
         try:
