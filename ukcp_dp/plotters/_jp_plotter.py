@@ -34,6 +34,10 @@ class JpPlotter(GraphPlotter):
         ybins = yedges[:-1] + (yedges[1] - yedges[0]) / 2
         h = h.T
 
+        print '\n\n\n'
+        print ybins
+        print dir(ybins)
+        print
         levels = [10, 50, 90]
         # fill the contours
         contour_fill = plt.contourf(xbins, ybins, h, levels,

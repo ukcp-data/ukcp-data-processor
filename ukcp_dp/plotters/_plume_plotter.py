@@ -65,6 +65,10 @@ class PlumePlotter(GraphPlotter):
         if plot_fifty is True:
             percentile_cube = cube.extract(
                 iris.Constraint(percentile=50))
+            if percentile_cube is None:
+                raise Exception(
+                    'Attempted to plot the 50th percentile, but no data found')
+
             ax.plot(t_points, percentile_cube.data, label='50th Percentile',
                     color=PERCENTILE_LINE_COLOUR)
 
@@ -79,6 +83,10 @@ class PlumePlotter(GraphPlotter):
             lovals = cube.extract(iris.Constraint(percentile=5))
             hivals = cube.extract(iris.Constraint(percentile=95))
             label = '5th to 95th Percentile'
+
+        if lovals is None or hivals is None:
+            raise Exception(
+                'Attempted to plot the {}, but no data found'.format(label))
 
         ax.fill_between(t_points, lovals.data, y2=hivals.data,
                         edgecolor="none", linewidth=0,

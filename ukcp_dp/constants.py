@@ -152,10 +152,6 @@ LOGO_LARGE = path.join(
 
 TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 
-MONTHLY = 'mon'
-SEASONAL = 'seas'
-ANNUAL = 'ann'
-
 DATA_SOURCE_PROB = 'land-prob'
 DATA_SOURCE_PROB_MIN_YEAR = 1961
 DATA_SOURCE_GCM = 'land-gcm'
@@ -195,3 +191,8 @@ DataFormat = enum(CSV='csv',
 ImageFormat = enum(JPG='jpg',
                    PDF='pdf',
                    PNG='png')
+
+# Temporal average types
+TemporalAverageType = enum(MONTHLY='mon',
+                           SEASONAL='seas',
+                           ANNUAL='ann')

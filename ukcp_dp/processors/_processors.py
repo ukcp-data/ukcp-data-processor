@@ -4,7 +4,7 @@ import logging
 import numpy
 
 import iris
-from ukcp_dp.constants import InputType, ANNUAL, MONTHLY, SEASONAL
+from ukcp_dp.constants import InputType, TemporalAverageType
 from ukcp_dp.data_extractor import DataExtractor
 from ukcp_dp.file_finder import get_file_lists
 
@@ -159,12 +159,13 @@ class SamplingProcessor(object):
         input_data.set_values(InputType.VARIABLE, [variable])
         input_data.set_value(InputType.TIME_PERIOD, time_period)
 
-        if time_period in self.vocab.get_collection_terms(MONTHLY):
-            temporal_average_type = MONTHLY
-        elif time_period == ANNUAL:
-            temporal_average_type = ANNUAL
+        if (time_period in
+                self.vocab.get_collection_terms(TemporalAverageType.MONTHLY)):
+            temporal_average_type = TemporalAverageType.MONTHLY
+        elif time_period == TemporalAverageType.ANNUAL:
+            temporal_average_type = TemporalAverageType.ANNUAL
         else:
-            temporal_average_type = SEASONAL
+            temporal_average_type = TemporalAverageType.SEASONAL
         input_data.set_value(
             InputType.TEMPORAL_AVERAGE_TYPE, temporal_average_type)
 

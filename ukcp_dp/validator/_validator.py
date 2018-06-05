@@ -3,8 +3,8 @@ import logging
 from ukcp_dp.constants import DATA_SOURCE_PROB, DATA_SOURCE_PROB_MIN_YEAR, \
     DATA_SOURCE_MARINE, DATA_SOURCE_MARINE_MIN_YEAR, \
     DATA_SOURCE_MARINE_MAX_YEAR, DATA_SOURCE_RCM, \
-    DATA_SOURCE_RCM_MIN_YEAR, InputType, MONTHLY, SEASONAL, \
-    METHOD_EXPLORATORY, OTHER_MAX_YEAR, AreaType
+    DATA_SOURCE_RCM_MIN_YEAR, InputType, METHOD_EXPLORATORY, OTHER_MAX_YEAR, \
+    AreaType, TemporalAverageType
 from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
@@ -204,8 +204,8 @@ class Validator(object):
             temporal_average_type)
 
         # special case for all
-        if ((temporal_average_type == MONTHLY or
-                temporal_average_type == SEASONAL)
+        if ((temporal_average_type == TemporalAverageType.MONTHLY or
+                temporal_average_type == TemporalAverageType.SEASONAL)
                 and time_period == 'all'):
             return
 

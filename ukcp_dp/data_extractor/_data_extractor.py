@@ -6,8 +6,8 @@ import iris
 from iris.cube import CubeList
 import iris.plot as iplt
 import iris.quickplot as qplt
-from ukcp_dp.constants import ANNUAL, DATA_SOURCE_PROB, InputType, \
-    MONTHLY, SEASONAL, TEMP_ANOMS, DATA_SOURCE_MARINE, AreaType
+from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, TEMP_ANOMS, \
+    DATA_SOURCE_MARINE, AreaType, TemporalAverageType
 from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
     make_anomaly
 from ukcp_dp.vocab_manager import get_months
@@ -126,9 +126,9 @@ class DataExtractor(object):
             cube_baseline, climtype=self.input_data.get_value_label(
                 InputType.TEMPORAL_AVERAGE_TYPE).lower())
         if (self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
-                MONTHLY or
+                TemporalAverageType.MONTHLY or
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
-                SEASONAL):
+                TemporalAverageType.SEASONAL):
             # we have to collapse the time coord so the dimensions match those
             # of the cube_absoute
             cube_climatology = cube_climatology.collapsed(
@@ -241,6 +241,8 @@ class DataExtractor(object):
 
         cube = cubes.concatenate_cube()
 
+        print '\n\n\n'
+        print cube
         if baseline is True:
             # generate a time slice constraint based on the baseline
             time_slice_constraint = self._time_slice_selector(True)
@@ -251,6 +253,8 @@ class DataExtractor(object):
             with iris.FUTURE.context(cell_datetime_objects=True):
                 cube = cube.extract(time_slice_constraint)
 
+        print '\n\n\n'
+        print cube
         if cube is None:
             if time_slice_constraint is not None:
                 log.warn('Time slice constraint resulted in no cubes being '
@@ -385,11 +389,11 @@ class DataExtractor(object):
             InputType.TEMPORAL_AVERAGE_TYPE)
 
         if (self.input_data.get_value(InputType.TIME_PERIOD) == 'all' or
-                temporal_average_type == ANNUAL):
+                temporal_average_type == TemporalAverageType.ANNUAL):
             # we want everything, so no need to add a restriction
             pass
 
-        elif temporal_average_type == MONTHLY:
+        elif temporal_average_type == TemporalAverageType.MONTHLY:
             for i, term in enumerate(
                     get_months()):
                 if term == self.input_data.get_value(InputType.TIME_PERIOD):
@@ -398,7 +402,7 @@ class DataExtractor(object):
                         time=lambda t: i < t.point.month <= i + 1)
                     break
 
-        elif temporal_average_type == SEASONAL:
+        elif temporal_average_type == TemporalAverageType.SEASONAL:
             temporal_constraint = iris.Constraint(
                 season=self.input_data.get_value(InputType.TIME_PERIOD))
 
@@ -448,7 +452,7 @@ class DataExtractor(object):
         variable = " and ".join(self.input_data.get_value_label(
             InputType.VARIABLE)).encode('utf-8')
         if (self.input_data.get_value(
-                InputType.TEMPORAL_AVERAGE_TYPE) == ANNUAL
+                InputType.TEMPORAL_AVERAGE_TYPE) == TemporalAverageType.ANNUAL
                 or self.input_data.get_value(InputType.TIME_PERIOD) == 'all'):
             title = ('Demonstration Version - {temporal_type} average '
                      '{variable}\n'

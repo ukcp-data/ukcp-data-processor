@@ -4,22 +4,22 @@ from ukcp_dp.constants import DATA_DIR, DATA_SOURCE_PROB, \
     DATA_SOURCE_PROB_MIN_YEAR, DATA_SOURCE_GCM, DATA_SOURCE_RCM, \
     DATA_SOURCE_MARINE, DATA_SOURCE_MARINE_MIN_YEAR, \
     DATA_SOURCE_MARINE_MAX_YEAR, InputType, METHOD_EXPLORATORY, \
-    OTHER_MAX_YEAR, AreaType
+    OTHER_MAX_YEAR, AreaType, TemporalAverageType
 
 import logging
 log = logging.getLogger(__name__)
 
 
 # month and day
-MONTH_START_DATE = '1201'
-MONTH_END_DATE = '1130'
-SEASON_START_DATE = '1201'
-SEASON_END_DATE = '1130'
-LAND_PROB_START_DATE = '19601201'
-LAND_PROB_END_DATE = '20991130'
-LAND_GCM_START_DATE = '19001215'
-LAND_GCM_END_DATE = '20991115'
+START_MONTH_DAY = '1201'
+END_MONTH_DAY = '1130'
+START_MONTH_DAY_CM = '1215'
+END_MONTH_DAY_CM = '1115'
+
 VERSION = 'latest'
+
+RIVER = 'river'
+REGION = 'region'
 
 
 def get_file_lists(input_data):
@@ -98,8 +98,14 @@ def _get_prob_file_list(input_data):
     elif year_minimum < DATA_SOURCE_PROB_MIN_YEAR:
         year_minimum = DATA_SOURCE_PROB_MIN_YEAR
 
+    # December's data is included with the next year so if a single year has
+    # been selected
+    if year_minimum == year_maximum:
+        year_maximum = year_maximum + 1
+
     for variable in variables:
         # generate a list of files for each variable
+        # NB the marine data are all annual
 
         file_list_per_scenario = []
         for scenario in input_data.get_value(InputType.SCENARIO):
@@ -107,7 +113,8 @@ def _get_prob_file_list(input_data):
             file_path = _get_prob_file_path(
                 input_data, scenario, spatial_representation, variable)
 
-            if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'ann'
+            if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
+                    TemporalAverageType.ANNUAL
                     or spatial_representation != '25km'):
                 if (input_data.get_value(InputType.DATA_SOURCE) ==
                         DATA_SOURCE_MARINE):
@@ -123,6 +130,10 @@ def _get_prob_file_list(input_data):
             scenario_file_list = []
 
             for year in range(year_minimum, (year_maximum + 1)):
+                if (input_data.get_value(InputType.DATA_SOURCE) ==
+                        DATA_SOURCE_PROB and year == OTHER_MAX_YEAR):
+                    # there is not data for December of the last year
+                    continue
                 file_name = _get_prob_file_name(
                     input_data, scenario, spatial_representation, variable,
                     year)
@@ -140,9 +151,9 @@ def _get_prob_spatial_representation(input_data):
         InputType.SPATIAL_REPRESENTATION)
 
     if spatial_representation == AreaType.RIVER_BASIN:
-        spatial_representation = 'river'
+        spatial_representation = RIVER
     elif spatial_representation == AreaType.ADMIN_REGION:
-        spatial_representation = 'region'
+        spatial_representation = REGION
     elif spatial_representation == AreaType.COUNTRY:
         pass
     else:
@@ -156,18 +167,17 @@ def _get_prob_spatial_representation(input_data):
 def _get_prob_file_path(input_data, scenario, spatial_representation,
                         variable):
 
-    if (input_data.get_value(InputType.DATA_SOURCE) ==
-                        DATA_SOURCE_MARINE):
+    if (input_data.get_value(InputType.DATA_SOURCE) == DATA_SOURCE_MARINE):
 
         file_path = os.path.join(
-            DATA_DIR, 
+            DATA_DIR,
             input_data.get_value(InputType.DATA_SOURCE),
             'msl-proj*',
             scenario,
             variable,
             VERSION)
     else:
-                                  
+
         file_path = os.path.join(
             DATA_DIR,
             input_data.get_value(InputType.DATA_SOURCE),
@@ -185,16 +195,10 @@ def _get_prob_file_path(input_data, scenario, spatial_representation,
 def _get_prob_file_name(input_data, scenario, spatial_representation,
                         variable, year):
     # the year starts in December, so subtract 1 from the year
-    if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
-        start_date = '{year}{mon_day}'.format(
-            year=year - 1, mon_day=MONTH_START_DATE)
-        end_date = '{year}{mon_day}'.format(
-            year=year, mon_day=MONTH_END_DATE)
-    else:  # 'seas'
-        start_date = '{year}{mon_day}'.format(
-            year=year - 1, mon_day=SEASON_START_DATE)
-        end_date = '{year}{mon_day}'.format(
-            year=year, mon_day=SEASON_END_DATE)
+    start_date = '{year}{mon_day}'.format(
+        year=year - 1, mon_day=START_MONTH_DAY)
+    end_date = '{year}{mon_day}'.format(
+        year=year, mon_day=END_MONTH_DAY)
 
     file_name = ('{variable}_{scenario}_{data_source}_uk_'
                  '{spatial_representation}_{data_type}_{temporal_type}_'
@@ -287,7 +291,7 @@ def _get_cm_file_list_for_range(input_data, year_minimum, year_maximum):
                     input_data, spatial_representation, variable_prefix,
                     scenario, ensemble)
                 if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
-                        'ann'
+                        TemporalAverageType.ANNUAL
                         or (spatial_representation != '12km'
                             and spatial_representation != '60km')):
                     # current thinking is that there will only be one file
@@ -314,9 +318,9 @@ def _get_cm_spatial_representation(input_data):
         InputType.SPATIAL_REPRESENTATION)
 
     if spatial_representation == AreaType.RIVER_BASIN:
-        spatial_representation = 'river'
+        spatial_representation = RIVER
     elif spatial_representation == AreaType.ADMIN_REGION:
-        spatial_representation = 'region'
+        spatial_representation = REGION
     return spatial_representation
 
 
@@ -340,16 +344,17 @@ def _get_cm_file_name(input_data, spatial_representation, variable, scenario,
                       ensemble, year):
 
     # the year starts in December, so subtract 1 from the year
-    if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == 'mon':
+    if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
+            TemporalAverageType.MONTHLY):
         start_date = '{year}{mon_day}'.format(
-            year=year - 1, mon_day='1215')
+            year=year - 1, mon_day=START_MONTH_DAY_CM)
         end_date = '{year}{mon_day}'.format(
-            year=year, mon_day='1115')
-    else:  # 'seas'
+            year=year, mon_day=END_MONTH_DAY_CM)
+    else:  # seasonal
         start_date = '{year}{mon_day}'.format(
-            year=year - 1, mon_day=SEASON_START_DATE)
+            year=year - 1, mon_day=START_MONTH_DAY)
         end_date = '{year}{mon_day}'.format(
-            year=year, mon_day=SEASON_END_DATE)
+            year=year, mon_day=END_MONTH_DAY)
 
     # we need to use the variable root and calculate the anomaly later
     variable = variable.split('Anom')[0]
