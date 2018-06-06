@@ -8,10 +8,9 @@ import iris
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
-from ukcp_dp.constants import DATA_SOURCE_GCM, DATA_SOURCE_PROB, \
+from ukcp_dp.constants import DATA_SOURCE_PROB, \
     DATA_SOURCE_MARINE, ENSEMBLE_COLOURS, ENSEMBLE_GREYSCALES, \
     ENSEMBLE_LOWLIGHT, PERCENTILE_LINE_COLOUR, PERCENTILE_FILL, InputType
-from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
 log = logging.getLogger(__name__)
@@ -95,8 +94,11 @@ class PlumePlotter(GraphPlotter):
 
     def _plot_ensemble(self, cube, ax):
         # Line plots of ensembles, highlighting selected members
-        highlighted_ensemble_members = self.input_data.get_value(
-            InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS)
+        highlighted_ensemble_members = []
+        # need to convert to ints to compare to values in the cube
+        for member in self.input_data.get_value(
+                InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS):
+            highlighted_ensemble_members.append(int(member))
 
         if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
             colours = ENSEMBLE_COLOURS
@@ -105,19 +107,17 @@ class PlumePlotter(GraphPlotter):
             colours = ENSEMBLE_GREYSCALES
             linestyle = ['solid', 'dashed', 'dotted', 'solid', 'dashed']
 
-        t_points = get_time_series(cube, 'Ensemble member')
+        t_points = get_time_series(cube, 'ensemble_member')
 
         highlighted_counter = 0
-        for ensemble_slice in cube.slices_over('Ensemble member'):
-            # TODO hack to get name
-            ensemble_name = get_ensemble_member_set(DATA_SOURCE_GCM)[
-                int(ensemble_slice.coord('Ensemble member').points[0])]
+        for ensemble_slice in cube.slices_over('ensemble_member'):
+            ensemble = ensemble_slice.coord('ensemble_member').points[0]
+            ensemble_name = ensemble_slice.coord(
+                'ensemble_member_id').points[0]
 
             # highlighted ensembles should be included in the legend
-            if ensemble_name in highlighted_ensemble_members:
-                ensemble_label = "Member: {}".format(
-                    self.vocab.get_collection_term_label(
-                        InputType.ENSEMBLE, ensemble_name))
+            if ensemble in highlighted_ensemble_members:
+                ensemble_label = "Member: {}".format(ensemble_name)
                 ax.plot(t_points, ensemble_slice.data, label=ensemble_label,
                         linestyle=linestyle[highlighted_counter],
                         color=colours[highlighted_counter], zorder=2)

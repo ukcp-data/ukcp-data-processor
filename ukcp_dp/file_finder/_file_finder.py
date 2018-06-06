@@ -13,8 +13,8 @@ log = logging.getLogger(__name__)
 # month and day
 START_MONTH_DAY = '1201'
 END_MONTH_DAY = '1130'
-START_MONTH_DAY_CM = '1215'
-END_MONTH_DAY_CM = '1115'
+START_MONTH_DAY_CM = '189912'
+END_MONTH_DAY_CM = '209911'
 
 VERSION = 'latest'
 
@@ -130,8 +130,10 @@ def _get_prob_file_list(input_data):
             scenario_file_list = []
 
             for year in range(year_minimum, (year_maximum + 1)):
-                if (input_data.get_value(InputType.DATA_SOURCE) ==
-                        DATA_SOURCE_PROB and year == OTHER_MAX_YEAR):
+                # We cannot check for DATA_SOURCE_PROB as this may be an
+                # overlay
+                if (input_data.get_value(InputType.DATA_SOURCE) !=
+                        DATA_SOURCE_MARINE and year == OTHER_MAX_YEAR):
                     # there is not data for December of the last year
                     continue
                 file_name = _get_prob_file_name(
@@ -180,7 +182,7 @@ def _get_prob_file_path(input_data, scenario, spatial_representation,
 
         file_path = os.path.join(
             DATA_DIR,
-            input_data.get_value(InputType.DATA_SOURCE),
+            DATA_SOURCE_PROB,
             'uk',
             spatial_representation,
             scenario,
@@ -292,8 +294,7 @@ def _get_cm_file_list_for_range(input_data, year_minimum, year_maximum):
                     scenario, ensemble)
                 if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
                         TemporalAverageType.ANNUAL
-                        or (spatial_representation != '12km'
-                            and spatial_representation != '60km')):
+                        or spatial_representation != '12km'):
                     # current thinking is that there will only be one file
                     ensemble_file_list.append(os.path.join(file_path, '*'))
                     continue

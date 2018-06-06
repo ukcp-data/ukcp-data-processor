@@ -6,8 +6,10 @@ import iris
 from iris.cube import CubeList
 import iris.plot as iplt
 import iris.quickplot as qplt
+import iris.experimental.equalise_cubes
+
 from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, TEMP_ANOMS, \
-    DATA_SOURCE_MARINE, AreaType, TemporalAverageType
+    DATA_SOURCE_MARINE, PERCENTAGE_ANOMALIES, AreaType, TemporalAverageType
 from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
     make_anomaly
 from ukcp_dp.vocab_manager import get_months
@@ -68,8 +70,8 @@ class DataExtractor(object):
         Get an iris cube list based on the given files and using selection
         criteria from the input_data.
 
-        If the variable type is an anomaly then then a climatology may be need
-        to be produced in order to generate the anomalies.
+        If a baseline has been provided then a climatology may be need to be
+        produced in order to generate the anomalies.
 
         @return an iris cube list containing the main data, one cube per
             scenario, per variable
@@ -135,15 +137,14 @@ class DataExtractor(object):
                 'time', iris.analysis.MEAN)
 
         # we need to remove these to be able to make the anomaly
-        for coord in ['month', 'month_number', 'season']:
+#         for coord in ['month', 'month_number', 'season']:
+        for coord in ['month', 'season']:
             try:
                 cube_climatology.remove_coord(coord)
             except iris.exceptions.CoordinateNotFoundError:
                 pass
 
-        percent_anomalies = ['hussAnom', 'prAnom', 'rain5DayAccumMaxAnom',
-                             'petAnom']
-        if variable in percent_anomalies:
+        if variable in PERCENTAGE_ANOMALIES:
             preferred_unit = cf_units.Unit("%")
         else:
             preferred_unit = None
@@ -187,7 +188,7 @@ class DataExtractor(object):
                     if variable in TEMP_ANOMS:
                         overlay_cube.units = cf_units.Unit("Celsius")
 
-        log.debug('Overlay cube: {}'.format(overlay_cube))
+        log.debug('Overlay cube:\n{}'.format(overlay_cube))
 
         return overlay_cube
 
@@ -217,6 +218,7 @@ class DataExtractor(object):
                      format(file_list))
             raise Exception('No data found for given selection options')
 
+        # Remove time_bnds cubes
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_PROB) or overlay_probability_levels is True:
             unfiltered_cubes = cubes
@@ -225,24 +227,18 @@ class DataExtractor(object):
                 if cube.name() != 'time_bnds':
                     cubes.append(cube)
 
-        # Remove attribute ensemble_member_id to allow us to merge cubes
-        if (self.input_data.get_value(InputType.DATA_SOURCE) !=
-                DATA_SOURCE_PROB):
-            for cube in cubes:
-                try:
-                    del cube.metadata.attributes['ensemble_member_id']
-                except KeyError:
-                    pass
-
         if len(cubes) == 0:
             log.warn('No data was retrieved from the following files:{}'.
                      format(file_list))
             raise Exception('No data found for given selection options')
 
+        log.debug('Concatenate cubes:\n{}'.format(cubes))
+
+        iris.experimental.equalise_cubes.equalise_attributes(cubes)
         cube = cubes.concatenate_cube()
 
-        print '\n\n\n'
-        print cube
+        log.debug('Concatenated cube:\n{}'.format(cube))
+
         if baseline is True:
             # generate a time slice constraint based on the baseline
             time_slice_constraint = self._time_slice_selector(True)
@@ -253,8 +249,6 @@ class DataExtractor(object):
             with iris.FUTURE.context(cell_datetime_objects=True):
                 cube = cube.extract(time_slice_constraint)
 
-        print '\n\n\n'
-        print cube
         if cube is None:
             if time_slice_constraint is not None:
                 log.warn('Time slice constraint resulted in no cubes being '
@@ -296,10 +290,10 @@ class DataExtractor(object):
     def _convert_to_percentiles_from_ensembles(self, cube):
         # generate the 10th,50th and 90th percentiles for the ensembles
         log.debug("convert to percentiles")
-        result = cube.collapsed('Ensemble member', iris.analysis.PERCENTILE,
+        result = cube.collapsed('ensemble_member', iris.analysis.PERCENTILE,
                                 percent=[10, 50, 90])
         result.coord(
-            'percentile_over_Ensemble member').long_name = 'percentile'
+            'percentile_over_ensemble_member').long_name = 'percentile'
         return result
 
     def _get_spatial_selector(self, cube):

@@ -1,12 +1,10 @@
 import logging
 
 import iris
-from ukcp_dp.constants import DATA_SOURCE_GCM, DATA_SOURCE_MARINE, \
-    DATA_SOURCE_PROB
+from ukcp_dp.constants import DATA_SOURCE_MARINE, DATA_SOURCE_PROB
 from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 from ukcp_dp.file_writers._utils import convert_to_2dp
-from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
 log = logging.getLogger(__name__)
@@ -54,18 +52,15 @@ class PlumeCsvWriter(BaseCsvWriter):
         """
         for cube in self.cube_list:
             # there should only be one cube
-            for ensemble_slice in cube.slices_over('Ensemble member'):
-                # TODO hack to get name
-                ensemble_name = get_ensemble_member_set(DATA_SOURCE_GCM)[
-                    int(ensemble_slice.coord('Ensemble member').points[0])]
-                ensemble_label = self.vocab.get_collection_term_label(
-                    InputType.ENSEMBLE, ensemble_name)
+            for ensemble_slice in cube.slices_over('ensemble_member'):
+                ensemble_name = ensemble_slice.coord(
+                    'ensemble_member_id').points[0]
 
                 # the plume plot will be of the first variable
                 var = self.input_data.get_value_label(
                     InputType.VARIABLE)[0].encode('utf-8')
                 self.header.append('{var}({ensemble})'.format(
-                    ensemble=ensemble_label, var=var))
+                    ensemble=ensemble_name, var=var))
                 self._read_time_cube(ensemble_slice, key_list)
 
         # now add the data from the overlay

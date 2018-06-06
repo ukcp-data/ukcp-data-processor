@@ -166,6 +166,10 @@ METHOD_EXPLORATORY = 'exploratory'
 
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 
+# A list of anomaly variables whose values are represented as percentages
+PERCENTAGE_ANOMALIES = ['hussAnom', 'prAnom', 'rain5DayAccumMaxAnom',
+                        'petAnom']
+
 # Area types
 AreaType = enum(ADMIN_REGION='admin_region',
                 BBOX='bbox',
