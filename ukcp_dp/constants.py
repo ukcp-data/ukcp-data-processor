@@ -164,6 +164,8 @@ OTHER_MAX_YEAR = 2100
 
 METHOD_EXPLORATORY = 'exploratory'
 
+CDF_LABEL = 'Probability of being less than (%)'
+
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 
 # A list of anomaly variables whose values are represented as percentages

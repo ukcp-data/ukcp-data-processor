@@ -37,8 +37,6 @@ class CdfPlotter(GraphPlotter):
                 DATA_SOURCE_PROB):
 
             for scenario_cube in self.cube_list:
-                scenario_cube.data.sort()
-
                 label = self.vocab.get_collection_term_label(
                     InputType.SCENARIO, scenario_cube.attributes['scenario'])
                 qplt.plot(
@@ -47,6 +45,7 @@ class CdfPlotter(GraphPlotter):
                     color=colours[scenario_cube.attributes['scenario']][0])
 
         plt.xlabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
+        plt.ylabel('Probability of being less than (%)')
 
         # clear the title field
         plt.title('')

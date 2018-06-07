@@ -1,6 +1,6 @@
 import logging
 
-from ukcp_dp.constants import InputType
+from ukcp_dp.constants import InputType, CDF_LABEL
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 from ukcp_dp.file_writers._utils import convert_to_2dp
 
@@ -19,7 +19,7 @@ class CdfCsvWriter(BaseCsvWriter):
         """
         Write out the data, in CSV format, associated with a CDF plot.
         """
-        self.header.append('Percentile')
+        self.header.append(CDF_LABEL)
         key_list = []
 
         for cube in self.cube_list:
