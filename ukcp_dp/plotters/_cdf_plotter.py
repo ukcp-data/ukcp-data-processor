@@ -6,8 +6,8 @@ import iris.quickplot as qplt
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
-from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, SCENARIO_COLOURS, \
-    SCENARIO_GREYSCALES
+from ukcp_dp.constants import CDF_LABEL, DATA_SOURCE_PROB, InputType, \
+    SCENARIO_COLOURS, SCENARIO_GREYSCALES
 
 
 log = logging.getLogger(__name__)
@@ -33,19 +33,18 @@ class CdfPlotter(GraphPlotter):
         else:
             colours = SCENARIO_GREYSCALES
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+        if (self.input_data.get_value(InputType.DATA_SOURCE) !=
                 DATA_SOURCE_PROB):
+            raise Exception('A CDF plot requires probabilistic data')
 
-            for scenario_cube in self.cube_list:
-                label = self.vocab.get_collection_term_label(
-                    InputType.SCENARIO, scenario_cube.attributes['scenario'])
-                qplt.plot(
-                    scenario_cube, scenario_cube.dim_coords[0], label=label,
-                    linestyle=colours[scenario_cube.attributes['scenario']][1],
-                    color=colours[scenario_cube.attributes['scenario']][0])
+        for scenario_cube in self.cube_list:
+            label = self.vocab.get_collection_term_label(
+                InputType.SCENARIO, scenario_cube.attributes['scenario'])
+            plt.plot(
+                scenario_cube.data, scenario_cube.coord('percentile').points,
+                label=label,
+                linestyle=colours[scenario_cube.attributes['scenario']][1],
+                color=colours[scenario_cube.attributes['scenario']][0])
 
         plt.xlabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
-        plt.ylabel('Probability of being less than (%)')
-
-        # clear the title field
-        plt.title('')
+        plt.ylabel(CDF_LABEL)

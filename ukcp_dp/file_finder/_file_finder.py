@@ -109,43 +109,54 @@ def _get_prob_file_list(input_data):
 
         file_list_per_scenario = []
         for scenario in input_data.get_value(InputType.SCENARIO):
-            # generate a list of files for each scenario
-            file_path = _get_prob_file_path(
-                input_data, scenario, spatial_representation, variable)
-
-            if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
-                    TemporalAverageType.ANNUAL
-                    or spatial_representation != '25km'):
-                if (input_data.get_value(InputType.DATA_SOURCE) ==
-                        DATA_SOURCE_MARINE):
-                    file_name = _get_marine_file_name(
-                        input_data, scenario, variable)
-                else:
-                    # current thinking is that there will only be one file
-                    file_name = '*'
-                file_list_per_scenario.append(
-                    [os.path.join(file_path, file_name)])
-                continue
-
-            scenario_file_list = []
-
-            for year in range(year_minimum, (year_maximum + 1)):
-                # We cannot check for DATA_SOURCE_PROB as this may be an
-                # overlay
-                if (input_data.get_value(InputType.DATA_SOURCE) !=
-                        DATA_SOURCE_MARINE and year == OTHER_MAX_YEAR):
-                    # there is not data for December of the last year
-                    continue
-                file_name = _get_prob_file_name(
-                    input_data, scenario, spatial_representation, variable,
-                    year)
-                scenario_file_list.append(os.path.join(file_path, file_name))
-
-            file_list_per_scenario.append(scenario_file_list)
+            file_list_per_scenario.extend(_get_file_list_per_scenario(
+                input_data, scenario, spatial_representation, variable,
+                year_minimum, year_maximum))
 
         file_lists_per_variable[variable] = file_list_per_scenario
 
     return file_lists_per_variable
+
+
+def _get_file_list_per_scenario(input_data, scenario, spatial_representation,
+                                variable, year_minimum, year_maximum):
+    # generate a list of files for each scenario
+    file_list_per_data_type = []
+    for data_type in input_data.get_value(InputType.DATA_TYPE):
+        file_path = _get_prob_file_path(
+            data_type, input_data, scenario, spatial_representation, variable)
+
+        if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
+                TemporalAverageType.ANNUAL
+                or spatial_representation != '25km'):
+            if (input_data.get_value(InputType.DATA_SOURCE) ==
+                    DATA_SOURCE_MARINE):
+                file_name = _get_marine_file_name(
+                    input_data, scenario, variable)
+            else:
+                # current thinking is that there will only be one file
+                file_name = '*'
+            file_list_per_data_type.append(
+                [os.path.join(file_path, file_name)])
+            continue
+
+        scenario_file_list = []
+
+        for year in range(year_minimum, (year_maximum + 1)):
+            # We cannot check for DATA_SOURCE_PROB as this may be an
+            # overlay
+            if (input_data.get_value(InputType.DATA_SOURCE) !=
+                    DATA_SOURCE_MARINE and year == OTHER_MAX_YEAR):
+                # there is not data for December of the last year
+                continue
+            file_name = _get_prob_file_name(
+                data_type, input_data, scenario, spatial_representation,
+                variable, year)
+            scenario_file_list.append(os.path.join(file_path, file_name))
+
+        file_list_per_data_type.append(scenario_file_list)
+
+    return file_list_per_data_type
 
 
 def _get_prob_spatial_representation(input_data):
@@ -166,8 +177,8 @@ def _get_prob_spatial_representation(input_data):
     return spatial_representation
 
 
-def _get_prob_file_path(input_data, scenario, spatial_representation,
-                        variable):
+def _get_prob_file_path(data_type, input_data, scenario,
+                        spatial_representation, variable):
 
     if (input_data.get_value(InputType.DATA_SOURCE) == DATA_SOURCE_MARINE):
 
@@ -186,7 +197,7 @@ def _get_prob_file_path(input_data, scenario, spatial_representation,
             'uk',
             spatial_representation,
             scenario,
-            input_data.get_value(InputType.DATA_TYPE),
+            data_type,
             variable,
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
             VERSION)
@@ -194,8 +205,8 @@ def _get_prob_file_path(input_data, scenario, spatial_representation,
     return file_path
 
 
-def _get_prob_file_name(input_data, scenario, spatial_representation,
-                        variable, year):
+def _get_prob_file_name(data_type, input_data, scenario,
+                        spatial_representation, variable, year):
     # the year starts in December, so subtract 1 from the year
     start_date = '{year}{mon_day}'.format(
         year=year - 1, mon_day=START_MONTH_DAY)
@@ -209,7 +220,7 @@ def _get_prob_file_name(input_data, scenario, spatial_representation,
                      scenario=scenario,
                      data_source=DATA_SOURCE_PROB,
                      spatial_representation=spatial_representation,
-                     data_type=input_data.get_value(InputType.DATA_TYPE),
+                     data_type=data_type,
                      temporal_type=input_data.get_value(
                          InputType.TEMPORAL_AVERAGE_TYPE),
                      start_data=start_date,

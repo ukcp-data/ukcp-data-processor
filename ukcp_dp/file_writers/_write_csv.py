@@ -5,6 +5,7 @@ from ukcp_dp.file_writers._write_csv_cdf import CdfCsvWriter
 from ukcp_dp.file_writers._write_csv_default import write_csv as \
     write_default_csv
 from ukcp_dp.file_writers._write_csv_jp import JpCsvWriter
+from ukcp_dp.file_writers._write_csv_pdf import PdfCsvWriter
 from ukcp_dp.file_writers._write_csv_plume import PlumeCsvWriter
 from ukcp_dp.file_writers._write_csv_postage_stamp_map import \
     PostageStampMapCsvWriter
@@ -29,6 +30,9 @@ def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
 
         if plot_type == PlotType.CDF_PLOT:
             csv_writer = CdfCsvWriter()
+
+        elif plot_type == PlotType.PDF_PLOT:
+            csv_writer = PdfCsvWriter()
 
         elif plot_type == PlotType.PLUME_PLOT:
             csv_writer = PlumeCsvWriter()

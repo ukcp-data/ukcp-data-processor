@@ -6,9 +6,8 @@ import iris.quickplot as qplt
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
-import numpy as np
-from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, SCENARIO_COLOURS, \
-    SCENARIO_GREYSCALES
+from ukcp_dp.constants import DATA_SOURCE_PROB, DataType, InputType, \
+    PDF_LABEL, SCENARIO_COLOURS, SCENARIO_GREYSCALES
 
 
 log = logging.getLogger(__name__)
@@ -34,28 +33,28 @@ class PdfPlotter(GraphPlotter):
         else:
             colours = SCENARIO_GREYSCALES
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+        if (self.input_data.get_value(InputType.DATA_SOURCE) !=
                 DATA_SOURCE_PROB):
+            raise Exception('A PDF plot requires probabilistic data')
 
-            for cube in self.cube_list:
-                # plot the percentiles
-                cube.data.sort()
+        for scenario_cube in self.cube_list:
+            if scenario_cube.attributes['prob_data_type'] == DataType.PDF:
+                continue
+            pdf_data = self._get_pdf_data_for_scenario(
+                scenario_cube.attributes['scenario'])
 
-                cube = self._add_dx(cube)
-                qplt.plot(self.cube_list, self.cube_list.coord(
-                    'relative probability'),
-                    linestyle=colours[cube.attributes['scenario']][1],
-                    color=colours[cube.attributes['scenario']][0])
+            label = self.vocab.get_collection_term_label(
+                InputType.SCENARIO, scenario_cube.attributes['scenario'])
+            plt.plot(
+                scenario_cube.data, pdf_data, label=label,
+                linestyle=colours[scenario_cube.attributes['scenario']][1],
+                color=colours[scenario_cube.attributes['scenario']][0])
 
         plt.xlabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
+        plt.ylabel(PDF_LABEL)
 
-        # clear the title field
-        plt.title('')
-
-    def _add_dx(self, cube):
-        gradient = np.gradient(cube.coord('percentile').points, cube.data)
-        gradient_dim = iris.coords.AuxCoord(
-            gradient, long_name='relative probability')
-        cube.add_aux_coord(gradient_dim, 0)
-
-        return cube
+    def _get_pdf_data_for_scenario(self, scenario):
+        for scenario_cube in self.cube_list:
+            if (scenario_cube.attributes['prob_data_type'] == DataType.PDF and
+                    scenario_cube.attributes['scenario'] == scenario):
+                return scenario_cube.data

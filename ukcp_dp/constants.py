@@ -48,7 +48,6 @@ INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
                             InputType.CONVERT_TO_PERCENTILES,
                             InputType.DATA_FORMAT,
                             InputType.DATA_SOURCE,
-                            InputType.DATA_TYPE,
                             InputType.FONT_SIZE,
                             InputType.IMAGE_FORMAT,
                             InputType.IMAGE_SIZE,
@@ -73,7 +72,8 @@ INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
                             InputType.YEAR_MINIMUM,
                             InputType.YEAR_MAXIMUM]
 
-INPUT_TYPES_MULTI_VALUE = [InputType.ENSEMBLE,
+INPUT_TYPES_MULTI_VALUE = [InputType.DATA_TYPE,
+                           InputType.ENSEMBLE,
                            InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS,
                            InputType.SAMPLING_ID,
                            InputType.SCENARIO,
@@ -165,6 +165,7 @@ OTHER_MAX_YEAR = 2100
 METHOD_EXPLORATORY = 'exploratory'
 
 CDF_LABEL = 'Probability of being less than (%)'
+PDF_LABEL = 'Relative probability'
 
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 
@@ -192,6 +193,10 @@ PlotType = enum(CDF_PLOT='CDF_PLOT',
 # Data formats
 DataFormat = enum(CSV='csv',
                   NET_CDF='netcdf')
+
+# Data types
+DataType = enum(CDF='cdf',
+                PDF='pdf')
 
 # Image formats
 ImageFormat = enum(JPG='jpg',
