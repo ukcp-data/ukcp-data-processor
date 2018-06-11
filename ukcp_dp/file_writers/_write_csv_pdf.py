@@ -1,3 +1,4 @@
+import collections
 import logging
 
 from ukcp_dp.constants import DataType, InputType, PDF_LABEL
@@ -34,8 +35,7 @@ class PdfCsvWriter(BaseCsvWriter):
 
             var = self.input_data.get_value_label(
                 InputType.VARIABLE)[0].encode('utf-8')
-            self.header.append('{var}({scenario})'.format(
-                scenario=scenario, var=var))
+            self.header.append('{var}'.format(var=var))
             self.header.append(PDF_LABEL)
 
             pdf_data = self._get_pdf_data_for_scenario(
@@ -46,7 +46,7 @@ class PdfCsvWriter(BaseCsvWriter):
             # now write the data
             output_data_file_path = self._get_full_file_name(
                 '_{}'.format(cube.attributes['scenario']))
-            self._write_data_dict(output_data_file_path, key_list)
+            self._write_data_dict(output_data_file_path, key_list, scenario)
             output_file_list.append(output_data_file_path)
 
         return output_file_list
@@ -69,3 +69,36 @@ class PdfCsvWriter(BaseCsvWriter):
             except KeyError:
                 key_list.append(cdf_point)
                 self.data_dict[cdf_point] = [pdf_point]
+
+    def _write_data_dict(self, output_data_file_path, key_list, scenario):
+        """
+        Write out the column headers and data_dict.
+
+        We have to override the method in the base class as we do not wish all
+        of the scenarios to be writen to the headers
+        """
+        user_inputs = self.input_data.get_user_inputs()
+        header_string = ','.join(self.header)
+        header_string = header_string.replace('\n,', '\n')
+        header_length = len(header_string.split('\n')) + \
+            len(user_inputs.keys()) + 1
+        with open(output_data_file_path, 'w') as output_data_file:
+            output_data_file.write('header length,{}\n'.format(header_length))
+            keys = user_inputs.keys()
+            keys.sort()
+            for key in keys:
+                if key == 'Scenario':
+                    output_data_file.write('Scenario,{value}\n'.format(value=scenario))
+                else:
+                    output_data_file.write('{key},{value}\n'.format(
+                        key=key, value=user_inputs[key]))
+            output_data_file.write(header_string)
+            output_data_file.write('\n')
+
+            for key in key_list:
+                line_out = '{key},{values}\n'.format(
+                    key=key, values=','.join(self.data_dict[key]))
+                output_data_file.write(line_out)
+
+        # reset the data dict
+        self.data_dict = collections.OrderedDict()
