@@ -4,9 +4,8 @@ import iris
 
 from _map_plotter import MapPlotter
 import matplotlib.gridspec as gridspec
-from ukcp_dp.constants import DATA_SOURCE_GCM, InputType
+from ukcp_dp.constants import AreaType, InputType
 import ukcp_dp.ukcp_standard_plots.mapper as maps
-from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
 log = logging.getLogger(__name__)
@@ -35,69 +34,58 @@ class PostageStampMapPlotter(MapPlotter):
         gs_left = 0.02
         gs_right = 0.98
 
-        ensemble_count = len(cube.coord('Ensemble member').points)
+        ensemble_count = len(cube.coord('ensemble_member').points)
 
         # work out the number of sub-plots based on orientation of the plot
         # and number of ensembles
         if self._is_landscape(cube) is True:
-            if ensemble_count == 20:
-                gs = gridspec.GridSpec(4, 6)
-                gs.update(top=gs_top, bottom=0.02, left=gs_left,
-                          right=gs_right)
-                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
-                        gs[0, 5],
-                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
-                        gs[1, 5],
-                        gs[2, 0], gs[2, 1], gs[2, 2], gs[2, 3], gs[2, 4],
-                        gs[2, 5],
-                        gs[3, 0], gs[3, 1]]
 
-            elif ensemble_count == 15:
-                gs = gridspec.GridSpec(3, 6)
-                gs.update(top=gs_top, bottom=0.02, left=gs_left,
+            if ensemble_count == 12:
+                gs = gridspec.GridSpec(3, 4)
+                gs.update(top=gs_top, bottom=0.10, left=gs_left,
                           right=gs_right)
-                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
-                        gs[0, 5],
-                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
-                        gs[1, 5],
-                        gs[2, 0], gs[2, 1], gs[2, 2]]
-            else:
-                gs = gridspec.GridSpec(2, 5)
-                gs.update(top=gs_top, bottom=0.13, left=gs_left,
-                          right=gs_right)
-                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
-                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4]]
-
-        else:  # portrait
-            if ensemble_count == 20:
-                gs = gridspec.GridSpec(3, 8)
-                gs.update(top=gs_top, bottom=0.02, left=gs_left,
-                          right=gs_right)
-                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
-                        gs[0, 5], gs[0, 6], gs[0, 7],
-                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
-                        gs[1, 5], gs[1, 6], gs[1, 7],
+                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3],
                         gs[2, 0], gs[2, 1], gs[2, 2], gs[2, 3]]
 
-            elif ensemble_count == 15:
-                gs = gridspec.GridSpec(2, 8)
-                gs.update(top=gs_top, bottom=0.1, left=gs_left, right=gs_right)
-                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
-                        gs[0, 5], gs[0, 6], gs[0, 7],
-                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
-                        gs[1, 5], gs[1, 6]]
-
-            else:
-                gs = gridspec.GridSpec(2, 5)
-                gs.update(top=gs_top, bottom=0.13, left=gs_left,
+            else:  # ensemble_count == 28:
+                gs = gridspec.GridSpec(4, 7)
+                gs.update(top=gs_top, bottom=0.10, left=gs_left,
                           right=gs_right)
                 grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
-                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4]]
+                        gs[0, 5], gs[0, 6],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
+                        gs[1, 5], gs[1, 6],
+                        gs[2, 0], gs[2, 1], gs[2, 2], gs[2, 3], gs[2, 4],
+                        gs[2, 5], gs[2, 6],
+                        gs[3, 0], gs[3, 1], gs[3, 2], gs[3, 3], gs[3, 4],
+                        gs[3, 5], gs[3, 6]]
+
+        else:  # portrait
+            if ensemble_count == 12:
+                gs = gridspec.GridSpec(2, 6)
+                gs.update(top=gs_top, bottom=0.10, left=gs_left,
+                          right=gs_right)
+                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
+                        gs[0, 5],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
+                        gs[1, 5]]
+
+            else:  # if ensemble_count == 28:
+                gs = gridspec.GridSpec(3, 10)
+                gs.update(top=gs_top, bottom=0.10, left=gs_left,
+                          right=gs_right)
+                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
+                        gs[0, 5], gs[0, 6], gs[0, 7], gs[0, 8], gs[0, 9],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
+                        gs[1, 5], gs[1, 6], gs[1, 7], gs[1, 8], gs[1, 9],
+                        gs[2, 0], gs[2, 1], gs[2, 2], gs[2, 3], gs[2, 4],
+                        gs[2, 5], gs[2, 6], gs[2, 7]]
 
         # define the location for the colour bar
-        bar_gs = gridspec.GridSpec(1, 2)
-        bar_grid = bar_gs[0, 1]
-        bar_gs.update(top=0.23, bottom=0.08, left=gs_left, right=gs_right)
+        bar_gs = gridspec.GridSpec(1, 3)
+        bar_grid = bar_gs[0, 0]
+        bar_gs.update(top=0.23, bottom=0.05, left=gs_left, right=gs_right)
 
         if self.input_data.get_value(InputType.ORDER_BY_MEAN) is True:
             # order by means
@@ -121,17 +109,17 @@ class PostageStampMapPlotter(MapPlotter):
              'longitude'], iris.analysis.MEAN)
 
         for ensemble_slice in ensemble_mean_cube.slices_over(
-                'Ensemble member'):
+                'ensemble_member'):
             ensemble_id = int(
-                ensemble_slice.coord('Ensemble member').points[0])
+                ensemble_slice.coord('ensemble_member').points[0])
             ensemble_cube_means[ensemble_id] = ensemble_slice.data.item()
 
         # ensemble_cubes, key = mean, value = cube
         ensemble_cubes = {}
 
-        for ensemble_slice in cube.slices_over('Ensemble member'):
+        for ensemble_slice in cube.slices_over('ensemble_member'):
             ensemble_id = int(
-                ensemble_slice.coord('Ensemble member').points[0])
+                ensemble_slice.coord('ensemble_member').points[0])
             mean_value = ensemble_cube_means[ensemble_id]
             ensemble_cubes[mean_value] = ensemble_slice
 
@@ -145,14 +133,12 @@ class PostageStampMapPlotter(MapPlotter):
 
     def _plot_maps_name_order(self, cube, fig, grid, plotsettings):
         for i, ensemble_slice in enumerate(
-                cube.slices_over('Ensemble member')):
+                cube.slices_over('ensemble_member')):
             result = self._plot_map(fig, grid, plotsettings, ensemble_slice, i)
         return result
 
     def _plot_map(self, fig, grid, plotsettings, ensemble_cube, i):
-        # TODO need a better way to get the ensemble_name
-        ensemble_name = get_ensemble_member_set(DATA_SOURCE_GCM)[
-            int(ensemble_cube.coord('Ensemble member').points[0])]
+        ensemble_name = ensemble_cube.coord('ensemble_member_id').points[0]
 
         log.debug('generating postage stamp map for ensemble {}'.
                   format(ensemble_name))
@@ -161,15 +147,24 @@ class PostageStampMapPlotter(MapPlotter):
 
         # Setting bar_orientation="none" here to override (prevent) drawing
         # the colour bar:
-        result = maps.plot_standard_map(ensemble_cube, plotsettings,
-                                        fig=fig,
-                                        ax=ax, barlab=None,
-                                        bar_orientation="none",
-                                        outfnames=None)
+        if self.input_data.get_area_type() == AreaType.BBOX:
+            result = maps.plot_standard_map(ensemble_cube, plotsettings,
+                                            fig=fig,
+                                            ax=ax, barlab=None,
+                                            bar_orientation="none",
+                                            outfnames=None)
+        else:
+            # TODO
+            # Code needed to produce choropleth map
+            return
+
         # add a title
-        title = "Member: {}".format(self.vocab.get_collection_term_label(
-            InputType.ENSEMBLE, ensemble_name))
-        ax.set_title(title)
+        if ensemble_name.startswith('HadGEM3-GC3.05-r001i1p'):
+            ensemble_name = ensemble_name.split('HadGEM3-GC3.05-r001i1p')[1]
+        elif ensemble_name.endswith('-r1i1p1'):
+            ensemble_name = ensemble_name.split('-r1i1p1')[0]
+        title = "Member: {}".format(ensemble_name)
+        ax.set_title(title, fontdict={'fontsize': 'medium'})
 
         # add a coast line
         self.plot_overlay('', False)
