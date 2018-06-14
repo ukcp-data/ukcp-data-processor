@@ -234,16 +234,32 @@ class BasePlotter(object):
         @return a StandardMap object containing plot settings
         """
         plotsettings = stds.UKCP_NAE_SEAS.copy()
+        # tas, tasmax, tasmin
         if 'tas' in var_id:
             if 'Anom' in var_id:
                 plotsettings = stds.UKCP_TEMP_ANOM.copy()
             else:
-                plotsettings = self._get_tas_plot_settings()
+                plotsettings = stds.UKCP_TEMP.copy()
+
         elif 'pr' in var_id:
             if 'Anom' in var_id:
                 plotsettings = stds.UKCP_PRECIP_ANOM.copy()
             else:
                 plotsettings = stds.UKCP_PRECIP.copy()
+
+        elif 'sfcWind' in var_id or 'uas' in var_id or 'vas' in var_id:
+            if 'Anom' in var_id:
+                plotsettings = stds.UKCP_WIND_ANOM.copy()
+            else:
+                plotsettings = stds.UKCP_WIND.copy()
+
+        # TODO
+        # clt, Total cloud anomaly (%)
+        # hurs, Relative humidity anomaly at 1.5m (%)
+        # huss, Specific humidity anomaly at 1.5m (1)
+        # psl, Sea level pressure anomaly (hPa)
+        # rls, Net Surface long wave flux anomaly (W m-2)
+        # rss, Net Surface short wave flux anomaly (W m-2)
 
         plotsettings.bar_orientation = 'horizontal'
 
@@ -271,21 +287,6 @@ class BasePlotter(object):
         plotsettings.fsize = fsize
 
         return plotsettings
-
-    def _get_tas_plot_settings(self):
-        """
-        Get the plot setting to use for tas.
-        """
-        UKCP_EURO = stds.UKCP_TEMP.copy()
-        UKCP_EURO.vrange = [-311.0, -302.0]
-        UKCP_EURO.vmid = None
-        UKCP_EURO.vstep = 1.0
-        # [left,bottom, width,height]
-        # UKCP_EURO.bar_position = [0.55, 0.15, 0.4, 0.03]
-        UKCP_EURO.bar_position = None
-        UKCP_EURO.cont = False
-
-        return UKCP_EURO
 
 
 def _wrap(text, font_size):

@@ -227,11 +227,18 @@ class DataExtractor(object):
                 if cube.name() != 'time_bnds':
                     cubes.append(cube)
 
+        # TODO Temp hack until removed from data
+        for cube in cubes:
+            coords = cube.coords(var_name='region')
+            for coord in coords:
+                cube.remove_coord(coord)
+
         if len(cubes) == 0:
             log.warn('No data was retrieved from the following files:{}'.
                      format(file_list))
             raise Exception('No data found for given selection options')
 
+        log.debug('First cube:\n{}'.format(cubes[0]))
         log.debug('Concatenate cubes:\n{}'.format(cubes))
 
         iris.experimental.equalise_cubes.equalise_attributes(cubes)

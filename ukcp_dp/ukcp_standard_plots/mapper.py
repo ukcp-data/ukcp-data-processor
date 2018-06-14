@@ -714,11 +714,12 @@ def plot_choropleth_map(regions,regionaldata_input, regional_sigs=None, fig=None
     # -- the details of what we're doing here are likely to change later!
 
     # This is used to look up metadata for the shapefiles:
-    region_set = regionaldata[0].attributes['region_set']
+    region_set = regionaldata[0].attributes['resolution']
     reg_key = regs.UKSHAPES[region_set]["attr_key"]
     regdata_dict = dict()
     for regcube in regionaldata:
-        regdata_dict[ regcube.attributes['region_name'] ] = float(regcube.data)
+        for reg_slice in regcube.slices_over(['region']):
+            regdata_dict[ reg_slice.coords(standard_name='region')[0].points[0] ] = float(reg_slice.data)
     regunits = regcube.units
     # Don't delete the CubeList - we'll probably want it later for labelling...?
 
@@ -1109,15 +1110,15 @@ def plot_choropleth_map(regions,regionaldata_input, regional_sigs=None, fig=None
 
 
     ##-------------------------------------------------------------------
+    
+    # (need to make a ScalarMappable ourselves as we don't have an image,
+    #  http://stackoverflow.com/questions/8342549/matplotlib-add-colorbar-to-a-sequence-of-line-plots )
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=normalizer)
+    sm._A = [] # fake up the array of the scalar mappable. Urgh...
     # Colour bar:
     if bar_orientation.lower()=="none":
         print "Skipping colour bar..."
     else:
-        # (need to make a ScalarMappable ourselves as we don't have an image,
-        #  http://stackoverflow.com/questions/8342549/matplotlib-add-colorbar-to-a-sequence-of-line-plots )
-        sm = plt.cm.ScalarMappable(cmap=cmap, norm=normalizer)
-        sm._A = [] # fake up the array of the scalar mappable. Urgh...
-
         if do_categories:
             ticklabs = level_tick_labs
             ticklen  = 4 # points

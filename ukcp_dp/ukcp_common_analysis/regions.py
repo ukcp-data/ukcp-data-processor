@@ -58,6 +58,8 @@ import cartopy
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
 import ukcp_dp.ukcp_standard_plots.map_projections as projns
+
+from ukcp_dp.constants import OVERLAY_ADMIN, OVERLAY_RIVER, OVERLAY_COUNTRY
 #==========================================================================
 
 
@@ -107,18 +109,18 @@ UKSHAPES = dict(# The countryplus set includes the UK as well as other sub-UK co
                                   projection = projns.UKCP_OSGB,
                                   attr_key   = "Region"),
                 # This includes 16 subnational administrative regions:
-                admin     =dict(sourcefile = '/project/ukcp18/shapefiles_uk/UK_Admin',
+                region     =dict(sourcefile = OVERLAY_ADMIN, #  '/project/ukcp18/shapefiles_uk/UK_Admin',
                                 projection = projns.UKCP_OSGB,
                                 attr_key   = "Region"),
                 # This includes the 4 constituent countries of the UK,
                 # plus the Channel Islands and the Isle of Man
-                countries =dict(sourcefile = '/project/ukcp18/shapefiles_uk/BritishIsles',
+                country =dict(sourcefile = OVERLAY_COUNTRY, #  '/project/ukcp18/shapefiles_uk/BritishIsles',
                                 projection = projns.UKCP_OSGB,
                                 attr_key   = "Region"),
                 # This contains river basin regions:
-                riverbasins=dict(sourcefile = '/project/ukcp18/shapefiles_riverbasins/ERC_Catch_Dissolve_NG2',
+                river=dict(sourcefile = OVERLAY_RIVER, #  '/project/ukcp18/shapefiles_riverbasins/ERC_Catch_Dissolve_NG2',
                                  projection = projns.UKCP_OSGB,
-                                 attr_key   = "BASINNAME"),
+                                 attr_key   = "Region"),
                 # Including the cartopy standard Natural Earth version too,
                 # mostly just for reference and comparison.
                 ukNaturalEarth=dict(sourcefile = shpreader.natural_earth(resolution='10m',  #'110m',

@@ -1,13 +1,15 @@
 import logging
 
 from _base_plotter import BasePlotter
-from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, \
-    OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER, \
-    OVERLAY_COASTLINE_SMALL, AreaType
+from iris.exceptions import CoordinateNotFoundError
 import matplotlib.pyplot as plt
 import numpy as np
 import shapefile as shp
+from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, \
+    OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER, \
+    OVERLAY_COASTLINE_SMALL, AreaType
 import ukcp_dp.ukcp_common_analysis.regions as regs
+import ukcp_dp.ukcp_standard_plots.mapper as maps
 import ukcp_dp.ukcp_standard_plots.plotting_general as plotgeneral
 
 
@@ -34,7 +36,12 @@ class MapPlotter(BasePlotter):
         # TODO we can only produce a map for a single scenario and variable
         cube = self.cube_list[0]
 
-        reg = regs.reg_from_cube(cube)
+        if self.input_data.get_area_type() == AreaType.BBOX:
+            reg = regs.reg_from_cube(cube)
+        else:
+            # Some form of region, therefore it is the whole of UK
+            reg = {'lons': [-10.9818, 2.2398], 'lats': [48.8957, 60.9531]}
+
         plotsettings.set_xylims(reg)
 
         # Turn off grid lines for maps
@@ -91,6 +98,11 @@ class MapPlotter(BasePlotter):
 
         @return a boolean, True if orientation is landscape
         """
+        if self.input_data.get_area_type() != AreaType.BBOX:
+            # Some form of region, therefore it is the whole of UK and we want
+            # portrait
+            return False
+
         y_coords = cube.coord('projection_y_coordinate').points
         y_range = max(y_coords) - min(y_coords)
         x_coords = cube.coord('projection_x_coordinate').points
@@ -131,12 +143,12 @@ class MapPlotter(BasePlotter):
             # loop over parts of each shape, plot separately
             for ip in range(nparts):
                 i0 = shape.parts[ip]
-                if ip < nparts-1:
-                    i1 = shape.parts[ip+1]-1
+                if ip < nparts - 1:
+                    i1 = shape.parts[ip + 1] - 1
                 else:
                     i1 = npoints
 
-                seg = shape.points[i0:i1+1]
+                seg = shape.points[i0:i1 + 1]
                 x_lon = np.zeros((len(seg), 1))
                 y_lat = np.zeros((len(seg), 1))
                 for ip in range(len(seg)):
@@ -146,3 +158,49 @@ class MapPlotter(BasePlotter):
                 plt.plot(x_lon, y_lat, color=OVERLAY_COLOUR,
                          linewidth=OVERLAY_LINE_WIDTH)
         log.debug('overlay added')
+
+
+def _plot_standard_choropleth_map(thecube, settings, fig=None, ax=None,
+                                  barlab=None, bar_orientation=None,
+                                  outfnames=["x11"]):
+    """
+    Wrapper to plot_choropleth_map(),
+    where most of the settings are given
+    in a StandardMap object called 'settings'
+
+    """
+    resolution = thecube.attributes['resolution']
+    shapefile_regions = regs.get_ukcp_shapefile_regions(resolution)
+
+    if barlab is None:
+        barlab = settings.default_barlabel
+    if bar_orientation is None:
+        bar_orientation = settings.bar_orientation
+
+    result = maps.plot_choropleth_map(
+        shapefile_regions, [thecube], fig=fig, ax=ax,
+        barlabel=barlab, bar_orientation=bar_orientation,
+        bar_position=settings.bar_position, outfnames=outfnames,
+        cpal=settings.cpal,
+        extendcolbar=settings.extendcolbar,
+        vrange=settings.vrange, vstep=settings.vstep, vmid=settings.vmid,
+        badcol=settings.maskcol, undercol=settings.undercol,
+        overcol=settings.overcol,
+        cmsize=settings.cmsize, dpi=settings.dpi,
+        fsize=settings.fsize, fontfam=settings.fontfam,
+        proj=settings.proj,
+        marlft=settings.marlft, marrgt=settings.marrgt,
+        martop=settings.martop, marbot=settings.marbot,
+        marwsp=settings.marwsp, marhsp=settings.marhsp,
+        countrylw=settings.countrylw, countrylcol=settings.countrylcol,
+        regionlw=settings.regionlw,  regionlcol=settings.regionlcol,
+        riverslw=settings.riverslw,  riverslcol=settings.riverslcol,
+        coastlw=settings.coastlw,
+        xlims=settings.xlims, ylims=settings.ylims,
+        showglobal=settings.showglobal, preferred_unit=settings.preferred_unit,
+        dxgrid=settings.dxgrid, dygrid=settings.dygrid,
+        xgridax=settings.xgridax, ygridax=settings.ygridax,
+        axbackgroundcol=settings.maskcol,
+        figbackgroundcol=settings.figbackgroundcol)
+
+    return result

@@ -83,7 +83,7 @@ class PlumeCsvWriter(BaseCsvWriter):
             var = self.input_data.get_value_label(
                 InputType.VARIABLE)[0].encode('utf-8')
             self.header.append('{var}({percentile}th Percentile)'.format(
-                percentile=percentile, var=var))
+                percentile=int(float(percentile)), var=var))
             self._read_time_cube(_slice, key_list)
 
     def _read_time_cube(self, cube, key_list):
