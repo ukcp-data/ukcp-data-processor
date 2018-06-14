@@ -6,6 +6,7 @@ from _map_plotter import MapPlotter
 import matplotlib.gridspec as gridspec
 from ukcp_dp.constants import AreaType, InputType
 import ukcp_dp.ukcp_standard_plots.mapper as maps
+from ukcp_dp.plotters._map_plotter import _plot_standard_choropleth_map
 
 
 log = logging.getLogger(__name__)
@@ -104,9 +105,13 @@ class PostageStampMapPlotter(MapPlotter):
         # cube_means, key = ensemble id, value = mean
         ensemble_cube_means = {}
 
-        ensemble_mean_cube = cube.collapsed(
-            ['projection_x_coordinate', 'projection_y_coordinate', 'latitude',
-             'longitude'], iris.analysis.MEAN)
+        if self.input_data.get_area_type() == AreaType.BBOX:
+            ensemble_mean_cube = cube.collapsed(
+                ['projection_x_coordinate', 'projection_y_coordinate', 'latitude',
+                 'longitude'], iris.analysis.MEAN)
+        else:
+            ensemble_mean_cube = cube.collapsed(
+                ['region'], iris.analysis.MEAN)
 
         for ensemble_slice in ensemble_mean_cube.slices_over(
                 'ensemble_member'):
@@ -154,9 +159,10 @@ class PostageStampMapPlotter(MapPlotter):
                                             bar_orientation="none",
                                             outfnames=None)
         else:
-            # TODO
-            # Code needed to produce choropleth map
-            return
+            result = _plot_standard_choropleth_map(ensemble_cube, plotsettings, fig=fig,
+                                                   ax=ax, barlab=None,
+                                                   bar_orientation="none",
+                                                   outfnames=None)
 
         # add a title
         if ensemble_name.startswith('HadGEM3-GC3.05-r001i1p'):
