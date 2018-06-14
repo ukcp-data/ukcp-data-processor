@@ -308,6 +308,10 @@ class DataExtractor(object):
         # generate an area constraint
         area_constraint = None
 
+        print '\n\n\n'
+        print self.input_data.get_area_type()
+        print self.input_data.get_value(InputType.DATA_SOURCE)
+        print '\n\n'
         if self.input_data.get_area_type() == AreaType.POINT:
             # coordinates are coming in as OSGB, x, y
             resolution = self._get_resolution_m(cube)
@@ -356,6 +360,19 @@ class DataExtractor(object):
                 (longitude - half_grid_size) <= cell <
                     (longitude + half_grid_size))
             area_constraint = latitude_constraint & longitude_constraint
+
+        # TODO temp hack for region, due to differences in LS1 and LS2/3
+
+        elif (self.input_data.get_value(InputType.DATA_SOURCE) !=
+                DATA_SOURCE_PROB and
+                (self.input_data.get_area_type() == AreaType.ADMIN_REGION or
+                 self.input_data.get_area_type() == AreaType.COUNTRY or
+                 self.input_data.get_area_type() == AreaType.RIVER_BASIN)):
+            if self.input_data.get_area() != 'all':
+                area_constraint = iris.Constraint(
+                    coord_values={
+                        'region':
+                        self.input_data.get_area_label()})
 
         elif self.input_data.get_area_type() == AreaType.ADMIN_REGION:
             if self.input_data.get_area() != 'all':
