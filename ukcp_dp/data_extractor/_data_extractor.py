@@ -308,10 +308,6 @@ class DataExtractor(object):
         # generate an area constraint
         area_constraint = None
 
-        print '\n\n\n'
-        print self.input_data.get_area_type()
-        print self.input_data.get_value(InputType.DATA_SOURCE)
-        print '\n\n'
         if self.input_data.get_area_type() == AreaType.POINT:
             # coordinates are coming in as OSGB, x, y
             resolution = self._get_resolution_m(cube)
