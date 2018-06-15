@@ -32,12 +32,15 @@ class JpPlotter(GraphPlotter):
         h, xedges, yedges = np.histogram2d(x, y, bins=10)
         xbins = xedges[:-1] + (xedges[1] - xedges[0]) / 2
         ybins = yedges[:-1] + (yedges[1] - yedges[0]) / 2
-        h = h.T
 
-        print '\n\n\n'
-        print ybins
-        print dir(ybins)
-        print
+        x_min, x_max = self._get_limits(h, xedges)
+        h = h.T
+        y_min, y_max = self._get_limits(h, yedges)
+
+        ax = plt.gca()
+        ax.set_xlim(x_min, x_max)
+        ax.set_ylim(y_min, y_max)
+
         levels = [10, 50, 90]
         # fill the contours
         contour_fill = plt.contourf(xbins, ybins, h, levels,
@@ -62,7 +65,6 @@ class JpPlotter(GraphPlotter):
         if ((x_id == 'tasAnom' or y_id == 'tasAnom') and
                 (x_id == 'prAnom' or y_id == 'prAnom')):
             font_size = self.input_data.get_font_size() + 10
-            ax = plt.gca()
 
             at = AnchoredText("hotter and wetter",
                               prop=dict(color='#612020', size=font_size),
@@ -73,3 +75,26 @@ class JpPlotter(GraphPlotter):
                               prop=dict(color='#2F7676', size=font_size),
                               frameon=False, loc=3)
             ax.add_artist(at)
+
+    def _get_limits(self, data, edges):
+        """
+        Get the limits, defined as were the data goes above 9.
+        To ensure we do not clip the image include the next bin
+        """
+        min_limit = 0
+        max_limit = 0
+
+        edge_count = len(edges)
+        for i, row in enumerate(data):
+
+            if max(row) > 9:
+                if i + 2 > edge_count:
+                    max_limit = edges[i + 1]
+                else:
+                    max_limit = edges[i + 2]
+                if min_limit == 0:
+                    if i > 0:
+                        min_limit = edges[i - 1]
+                    else:
+                        min_limit = edges[i]
+        return min_limit, max_limit
