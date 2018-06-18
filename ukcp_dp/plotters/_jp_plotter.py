@@ -29,13 +29,14 @@ class JpPlotter(GraphPlotter):
         y = self.cube_list[1].data
         y_id = self.input_data.get_value(InputType.VARIABLE)[1]
 
-        h, xedges, yedges = np.histogram2d(x, y, bins=10)
+        h, xedges, yedges = _histogram2d(x, y)
+
         xbins = xedges[:-1] + (xedges[1] - xedges[0]) / 2
         ybins = yedges[:-1] + (yedges[1] - yedges[0]) / 2
 
-        x_min, x_max = self._get_limits(h, xedges)
+        x_min, x_max = _get_limits(h, xedges)
         h = h.T
-        y_min, y_max = self._get_limits(h, yedges)
+        y_min, y_max = _get_limits(h, yedges)
 
         ax = plt.gca()
         ax.set_xlim(x_min, x_max)
@@ -76,25 +77,48 @@ class JpPlotter(GraphPlotter):
                               frameon=False, loc=3)
             ax.add_artist(at)
 
-    def _get_limits(self, data, edges):
-        """
-        Get the limits, defined as were the data goes above 9.
-        To ensure we do not clip the image include the next bin
-        """
-        min_limit = 0
-        max_limit = 0
 
-        edge_count = len(edges)
-        for i, row in enumerate(data):
+def _histogram2d(x, y):
+    """
+    Using the default range some of the plots are getting chopped. Therefore we
+    are using a custom range. The range is incrementally increased until the
+    10th percentile boundary is included.
+    """
+    for i in range(10):
+        range_factor = 1.0 + (float(i) / 10)
+        range_ = [[min(x) * range_factor, max(x) * range_factor],
+                  [min(y) * range_factor, max(y) * range_factor]]
 
-            if max(row) > 9:
-                if i + 2 > edge_count:
-                    max_limit = edges[i + 1]
+        h, xedges, yedges = np.histogram2d(x, y, bins=10, range=range_)
+        h1 = h.T
+        if (max(h[0]) < 10 and max(h[len(h) - 1]) < 10 and
+                max(h1[0]) < 10 and max(h1[len(h1) - 1]) < 10):
+            break
+
+    log.debug("Generating histogram with a range factor of {}".format(
+        range_factor))
+    return h, xedges, yedges
+
+
+def _get_limits(data, edges):
+    """
+    Get the limits, defined as were the data goes above 9.
+    To ensure we do not clip the image include the next bin
+    """
+    min_limit = 0
+    max_limit = 0
+
+    edge_count = len(edges)
+    for i, row in enumerate(data):
+
+        if max(row) > 9:
+            if i + 2 > edge_count:
+                max_limit = edges[i + 1]
+            else:
+                max_limit = edges[i + 2]
+            if min_limit == 0:
+                if i > 0:
+                    min_limit = edges[i - 1]
                 else:
-                    max_limit = edges[i + 2]
-                if min_limit == 0:
-                    if i > 0:
-                        min_limit = edges[i - 1]
-                    else:
-                        min_limit = edges[i]
-        return min_limit, max_limit
+                    min_limit = edges[i]
+    return min_limit, max_limit
