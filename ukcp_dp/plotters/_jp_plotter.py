@@ -29,7 +29,7 @@ class JpPlotter(GraphPlotter):
         y = self.cube_list[1].data
         y_id = self.input_data.get_value(InputType.VARIABLE)[1]
 
-        h, xedges, yedges = _histogram2d(x, y)
+        h, xedges, yedges = np.histogram2d(x, y, bins=10)
 
         xbins = xedges[:-1] + (xedges[1] - xedges[0]) / 2
         ybins = yedges[:-1] + (yedges[1] - yedges[0]) / 2
@@ -76,28 +76,6 @@ class JpPlotter(GraphPlotter):
                               prop=dict(color='#2F7676', size=font_size),
                               frameon=False, loc=3)
             ax.add_artist(at)
-
-
-def _histogram2d(x, y):
-    """
-    Using the default range some of the plots are getting chopped. Therefore we
-    are using a custom range. The range is incrementally increased until the
-    10th percentile boundary is included.
-    """
-    for i in range(20):
-        range_factor = 1.0 + (float(i) / 10)
-        range_ = [[min(x) * range_factor, max(x) * range_factor],
-                  [min(y) * range_factor, max(y) * range_factor]]
-
-        h, xedges, yedges = np.histogram2d(x, y, bins=10, range=range_)
-        h1 = h.T
-        if (max(h[0]) < 10 and max(h[len(h) - 1]) < 10 and
-                max(h1[0]) < 10 and max(h1[len(h1) - 1]) < 10):
-            break
-
-    log.debug("Generating histogram with a range factor of {}".format(
-        range_factor))
-    return h, xedges, yedges
 
 
 def _get_limits(data, edges):
