@@ -90,8 +90,8 @@ def _get_limits(data, edges):
     for i, row in enumerate(data):
 
         if max(row) > 9:
-            if i + 2 > edge_count:
-                max_limit = edges[i + 1]
+            if i + 2 >= edge_count:
+                max_limit = edges[edge_count - 1]
             else:
                 max_limit = edges[i + 2]
             if min_limit == 0:
