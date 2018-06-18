@@ -84,7 +84,7 @@ def _histogram2d(x, y):
     are using a custom range. The range is incrementally increased until the
     10th percentile boundary is included.
     """
-    for i in range(10):
+    for i in range(20):
         range_factor = 1.0 + (float(i) / 10)
         range_ = [[min(x) * range_factor, max(x) * range_factor],
                   [min(y) * range_factor, max(y) * range_factor]]
