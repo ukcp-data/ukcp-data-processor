@@ -13,8 +13,6 @@ log = logging.getLogger(__name__)
 # month and day
 START_MONTH_DAY = '1201'
 END_MONTH_DAY = '1130'
-START_MONTH_DAY_CM = '189912'
-END_MONTH_DAY_CM = '209911'
 
 VERSION = 'latest'
 
@@ -303,20 +301,8 @@ def _get_cm_file_list_for_range(input_data, year_minimum, year_maximum):
                 file_path = _get_cm_file_path(
                     input_data, spatial_representation, variable_prefix,
                     scenario, ensemble)
-                if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
-                        TemporalAverageType.ANNUAL
-                        or spatial_representation != '12km'):
-                    # current thinking is that there will only be one file
-                    ensemble_file_list.append(os.path.join(file_path, '*'))
-                    continue
-
-                # generate a list of files for each ensemble
-                for year in range(year_minimum, (year_maximum + 1)):
-                    file_name = _get_cm_file_name(
-                        input_data, spatial_representation, variable_prefix,
-                        scenario, ensemble, year)
-                    ensemble_file_list.append(
-                        os.path.join(file_path, file_name))
+                # there will only be one file
+                ensemble_file_list.append(os.path.join(file_path, '*'))
 
             file_list_per_scenario.append(ensemble_file_list)
 
@@ -350,38 +336,3 @@ def _get_cm_file_path(input_data, spatial_representation, variable, scenario,
         VERSION)
 
     return file_path
-
-
-def _get_cm_file_name(input_data, spatial_representation, variable, scenario,
-                      ensemble, year):
-
-    # the year starts in December, so subtract 1 from the year
-    if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
-            TemporalAverageType.MONTHLY):
-        start_date = '{year}{mon_day}'.format(
-            year=year - 1, mon_day=START_MONTH_DAY_CM)
-        end_date = '{year}{mon_day}'.format(
-            year=year, mon_day=END_MONTH_DAY_CM)
-    else:  # seasonal
-        start_date = '{year}{mon_day}'.format(
-            year=year - 1, mon_day=START_MONTH_DAY)
-        end_date = '{year}{mon_day}'.format(
-            year=year, mon_day=END_MONTH_DAY)
-
-    # we need to use the variable root and calculate the anomaly later
-    variable = variable.split('Anom')[0]
-    file_name = ('{variable}_{scenario}_{data_source}_uk_{spatial_'
-                 'representation}_{ensemble}_{temporal_type}_{start_data}-'
-                 '{end_date}.nc'.format(
-                     variable=variable,
-                     scenario=scenario,
-                     data_source=input_data.get_value(InputType.DATA_SOURCE),
-                     spatial_representation=spatial_representation,
-                     source=input_data.get_value(InputType.DATA_SOURCE),
-                     ensemble=ensemble,
-                     temporal_type=input_data.get_value(
-                         InputType.TEMPORAL_AVERAGE_TYPE),
-                     start_data=start_date,
-                     end_date=end_date))
-
-    return file_name
