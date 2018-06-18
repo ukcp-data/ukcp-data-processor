@@ -21,7 +21,7 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
         Write out the data, in CSV format, associated with three maps.
         """
         if self.input_data.get_area_type() == AreaType.BBOX:
-            return self._write_x_y_csv(self)
+            return self._write_x_y_csv()
         else:
             return self._write_region_csv()
 
