@@ -8,9 +8,9 @@ import shapefile as shp
 from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, \
     OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER, \
     OVERLAY_COASTLINE_SMALL, AreaType
-import ukcp_dp.ukcp_common_analysis.regions as regs
-import ukcp_dp.ukcp_standard_plots.mapper as maps
-import ukcp_dp.ukcp_standard_plots.plotting_general as plotgeneral
+from ukcp_dp.plotters.utils._plotting_utils import end_figure, \
+    make_standard_bar, start_standard_figure
+from ukcp_dp.plotters.utils._region_utils import reg_from_cube
 
 
 log = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ class MapPlotter(BasePlotter):
         cube = self.cube_list[0]
 
         if self.input_data.get_area_type() == AreaType.BBOX:
-            reg = regs.reg_from_cube(cube)
+            reg = reg_from_cube(cube)
         else:
             # Some form of region, therefore it is the whole of UK
             reg = {'lons': [-10.9818, 2.2398], 'lats': [48.8957, 60.9531]}
@@ -49,7 +49,7 @@ class MapPlotter(BasePlotter):
         plotsettings.dygrid = 1000
 
         # First create the figure
-        fig, _, _ = plotgeneral.start_standard_figure(plotsettings)
+        fig, _, _ = start_standard_figure(plotsettings)
 
         # Add the logo and metadata box
         self._add_logo(fig)
@@ -69,13 +69,12 @@ class MapPlotter(BasePlotter):
         fig.suptitle(title, fontsize='larger')
 
         # Add the colourbar
-        plotgeneral.make_standard_bar(plotsettings, fig,
-                                      bar_pos=plotsettings.bar_position,
-                                      colmappable=result[1])
+        make_standard_bar(plotsettings, fig, bar_pos=plotsettings.bar_position,
+                          colmappable=result[1])
 
         # Set the margins, and save/display & close the plot:
 #         plotgeneral.set_standard_margins(settings=None, fig=fig)
-        plotgeneral.end_figure(output_path)
+        end_figure(output_path)
 
     def _generate_subplots(self, cube, plotsettings, fig, metadata_bbox):
         """
@@ -158,49 +157,3 @@ class MapPlotter(BasePlotter):
                 plt.plot(x_lon, y_lat, color=OVERLAY_COLOUR,
                          linewidth=OVERLAY_LINE_WIDTH)
         log.debug('overlay added')
-
-
-def _plot_standard_choropleth_map(thecube, settings, fig=None, ax=None,
-                                  barlab=None, bar_orientation=None,
-                                  outfnames=["x11"]):
-    """
-    Wrapper to plot_choropleth_map(),
-    where most of the settings are given
-    in a StandardMap object called 'settings'
-
-    """
-    resolution = thecube.attributes['resolution']
-    shapefile_regions = regs.get_ukcp_shapefile_regions(resolution)
-
-    if barlab is None:
-        barlab = settings.default_barlabel
-    if bar_orientation is None:
-        bar_orientation = settings.bar_orientation
-
-    result = maps.plot_choropleth_map(
-        shapefile_regions, [thecube], fig=fig, ax=ax,
-        barlabel=barlab, bar_orientation=bar_orientation,
-        bar_position=settings.bar_position, outfnames=outfnames,
-        cpal=settings.cpal,
-        extendcolbar=settings.extendcolbar,
-        vrange=settings.vrange, vstep=settings.vstep, vmid=settings.vmid,
-        badcol=settings.maskcol, undercol=settings.undercol,
-        overcol=settings.overcol,
-        cmsize=settings.cmsize, dpi=settings.dpi,
-        fsize=settings.fsize, fontfam=settings.fontfam,
-        proj=settings.proj,
-        marlft=settings.marlft, marrgt=settings.marrgt,
-        martop=settings.martop, marbot=settings.marbot,
-        marwsp=settings.marwsp, marhsp=settings.marhsp,
-        countrylw=settings.countrylw, countrylcol=settings.countrylcol,
-        regionlw=settings.regionlw,  regionlcol=settings.regionlcol,
-        riverslw=settings.riverslw,  riverslcol=settings.riverslcol,
-        coastlw=settings.coastlw,
-        xlims=settings.xlims, ylims=settings.ylims,
-        showglobal=settings.showglobal, preferred_unit=settings.preferred_unit,
-        dxgrid=settings.dxgrid, dygrid=settings.dygrid,
-        xgridax=settings.xgridax, ygridax=settings.ygridax,
-        axbackgroundcol=settings.maskcol,
-        figbackgroundcol=settings.figbackgroundcol)
-
-    return result

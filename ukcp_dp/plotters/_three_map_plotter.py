@@ -4,8 +4,8 @@ from _map_plotter import MapPlotter
 import iris
 import matplotlib.gridspec as gridspec
 from ukcp_dp.constants import AreaType, InputType
-import ukcp_dp.ukcp_standard_plots.mapper as maps
-from ukcp_dp.plotters._map_plotter import _plot_standard_choropleth_map
+from ukcp_dp.plotters.utils._map_utils import plot_standard_map, \
+    plot_standard_choropleth_map
 
 
 log = logging.getLogger(__name__)
@@ -74,15 +74,15 @@ class ThreeMapPlotter(MapPlotter):
         # Setting bar_orientation="none" here to override (prevent) drawing
         # the colorbar
         if self.input_data.get_area_type() == AreaType.BBOX:
-            result = maps.plot_standard_map(data, plotsettings, fig=fig,
-                                            ax=ax, barlab=None,
-                                            bar_orientation="none",
-                                            outfnames=None)
+            result = plot_standard_map(data, plotsettings, fig=fig,
+                                       ax=ax, barlab=None,
+                                       bar_orientation="none",
+                                       outfnames=None)
         else:
-            result = _plot_standard_choropleth_map(data, plotsettings, fig=fig,
-                                                   ax=ax, barlab=None,
-                                                   bar_orientation="none",
-                                                   outfnames=None)
+            result = plot_standard_choropleth_map(data, plotsettings, fig=fig,
+                                                  ax=ax, barlab=None,
+                                                  bar_orientation="none",
+                                                  outfnames=None)
 
         self.plot_overlay(self.input_data.get_value(InputType.SHOW_BOUNDARIES))
 

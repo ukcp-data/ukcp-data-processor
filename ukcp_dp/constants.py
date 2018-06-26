@@ -207,3 +207,6 @@ ImageFormat = enum(JPG='jpg',
 TemporalAverageType = enum(MONTHLY='mon',
                            SEASONAL='seas',
                            ANNUAL='ann')
+
+DPI_DISPLAY = 94
+DPI_SAVING  = 100

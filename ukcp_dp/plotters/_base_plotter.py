@@ -9,7 +9,7 @@ import matplotlib.image as image
 from matplotlib.transforms import Bbox
 from ukcp_dp.constants import DATA_SELECTION_TYPES, InputType, \
     LOGO_SMALL, LOGO_MEDIUM, LOGO_LARGE
-from ukcp_dp.ukcp_standard_plots import standards_class as stds
+from ukcp_dp.plotters.utils import _standards_class as stds
 
 
 log = logging.getLogger(__name__)
@@ -233,33 +233,102 @@ class BasePlotter(object):
 
         @return a StandardMap object containing plot settings
         """
-        plotsettings = stds.UKCP_NAE_SEAS.copy()
         # tas, tasmax, tasmin
         if 'tas' in var_id:
+            # Mean air temperature at 1.5m (C)
+            # Maximum air temperature at 1.5m (C)
+            # Minimum air temperature at 1.5m (C)
             if 'Anom' in var_id:
                 plotsettings = stds.UKCP_TEMP_ANOM.copy()
             else:
                 plotsettings = stds.UKCP_TEMP.copy()
 
         elif 'pr' in var_id:
+            # Precipitation rate (mm/day)
             if 'Anom' in var_id:
                 plotsettings = stds.UKCP_PRECIP_ANOM.copy()
             else:
                 plotsettings = stds.UKCP_PRECIP.copy()
 
-        elif 'sfcWind' in var_id or 'uas' in var_id or 'vas' in var_id:
+        elif 'sfcWind' in var_id:
+            # Wind speed at 10m (m s-1)
             if 'Anom' in var_id:
                 plotsettings = stds.UKCP_WIND_ANOM.copy()
             else:
                 plotsettings = stds.UKCP_WIND.copy()
 
-        # TODO
-        # clt, Total cloud anomaly (%)
-        # hurs, Relative humidity anomaly at 1.5m (%)
-        # huss, Specific humidity anomaly at 1.5m (1)
-        # psl, Sea level pressure anomaly (hPa)
-        # rls, Net Surface long wave flux anomaly (W m-2)
-        # rss, Net Surface short wave flux anomaly (W m-2)
+        elif 'uas' in var_id:
+            # Eastward wind at 10m (m s-1)
+            if 'Anom' in var_id:
+                plotsettings = stds.UKCP_WIND_EASTWARD_ANOM.copy()
+            else:
+                plotsettings = stds.UKCP_WIND_EASTWARD.copy()
+
+        elif 'vas' in var_id:
+            # Northward wind at 10m (m s-1)
+            if 'Anom' in var_id:
+                plotsettings = stds.UKCP_WIND_NORTHWARD_ANOM.copy()
+            else:
+                plotsettings = stds.UKCP_WIND_NORTHWARD.copy()
+
+        elif 'clt' in var_id:
+            # Total cloud (%)
+            if 'Anom' in var_id:
+                # TODO check BIAS is the correct thing to use
+                plotsettings = stds.UKCP_CLOUDFRAC_MONTHLY_BIAS.copy()
+            else:
+                plotsettings = stds.UKCP_CLOUDFRAC_MONTHLY.copy()
+
+        elif 'hurs' in var_id:
+            # Relative humidity at 1.5m (%)
+            if 'Anom' in var_id:
+                # TODO do we need an ANOM version?
+                plotsettings = stds.UKCP_RELATIVE_HUMIDITY.copy()
+            else:
+                plotsettings = stds.UKCP_RELATIVE_HUMIDITY.copy()
+
+        elif 'huss' in var_id:
+            # Specific humidity at 1.5m (1)
+            if 'Anom' in var_id:
+                # TODO do we need an ANOM version?
+                plotsettings = stds.UKCP_SPECIFIC_HUMIDITY.copy()
+            else:
+                plotsettings = stds.UKCP_SPECIFIC_HUMIDITY.copy()
+
+        elif 'psl' in var_id:
+            # Sea level pressure (hPa)
+            if 'Anom' in var_id:
+                plotsettings = stds.UKCP_PMSL_ANOM.copy()
+            else:
+                # TODO do we need a non-ANOM version?
+                plotsettings = stds.UKCP_PMSL_ANOM.copy()
+
+        elif 'rls' in var_id:
+            # Net Surface long wave flux (W m-2)
+            if 'Anom' in var_id:
+                # TODO check BIAS is the correct thing to use
+                plotsettings = stds.UKCP_LWRAD_NET_MONTHLY_BIAS.copy()
+            else:
+                plotsettings = stds.UKCP_LWRAD_NET_MONTHLY.copy()
+
+        elif 'rsds' in var_id:
+            # Total downward shortwave flux anomaly (W m-2)
+            if 'Anom' in var_id:
+                # TODO check BIAS is the correct thing to use
+                plotsettings = stds.UKCP_SWRAD_DOWN_MONTHLY_BIAS.copy()
+            else:
+                plotsettings = stds.UKCP_SWRAD_DOWN_MONTHLY.copy()
+
+        elif 'rss' in var_id:
+            # Net Surface short wave flux (W m-2)
+            if 'Anom' in var_id:
+                # TODO check BIAS is the correct thing to use
+                plotsettings = stds.UKCP_SWRAD_NET_MONTHLY_BIAS.copy()
+            else:
+                plotsettings = stds.UKCP_SWRAD_NET_MONTHLY.copy()
+
+        else:
+            plotsettings = stds.UKCPNEAT.copy()
 
         plotsettings.bar_orientation = 'horizontal'
 
@@ -274,6 +343,7 @@ class BasePlotter(object):
 
         # 100 dots per cm
         plotsettings.dpi = 100
+        plotsettings.dpi_display = 100
         if cmsize == 900:
             # using 100 dpi set size to 900x600
             plotsettings.cmsize = [22.86, 15.24]

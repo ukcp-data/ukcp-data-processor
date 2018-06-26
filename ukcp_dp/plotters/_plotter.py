@@ -1,3 +1,6 @@
+import os
+from time import gmtime, strftime
+
 from _cdf_plotter import CdfPlotter
 from _jp_plotter import JpPlotter
 from _pdf_plotter import PdfPlotter
@@ -5,8 +8,6 @@ from _plume_plotter import PlumePlotter
 from _postage_stamp_map_plotter import PostageStampMapPlotter
 from _three_map_plotter import ThreeMapPlotter
 from ukcp_dp.constants import PlotType
-from time import gmtime, strftime
-import os
 
 
 def write_plot(plot_type, output_path, image_format, input_data, cube_list,
@@ -54,5 +55,6 @@ def _get_image_file(output_path, image_format, plot_type):
     if plot_type is not None:
         plot_type_string = '{}_'.format(plot_type.lower())
     file_name = '{plot_type}{timestamp}.{image_format}'.format(
-        plot_type=plot_type_string, timestamp=timestamp, image_format=image_format)
+        plot_type=plot_type_string, timestamp=timestamp,
+        image_format=image_format)
     return os.path.join(output_path, file_name)

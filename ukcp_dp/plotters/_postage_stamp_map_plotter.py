@@ -1,12 +1,11 @@
 import logging
 
-import iris
-
 from _map_plotter import MapPlotter
+import iris
 import matplotlib.gridspec as gridspec
 from ukcp_dp.constants import AreaType, InputType
-import ukcp_dp.ukcp_standard_plots.mapper as maps
-from ukcp_dp.plotters._map_plotter import _plot_standard_choropleth_map
+from ukcp_dp.plotters.utils._map_utils import plot_standard_map, \
+    plot_standard_choropleth_map
 
 
 log = logging.getLogger(__name__)
@@ -107,8 +106,8 @@ class PostageStampMapPlotter(MapPlotter):
 
         if self.input_data.get_area_type() == AreaType.BBOX:
             ensemble_mean_cube = cube.collapsed(
-                ['projection_x_coordinate', 'projection_y_coordinate', 'latitude',
-                 'longitude'], iris.analysis.MEAN)
+                ['projection_x_coordinate', 'projection_y_coordinate',
+                 'latitude', 'longitude'], iris.analysis.MEAN)
         else:
             ensemble_mean_cube = cube.collapsed(
                 ['region'], iris.analysis.MEAN)
@@ -153,16 +152,17 @@ class PostageStampMapPlotter(MapPlotter):
         # Setting bar_orientation="none" here to override (prevent) drawing
         # the colour bar:
         if self.input_data.get_area_type() == AreaType.BBOX:
-            result = maps.plot_standard_map(ensemble_cube, plotsettings,
-                                            fig=fig,
-                                            ax=ax, barlab=None,
-                                            bar_orientation="none",
-                                            outfnames=None)
+            result = plot_standard_map(ensemble_cube, plotsettings,
+                                       fig=fig,
+                                       ax=ax, barlab=None,
+                                       bar_orientation="none",
+                                       outfnames=None)
         else:
-            result = _plot_standard_choropleth_map(ensemble_cube, plotsettings, fig=fig,
-                                                   ax=ax, barlab=None,
-                                                   bar_orientation="none",
-                                                   outfnames=None)
+            result = plot_standard_choropleth_map(ensemble_cube, plotsettings,
+                                                  fig=fig,
+                                                  ax=ax, barlab=None,
+                                                  bar_orientation="none",
+                                                  outfnames=None)
 
         # add a title
         if ensemble_name.startswith('HadGEM3-GC3.05-r001i1p'):

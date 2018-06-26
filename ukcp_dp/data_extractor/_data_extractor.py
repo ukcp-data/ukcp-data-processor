@@ -10,8 +10,7 @@ import iris.experimental.equalise_cubes
 
 from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, TEMP_ANOMS, \
     DATA_SOURCE_MARINE, PERCENTAGE_ANOMALIES, AreaType, TemporalAverageType
-from ukcp_dp.ukcp_common_analysis.common_analysis import make_climatology, \
-    make_anomaly
+from ukcp_dp.data_extractor._utils import make_climatology, make_anomaly
 from ukcp_dp.vocab_manager import get_months
 
 

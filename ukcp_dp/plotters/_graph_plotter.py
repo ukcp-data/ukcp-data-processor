@@ -4,7 +4,8 @@ from _base_plotter import BasePlotter
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
 from ukcp_dp.constants import InputType
-import ukcp_dp.ukcp_standard_plots.plotting_general as plotgeneral
+from ukcp_dp.plotters.utils._plotting_utils import end_figure, \
+    start_standard_figure
 
 
 class GraphPlotter(BasePlotter):
@@ -25,7 +26,7 @@ class GraphPlotter(BasePlotter):
         @param title (str): a title for the plot
         """
         # First create the figure
-        fig, _, _ = plotgeneral.start_standard_figure(plotsettings)
+        fig, _, _ = start_standard_figure(plotsettings)
 
         # Add the logo and metadata box
         self._add_logo(fig)
@@ -53,7 +54,7 @@ class GraphPlotter(BasePlotter):
 
         # Output the plot
 #         plotgeneral.set_standard_margins(settings=None, fig=fig)
-        plotgeneral.end_figure(output_path)
+        end_figure(output_path)
         return
 
     def _generate_graph(self):
