@@ -24,10 +24,15 @@ class JpPlotter(GraphPlotter):
         """
         log.debug('_generate_graph')
 
-        x = self.cube_list[0].data
-        x_id = self.input_data.get_value(InputType.VARIABLE)[0]
-        y = self.cube_list[1].data
-        y_id = self.input_data.get_value(InputType.VARIABLE)[1]
+        for cube in self.cube_list:
+            if (cube.var_name == self.input_data.get_value(
+                    InputType.VARIABLE)[0]):
+                x = cube.data
+                x_id = self.input_data.get_value(InputType.VARIABLE)[0]
+            elif (cube.var_name == self.input_data.get_value(
+                    InputType.VARIABLE)[1]):
+                y = cube.data
+                y_id = self.input_data.get_value(InputType.VARIABLE)[1]
 
         h, xedges, yedges = np.histogram2d(x, y, bins=10)
 
