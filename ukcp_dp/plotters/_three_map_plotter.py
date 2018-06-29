@@ -16,15 +16,15 @@ class ThreeMapPlotter(MapPlotter):
     The three map plotter class.
 
     This class extends MapPlotter with a _generate_subplots(self, cube,
-    plotsettings).
+    plot_settings).
     """
 
-    def _generate_subplots(self, cube, plotsettings, fig, metadata_bbox):
+    def _generate_subplots(self, cube, plot_settings, fig, metadata_bbox):
         """
         Override base class method.
 
         @param cube (iris cube): a cube containing the selected data
-        @param plotsettings (StandardMap): an object containing plot settings
+        @param plot_settings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
@@ -60,7 +60,7 @@ class ThreeMapPlotter(MapPlotter):
                     'Attempted to plot the {}th percentile, but no data found'.
                     format(percentile))
             result = self._add_sub_plot(
-                fig, grid[i], plotsettings, title, percentile_cube)
+                fig, grid[i], plot_settings, title, percentile_cube)
 
         # add the sub plot to contain the bar
         ax = fig.add_subplot(bar_grid)
@@ -68,18 +68,18 @@ class ThreeMapPlotter(MapPlotter):
 
         return result
 
-    def _add_sub_plot(self, fig, grid, plotsettings, title, data):
-        ax = fig.add_subplot(grid, projection=plotsettings.proj)
+    def _add_sub_plot(self, fig, grid, plot_settings, title, data):
+        ax = fig.add_subplot(grid, projection=plot_settings.proj)
 
         # Setting bar_orientation="none" here to override (prevent) drawing
         # the colorbar
         if self.input_data.get_area_type() == AreaType.BBOX:
-            result = plot_standard_map(data, plotsettings, fig=fig,
+            result = plot_standard_map(data, plot_settings, fig=fig,
                                        ax=ax, barlab=None,
                                        bar_orientation="none",
                                        outfnames=None)
         else:
-            result = plot_standard_choropleth_map(data, plotsettings, fig=fig,
+            result = plot_standard_choropleth_map(data, plot_settings, fig=fig,
                                                   ax=ax, barlab=None,
                                                   bar_orientation="none",
                                                   outfnames=None)

@@ -17,16 +17,16 @@ class GraphPlotter(BasePlotter):
     to plot the map.
     """
 
-    def _generate_plot(self, output_path, plotsettings, title):
+    def _generate_plot(self, output_path, plot_settings, title):
         """
         Override base class method.
 
         @param output_path (str): the full path to the file
-        @param plotsettings (StandardMap): an object containing plot settings
+        @param plot_settings (StandardMap): an object containing plot settings
         @param title (str): a title for the plot
         """
         # First create the figure
-        fig, _, _ = start_standard_figure(plotsettings)
+        fig, _, _ = start_standard_figure(plot_settings)
 
         # Add the logo and metadata box
         self._add_logo(fig)

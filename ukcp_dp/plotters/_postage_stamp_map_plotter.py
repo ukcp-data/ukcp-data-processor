@@ -16,15 +16,15 @@ class PostageStampMapPlotter(MapPlotter):
     The postage stamp map plotter class.
 
     This class extends MapPlotter with a _generate_subplots(self, cube,
-    plotsettings).
+    plot_settings).
     """
 
-    def _generate_subplots(self, cube, plotsettings, fig, metadata_bbox):
+    def _generate_subplots(self, cube, plot_settings, fig, metadata_bbox):
         """
         Override base class method.
 
         @param cube (iris cube): a cube containing the selected data
-        @param plotsettings (StandardMap): an object containing plot settings
+        @param plot_settings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
@@ -89,10 +89,10 @@ class PostageStampMapPlotter(MapPlotter):
 
         if self.input_data.get_value(InputType.ORDER_BY_MEAN) is True:
             # order by means
-            result = self._plot_maps_mean_order(cube, fig, grid, plotsettings)
+            result = self._plot_maps_mean_order(cube, fig, grid, plot_settings)
 
         else:
-            result = self._plot_maps_name_order(cube, fig, grid, plotsettings)
+            result = self._plot_maps_name_order(cube, fig, grid, plot_settings)
 
         # add the sub plot to contain the bar
         ax = fig.add_subplot(bar_grid)
@@ -100,7 +100,7 @@ class PostageStampMapPlotter(MapPlotter):
 
         return result
 
-    def _plot_maps_mean_order(self, cube, fig, grid, plotsettings):
+    def _plot_maps_mean_order(self, cube, fig, grid, plot_settings):
         # cube_means, key = ensemble id, value = mean
         ensemble_cube_means = {}
 
@@ -130,35 +130,36 @@ class PostageStampMapPlotter(MapPlotter):
         i = 0
         for ensemble_mean in sorted(ensemble_cubes.keys()):
             result = self._plot_map(
-                fig, grid, plotsettings, ensemble_cubes[ensemble_mean], i)
+                fig, grid, plot_settings, ensemble_cubes[ensemble_mean], i)
             i += 1
 
         return result
 
-    def _plot_maps_name_order(self, cube, fig, grid, plotsettings):
+    def _plot_maps_name_order(self, cube, fig, grid, plot_settings):
         for i, ensemble_slice in enumerate(
                 cube.slices_over('ensemble_member')):
-            result = self._plot_map(fig, grid, plotsettings, ensemble_slice, i)
+            result = self._plot_map(
+                fig, grid, plot_settings, ensemble_slice, i)
         return result
 
-    def _plot_map(self, fig, grid, plotsettings, ensemble_cube, i):
+    def _plot_map(self, fig, grid, plot_settings, ensemble_cube, i):
         ensemble_name = ensemble_cube.coord('ensemble_member_id').points[0]
 
         log.debug('generating postage stamp map for ensemble {}'.
                   format(ensemble_name))
 
-        ax = fig.add_subplot(grid[i], projection=plotsettings.proj)
+        ax = fig.add_subplot(grid[i], projection=plot_settings.proj)
 
         # Setting bar_orientation="none" here to override (prevent) drawing
         # the colour bar:
         if self.input_data.get_area_type() == AreaType.BBOX:
-            result = plot_standard_map(ensemble_cube, plotsettings,
+            result = plot_standard_map(ensemble_cube, plot_settings,
                                        fig=fig,
                                        ax=ax, barlab=None,
                                        bar_orientation="none",
                                        outfnames=None)
         else:
-            result = plot_standard_choropleth_map(ensemble_cube, plotsettings,
+            result = plot_standard_choropleth_map(ensemble_cube, plot_settings,
                                                   fig=fig,
                                                   ax=ax, barlab=None,
                                                   bar_orientation="none",

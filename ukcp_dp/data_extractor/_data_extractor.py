@@ -4,13 +4,12 @@ import logging
 import cf_units
 import iris
 from iris.cube import CubeList
+import iris.experimental.equalise_cubes
 import iris.plot as iplt
 import iris.quickplot as qplt
-import iris.experimental.equalise_cubes
-
 from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, TEMP_ANOMS, \
-    DATA_SOURCE_MARINE, PERCENTAGE_ANOMALIES, AreaType, TemporalAverageType
-from ukcp_dp.data_extractor._utils import make_climatology, make_anomaly
+    DATA_SOURCE_MARINE, AreaType, TemporalAverageType
+from ukcp_dp.data_extractor._utils import get_anomaly
 from ukcp_dp.vocab_manager import get_months
 
 
@@ -23,7 +22,7 @@ class DataExtractor(object):
     criteria.
     """
 
-    def __init__(self, file_lists, input_data):
+    def __init__(self, file_lists, input_data, plot_settings):
         """
         Initialise the DataExtractor.
 
@@ -35,9 +34,11 @@ class DataExtractor(object):
                     each list is a list of files per scenario, including their
                     full paths
         @param input_data (InputData) an object containing user defined values
+        @param plot_settings (StandardMap): an object containing plot settings
         """
         self.file_lists = file_lists
         self.input_data = input_data
+        self.plot_settings = plot_settings
         self.cubes = self._get_main_cubes()
         self.overlay_cube = self._get_overlay_cube()
         log.debug('DataExtractor __init__ finished')
@@ -88,8 +89,7 @@ class DataExtractor(object):
                     # we need anomalies so lets calculate them
                     # TODO we may get these directly from file in future
                     cube = self._get_anomaly_cube(
-                        file_list, self.file_lists['baseline'][variable][i],
-                        variable)
+                        file_list, self.file_lists['baseline'][variable][i])
 
                 else:
                     # we can use the values directly from the file
@@ -102,19 +102,13 @@ class DataExtractor(object):
                             InputType.CONVERT_TO_PERCENTILES) is True)):
                     cube = (self._convert_to_percentiles_from_ensembles(cube))
 
-                if variable in TEMP_ANOMS:
-                    # this in an anomaly so set the units to Celsius, otherwise
-                    # they will get converted later and that would be bad
-                    cube.units = cf_units.Unit("Celsius")
-                    log.debug('updated cube units to Celsius')
-
                 cubes.append(cube)
 
         log.debug(cubes)
 
         return cubes
 
-    def _get_anomaly_cube(self, file_list, baseline_file_list, variable):
+    def _get_anomaly_cube(self, file_list, baseline_file_list):
         log.debug('_get_anomaly_cube')
         # anomalies have been selected for something other than LS1,
         # therefore we need to calculate the climatology using the
@@ -123,42 +117,15 @@ class DataExtractor(object):
 
         cube_baseline = self._get_cube(baseline_file_list, baseline=True)
 
-        cube_climatology = make_climatology(
-            cube_baseline, climtype=self.input_data.get_value_label(
-                InputType.TEMPORAL_AVERAGE_TYPE).lower())
-        if (self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
-                TemporalAverageType.MONTHLY or
-            self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
-                TemporalAverageType.SEASONAL):
-            # we have to collapse the time coord so the dimensions match those
-            # of the cube_absoute
-            cube_climatology = cube_climatology.collapsed(
-                'time', iris.analysis.MEAN)
+        baseline = self.input_data.get_value(InputType.BASELINE)
 
-        # we need to remove these to be able to make the anomaly
-#         for coord in ['month', 'month_number', 'season']:
-        for coord in ['month', 'season']:
-            try:
-                cube_climatology.remove_coord(coord)
-            except iris.exceptions.CoordinateNotFoundError:
-                pass
+        anomaly = get_anomaly(
+            cube_baseline, cube_absoute, baseline,
+            self.plot_settings.preferred_unit,
+            self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+            self.input_data.get_value(InputType.TIME_PERIOD))
 
-        if variable in PERCENTAGE_ANOMALIES:
-            preferred_unit = cf_units.Unit("%")
-        else:
-            preferred_unit = None
-
-        cube_anomaly = make_anomaly(
-            cube_absoute, cube_climatology, preferred_unit)
-
-        # add the attributes back in and add info about the baseline and
-        # anomaly
-        cube_anomaly.attributes = cube_absoute.attributes
-        cube_anomaly.attributes['baseline_period'] = (
-            self.input_data.get_value(InputType.BASELINE))
-        cube_anomaly.attributes['anomaly_type'] = 'relative_change'
-
-        return cube_anomaly
+        return anomaly
 
     def _get_overlay_cube(self):
         """

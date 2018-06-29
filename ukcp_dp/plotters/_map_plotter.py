@@ -22,15 +22,15 @@ class MapPlotter(BasePlotter):
 
     This class extends BasePlotter with _generate_plot(self, output_path,
     title). This class should be extended with a _generate_subplots(self, cube,
-    plotsettings, fig, metadata_bbox) method to plot the map.
+    plot_settings, fig, metadata_bbox) method to plot the map.
     """
 
-    def _generate_plot(self, output_path, plotsettings, title):
+    def _generate_plot(self, output_path, plot_settings, title):
         """
         Override base class method.
 
         @param output_path (str): the full path to the file
-        @param plotsettings (StandardMap): an object containing plot settings
+        @param plot_settings (StandardMap): an object containing plot settings
         @param title (str): a title for the plot
         """
         # TODO we can only produce a map for a single scenario and variable
@@ -42,14 +42,14 @@ class MapPlotter(BasePlotter):
             # Some form of region, therefore it is the whole of UK
             reg = {'lons': [-10.9818, 2.2398], 'lats': [48.8957, 60.9531]}
 
-        plotsettings.set_xylims(reg)
+        plot_settings.set_xylims(reg)
 
         # Turn off grid lines for maps
-        plotsettings.dxgrid = 1000
-        plotsettings.dygrid = 1000
+        plot_settings.dxgrid = 1000
+        plot_settings.dygrid = 1000
 
         # First create the figure
-        fig, _, _ = start_standard_figure(plotsettings)
+        fig, _, _ = start_standard_figure(plot_settings)
 
         # Add the logo and metadata box
         self._add_logo(fig)
@@ -57,7 +57,7 @@ class MapPlotter(BasePlotter):
 
         # Call the method to generate the maps
         result = self._generate_subplots(
-            cube, plotsettings, fig, metadata_bbox)
+            cube, plot_settings, fig, metadata_bbox)
 
         # TODO Remove water mark
         # Add a water mark
@@ -69,19 +69,20 @@ class MapPlotter(BasePlotter):
         fig.suptitle(title, fontsize='larger')
 
         # Add the colourbar
-        make_standard_bar(plotsettings, fig, bar_pos=plotsettings.bar_position,
+        make_standard_bar(plot_settings, fig,
+                          bar_pos=plot_settings.bar_position,
                           colmappable=result[1])
 
         # Set the margins, and save/display & close the plot:
 #         plotgeneral.set_standard_margins(settings=None, fig=fig)
         end_figure(output_path)
 
-    def _generate_subplots(self, cube, plotsettings, fig, metadata_bbox):
+    def _generate_subplots(self, cube, plot_settings, fig, metadata_bbox):
         """
         This method should be overridden to produce the sub-plots.
 
         @param cube (iris cube): a cube containing the selected data
-        @param plotsettings (StandardMap): an object containing plot settings
+        @param plot_settings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
         @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """

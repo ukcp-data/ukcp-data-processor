@@ -11,7 +11,7 @@ from ukcp_dp.constants import PlotType
 
 
 def write_plot(plot_type, output_path, image_format, input_data, cube_list,
-               overlay_cube, title, vocab):
+               overlay_cube, title, vocab, plot_settings):
     """
     Generate a plot based on the plot type.
 
@@ -24,6 +24,7 @@ def write_plot(plot_type, output_path, image_format, input_data, cube_list,
         selected data
     @param title (str): a title for the plot
     @param vocab (Vocab): an instance of the ukcp_dp Vocab class
+    @param plot_settings (StandardMap): an object containing plot settings
     """
 
     image_file = _get_image_file(output_path, image_format, plot_type)
@@ -44,7 +45,7 @@ def write_plot(plot_type, output_path, image_format, input_data, cube_list,
         raise Exception('Invalid plot type: {}'.format(plot_type))
 
     plotter.generate_plot(input_data, cube_list, overlay_cube, image_file,
-                          title, vocab)
+                          title, vocab, plot_settings)
 
     return image_file
 

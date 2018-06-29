@@ -3,9 +3,7 @@ import copy
 
 import cartopy.crs as ccrs
 import cf_units
-from ukcp_dp.constants import DPI_DISPLAY, DPI_SAVING
-from ukcp_dp.plotters.utils._region_utils import REG_BI_FULL
-from ukcp_dp.plotters.utils._map_projections import UKCP_OSGB
+from ukcp_dp.constants import DPI_DISPLAY, DPI_SAVING, REG_BI_FULL, UKCP_OSGB
 
 
 class StandardMap(object):
@@ -393,9 +391,9 @@ UKCP_TEMP_ANOM = UKCP_TEMP.copy()
 UKCP_TEMP_ANOM.tag = "UKCP_temp_anom"
 UKCP_TEMP_ANOM.default_barlabel = "Temperature anomaly, $^\circ$C"
 UKCP_TEMP_ANOM.preferred_unit = cf_units.Unit("Celsius")
-UKCP_TEMP_ANOM.vrange = [-10.0, 10.0]
+UKCP_TEMP_ANOM.vrange = [-10.0, 15.0]
 UKCP_TEMP_ANOM.vmid = 0.0
-UKCP_TEMP_ANOM.vstep = 1.0
+UKCP_TEMP_ANOM.vstep = 2.0
 
 
 # Precipitation rate.

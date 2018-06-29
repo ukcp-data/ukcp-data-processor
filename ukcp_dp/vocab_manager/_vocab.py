@@ -461,6 +461,13 @@ MONTHS = [
     'dec'
 ]
 
+SEASONS = [
+    'djf',
+    'mam',
+    'jja',
+    'son'
+]
+
 ENSEMBLE_MEMBER_SET = {
     'land-gcm': ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10',
                  '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
@@ -480,6 +487,16 @@ def get_months():
     @return a list of strings representing the months
     """
     return MONTHS
+
+
+def get_seasons():
+    """
+    Get an ordered list of seasons.
+    The values are the same as those used in the vocab, 'djf', 'mam' etc.
+
+    @return a list of strings representing the seasons
+    """
+    return SEASONS
 
 
 def get_ensemble_member_set(data_source):

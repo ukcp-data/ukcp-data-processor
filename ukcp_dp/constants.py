@@ -1,5 +1,7 @@
 from os import path
 
+import cartopy.crs as ccrs
+
 
 def enum(**named_values):
     return type('Enum', (), named_values)
@@ -169,10 +171,6 @@ PDF_LABEL = 'Relative probability'
 
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
 
-# A list of anomaly variables whose values are represented as percentages
-PERCENTAGE_ANOMALIES = ['hussAnom', 'prAnom', 'rain5DayAccumMaxAnom',
-                        'petAnom']
-
 # Area types
 AreaType = enum(ADMIN_REGION='admin_region',
                 BBOX='bbox',
@@ -209,4 +207,20 @@ TemporalAverageType = enum(MONTHLY='mon',
                            ANNUAL='ann')
 
 DPI_DISPLAY = 94
-DPI_SAVING  = 100
+DPI_SAVING = 100
+
+# Map Projections
+OSGB_GLOBE = ccrs.Globe(datum='OSGB36', ellipse='airy')
+# See the output of the shell commands `proj -ld` and `proj -le`
+# to see how these options are defined!
+
+UKCP_OSGB = ccrs.TransverseMercator(central_longitude=-2.0,
+                                    central_latitude=49.0,
+                                    false_easting=400000,
+                                    false_northing=-100000,
+                                    scale_factor=0.9996012717,
+                                    globe=OSGB_GLOBE)
+
+# This is useful for defining plotting boundaries
+# (It includes the Shetlands and the Channel Islands)
+REG_BI_FULL = dict(lons=(-11, 3), lats=(49, 61))

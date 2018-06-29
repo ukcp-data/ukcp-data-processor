@@ -4,13 +4,118 @@ import logging
 import cf_units
 import iris
 import iris.coord_categorisation
+from iris.exceptions import CoordinateNotFoundError
+from ukcp_dp.constants import TemporalAverageType
+from ukcp_dp.vocab_manager import get_months, get_seasons
 
 
 log = logging.getLogger(__name__)
 
 
-def make_anomaly(datacube, reference_cube, preferred_unit=None,
-                 name_tag="anomaly"):
+def get_anomaly(cube_baseline, cube_absoute, baseline, preferred_unit,
+                temporal_average_type, time_period):
+    """
+    Generate a cube containing the anomaly values.
+
+    @param cube_baseline (iris.cube): a cube containing the baseline data
+    @param cube_absoute (iris.cube): a cube containing the absolute data to be
+        changed into anomalies
+    @param baseline (str): the value to be used added as the baseline
+        attribute to the resultant cube
+    @param preferred_unit(str):
+    @param temporal_average_type (TemporalAverageType): the temporal average
+        type
+    @param time_period(str): the name of a month or season or 'all'
+    """
+    cube_climatology = _make_climatology(
+        cube_baseline, temporal_average_type)
+
+    if temporal_average_type == TemporalAverageType.MONTHLY:
+        periods = _get_selected_month_numbers(time_period)
+    elif temporal_average_type == TemporalAverageType.SEASONAL:
+        periods = _get_selected_season_numbers()
+    else:
+        # TODO annual
+        pass
+
+    # generate the anomaly for each time period, i.e. month or season
+    anomaly_cubes = iris.cube.CubeList()
+    for period in periods:
+        if temporal_average_type == TemporalAverageType.MONTHLY:
+            constraint = iris.Constraint(month_number=period)
+
+        elif temporal_average_type == TemporalAverageType.SEASONAL:
+            constraint = iris.Constraint(season_number=period)
+
+        else:
+            # TODO annual
+            pass
+
+        cube_absoute_period = cube_absoute.extract(constraint)
+        cube_climatology_period = cube_climatology.extract(constraint)
+
+        cube_anomaly_period = _make_anomaly(
+            cube_absoute_period, cube_climatology_period, preferred_unit)
+
+        # we need to remove these so that we can concatenate the cubes
+        for coord in ['month_number', 'yyyymm', 'year']:
+            try:
+                cube_anomaly_period.remove_coord(coord)
+            except iris.exceptions.CoordinateNotFoundError:
+                pass
+
+        if time_period == 'all':
+            # At this point the cube will contain all of the values for a
+            # specific month/season for the entire time range. We cannot
+            # concatenate cubes of this type together so we have to split them
+            # up so they can be concatenated later on.
+            # At the same time we are promoting 'time' back to a coordinate
+            for anomaly_slice in cube_anomaly_period.slices_over('time'):
+                anomaly_cubes.append(
+                    iris.util.new_axis(anomaly_slice, 'time'))
+        else:
+            anomaly_cubes.append(cube_anomaly_period)
+
+    cube_anomaly = anomaly_cubes.concatenate_cube()
+
+    if time_period == 'all':
+        # Put 'time' back in the correct place
+        cube_anomaly.transpose()
+
+    # add the aux coords back
+    if temporal_average_type == TemporalAverageType.MONTHLY:
+        try:
+            iris.coord_categorisation.add_month_number(
+                cube_anomaly, 'time', name='month_number')
+        except CoordinateNotFoundError:
+            pass
+    elif temporal_average_type == TemporalAverageType.SEASONAL:
+        # TODO
+        try:
+            iris.coord_categorisation.add_month_number(
+                cube_anomaly, 'time', name='month_number')
+        except CoordinateNotFoundError:
+            pass
+    else:
+        pass
+        # TODO annual ?
+
+    try:
+        iris.coord_categorisation.add_year(
+            cube_anomaly, 'time', name='year')
+    except CoordinateNotFoundError:
+        pass
+
+    # add the attributes back in and add info about the baseline and
+    # anomaly
+    cube_anomaly.attributes = cube_absoute.attributes
+    cube_anomaly.attributes['baseline_period'] = baseline
+    cube_anomaly.attributes['anomaly_type'] = 'relative_change'
+
+    return cube_anomaly
+
+
+def _make_anomaly(datacube, reference_cube, preferred_unit=None):
     """
     Calculate the anomaly (or bias) of acube with respect to a reference_cube.
     These must be compatible shapes, or it will fail.
@@ -32,11 +137,6 @@ def make_anomaly(datacube, reference_cube, preferred_unit=None,
     then we take that to imply a request for RELATIVE anomalies,
     i.e. (x-μ)/μ instead of just x-μ   (where μ is the mean of x)
     This might be the case for precip, where we want anomalies in %.
-
-
-    The name_tag will be appended to the existing long/standard name
-    in the long_name of the new cube.
-    You probably want it to be "anomaly" or "bias".
     """
     # Actually calculating the anomalies is trivial:
     anomaly = datacube - reference_cube
@@ -51,6 +151,7 @@ def make_anomaly(datacube, reference_cube, preferred_unit=None,
                 anomaly.units = cf_units.Unit("Celsius")
 
         if preferred_unit.is_convertible(1):
+
             # We've asked for RELATIVE anomalies,
             # i.e. (x-μ)/μ instead of just x-μ (where μ is the mean of x)
             # This might be the case for precip where we want anomalies in %.
@@ -69,7 +170,7 @@ def make_anomaly(datacube, reference_cube, preferred_unit=None,
 
     # Append the name_tag to the long_name
     # (we'll do something different later probably!)
-    anomaly.long_name += " " + name_tag
+    anomaly.long_name += " anomaly"
 
     # We will want to include a new attribute 'climatology_baselne'
     # that describes the dates of the climatology in the reference_cube,
@@ -86,103 +187,40 @@ def make_anomaly(datacube, reference_cube, preferred_unit=None,
     return anomaly
 
 
-def make_climatology(acube, timecoordname='time', year_range=None,
-                     seasonyear_range=None,
-                     climtype="annual", operation=iris.analysis.MEAN):
+def _make_climatology(acube, climtype):
     """
-    Make a "climatology", i.e. a statistic calculated over a long period of
+    Make a "climatology", i.e. a mean calculated over a long period of
     time.
-
-    The obvious example is the long-term mean over many years,
-    but you can provide any iris.analysis function as the "operation" argument,
-    http://scitools.org.uk/iris/docs/latest/iris/iris/analysis.html
 
     You can also do monthly or seasonal climatologies:
     climtype ("climatology type")  must be one of 'annual', 'seasonal',
-    'monthly'. (acutally, just starting with seas* or month* will do)
+    'monthly'. (actually, just starting with seas* or month* will do)
 
     Seasons and month categorical AuxCoords will be added if necessary
-    (so if you want special season definitions, e.g. NDJ instead of DJF,
-     you should add them yourself first!)
 
     In the case of seasonal/monthly climatologies,
     the resulting cube has an anonymous leading dimension (DimCoord),
     which is linked to time, year, and season or month & month_number
     AuxCoords.
 
-    The climatology will be calculated over all timesteps in acube by default.
-    Alternatively, you can provide a 2-element tuple/list to year_range,
-    specifying the subset of years to include;
-    an intermediate cube will be extracted covering that range.
-    Note that the years selected will go from year_range[0] to year_range[1]
-    INCLUSIVE.
-
-    Alternatively, you can do the same thing to a season_year coordinate,
-    by giving that 2-element tuple/list to the seasonyear_range argument
-    instead. This means that Decembers will be kept with the subsequent year
-    (e.g. Dec 1980 is in season_year 1981),
-    which is what we usually want to do for UKCP18...
+    The climatology will be calculated over all timesteps in acube.
 
     """
 
-    if year_range is not None:
-        try:
-            iris.coord_categorisation.add_year(
-                acube, timecoordname, name="year")
-        except ValueError:
-            pass
-        # Now extract the subset of years:
-        year_constraint = iris.Constraint(
-            year=lambda cell: year_range[0] <= cell <= year_range[1])
-        thiscube = acube.extract(year_constraint)
-    else:
-        thiscube = acube
+    thiscube = acube
+    operation = iris.analysis.MEAN
 
-    if seasonyear_range is not None:
-        try:
-            iris.coord_categorisation.add_season_year(
-                acube, timecoordname, name="season_year")
-        except ValueError:
-            pass
-        # Now extract the subset of years:
-        seasyear_constraint = iris.Constraint(
-            season_year=lambda cell:
-                seasonyear_range[0] <= cell <= seasonyear_range[1])
-        thiscube = acube.extract(seasyear_constraint)
-    else:
-        thiscube = acube
-
-    climtype = climtype.lower()
-    if climtype.startswith("seas"):
+    if climtype == TemporalAverageType.SEASONAL:
         theseasons = ('djf', 'mam', 'jja', 'son')
         try:
-            iris.coord_categorisation.add_season(thiscube, timecoordname,
+            iris.coord_categorisation.add_season(thiscube, 'time',
                                                  name='season',
                                                  seasons=theseasons)
         except ValueError:
             pass
 
-        # Because the mean of a mean is a mean, there isn't an issue if we've
-        # requested means.
-        # But if we've requested standard deviations for example,
-        # we need to make sure we start with a seasonal-mean time series.
-        if operation is not iris.analysis.MEAN:
-            # The more general case: get the seasonal means first,
-            # then perform the requested interannual aggregation for the
-            # seasonal means.
-            if not _is_seasonal(thiscube, timecoordname=timecoordname):
-                log.debug("Calculating seasonal means prior to applying {} "
-                          "interannually".format(operation.name()))
-                seascube = _get_seasmean_timeseries(
-                    thiscube, timecoordname=timecoordname,
-                    theseasons=theseasons)
-            else:
-                seascube = thiscube
-        else:
-            seascube = thiscube
-
         # Now we are safe to aggregate:
-        climatol = seascube.aggregated_by('season', operation)
+        climatol = acube.aggregated_by('season', operation)
         # This is likely to result in an anonymous dimension
         # with time, season and season_year (and possibly other) aux coords.
 
@@ -194,191 +232,48 @@ def make_climatology(acube, timecoordname='time', year_range=None,
         # dimension and remove them in a loop.
         # So, the user will have to do this themselves if required.
 
-    elif climtype.startswith("month"):
-        try:
-            iris.coord_categorisation.add_month(
-                thiscube, timecoordname, name='month')
-        except ValueError:
-            pass
+    elif climtype == TemporalAverageType.MONTHLY:
         try:
             iris.coord_categorisation.add_month_number(
-                thiscube, timecoordname, name='month_number')
+                thiscube, 'time', name='month_number')
         except ValueError:
             pass
 
-        # Because the mean of a mean is a mean, there isn't an issue if we've
-        # requested means. But if we've requested standard deviations for
-        # example,we need to make sure we start with a monthly-mean time
-        # series.
-        if operation is not iris.analysis.MEAN:
-            # The more general case: get the monthly means first if necessary,
-            # then perform the requested interannual aggregation for the
-            # monthly means.
-            if not _is_monthly(thiscube, timecoordname=timecoordname):
-                log.debug("Calculating monthly means prior to applying  {} "
-                          "interannually".format(operation.name()))
-                moncube = _get_monthlymean_timeseries(
-                    thiscube, timecoordname=timecoordname)
-            else:
-                log.debug("it's ok, data is already monthly")
-                moncube = thiscube
-        else:
-            moncube = thiscube
-
         # Now we are safe to aggregate:
-        climatol = moncube.aggregated_by('month_number', operation)
+        climatol = acube.aggregated_by('month_number', operation)
         # As with seasonal, this will result in an anonymous dim coord
         # covering time, month, month_number etc,
         # but in this case we'd want to retain BOTH month and month_number.
-        # So it's even less clear how to automaticaly tidy in this case.
+        # So it's even less clear how to automatically tidy in this case.
 
-    elif climtype == "annual":
-        # Because the mean of a mean is a mean, there isn't an issue if we've
-        # requested means. But if we've requested standard deviations for
-        # example, we need to make sure we start with an annual-mean time
-        # series.
-        if operation is not iris.analysis.MEAN:
-            # The more general case: get the annual means first if necessary,
-            # then perform the requested interannual aggregation for the annual
-            # means.
-            annlcube = _get_annlmean_timeseries(
-                thiscube, timecoordname=timecoordname)
-        else:
-            annlcube = thiscube
-
+    elif climtype == TemporalAverageType.ANNUAL:
         # Now we are safe to aggregate -- actually, we want to COLLAPSE
         # over all time in this case!
-        climatol = annlcube.collapsed('time', operation)
+        climatol = acube.collapsed('time', operation)
 
     else:
         raise UserWarning("Climate type (" + climtype +
                           ") not recognised! \n" +
-                          "Use annual, sesonal or monthly.")
+                          "Use annual, seasonal or monthly.")
 
     return climatol
 
 
-def _get_annlmean_timeseries(acube, timecoordname="time"):
-    """
-    Handy function to get annual means each year.
-    Note that a 'year' categorical AuxCoord will be added if necessary.
-    """
-    try:
-        iris.coord_categorisation.add_year(acube, timecoordname, name="year")
-    except ValueError:
-        pass
-    annlmeans = acube.aggregated_by('year', operation)
-    return annlmeans
+def _get_selected_month_numbers(time_period):
+    if time_period == 'all':
+        months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        return months
+    for i, term in enumerate(get_months()):
+        if term == time_period:
+            # i is the index not the month number
+            return [i + 1]
 
 
-def _get_monthlymean_timeseries(acube, timecoordname="time"):
-    """
-    Handy function to get monthly means each year.
-
-    Note that 'year' and 'month_number' categorical AuxCoords will be added if
-    necessary.
-    """
-    try:
-        iris.coord_categorisation.add_year(acube, timecoordname, name="year")
-    except ValueError:
-        pass
-
-    try:
-        iris.coord_categorisation.add_month_number(
-            acube, timecoordname, name='month_number')
-    except ValueError:
-        pass
-
-    moncube = acube.aggregated_by(['month_number', 'year'], iris.analysis.MEAN)
-    return moncube
-
-
-def _get_seasmean_timeseries(acube, timecoordname="time",
-                             theseasons=('djf', 'mam', 'jja', 'son')):
-    """
-    Handy function to get seasonal means each year.
-    Note that 'season' and 'season_year' categorical AuxCoords will be added if
-    necessary.
-
-    theseasons is an iterable giving a complete list of season names
-    (see http://scitools.org.uk/iris/docs/latest/iris/iris/
-        coord_categorisation.html#iris.coord_categorisation.add_season)
-    """
-    try:
-        iris.coord_categorisation.add_season(acube, timecoordname,
-                                             name='season',
-                                             seasons=theseasons)
-    except ValueError:
-        pass
-
-    try:
-        iris.coord_categorisation.add_season_year(acube, timecoordname,
-                                                  name='season_year',
-                                                  seasons=theseasons)
-    except ValueError:
-        pass
-
-    seascube = acube.aggregated_by(
-        ["season", "season_year"], iris.analysis.MEAN)
-    return seascube
-
-
-def _is_n_monthly(acube, nmonths, timecoordname="time"):
-    """
-    Test if the time-resolution of acube's time coord
-    is nmonths (e.g. monthly for nmonths=1, seasonal for nmonths=3)
-
-    This will work for 360-day calendars,
-    and really should work for real-world calendars.
-    (but that hasn't been properly tested yet)
-    """
-    tcoord = acube.coord(timecoordname)
-
-    # Get the time coord data as a date/datetime/mysterious object:
-    # (if it's a 360-day calendar, then it's not a standard python
-    #  date/datetime, but a mysterious "instance" object, although it behaves
-    # like normal dates;
-    #  I think this is a netcdftime.datetime object)
-    t = cf_units.num2date(tcoord.points,
-                          tcoord.units.name,
-                          tcoord.units.calendar)
-    t_first = t[0]
-    t_next = t[1]
-
-    oldmonth = t_first.month
-
-    new_day = t_first.day
-    new_month = ((oldmonth + nmonths) - 1) % 12 + 1
-    new_year = t_first.year + (((oldmonth + nmonths) - 1) / 12)
-
-    # Create a new object using the class constructor
-    # of t_first's class
-    # (could be a datetime.date, datetime.datetime, netcdftime.datetime, ...)
-    newdate = t_first.__class__(new_year, new_month, new_day)
-
-    # With netcdftime.datetime objects, you can't change the components:
-    # newdate       = copy.copy(t_first)
-    # newdate.month = ((oldmonth+nmonths)-1) % 12 +1
-    # newdate.year  = t_first.year+( ((oldmonth+nmonths)-1) /12 )
-    # newdate.day  = t_first.day    (don't need to change this)
-
-    # After adding n months, is the result the same as the next date?
-    is_nmonthly = t_next == newdate
-
-    return is_nmonthly
-
-
-def _is_monthly(acube, timecoordname="time"):
-    """
-    Convenience wrapper to is_n_monthly() for n=1,
-    i.e. testing if acube contains monthly data.
-    """
-    return _is_n_monthly(acube, 1, timecoordname=timecoordname)
-
-
-def _is_seasonal(acube, timecoordname="time"):
-    """
-    Convenience wrapper to is_n_monthly() for n=3,
-    i.e. testing if acube contains seasonal data.
-    """
-    return _is_n_monthly(acube, 3, timecoordname=timecoordname)
+def _get_selected_season_numbers(time_period):
+    if time_period == 'all':
+        seasons = [1, 2, 3, 4]
+        return seasons
+    for i, term in enumerate(get_seasons()):
+        if term == time_period:
+            # i is the index not the season number
+            return [i + 1]

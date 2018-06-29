@@ -2,15 +2,11 @@ import logging
 
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
-from ukcp_dp.constants import OVERLAY_ADMIN, OVERLAY_RIVER, OVERLAY_COUNTRY
-from ukcp_dp.plotters.utils._map_projections import UKCP_OSGB
+from ukcp_dp.constants import OVERLAY_ADMIN, OVERLAY_RIVER, OVERLAY_COUNTRY, \
+    UKCP_OSGB
 
 
 log = logging.getLogger(__name__)
-
-# This is useful for defining plotting boundaries
-# (It includes the Shetlands and the Channel Islands)
-REG_BI_FULL = dict(lons=(-11, 3), lats=(49, 61))
 
 
 def reg_from_cube(acube,
