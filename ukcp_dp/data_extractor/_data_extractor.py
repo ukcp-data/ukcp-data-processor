@@ -7,8 +7,10 @@ from iris.cube import CubeList
 import iris.experimental.equalise_cubes
 import iris.plot as iplt
 import iris.quickplot as qplt
+from iris.util import unify_time_units
 from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, TEMP_ANOMS, \
-    DATA_SOURCE_MARINE, AreaType, TemporalAverageType
+    DATA_SOURCE_MARINE, AreaType, TemporalAverageType, DATA_SOURCE_GCM, \
+    DATA_SOURCE_RCM
 from ukcp_dp.data_extractor._utils import get_anomaly
 from ukcp_dp.vocab_manager import get_months
 
@@ -193,11 +195,29 @@ class DataExtractor(object):
                 if cube.name() != 'time_bnds':
                     cubes.append(cube)
 
-        # TODO Temp hack until removed from data
-        for cube in cubes:
-            coords = cube.coords(var_name='region')
-            for coord in coords:
-                cube.remove_coord(coord)
+        # TODO Temp hack until data updated
+        #
+        #     int region(region) ;
+        #         region:units = "1" ;
+        #         region:standard_name = "region" ;
+        #     char geo_region(region, string24) ;
+        #         geo_region:units = "1" ;
+        #         geo_region:standard_name = "region" ;
+        #         geo_region:long_name = "Administrative Region" ;
+        #
+        # The reuse of standard_name = "region" results in a region coord in
+        # "Dimension coordinates" and "Auxiliary coordinates"
+
+        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_GCM or
+                self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_RCM):
+            for cube in cubes:
+                coords = cube.coords(var_name='region')
+                for coord in coords:
+                    cube.remove_coord(coord)
+
+        # END TEMP HACK
 
         if len(cubes) == 0:
             log.warn('No data was retrieved from the following files:{}'.
@@ -208,6 +228,7 @@ class DataExtractor(object):
         log.debug('Concatenate cubes:\n{}'.format(cubes))
 
         iris.experimental.equalise_cubes.equalise_attributes(cubes)
+        unify_time_units(cubes)
         cube = cubes.concatenate_cube()
 
         log.debug('Concatenated cube:\n{}'.format(cube))

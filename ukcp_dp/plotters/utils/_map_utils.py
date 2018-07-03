@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+import math
 from os import path
 
 import cartopy
@@ -575,7 +576,7 @@ def plot_choropleth_map(regions, regionaldata_input, regional_sigs=None,
     regdata_dict = dict()
     for regcube in regionaldata:
         for reg_slice in regcube.slices_over(['region']):
-            regdata_dict[reg_slice.coords(standard_name='region')[
+            regdata_dict[reg_slice.coords(var_name='geo_region')[
                 0].points[0]] = float(reg_slice.data)
     regunits = regcube.units
     # Don't delete the CubeList - we'll probably want it later for
@@ -720,9 +721,12 @@ def plot_choropleth_map(regions, regionaldata_input, regional_sigs=None,
     for i, region in enumerate(regions):
         reg_name = region.attributes[reg_key]
         if reg_name not in regdata_dict.keys():
-            val = float('nan')
+            continue
         else:
             val = regdata_dict[reg_name]
+
+        if math.isnan(val):
+            continue
 
         facecolor = cmap(normalizer([val]))
 

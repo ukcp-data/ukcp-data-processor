@@ -76,7 +76,8 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
         cube = self.cube_list[0]
 
         # update the header
-        self.header.append(str(cube.coord('region').long_name))
+        self.header.append(str(
+            cube.coords(var_name='geo_region')[0].long_name))
 
         key_list = []
         for ensemble_slice in cube.slices_over('ensemble_member'):
@@ -91,7 +92,8 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
 
             # rows of data
             for region_slice in ensemble_slice.slices_over('region'):
-                region = str(region_slice.coord('region').points[0])
+                region = str(region_slice.coords(var_name='geo_region')[
+                    0].points[0])
 
                 value = convert_to_2dp(region_slice.data)
                 try:
