@@ -17,6 +17,7 @@ from ukcp_dp.plotters import write_plot as plotter_write_plot
 from ukcp_dp.processors import SamplingProcessor
 from ukcp_dp.validator import Validator
 from ukcp_dp.vocab_manager import Vocab
+from ukcp_dp.utils import get_plot_settings
 
 
 class UKCPDataProcessor(object):
@@ -25,6 +26,7 @@ class UKCPDataProcessor(object):
         self.cube_list = None
         self.input_data = None
         self.overlay_cube = None
+        self.plot_settings = None
         self.plot_type = None
         self.vocab = Vocab()
         self.validator = Validator(self.vocab)
@@ -81,7 +83,18 @@ class UKCPDataProcessor(object):
             self.validate_inputs()
 
         file_lists = get_file_lists(self.input_data)
-        data_extractor = DataExtractor(file_lists, self.input_data)
+
+        # The plot settings are customised to the first variable in the list
+        # We may want to change this in the future
+        self.plot_settings = get_plot_settings(
+            self.vocab,
+            self.input_data.get_value(InputType.IMAGE_SIZE),
+            self.input_data.get_font_size(),
+            self.input_data.get_value(InputType.VARIABLE)[0])
+
+        data_extractor = DataExtractor(file_lists, self.input_data,
+                                       self.plot_settings)
+
         self.title = data_extractor.get_title()
         self.cube_list = data_extractor.get_cubes()
         self.overlay_cube = data_extractor.get_overlay_cube()
@@ -123,7 +136,8 @@ class UKCPDataProcessor(object):
 
         image_file = plotter_write_plot(plot_type, output_path, image_format,
                                         self.input_data, self.cube_list,
-                                        self.overlay_cube, title, self.vocab)
+                                        self.overlay_cube, title, self.vocab,
+                                        self.plot_settings)
         self.plot_type = plot_type
 
         return image_file
