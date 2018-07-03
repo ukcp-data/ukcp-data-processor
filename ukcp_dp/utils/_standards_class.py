@@ -422,9 +422,9 @@ UKCP_PRECIP_ANOM.default_barlabel = "Precipitation rate anomaly, %"
 # UKCP_PRECIP_ANOM.default_barlabel = "Precipitation rate anomaly, mm/day"
 UKCP_PRECIP_ANOM.extendcolbar = "both"
 UKCP_PRECIP_ANOM.cpal = "BrBG"
-UKCP_PRECIP_ANOM.vrange = [-5.0, 5.0]
+UKCP_PRECIP_ANOM.vrange = [-100.0, 100.0]
 UKCP_PRECIP_ANOM.vmid = 0.0
-UKCP_PRECIP_ANOM.vstep = 1.0
+UKCP_PRECIP_ANOM.vstep = 20.0
 
 
 # Wind speed.
