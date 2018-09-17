@@ -173,7 +173,7 @@ class Vocab(object):
     },
         'area_type': {
         'bbox': 'Bounding box',
-        'point': ' Point',
+        'point': 'Grid Cell',
         'country': 'Country',
         'admin_region': 'Administrative Region',
         'river_basin': 'River Basin',
@@ -265,36 +265,6 @@ class Vocab(object):
         85: '85',
         90: '90',
     },
-
-        # vocabs just for facets
-        'period': {
-        '1900-2100': '1900-2100',
-        '1961-2100': '1961-2100',
-        '1980-2080': '1980-2080',
-        '2007-2100': '2007-2100',
-        '2007-2300': '2007-2300'
-    },
-        'output': {
-        'graphs': 'Graphs',
-        'maps': 'Maps',
-        'data': 'Data only',
-    },
-        'spatial_representation_group': {
-        '60km': '60km grid',
-        '25km': '25km grid',
-        '12km': '12km grid',
-        '2km': '2.2km grid',
-        'aggregated_areas': 'Spatially Aggregated Areas',
-        'coastal': 'Coastal'
-    },
-        'variable_group': {
-        'temp': 'Temperature',
-        'rain': 'Rainfall',
-        'press': 'Pressure',
-        'hum': 'Humidity',
-        'sea': 'Sea level',
-        'wind': 'Wind speed'
-    },
     }
 
     COLLECTION_LABELS = {
@@ -313,9 +283,7 @@ class Vocab(object):
         'image_size': 'Image Size',
         'legend_position': 'Legend Position',
         'method': 'Method',
-        'output': 'Output',
         'overlay_probability_levels': 'Overlay Probability Levels',
-        'period': 'Date Range',
         'random_sampling_count': 'Random Sampling Count',
         'sampling_id': 'Sampling IDs',
         'sampling_method': 'Sampling Method',
@@ -329,11 +297,9 @@ class Vocab(object):
         'scenario': 'Scenario',
         'show_boundaries': 'Show Boundaries',
         'spatial_representation': 'Spatial Representation',
-        'spatial_representation_group': 'Spatial Representation',
         'temporal_average_type': 'Temporal Average Type',
         'time_period': 'Time Period',
         'variable': 'Variable',
-        'variable_group': 'Variable',
         'year': 'Year',
         'year_minimum': 'Year Minimum',
         'year_maximum': 'Year Maximum'
