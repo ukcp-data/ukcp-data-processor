@@ -224,3 +224,5 @@ UKCP_OSGB = ccrs.TransverseMercator(central_longitude=-2.0,
 # This is useful for defining plotting boundaries
 # (It includes the Shetlands and the Channel Islands)
 REG_BI_FULL = dict(lons=(-11, 3), lats=(49, 61))
+
+SOFTWARE_VERSION = 'WPS-1.0.0-DP-1.0.0'

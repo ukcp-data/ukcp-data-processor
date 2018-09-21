@@ -1,7 +1,7 @@
 import collections
 import logging
 
-from ukcp_dp.constants import DataType, InputType, PDF_LABEL
+from ukcp_dp.constants import DataType, InputType, PDF_LABEL, SOFTWARE_VERSION
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 from ukcp_dp.file_writers._utils import convert_to_2dp, convert_to_4dp
 
@@ -75,9 +75,16 @@ class PdfCsvWriter(BaseCsvWriter):
         Write out the column headers and data_dict.
 
         We have to override the method in the base class as we do not wish all
-        of the scenarios to be writen to the headers
+        of the scenarios to be written to the headers
         """
-        user_inputs = self.input_data.get_user_inputs()
+        user_inputs = {}
+        all_user_inputs = self.input_data.get_user_inputs()
+        for key in all_user_inputs:
+            if key in self.ignore_in_header:
+                    continue
+            user_inputs[key] = all_user_inputs[key]
+        user_inputs['Software Version'] = SOFTWARE_VERSION
+
         header_string = ','.join(self.header)
         header_string = header_string.replace('\n,', '\n')
         header_length = len(header_string.split('\n')) + \

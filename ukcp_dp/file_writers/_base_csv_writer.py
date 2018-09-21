@@ -3,6 +3,8 @@ import logging
 import os
 from time import gmtime, strftime
 
+from ukcp_dp.constants import SOFTWARE_VERSION
+
 
 log = logging.getLogger(__name__)
 
@@ -23,6 +25,8 @@ class BaseCsvWriter(object):
         self.output_data_file_path
         self.timestamp
     """
+    ignore_in_header = ['Colour Mode', 'Font Size', 'Image Size',
+                        'Legend Position']
 
     def write_csv(self, input_data, cube_list, output_data_file_path, vocab,
                   plot_type, overlay_cube=None):
@@ -71,7 +75,13 @@ class BaseCsvWriter(object):
         """
         Write out the column headers and data_dict.
         """
-        user_inputs = self.input_data.get_user_inputs()
+        user_inputs = {}
+        all_user_inputs = self.input_data.get_user_inputs()
+        for key in all_user_inputs:
+            if key in self.ignore_in_header:
+                    continue
+            user_inputs[key] = all_user_inputs[key]
+        user_inputs['Software Version'] = SOFTWARE_VERSION
         header_string = ','.join(self.header)
         header_string = header_string.replace('\n,', '\n')
         header_length = len(header_string.split('\n')) + \
