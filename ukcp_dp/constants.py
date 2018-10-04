@@ -136,7 +136,6 @@ OVERLAY_COLOUR = 'black'
 OVERLAY_LINE_WIDTH = 0.3
 
 ROOT_DIR = '/usr/local/cows_venv_py27/cows_venv/lib/python2.7/site-packages'
-ROOT_DIR = '/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'  # TODO
 
 OVERLAY_ADMIN = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK_Admin')
 OVERLAY_COASTLINE = path.join(
