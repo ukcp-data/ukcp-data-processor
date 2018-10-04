@@ -9,9 +9,9 @@ the entry point for this package.
 
 from iris.cube import CubeList
 from ukcp_dp._input_data import InputData
-from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, PlotType
+from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, PlotType, VERSION
 from ukcp_dp.data_extractor import DataExtractor, get_probability_levels
-from ukcp_dp.file_finder import get_file_lists
+from ukcp_dp.file_finder import get_absolute_paths, get_file_lists
 from ukcp_dp.file_writers import write_file
 from ukcp_dp.plotters import write_plot as plotter_write_plot
 from ukcp_dp.processors import SamplingProcessor
@@ -22,7 +22,7 @@ from ukcp_dp.utils import get_plot_settings
 
 class UKCPDataProcessor(object):
 
-    def __init__(self):
+    def __init__(self, process_version=None):
         self.cube_list = None
         self.input_data = None
         self.overlay_cube = None
@@ -31,6 +31,10 @@ class UKCPDataProcessor(object):
         self.vocab = Vocab()
         self.validator = Validator(self.vocab)
         self.validated = False
+        if process_version is None:
+            self.process_version = VERSION
+        else:
+            self.process_version = process_version
 
     def get_vocab(self):
         """
@@ -77,7 +81,7 @@ class UKCPDataProcessor(object):
         """
         Use the data set via 'set_inputs' to generate an iris cube list.
 
-        @return an iris cube list
+        @return a list of file paths of the files containing the selected data
         """
         if self.validated is False:
             self.validate_inputs()
@@ -104,7 +108,7 @@ class UKCPDataProcessor(object):
                 self.cube_list, self.input_data, self.vocab)
             self.cube_list = sampling_processor.get_cubes()
 
-        return self.cube_list
+        return get_absolute_paths(file_lists)
 
     def write_plot(self, plot_type, output_path, image_format=None,
                    title=None):
@@ -190,6 +194,6 @@ class UKCPDataProcessor(object):
         output_file_list = write_file(cubes, self.overlay_cube, self.title,
                                       output_data_file_path, data_format,
                                       self.input_data, self.plot_type,
-                                      self.vocab)
+                                      self.process_version, self.vocab)
         self.plot_type = None
         return output_file_list

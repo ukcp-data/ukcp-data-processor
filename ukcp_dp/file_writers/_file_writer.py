@@ -11,13 +11,13 @@ log = logging.getLogger(__name__)
 
 
 def write_file(cube_list, overlay_cube, title, output_data_file_path,
-               data_format, input_data, plot_type, vocab):
+               data_format, input_data, plot_type, process_version, vocab):
     log.debug(cube_list)
 
     if data_format == DataFormat.CSV:
         return write_csv_file(
             cube_list, overlay_cube, title, output_data_file_path, input_data,
-            plot_type, vocab)
+            plot_type, process_version, vocab)
 
     elif data_format == DataFormat.NET_CDF:
         return _write_netcdf_file(cube_list, output_data_file_path, plot_type)

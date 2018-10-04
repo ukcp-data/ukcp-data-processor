@@ -13,18 +13,19 @@ reqs = [line.strip() for line in open('requirements.txt')]
 GIT_REPO = "https://github.com/ukcp-data/ukcp-data-processor"
 
 setup(
-    name                 = "ukcp-data-processor",
-    version              = __version__,
-    description          = "Python library for reading, writing, processing and plotting UKCP data.",
-    long_description     = readme(),
-    license              = "",
-    author               = "Antony Wilson",
-    author_email         = "antony.wilson@stfc.ac.uk",
-    url                  = GIT_REPO,
-    packages             = find_packages(),
-    install_requires     = reqs,
-    tests_require        = ['pytest'],
-    classifiers          = [
+    name="ukcp-data-processor",
+    version=__version__,
+    description="Python library for reading, writing, processing and plotting UKCP data.",
+    long_description=readme(),
+    long_description_content_type='text/markdown',
+    license='BSD - See ceda_example/LICENSE file for details',
+    author="Antony Wilson",
+    author_email="antony.wilson@stfc.ac.uk",
+    url=GIT_REPO,
+    packages=find_packages(),
+    install_requires=[' SciTools Iris'],
+    tests_require=['pytest'],
+    classifiers=[
         'Development Status :: 2 - ???',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
@@ -33,8 +34,12 @@ setup(
         'Programming Language :: Python',
         'Topic :: Scientific/Engineering',
     ],
-    include_package_data = True,
+    include_package_data=True,
     scripts=[],
-    entry_points = {},
-    package_data = {}
+    entry_points={},
+    package_data={
+        'ceda_example': [
+            'LICENSE',
+        ],
+    }
 )

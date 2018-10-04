@@ -66,6 +66,33 @@ def get_file_lists(input_data):
     return file_list
 
 
+def get_absolute_paths(file_lists):
+    """Take an object returned from get_file_lists and returns a flattened list
+    of absolute file paths.
+
+    @param file_list (dict): a dictionary returned from a get_file_lists call
+
+    @return a list of absolute file paths
+    """
+    absolute_paths = []
+    for key in file_lists:
+        for variable_files in file_lists[key]:
+            for file_paths in file_lists[key][variable_files]:
+                for file_path in file_paths:
+                    absolute_paths.append(_get_absolute_path(file_path))
+    absolute_paths.sort()
+    return absolute_paths
+
+
+def _get_absolute_path(file_path):
+    if '*' in file_path:
+        path = os.path.realpath(file_path.split('*')[0])
+        path = os.path.join(path, '*')
+    else:
+        path = os.path.realpath(file_path)
+    return path
+
+
 def _get_prob_file_list(input_data):
     """
     Get a list of files based on the data provided in the input data. As this

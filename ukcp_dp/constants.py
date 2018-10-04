@@ -3,6 +3,9 @@ from os import path
 import cartopy.crs as ccrs
 
 
+VERSION = "0.1.0dev4"
+
+
 def enum(**named_values):
     return type('Enum', (), named_values)
 
@@ -133,6 +136,7 @@ OVERLAY_COLOUR = 'black'
 OVERLAY_LINE_WIDTH = 0.3
 
 ROOT_DIR = '/usr/local/cows_venv_py27/cows_venv/lib/python2.7/site-packages'
+ROOT_DIR = '/usr/local/cows_venv_py27/local_dists/ukcp-data-processor'  # TODO
 
 OVERLAY_ADMIN = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK_Admin')
 OVERLAY_COASTLINE = path.join(
@@ -224,5 +228,3 @@ UKCP_OSGB = ccrs.TransverseMercator(central_longitude=-2.0,
 # This is useful for defining plotting boundaries
 # (It includes the Shetlands and the Channel Islands)
 REG_BI_FULL = dict(lons=(-11, 3), lats=(49, 61))
-
-SOFTWARE_VERSION = 'WPS-1.0.0-DP-1.0.0'

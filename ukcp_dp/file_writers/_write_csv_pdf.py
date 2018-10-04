@@ -1,7 +1,7 @@
 import collections
 import logging
 
-from ukcp_dp.constants import DataType, InputType, PDF_LABEL, SOFTWARE_VERSION
+from ukcp_dp.constants import DataType, InputType, PDF_LABEL
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 from ukcp_dp.file_writers._utils import convert_to_2dp, convert_to_4dp
 
@@ -83,7 +83,7 @@ class PdfCsvWriter(BaseCsvWriter):
             if key in self.ignore_in_header:
                     continue
             user_inputs[key] = all_user_inputs[key]
-        user_inputs['Software Version'] = SOFTWARE_VERSION
+        user_inputs['Software Version'] = self.process_version
 
         header_string = ','.join(self.header)
         header_string = header_string.replace('\n,', '\n')

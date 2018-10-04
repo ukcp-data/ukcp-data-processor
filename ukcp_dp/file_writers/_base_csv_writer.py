@@ -3,8 +3,6 @@ import logging
 import os
 from time import gmtime, strftime
 
-from ukcp_dp.constants import SOFTWARE_VERSION
-
 
 log = logging.getLogger(__name__)
 
@@ -23,13 +21,15 @@ class BaseCsvWriter(object):
         self.data_dict
         self.header
         self.output_data_file_path
+        self.plot_type
+        self.process_version
         self.timestamp
     """
     ignore_in_header = ['Colour Mode', 'Font Size', 'Image Size',
                         'Legend Position']
 
     def write_csv(self, input_data, cube_list, output_data_file_path, vocab,
-                  plot_type, overlay_cube=None):
+                  plot_type, process_version, overlay_cube=None):
         """
         Write a CSV file.
 
@@ -38,6 +38,9 @@ class BaseCsvWriter(object):
             selected data, one cube per scenario, per variable
         @param output_data_file_path (str): the full path to the file
         @param vocab (Vocab): an instance of the ukcp_dp Vocab class
+        @param plot_type (PlotType): the type of the plot
+        @param process_version (str): the version of the process generating
+            this output
         @param overlay_cube (iris cube): a cube containing the data for
             the overlay
         """
@@ -54,6 +57,7 @@ class BaseCsvWriter(object):
             0]
         self.timestamp = strftime("%Y-%m-%dT%H-%M-%S", gmtime())
         self.plot_type = plot_type
+        self.process_version = process_version
         return self._write_csv()
 
     def _write_csv(self):
@@ -81,7 +85,7 @@ class BaseCsvWriter(object):
             if key in self.ignore_in_header:
                     continue
             user_inputs[key] = all_user_inputs[key]
-        user_inputs['Software Version'] = SOFTWARE_VERSION
+        user_inputs['Software Version'] = self.process_version
         header_string = ','.join(self.header)
         header_string = header_string.replace('\n,', '\n')
         header_length = len(header_string.split('\n')) + \

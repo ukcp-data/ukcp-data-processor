@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
-                   input_data, plot_type, vocab):
+                   input_data, plot_type, process_version, vocab):
     """
     Output the data as csv.
 
@@ -56,4 +56,4 @@ def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
         return write_default_csv(cube_list, title, output_data_file_path)
 
     return csv_writer.write_csv(input_data, cube_list, output_data_file_path,
-                                vocab, plot_type, overlay_cube)
+                                vocab, plot_type, process_version, overlay_cube)
