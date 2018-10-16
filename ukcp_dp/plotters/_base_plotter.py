@@ -215,9 +215,9 @@ class BasePlotter(object):
                 inverse_transformed(fig.transFigure))
 
         # add a box around the table
-        ax = fig.add_axes(Bbox(bbox), axis_bgcolor='none')
-        ax.set_xticks([])
-        ax.set_yticks([])
+#         ax = fig.add_axes(Bbox(bbox), axis_bgcolor='none')
+#         ax.set_xticks([])
+#         ax.set_yticks([])
         return bbox
 
 
