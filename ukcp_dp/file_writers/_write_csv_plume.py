@@ -2,7 +2,7 @@ import logging
 
 import iris
 from ukcp_dp.constants import DATA_SOURCE_MARINE, DATA_SOURCE_PROB
-from ukcp_dp.constants import InputType
+from ukcp_dp.constants import InputType, RETURN_PERIODS
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 from ukcp_dp.file_writers._utils import convert_to_2dp
 
@@ -21,7 +21,11 @@ class PlumeCsvWriter(BaseCsvWriter):
         """
         Write out the data, in CSV format, associated with a plume plot.
         """
-        self.header.append('Date')
+        if (self.input_data.get_value(InputType.METHOD).startswith(
+                RETURN_PERIODS)):
+            self.header.append('Return period(years)')
+        else:
+            self.header.append('Date')
         key_list = []
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
@@ -61,7 +65,7 @@ class PlumeCsvWriter(BaseCsvWriter):
                     InputType.VARIABLE)[0].encode('utf-8')
                 self.header.append('{var}({ensemble})'.format(
                     ensemble=ensemble_name, var=var))
-                self._read_time_cube(ensemble_slice, key_list)
+                self._read_x_cube(ensemble_slice, key_list)
 
         # now add the data from the overlay
         if self.overlay_cube is not None:
@@ -84,7 +88,27 @@ class PlumeCsvWriter(BaseCsvWriter):
                 InputType.VARIABLE)[0].encode('utf-8')
             self.header.append('{var}({percentile}th Percentile)'.format(
                 percentile=int(float(percentile)), var=var))
-            self._read_time_cube(_slice, key_list)
+            self._read_x_cube(_slice, key_list)
+
+    def _read_x_cube(self, cube, key_list):
+        if (self.input_data.get_value(InputType.METHOD).startswith(
+                RETURN_PERIODS)):
+            self._read_returnlevel_cube(cube, key_list)
+        else:
+            self._read_time_cube(cube, key_list)
+
+    def _read_returnlevel_cube(self, cube, key_list):
+        """
+        Slice the cube over 'return_period' and update data_dict
+        """
+        for _slice in cube.slices_over('return_period'):
+            value = convert_to_2dp(_slice.data)
+            time_str = int(round(_slice.coord('return_period').cell(0).point))
+            try:
+                self.data_dict[time_str].append(value)
+            except KeyError:
+                key_list.append(time_str)
+                self.data_dict[time_str] = [value]
 
     def _read_time_cube(self, cube, key_list):
         """

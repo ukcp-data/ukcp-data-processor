@@ -167,12 +167,15 @@ DATA_SOURCE_MARINE_MIN_YEAR = 2007
 DATA_SOURCE_MARINE_MAX_YEAR = 2300
 OTHER_MAX_YEAR = 2100
 
-METHOD_EXPLORATORY = 'exploratory'
+# Marine data stuff
+RETURN_PERIODS = 'return-periods'
+EXTENDED_PROJECTIONS = ['msl-proj-expl', 'return-periods-ext']
 
 CDF_LABEL = 'Probability of being less than (%)'
 PDF_LABEL = 'Relative probability'
 
 DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
+DATA_SERVICE_URL = 'http://data.ceda.ac.uk/badc/ukcp18/data'
 
 # Area types
 AreaType = enum(ADMIN_REGION='admin_region',

@@ -3,8 +3,8 @@ import logging
 from ukcp_dp.constants import DATA_SOURCE_PROB, DATA_SOURCE_PROB_MIN_YEAR, \
     DATA_SOURCE_MARINE, DATA_SOURCE_MARINE_MIN_YEAR, \
     DATA_SOURCE_MARINE_MAX_YEAR, DATA_SOURCE_RCM, \
-    DATA_SOURCE_RCM_MIN_YEAR, InputType, METHOD_EXPLORATORY, OTHER_MAX_YEAR, \
-    AreaType, TemporalAverageType
+    DATA_SOURCE_RCM_MIN_YEAR, EXTENDED_PROJECTIONS, InputType, \
+    OTHER_MAX_YEAR, AreaType, TemporalAverageType
 from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
@@ -141,8 +141,8 @@ class Validator(object):
 
         if (self.input_data.get_value(InputType.DATA_SOURCE) ==
                 DATA_SOURCE_MARINE and
-                self.input_data.get_value(InputType.METHOD) ==
-                METHOD_EXPLORATORY):
+                self.input_data.get_value(InputType.METHOD) in
+                EXTENDED_PROJECTIONS):
             max_allowed_year = DATA_SOURCE_MARINE_MAX_YEAR
         else:
             max_allowed_year = OTHER_MAX_YEAR

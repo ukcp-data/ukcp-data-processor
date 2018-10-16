@@ -1,10 +1,9 @@
 import os
 
-from ukcp_dp.constants import DATA_DIR, DATA_SOURCE_PROB, \
+from ukcp_dp.constants import DATA_DIR, DATA_SERVICE_URL, DATA_SOURCE_PROB, \
     DATA_SOURCE_PROB_MIN_YEAR, DATA_SOURCE_GCM, DATA_SOURCE_RCM, \
-    DATA_SOURCE_MARINE, DATA_SOURCE_MARINE_MIN_YEAR, \
-    DATA_SOURCE_MARINE_MAX_YEAR, InputType, METHOD_EXPLORATORY, \
-    OTHER_MAX_YEAR, AreaType, TemporalAverageType
+    DATA_SOURCE_MARINE, InputType, OTHER_MAX_YEAR, AreaType, \
+    TemporalAverageType
 
 import logging
 log = logging.getLogger(__name__)
@@ -90,6 +89,8 @@ def _get_absolute_path(file_path):
         path = os.path.join(path, '*')
     else:
         path = os.path.realpath(file_path)
+
+    path = path.replace(DATA_DIR, DATA_SERVICE_URL)
     return path
 
 
@@ -151,16 +152,13 @@ def _get_file_list_per_scenario(input_data, scenario, spatial_representation,
         file_path = _get_prob_file_path(
             data_type, input_data, scenario, spatial_representation, variable)
 
-        if (input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
-                TemporalAverageType.ANNUAL
-                or spatial_representation != '25km'):
-            if (input_data.get_value(InputType.DATA_SOURCE) ==
-                    DATA_SOURCE_MARINE):
-                file_name = _get_marine_file_name(
-                    input_data, scenario, variable)
-            else:
-                # current thinking is that there will only be one file
-                file_name = '*'
+        if ((input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
+                TemporalAverageType.ANNUAL or spatial_representation != '25km')
+                or
+                (input_data.get_value(InputType.DATA_SOURCE) ==
+                 DATA_SOURCE_MARINE)):
+            # current thinking is that there will only be one file
+            file_name = '*'
             file_list_per_data_type.append(
                 [os.path.join(file_path, file_name)])
             continue
@@ -209,8 +207,8 @@ def _get_prob_file_path(data_type, input_data, scenario,
 
         file_path = os.path.join(
             DATA_DIR,
-            input_data.get_value(InputType.DATA_SOURCE),
-            'msl-proj*',
+            DATA_SOURCE_MARINE,
+            input_data.get_value(InputType.METHOD),
             scenario,
             variable,
             VERSION)
@@ -248,23 +246,6 @@ def _get_prob_file_name(data_type, input_data, scenario,
                      data_type=data_type,
                      temporal_type=input_data.get_value(
                          InputType.TEMPORAL_AVERAGE_TYPE),
-                     start_data=start_date,
-                     end_date=end_date))
-    return file_name
-
-
-def _get_marine_file_name(input_data, scenario, variable):
-    start_date = DATA_SOURCE_MARINE_MIN_YEAR
-    if (input_data.get_value(InputType.METHOD) == METHOD_EXPLORATORY):
-        end_date = DATA_SOURCE_MARINE_MAX_YEAR
-    else:
-        end_date = OTHER_MAX_YEAR
-
-    file_name = ('{variable}_{data_source}_{scenario}_ann_'
-                 '{start_data}-{end_date}.nc'.format(
-                     variable=variable,
-                     scenario=scenario,
-                     data_source=DATA_SOURCE_MARINE,
                      start_data=start_date,
                      end_date=end_date))
     return file_name

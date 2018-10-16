@@ -8,9 +8,11 @@ import iris
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
+import numpy as np
 from ukcp_dp.constants import DATA_SOURCE_PROB, \
     DATA_SOURCE_MARINE, ENSEMBLE_COLOURS, ENSEMBLE_GREYSCALES, \
-    ENSEMBLE_LOWLIGHT, PERCENTILE_LINE_COLOUR, PERCENTILE_FILL, InputType
+    ENSEMBLE_LOWLIGHT, PERCENTILE_LINE_COLOUR, PERCENTILE_FILL, \
+    RETURN_PERIODS, InputType
 
 
 log = logging.getLogger(__name__)
@@ -48,17 +50,32 @@ class PlumePlotter(GraphPlotter):
                 # plot the ensemble members
                 self._plot_ensemble(self.cube_list[0], ax)
 
-        # set the limits on the x axis, time axis
-        set_x_limits(self.cube_list[0], ax)
+        if (self.input_data.get_value(InputType.METHOD).startswith(
+                'return-periods')):
+            # add axis labels
+            plt.xlabel('Return period (years)')
+            # use a log scale for the x axis
+            ax.set_xscale("log")
+            labs3 = np.array(['1', '10', '100', '1000'])
+            locs3 = [np.int(lab) for lab in labs3]
+            plt.xticks(locs3, labs3)
 
-        # add axis labels
-        plt.xlabel('Date')
+        else:
+            # set the limits on the x axis, time axis
+            set_x_limits(self.cube_list[0], ax)
+            # add axis labels
+            plt.xlabel('Date')
+
         plt.ylabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
 
     def _plot_probability_levels(self, cube, ax, plot_fifty):
         # plot a shaded area between the 10th and 90th percentiles
 
-        t_points = get_time_series(cube, 'percentile')
+        if (self.input_data.get_value(InputType.METHOD).startswith(
+                RETURN_PERIODS)):
+            t_points = get_return_periods(cube, 'percentile')
+        else:
+            t_points = get_time_series(cube, 'percentile')
 
         # plot a line for the 50th
         if plot_fifty is True:
@@ -126,6 +143,12 @@ class PlumePlotter(GraphPlotter):
                 ax.plot(t_points, ensemble_slice.data,
                         linestyle='dotted',
                         color=ENSEMBLE_LOWLIGHT, zorder=1)
+
+
+def get_return_periods(cube, slice_and_sel_coord):
+    tcoord = cube.slices_over(
+        slice_and_sel_coord).next().coord('return_period')
+    return tcoord.points
 
 
 def get_time_series(cube, slice_and_sel_coord):

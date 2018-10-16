@@ -390,7 +390,8 @@ class DataExtractor(object):
             InputType.TEMPORAL_AVERAGE_TYPE)
 
         if (self.input_data.get_value(InputType.TIME_PERIOD) == 'all' or
-                temporal_average_type == TemporalAverageType.ANNUAL):
+                temporal_average_type == TemporalAverageType.ANNUAL or
+                temporal_average_type is None):
             # we want everything, so no need to add a restriction
             pass
 
@@ -461,6 +462,13 @@ class DataExtractor(object):
                          temporal_type=self.input_data.get_value_label(
                              InputType.TEMPORAL_AVERAGE_TYPE),
                          variable=variable))
+
+        elif (self.input_data.get_value(
+                InputType.TEMPORAL_AVERAGE_TYPE) is None):
+            title = ('Demonstration Version - '
+                     '{variable}\n'
+                     'for'.format(variable=variable))
+
         else:
             title = ('Demonstration Version - {temporal_type} average '
                      '{variable} for\n'

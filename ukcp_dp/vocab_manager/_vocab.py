@@ -226,7 +226,10 @@ class Vocab(object):
         10: '10'
     },
         'method': {
-        'exploratory': 'exploratory'
+        'msl-proj': '21st century projections',
+        'msl-proj-expl': 'Extended projections',
+        'return-periods': '21st century projections',
+        'return-periods-ext': 'Extended projections',
     },
         'order_by_mean': {
         True: 'True',
@@ -307,7 +310,7 @@ class Vocab(object):
 
     def __init__(self):
         self.vocab = self.VOCAB
-        self.vocab['year'] = _get_range(1900, 2101)
+        self.vocab['year'] = _get_range(1900, 2301)
         self.vocab['year_minimum'] = _get_range(1900, 2301)
         self.vocab['year_maximum'] = _get_range(1900, 2301)
         self.vocab['sampling_id'] = _get_range(1, 4001)
