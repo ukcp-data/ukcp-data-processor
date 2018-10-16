@@ -221,6 +221,8 @@ def _get_prob_file_path(data_type, input_data, scenario,
             spatial_representation,
             scenario,
             data_type,
+            input_data.get_value(InputType.BASELINE),
+            input_data.get_value(InputType.TIME_SLICE_TYPE),
             variable,
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
             VERSION)
@@ -237,13 +239,18 @@ def _get_prob_file_name(data_type, input_data, scenario,
         year=year, mon_day=END_MONTH_DAY)
 
     file_name = ('{variable}_{scenario}_{data_source}_uk_'
-                 '{spatial_representation}_{data_type}_{temporal_type}_'
-                 '{start_data}-{end_date}.nc'.format(
+                 '{spatial_representation}_{data_type}_{baseline}_'
+                 '{time_slice_type}_{temporal_type}_{start_data}-'
+                 '{end_date}.nc'.format(
                      variable=variable,
                      scenario=scenario,
                      data_source=DATA_SOURCE_PROB,
                      spatial_representation=spatial_representation,
                      data_type=data_type,
+                     baseline=input_data.get_value(
+                         InputType.BASELINE),
+                     time_slice_type=input_data.get_value(
+                         InputType.TIME_SLICE_TYPE),
                      temporal_type=input_data.get_value(
                          InputType.TEMPORAL_AVERAGE_TYPE),
                      start_data=start_date,

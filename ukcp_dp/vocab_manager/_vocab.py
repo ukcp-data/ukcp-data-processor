@@ -131,7 +131,10 @@ class Vocab(object):
         'seas': 'Seasonal',
         'mon': 'Monthly'
     },
-
+        'time_slice_type': {
+        '1y': '1-year time slices',
+        '30y': '30-year time slices',
+    },
         # the following are not currently in UKCP18
         'baseline': {
         '1961-1990': '1961 - 1990',
