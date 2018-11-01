@@ -571,7 +571,7 @@ UKCP_CLOUDFRAC_MONTHLY.default_barlabel = "Cloud area fraction, %"
 UKCP_CLOUDFRAC_MONTHLY.preferred_unit = cf_units.Unit("%")
 UKCP_CLOUDFRAC_MONTHLY.extendcolbar = "neither"
 # "Blues"  # or maybe "Greys" or "Purples"?
-UKCP_CLOUDFRAC_MONTHLY.cpal = "UKCP_GrYlOr"
+UKCP_CLOUDFRAC_MONTHLY.cpal = "UKCP_GrYl"
 UKCP_CLOUDFRAC_MONTHLY.vrange = [0.0, 100.0]
 UKCP_CLOUDFRAC_MONTHLY.vmid = 50.0  # None
 UKCP_CLOUDFRAC_MONTHLY.vstep = 10.0
@@ -582,7 +582,7 @@ UKCP_CLOUDFRAC_MONTHLY_BIAS = UKCP_CLOUDFRAC_MONTHLY.copy()
 UKCP_CLOUDFRAC_MONTHLY_BIAS.default_barlabel = (
     "Bias in cloud area fraction (difference in %)")
 UKCP_CLOUDFRAC_MONTHLY_BIAS.extendcolbar = "both"
-UKCP_CLOUDFRAC_MONTHLY_BIAS.cpal = "UKCP_GrYlOr"  # "coolwarm"
+UKCP_CLOUDFRAC_MONTHLY_BIAS.cpal = "UKCP_GrYl"  # "coolwarm"
 UKCP_CLOUDFRAC_MONTHLY_BIAS.vrange = [-20.0, 30.0]
 UKCP_CLOUDFRAC_MONTHLY_BIAS.vmid = 0.0
 UKCP_CLOUDFRAC_MONTHLY_BIAS.vstep = 5.0
