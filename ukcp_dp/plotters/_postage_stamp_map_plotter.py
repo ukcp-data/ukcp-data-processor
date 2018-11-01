@@ -170,8 +170,7 @@ class PostageStampMapPlotter(MapPlotter):
             ensemble_name = ensemble_name.split('HadGEM3-GC3.05-r001i1p')[1]
         elif ensemble_name.endswith('-r1i1p1'):
             ensemble_name = ensemble_name.split('-r1i1p1')[0]
-        title = "Member: {}".format(ensemble_name)
-        ax.set_title(title, fontdict={'fontsize': 'medium'})
+        ax.set_title(ensemble_name, fontdict={'fontsize': 'medium'})
 
         # add a coast line
         self.plot_overlay('', False)
