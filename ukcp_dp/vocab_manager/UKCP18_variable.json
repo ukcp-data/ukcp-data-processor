@@ -34,7 +34,7 @@
             "units": "%"
         },
         "cltAnom": {
-            "anomaly_type": "absolute_change",
+            "anomaly_type": "percentage_change",
             "cmip6_cmor_tables_row_id": [
                 "206",
                 "209"
@@ -66,6 +66,32 @@
             ],
             "um_stash": "02204",
             "units": "%"
+        },
+        "evspsbl": {
+            "cmip6_name": "evspsbl",
+            "cmip6_standard_name": "water_evaporation_flux",
+            "description": "Evaporation rate",
+            "label_units": "mm/day",
+            "long_name": "Evaporation rate",
+            "plot_label": "Evaporation rate (mm/day)",
+            "standard_name": "water_evaporation_flux",
+            "strand": [
+                "land strand 1",
+                "land strand 2",
+                "land strand 3 12km",
+                "land strand 3 2km",
+                "marine",
+                "observations"
+            ],
+            "time_averaging": [
+                "mean"
+            ],
+            "time_step": [
+                "day",
+                "mon"
+            ],
+            "um_stash": "3223",
+            "units": "mm/day"
         },
         "flashrate": {
             "cmip6_cmor_tables_row_id": [
@@ -181,6 +207,32 @@
             "um_stash": "03248",
             "units": "1"
         },
+        "gusts": {
+            "cmip6_name": "wsgmax10m",
+            "cmip6_standard_name": "wind_speed_of_gust",
+            "description": "Wind speed gust maximum at 10m",
+            "label_units": "m s-1",
+            "level": "10m",
+            "long_name": "Maximum Wind Speed of Gust at 10m",
+            "plot_label": "Wind speed gust maximum (m s-1)",
+            "standard_name": "wind_speed_of_gust",
+            "strand": [
+                "land strand 1",
+                "land strand 2",
+                "land strand 3 12km",
+                "land strand 3 2km",
+                "marine",
+                "observations"
+            ],
+            "time_averaging": [
+                "max"
+            ],
+            "time_step": [
+                "day"
+            ],
+            "um_stash": "3463",
+            "units": "m s-1"
+        },
         "hail": {
             "description": "Hail (Graupel)",
             "label_units": "1",
@@ -272,7 +324,7 @@
             "units": "%"
         },
         "hursAnom": {
-            "anomaly_type": "absolute_change",
+            "anomaly_type": "percentage_change",
             "cmip6_cmor_tables_row_id": [
                 "678",
                 "679",
@@ -346,7 +398,7 @@
             "units": "1"
         },
         "hussAnom": {
-            "anomaly_type": "absolute_change",
+            "anomaly_type": "percentage_change",
             "cmip6_cmor_tables_row_id": [
                 "704",
                 "705",
@@ -497,7 +549,7 @@
             "units": "mm/day"
         },
         "prAnom": {
-            "anomaly_type": "absolute_change",
+            "anomaly_type": "percentage_change",
             "cmip6_cmor_tables_row_id": [
                 "1164",
                 "1166",
@@ -1328,10 +1380,10 @@
             "cmip6_name": "ta",
             "cmip6_standard_name": "air_temperature",
             "description": "Air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "250hPa",
             "long_name": "Air Temperature",
-            "plot_label": "Air temperature at 250hPa (°c)",
+            "plot_label": "Air temperature at 250hPa (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1354,10 +1406,10 @@
             "cmip6_name": "ta",
             "cmip6_standard_name": "air_temperature",
             "description": "Air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "250hPa",
             "long_name": "Air Temperature",
-            "plot_label": "Air temperature anomaly at 250hPa (°c)",
+            "plot_label": "Air temperature anomaly at 250hPa (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1379,10 +1431,10 @@
             "cmip6_name": "ta",
             "cmip6_standard_name": "air_temperature",
             "description": "Air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "500hPa",
             "long_name": "Air Temperature",
-            "plot_label": "Air temperature at 500hPa (°c)",
+            "plot_label": "Air temperature at 500hPa (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1405,10 +1457,10 @@
             "cmip6_name": "ta",
             "cmip6_standard_name": "air_temperature",
             "description": "Air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "500hPa",
             "long_name": "Air Temperature",
-            "plot_label": "Air temperature anomaly at 500hPa (°c)",
+            "plot_label": "Air temperature anomaly at 500hPa (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1430,10 +1482,10 @@
             "cmip6_name": "ta",
             "cmip6_standard_name": "air_temperature",
             "description": "Air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "850hPa",
             "long_name": "Air Temperature",
-            "plot_label": "Air temperature at 850hPa (°c)",
+            "plot_label": "Air temperature at 850hPa (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1456,10 +1508,10 @@
             "cmip6_name": "ta",
             "cmip6_standard_name": "air_temperature",
             "description": "Air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "850hPa",
             "long_name": "Air Temperature",
-            "plot_label": "Air temperature anomaly at 850hPa (°c)",
+            "plot_label": "Air temperature anomaly at 850hPa (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1486,13 +1538,13 @@
             "cmip6_name": "tas",
             "cmip6_standard_name": "air_temperature",
             "description": "Mean air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "1.5m",
             "long_name": "Mean air temperature",
             "notes": [
                 "Use WPS for LS1-3"
             ],
-            "plot_label": "Mean air temperature at 1.5m (°c)",
+            "plot_label": "Mean air temperature at 1.5m (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1525,13 +1577,13 @@
             "cmip6_name": "tas",
             "cmip6_standard_name": "air_temperature",
             "description": "Mean air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "1.5m",
             "long_name": "Mean air temperature",
             "notes": [
                 "Use WPS for LS1-3"
             ],
-            "plot_label": "Mean air temperature anomaly at 1.5m (°c)",
+            "plot_label": "Mean air temperature anomaly at 1.5m (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1562,13 +1614,13 @@
             "cmip6_name": "tasmax",
             "cmip6_standard_name": "air_temperature",
             "description": "Maximum air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "1.5m",
             "long_name": "Maximum air temperature",
             "notes": [
                 "Use WPS for LS1-3"
             ],
-            "plot_label": "Maximum air temperature at 1.5m (°c)",
+            "plot_label": "Maximum air temperature at 1.5m (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1598,13 +1650,13 @@
             "cmip6_name": "tasmax",
             "cmip6_standard_name": "air_temperature",
             "description": "Maximum air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "1.5m",
             "long_name": "Maximum air temperature",
             "notes": [
                 "Use WPS for LS1-3"
             ],
-            "plot_label": "Maximum air temperature anomaly at 1.5m (°c)",
+            "plot_label": "Maximum air temperature anomaly at 1.5m (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1627,10 +1679,10 @@
         },
         "tasmaxHottestDay": {
             "description": "Maximum air temperature on the hottest day",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "1.5m",
             "long_name": "Maximum air temperature on the hottest day",
-            "plot_label": "Maximum air temperature on the hottest day at 1.5m (°c)",
+            "plot_label": "Maximum air temperature on the hottest day at 1.5m (°C)",
             "standard_name": "air temperature",
             "strand": [
                 "land strand 1",
@@ -1652,10 +1704,10 @@
         "tasmaxHottestDayAnom": {
             "anomaly_type": "absolute_change",
             "description": "Maximum air temperature on the hottest day",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "1.5m",
             "long_name": "Maximum air temperature on the hottest day",
-            "plot_label": "Maximum air temperature on the hottest day anomaly at 1.5m (°c)",
+            "plot_label": "Maximum air temperature on the hottest day anomaly at 1.5m (°C)",
             "standard_name": "air temperature",
             "strand": [
                 "land strand 1",
@@ -1682,13 +1734,13 @@
             "cmip6_name": "tasmin",
             "cmip6_standard_name": "air_temperature",
             "description": "Minimum air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "1.5m",
             "long_name": "Minimum air temperature",
             "notes": [
                 "Use WPS for LS1-3"
             ],
-            "plot_label": "Minimum air temperature at 1.5m (°c)",
+            "plot_label": "Minimum air temperature at 1.5m (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1718,13 +1770,13 @@
             "cmip6_name": "tasmin",
             "cmip6_standard_name": "air_temperature",
             "description": "Minimum air temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "1.5m",
             "long_name": "Minimum air temperature",
             "notes": [
                 "Use WPS for LS1-3"
             ],
-            "plot_label": "Minimum air temperature anomaly at 1.5m (°c)",
+            "plot_label": "Minimum air temperature anomaly at 1.5m (°C)",
             "standard_name": "air_temperature",
             "strand": [
                 "land strand 1",
@@ -1789,6 +1841,55 @@
             ],
             "units": "m"
         },
+        "tos": {
+            "cmip6_name": "tos",
+            "cmip6_standard_name": "sea_surface_temperature",
+            "description": "Sea surface temperature",
+            "label_units": "°C",
+            "long_name": "Sea surface temperature",
+            "plot_label": "Sea surface temperature (°C)",
+            "standard_name": "sea_surface_temperature",
+            "strand": [
+                "land strand 1",
+                "land strand 2",
+                "land strand 3 12km",
+                "land strand 3 2km",
+                "marine",
+                "observations"
+            ],
+            "time_averaging": [
+                "mean"
+            ],
+            "time_step": [
+                "mon"
+            ],
+            "units": "degC"
+        },
+        "tosAnom": {
+            "anomaly_type": "absolute_change",
+            "cmip6_name": "tos",
+            "cmip6_standard_name": "sea_surface_temperature",
+            "description": "Sea surface temperature",
+            "label_units": "°C",
+            "long_name": "Sea surface temperature",
+            "plot_label": "Sea surface temperature anomaly (°C)",
+            "standard_name": "sea_surface_temperature",
+            "strand": [
+                "land strand 1",
+                "land strand 2",
+                "land strand 3 12km",
+                "land strand 3 2km",
+                "marine",
+                "observations"
+            ],
+            "time_averaging": [
+                "mean"
+            ],
+            "time_step": [
+                "mon"
+            ],
+            "units": "degC"
+        },
         "tpl": {
             "description": "Target protection level",
             "label_units": "m",
@@ -1839,10 +1940,10 @@
         },
         "twb": {
             "description": "Wet bulb temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "1.5 m???",
             "long_name": "Wet bulb temperature",
-            "plot_label": "Wet bulb temperature at 1.5 m??? (°c)",
+            "plot_label": "Wet bulb temperature at 1.5 m??? (°C)",
             "standard_name": "wet_bulb_temperature",
             "strand": [
                 "land strand 1",
@@ -1866,10 +1967,10 @@
         "twbAnom": {
             "anomaly_type": "absolute_change",
             "description": "Wet bulb temperature",
-            "label_units": "°c",
+            "label_units": "°C",
             "level": "1.5 m???",
             "long_name": "Wet bulb temperature",
-            "plot_label": "Wet bulb temperature anomaly at 1.5 m??? (°c)",
+            "plot_label": "Wet bulb temperature anomaly at 1.5 m??? (°C)",
             "standard_name": "wet_bulb_temperature",
             "strand": [
                 "land strand 1",
