@@ -1,1 +1,4 @@
-iris
+iris==1.13.0
+
+# For testing
+pytest
