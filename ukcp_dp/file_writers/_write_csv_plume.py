@@ -21,7 +21,9 @@ class PlumeCsvWriter(BaseCsvWriter):
         """
         Write out the data, in CSV format, associated with a plume plot.
         """
-        if (self.input_data.get_value(InputType.METHOD).startswith(
+        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_MARINE and
+                self.input_data.get_value(InputType.METHOD).startswith(
                 RETURN_PERIODS)):
             self.header.append('Return period(years)')
         else:
@@ -91,7 +93,9 @@ class PlumeCsvWriter(BaseCsvWriter):
             self._read_x_cube(_slice, key_list)
 
     def _read_x_cube(self, cube, key_list):
-        if (self.input_data.get_value(InputType.METHOD).startswith(
+        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_MARINE and
+                self.input_data.get_value(InputType.METHOD).startswith(
                 RETURN_PERIODS)):
             self._read_returnlevel_cube(cube, key_list)
         else:

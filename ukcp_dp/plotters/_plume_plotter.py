@@ -50,7 +50,9 @@ class PlumePlotter(GraphPlotter):
                 # plot the ensemble members
                 self._plot_ensemble(self.cube_list[0], ax)
 
-        if (self.input_data.get_value(InputType.METHOD).startswith(
+        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_MARINE and
+                self.input_data.get_value(InputType.METHOD).startswith(
                 'return-periods')):
             # add axis labels
             plt.xlabel('Return period (years)')
@@ -71,7 +73,9 @@ class PlumePlotter(GraphPlotter):
     def _plot_probability_levels(self, cube, ax, plot_fifty):
         # plot a shaded area between the 10th and 90th percentiles
 
-        if (self.input_data.get_value(InputType.METHOD).startswith(
+        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                DATA_SOURCE_MARINE and
+                self.input_data.get_value(InputType.METHOD).startswith(
                 RETURN_PERIODS)):
             t_points = get_return_periods(cube, 'percentile')
         else:
@@ -134,8 +138,7 @@ class PlumePlotter(GraphPlotter):
 
             # highlighted ensembles should be included in the legend
             if ensemble in highlighted_ensemble_members:
-                ensemble_label = "Member: {}".format(ensemble_name)
-                ax.plot(t_points, ensemble_slice.data, label=ensemble_label,
+                ax.plot(t_points, ensemble_slice.data, label=ensemble_name,
                         linestyle=linestyle[highlighted_counter],
                         color=colours[highlighted_counter], zorder=2)
                 highlighted_counter += 1
