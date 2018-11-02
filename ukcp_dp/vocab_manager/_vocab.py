@@ -137,9 +137,9 @@ class Vocab(object):
     },
         # the following are not currently in UKCP18
         'baseline': {
-        '1961-1990': '1961 - 1990',
-        '1981-2000': '1981 - 2000',
-        '1981-2010': '1981 - 2010',
+        'b6190': '1961 - 1990',
+        'b8100': '1981 - 2000',
+        'b8110': '1981 - 2010',
     },
         'climate_change_type': {
         'anomalies': 'Anomalies',

@@ -133,3 +133,12 @@ def get_plot_settings(vocab, cmsize, fsize, var_id):
     plot_settings.fsize = fsize
 
     return plot_settings
+
+
+def get_baseline_range(baseline):
+    if baseline == 'b6190':
+        return 1961, 1990
+    elif baseline == 'b8100':
+        return 1981, 2000
+    elif baseline == 'b8110':
+        return 1981, 2010

@@ -12,6 +12,7 @@ from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, TEMP_ANOMS, \
     DATA_SOURCE_MARINE, AreaType, TemporalAverageType, DATA_SOURCE_GCM, \
     DATA_SOURCE_RCM
 from ukcp_dp.data_extractor._utils import get_anomaly
+from ukcp_dp.utils import get_baseline_range
 from ukcp_dp.vocab_manager import get_months
 
 
@@ -423,10 +424,8 @@ class DataExtractor(object):
         year_max = None
 
         if baseline is True:
-            year_min = int(self.input_data.get_value(
-                InputType.BASELINE).split('-')[0])
-            year_max = int(self.input_data.get_value(
-                InputType.BASELINE).split('-')[1])
+            year_min,  year_max = get_baseline_range(self.input_data.get_value(
+                InputType.BASELINE))
         else:
             if self.input_data.get_value(InputType.YEAR) is not None:
                 # year

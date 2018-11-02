@@ -4,6 +4,7 @@ from ukcp_dp.constants import DATA_DIR, DATA_SERVICE_URL, DATA_SOURCE_PROB, \
     DATA_SOURCE_PROB_MIN_YEAR, DATA_SOURCE_GCM, DATA_SOURCE_RCM, \
     DATA_SOURCE_MARINE, InputType, OTHER_MAX_YEAR, AreaType, \
     TemporalAverageType
+from ukcp_dp.utils import get_baseline_range
 
 import logging
 log = logging.getLogger(__name__)
@@ -290,9 +291,9 @@ def _get_file_list_for_baseline(input_data):
             their full paths
     """
     baseline = input_data.get_value(InputType.BASELINE)
-    year_minimum,  year_maximum = baseline.split('-')
-    return _get_cm_file_list_for_range(input_data, int(year_minimum),
-                                       int(year_maximum))
+    year_minimum,  year_maximum = get_baseline_range(baseline)
+    return _get_cm_file_list_for_range(input_data, year_minimum,
+                                       year_maximum)
 
 
 def _get_cm_file_list_for_range(input_data, year_minimum, year_maximum):
