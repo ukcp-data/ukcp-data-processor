@@ -1,6 +1,7 @@
 import json
 from os import path
 
+from ukcp_cv import CV_Type, get_cv
 from ukcp_dp.constants import ROOT_DIR
 
 
@@ -131,19 +132,11 @@ class Vocab(object):
         'seas': 'Seasonal',
         'mon': 'Monthly'
     },
-        'time_slice_type': {
-        '1y': '1-year time slices',
-        '30y': '30-year time slices',
-    },
         # the following are not currently in UKCP18
         'baseline': {
         'b6190': '1961 - 1990',
         'b8100': '1981 - 2000',
         'b8110': '1981 - 2010',
-    },
-        'climate_change_type': {
-        'anomalies': 'Anomalies',
-        'absolute': 'Absolute values'
     },
         'data_type': {
         'cdf': 'cdf',
@@ -332,6 +325,8 @@ class Vocab(object):
         self.variables = self._load_json_variables()
         self.vocab['sampling_variable_1'] = self.vocab['variable']
         self.vocab['sampling_variable_2'] = self.vocab['variable']
+        self._load_cv(CV_Type.CLIMATE_CHANGE_TYPE)
+        self._load_cv(CV_Type.TIME_SLICE_TYPE)
 
     def _load_json_variables(self):
         # TODO quick hack to get UKCP18_CVs
@@ -343,6 +338,20 @@ class Vocab(object):
         for key in variables.keys():
             try:
                 self.vocab['variable'][key] = variables[key]['plot_label']
+            except KeyError:
+                pass
+
+    def _load_cv(self, cv_type):
+        """
+        Load in UKCP18 vocab.
+        
+        @param cv_type (CV_Type): the vocabulary to load in
+        """
+        terms = get_cv(cv_type)[cv_type]
+        self.vocab[cv_type] = {}
+        for key in terms.keys():
+            try:
+                self.vocab[cv_type][key] = terms[key]
             except KeyError:
                 pass
 

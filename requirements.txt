@@ -1,4 +1,5 @@
 iris==1.13.0
+ukcp_cv
 
 # For testing
 pytest
