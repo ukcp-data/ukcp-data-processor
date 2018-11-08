@@ -8,9 +8,9 @@ import iris.experimental.equalise_cubes
 import iris.plot as iplt
 import iris.quickplot as qplt
 from iris.util import unify_time_units
-from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, TEMP_ANOMS, \
-    DATA_SOURCE_MARINE, AreaType, TemporalAverageType, DATA_SOURCE_GCM, \
-    DATA_SOURCE_RCM
+from ukcp_dp.constants import COLLECTION_PROB, InputType, TEMP_ANOMS, \
+    COLLECTION_MARINE, AreaType, TemporalAverageType, COLLECTION_GCM, \
+    COLLECTION_RCM
 from ukcp_dp.data_extractor._utils import get_anomaly
 from ukcp_dp.utils import get_baseline_range
 from ukcp_dp.vocab_manager import get_months
@@ -87,8 +87,8 @@ class DataExtractor(object):
             for i, file_list in enumerate(self.file_lists['main'][variable]):
 
                 if (variable.endswith('Anom') and
-                        self.input_data.get_value(InputType.DATA_SOURCE) not in
-                        [DATA_SOURCE_PROB, DATA_SOURCE_MARINE]):
+                        self.input_data.get_value(InputType.COLLECTION) not in
+                        [COLLECTION_PROB, COLLECTION_MARINE]):
                     # we need anomalies so lets calculate them
                     # TODO we may get these directly from file in future
                     cube = self._get_anomaly_cube(
@@ -141,8 +141,8 @@ class DataExtractor(object):
         """
         log.debug('_get_overlay_cube')
         overlay_cube = None
-        if (self.input_data.get_value(InputType.DATA_SOURCE) !=
-                DATA_SOURCE_PROB and
+        if (self.input_data.get_value(InputType.COLLECTION) !=
+                COLLECTION_PROB and
             self.input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is
                 not None and
             self.input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is
@@ -188,8 +188,8 @@ class DataExtractor(object):
             raise Exception('No data found for given selection options')
 
         # Remove time_bnds cubes
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_PROB) or overlay_probability_levels is True:
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_PROB) or overlay_probability_levels is True:
             unfiltered_cubes = cubes
             cubes = CubeList()
             for cube in unfiltered_cubes:
@@ -209,10 +209,10 @@ class DataExtractor(object):
         # The reuse of standard_name = "region" results in a region coord in
         # "Dimension coordinates" and "Auxiliary coordinates"
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_GCM or
-                self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_RCM):
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_GCM or
+                self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_RCM):
             for cube in cubes:
                 coords = cube.coords(var_name='region')
                 for coord in coords:
@@ -347,8 +347,8 @@ class DataExtractor(object):
 
         # TODO temp hack for region, due to differences in LS1 and LS2/3
 
-        elif (self.input_data.get_value(InputType.DATA_SOURCE) !=
-                DATA_SOURCE_PROB and
+        elif (self.input_data.get_value(InputType.COLLECTION) !=
+                COLLECTION_PROB and
                 (self.input_data.get_area_type() == AreaType.ADMIN_REGION or
                  self.input_data.get_area_type() == AreaType.COUNTRY or
                  self.input_data.get_area_type() == AreaType.RIVER_BASIN)):

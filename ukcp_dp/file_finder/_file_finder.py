@@ -1,8 +1,8 @@
 import os
 
-from ukcp_dp.constants import DATA_DIR, DATA_SERVICE_URL, DATA_SOURCE_PROB, \
-    DATA_SOURCE_PROB_MIN_YEAR, DATA_SOURCE_GCM, DATA_SOURCE_RCM, \
-    DATA_SOURCE_MARINE, InputType, OTHER_MAX_YEAR, AreaType, \
+from ukcp_dp.constants import DATA_DIR, DATA_SERVICE_URL, COLLECTION_PROB, \
+    COLLECTION_PROB_MIN_YEAR, COLLECTION_GCM, COLLECTION_RCM, \
+    COLLECTION_MARINE, InputType, OTHER_MAX_YEAR, AreaType, \
     TemporalAverageType
 from ukcp_dp.utils import get_baseline_range
 
@@ -38,12 +38,12 @@ def get_file_lists(input_data):
     file_list = {}
 
     # the main file list
-    if (input_data.get_value(InputType.DATA_SOURCE) in
-            [DATA_SOURCE_PROB, DATA_SOURCE_MARINE]):
+    if (input_data.get_value(InputType.COLLECTION) in
+            [COLLECTION_PROB, COLLECTION_MARINE]):
         file_list['main'] = _get_prob_file_list(input_data)
 
-    elif (input_data.get_value(InputType.DATA_SOURCE) in
-            [DATA_SOURCE_GCM, DATA_SOURCE_RCM]):
+    elif (input_data.get_value(InputType.COLLECTION) in
+            [COLLECTION_GCM, COLLECTION_RCM]):
         file_list['main'] = _get_cm_file_list(input_data)
 
         if input_data.get_value(InputType.BASELINE) is not None:
@@ -54,7 +54,7 @@ def get_file_lists(input_data):
             and
             input_data.get_value(
                 InputType.OVERLAY_PROBABILITY_LEVELS) is True):
-        if input_data.get_value(InputType.DATA_SOURCE) == DATA_SOURCE_PROB:
+        if input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB:
             file_list_overlay = file_list['main']
         else:
             file_list_overlay = _get_prob_file_list(input_data)
@@ -120,10 +120,10 @@ def _get_prob_file_list(input_data):
     # needed
     year_maximum = input_data.get_value(InputType.YEAR_MAXIMUM)
     year_minimum = input_data.get_value(InputType.YEAR_MINIMUM)
-    if year_maximum < DATA_SOURCE_PROB_MIN_YEAR:
+    if year_maximum < COLLECTION_PROB_MIN_YEAR:
         return {}
-    elif year_minimum < DATA_SOURCE_PROB_MIN_YEAR:
-        year_minimum = DATA_SOURCE_PROB_MIN_YEAR
+    elif year_minimum < COLLECTION_PROB_MIN_YEAR:
+        year_minimum = COLLECTION_PROB_MIN_YEAR
 
     # December's data is included with the next year so if a single year has
     # been selected
@@ -156,8 +156,8 @@ def _get_file_list_per_scenario(input_data, scenario, spatial_representation,
         if ((input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) ==
                 TemporalAverageType.ANNUAL or spatial_representation != '25km')
                 or
-                (input_data.get_value(InputType.DATA_SOURCE) ==
-                 DATA_SOURCE_MARINE)):
+                (input_data.get_value(InputType.COLLECTION) ==
+                 COLLECTION_MARINE)):
             # current thinking is that there will only be one file
             file_name = '*'
             file_list_per_data_type.append(
@@ -167,10 +167,10 @@ def _get_file_list_per_scenario(input_data, scenario, spatial_representation,
         scenario_file_list = []
 
         for year in range(year_minimum, (year_maximum + 1)):
-            # We cannot check for DATA_SOURCE_PROB as this may be an
+            # We cannot check for COLLECTION_PROB as this may be an
             # overlay
-            if (input_data.get_value(InputType.DATA_SOURCE) !=
-                    DATA_SOURCE_MARINE and year == OTHER_MAX_YEAR):
+            if (input_data.get_value(InputType.COLLECTION) !=
+                    COLLECTION_MARINE and year == OTHER_MAX_YEAR):
                 # there is not data for December of the last year
                 continue
             file_name = _get_prob_file_name(
@@ -204,11 +204,11 @@ def _get_prob_spatial_representation(input_data):
 def _get_prob_file_path(data_type, input_data, scenario,
                         spatial_representation, variable):
 
-    if (input_data.get_value(InputType.DATA_SOURCE) == DATA_SOURCE_MARINE):
+    if (input_data.get_value(InputType.COLLECTION) == COLLECTION_MARINE):
 
         file_path = os.path.join(
             DATA_DIR,
-            DATA_SOURCE_MARINE,
+            COLLECTION_MARINE,
             input_data.get_value(InputType.METHOD),
             scenario,
             variable,
@@ -217,7 +217,7 @@ def _get_prob_file_path(data_type, input_data, scenario,
 
         file_path = os.path.join(
             DATA_DIR,
-            DATA_SOURCE_PROB,
+            COLLECTION_PROB,
             'uk',
             spatial_representation,
             scenario,
@@ -239,13 +239,13 @@ def _get_prob_file_name(data_type, input_data, scenario,
     end_date = '{year}{mon_day}'.format(
         year=year, mon_day=END_MONTH_DAY)
 
-    file_name = ('{variable}_{scenario}_{data_source}_uk_'
+    file_name = ('{variable}_{scenario}_{collection}_uk_'
                  '{spatial_representation}_{data_type}_{baseline}_'
                  '{time_slice_type}_{temporal_type}_{start_data}-'
                  '{end_date}.nc'.format(
                      variable=variable,
                      scenario=scenario,
-                     data_source=DATA_SOURCE_PROB,
+                     collection=COLLECTION_PROB,
                      spatial_representation=spatial_representation,
                      data_type=data_type,
                      baseline=input_data.get_value(
@@ -342,7 +342,7 @@ def _get_cm_file_path(input_data, spatial_representation, variable, scenario,
                       ensemble):
     file_path = os.path.join(
         DATA_DIR,
-        input_data.get_value(InputType.DATA_SOURCE),
+        input_data.get_value(InputType.COLLECTION),
         'uk',
         spatial_representation,
         scenario,

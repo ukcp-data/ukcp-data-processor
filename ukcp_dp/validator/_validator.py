@@ -1,9 +1,9 @@
 import logging
 
-from ukcp_dp.constants import DATA_SOURCE_PROB, DATA_SOURCE_PROB_MIN_YEAR, \
-    DATA_SOURCE_MARINE, DATA_SOURCE_MARINE_MIN_YEAR, \
-    DATA_SOURCE_MARINE_MAX_YEAR, DATA_SOURCE_RCM, \
-    DATA_SOURCE_RCM_MIN_YEAR, EXTENDED_PROJECTIONS, InputType, \
+from ukcp_dp.constants import COLLECTION_PROB, COLLECTION_PROB_MIN_YEAR, \
+    COLLECTION_MARINE, COLLECTION_MARINE_MIN_YEAR, \
+    COLLECTION_MARINE_MAX_YEAR, COLLECTION_RCM, \
+    COLLECTION_RCM_MIN_YEAR, EXTENDED_PROJECTIONS, InputType, \
     OTHER_MAX_YEAR, AreaType, TemporalAverageType
 from ukcp_dp.vocab_manager import get_ensemble_member_set
 
@@ -32,10 +32,10 @@ class Validator(object):
 
         return self.input_data
 
-    def _validate_data_source(self):
+    def _validate_collection(self):
         # this must always be set
-        if self.input_data.get_value(InputType.DATA_SOURCE) is None:
-            raise Exception('{} not set'.format(InputType.DATA_SOURCE))
+        if self.input_data.get_value(InputType.COLLECTION) is None:
+            raise Exception('{} not set'.format(InputType.COLLECTION))
 
     def _validate_spatial_rep(self):
         spatial_rep = self.input_data.get_value(
@@ -47,16 +47,16 @@ class Validator(object):
             # Not set, lets be kind and set it
             if (self.input_data.get_area_type() in
                     [AreaType.BBOX, AreaType.POINT]):
-                if (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                if (self.input_data.get_value(InputType.COLLECTION) ==
                         'land-gcm'):
                     self.input_data.set_value(
                         InputType.SPATIAL_REPRESENTATION, '60km')
-                elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
+                elif (self.input_data.get_value(InputType.COLLECTION) ==
                         'land-rcm'):
                     self.input_data.set_value(
                         InputType.SPATIAL_REPRESENTATION, '12km')
-                elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                        DATA_SOURCE_PROB):
+                elif (self.input_data.get_value(InputType.COLLECTION) ==
+                        COLLECTION_PROB):
                     self.input_data.set_value(
                         InputType.SPATIAL_REPRESENTATION, '25km')
 
@@ -120,15 +120,15 @@ class Validator(object):
             self.input_data.set_value(InputType.YEAR_MINIMUM, year)
             self.input_data.set_value(InputType.YEAR_MAXIMUM, year)
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_PROB):
-            min_allowed_year = DATA_SOURCE_PROB_MIN_YEAR
-        elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_MARINE):
-            min_allowed_year = DATA_SOURCE_MARINE_MIN_YEAR
-        elif (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_RCM):
-            min_allowed_year = DATA_SOURCE_RCM_MIN_YEAR
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_PROB):
+            min_allowed_year = COLLECTION_PROB_MIN_YEAR
+        elif (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_MARINE):
+            min_allowed_year = COLLECTION_MARINE_MIN_YEAR
+        elif (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_RCM):
+            min_allowed_year = COLLECTION_RCM_MIN_YEAR
         else:
             min_allowed_year = min(
                 self.vocab.get_collection_terms('year_minimum'))
@@ -139,11 +139,11 @@ class Validator(object):
                 "The minimum year must be equal or greater than {}".
                 format(min_allowed_year))
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_MARINE and
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_MARINE and
                 self.input_data.get_value(InputType.METHOD) in
                 EXTENDED_PROJECTIONS):
-            max_allowed_year = DATA_SOURCE_MARINE_MAX_YEAR
+            max_allowed_year = COLLECTION_MARINE_MAX_YEAR
         else:
             max_allowed_year = OTHER_MAX_YEAR
 
@@ -176,19 +176,19 @@ class Validator(object):
 
     def _validate_ensembles(self, ensembles, input_type):
         allowed_ensembles = get_ensemble_member_set(
-            self.input_data.get_value(InputType.DATA_SOURCE))
+            self.input_data.get_value(InputType.COLLECTION))
         if allowed_ensembles is None:
             raise Exception("Unable to get list of valid ensembles for {}".
                             format(self.input_data.get_value(
-                                InputType.DATA_SOURCE)))
+                                InputType.COLLECTION)))
 
         for ensemble in ensembles:
             if ensemble not in allowed_ensembles:
                 raise Exception(
-                    "Invalid {value_type} for {data_source}: {value}.".format(
+                    "Invalid {value_type} for {collection}: {value}.".format(
                         value_type=input_type,
-                        data_source=self.input_data.get_value(
-                            InputType.DATA_SOURCE),
+                        collection=self.input_data.get_value(
+                            InputType.COLLECTION),
                         value=ensemble))
 
     def _validate_time_period(self):
@@ -217,8 +217,8 @@ class Validator(object):
 
     def _validate_baseline(self):
         # only a subset of values are allowed for RCM
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_RCM):
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_RCM):
             baseline = self.input_data.get_value(InputType.BASELINE)
             if baseline is None:
                 return
@@ -295,8 +295,8 @@ class Validator(object):
                         InputType.SAMPLING_VARIABLE_2))
 
     def _validate_data_type(self):
-        if (self.input_data.get_value(InputType.DATA_SOURCE) !=
-                DATA_SOURCE_PROB):
+        if (self.input_data.get_value(InputType.COLLECTION) !=
+                COLLECTION_PROB):
             return
         if self.input_data.get_value(InputType.DATA_TYPE) is None:
             raise Exception("{} must be set".format(InputType.DATA_TYPE))

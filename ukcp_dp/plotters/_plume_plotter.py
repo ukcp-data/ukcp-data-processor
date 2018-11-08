@@ -9,8 +9,8 @@ import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
 import numpy as np
-from ukcp_dp.constants import DATA_SOURCE_PROB, \
-    DATA_SOURCE_MARINE, ENSEMBLE_COLOURS, ENSEMBLE_GREYSCALES, \
+from ukcp_dp.constants import COLLECTION_PROB, \
+    COLLECTION_MARINE, ENSEMBLE_COLOURS, ENSEMBLE_GREYSCALES, \
     ENSEMBLE_LOWLIGHT, PERCENTILE_LINE_COLOUR, PERCENTILE_FILL, \
     RETURN_PERIODS, InputType
 
@@ -33,10 +33,10 @@ class PlumePlotter(GraphPlotter):
         log.debug('_generate_graph')
         ax = plt.gca()
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_PROB or
-                self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_MARINE):
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_PROB or
+                self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_MARINE):
             # plot the percentiles
             self._plot_probability_levels(self.cube_list[0], ax, True)
 
@@ -50,8 +50,8 @@ class PlumePlotter(GraphPlotter):
                 # plot the ensemble members
                 self._plot_ensemble(self.cube_list[0], ax)
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_MARINE and
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_MARINE and
                 self.input_data.get_value(InputType.METHOD).startswith(
                 'return-periods')):
             # add axis labels
@@ -73,8 +73,8 @@ class PlumePlotter(GraphPlotter):
     def _plot_probability_levels(self, cube, ax, plot_fifty):
         # plot a shaded area between the 10th and 90th percentiles
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_MARINE and
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_MARINE and
                 self.input_data.get_value(InputType.METHOD).startswith(
                 RETURN_PERIODS)):
             t_points = get_return_periods(cube, 'percentile')
@@ -92,8 +92,8 @@ class PlumePlotter(GraphPlotter):
             ax.plot(t_points, percentile_cube.data, label='50th Percentile',
                     color=PERCENTILE_LINE_COLOUR)
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_PROB):
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_PROB):
             # fill between the 10th and 90th
             lovals = cube.extract(iris.Constraint(percentile=10))
             hivals = cube.extract(iris.Constraint(percentile=90))

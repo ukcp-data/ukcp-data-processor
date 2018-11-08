@@ -7,47 +7,7 @@ from ukcp_dp.constants import ROOT_DIR
 
 class Vocab(object):
 
-    VOCAB = {'admin_region': {
-        # includes 'all', not in UKCP18_admin_region
-        'all': 'All administrative regions',
-        'channel_islands': 'Channel Islands',
-        'east_midlands': 'East Midlands',
-        'east_of_england': 'East of England',
-        'east_scotland': 'East Scotland',
-        'isle_of_man': 'Isle of Man',
-        'london': 'London',
-        'north_east_england': 'North East England',
-        'north_scotland': 'North Scotland',
-        'north_west_england': 'North West England',
-        'northern_ireland': 'Northern Ireland',
-        'south_east_england': 'South East England',
-        'south_west_england': 'South West England',
-        'wales': 'Wales',
-        'west_midlands': 'West Midlands',
-        'west_scotland': 'West Scotland',
-        'yorkshire_and_Humber': 'Yorkshire and Humber'
-    },
-        'country': {
-        # includes 'all', not in UKCP18_country
-        'all': 'All countries',
-        'channel_islands': 'Channel Islands',
-        'england': 'England',
-        'england_and_wales': 'England and Wales',
-        'isle_of_man': 'Isle of Man',
-        'northern_ireland': 'Northern Ireland',
-        'scotland': 'Scotland',
-        'uk': 'United Kingdom',
-        'wales': 'Wales'
-    },
-        'data_source': {
-        # equivalent to UKCP18_collection
-        'land-gcm': 'Global simulations',
-        'land-prob': 'Land probabilistic projections',
-        'land-rcm': 'Regional simulations',
-        'marine-sim': 'Marine simulations'
-    },
-
-        'ensemble': {
+    VOCAB = {'ensemble': {
         # equivalent to UKCP18_ensemble_member
         # UKCP18 values are full values
         '01': '00000',
@@ -92,51 +52,11 @@ class Vocab(object):
         'country': 'Country',
         'river_basin': 'River Basin'
     },
-        'river_basin': {
-        # includes 'all', not in UKCP18_country
-        'all': 'All river basins',
-        'anglian': 'Anglian',
-        'argyll': 'Argyll',
-        'clyde': 'Clyde',
-        'dee': 'Dee',
-        'forth': 'Forth',
-        'humber': 'Humber',
-        'neagh_bann': 'Neagh Bann',
-        'north_east_scotland': 'North East Scotland',
-        'north_eastern_ireland': 'North Eastern Ireland',
-        'north_highland': 'North Highland',
-        'north_west_england': 'North West England',
-        'north_western_ireland': 'North Western Ireland',
-        'northumbria': 'Northumbria',
-        'orkney_and_shetlands': 'Orkney and Shetlands',
-        'severn': 'Severn',
-        'solway': 'Solway',
-        'south_east_england': 'South East England',
-        'south_west_england': 'South West England',
-        'tay': 'Tay',
-        'thames': 'Thames',
-        'tweed': 'Tweed',
-        'west_highland': 'West Highland',
-        'western_wales': 'Western Wales'
-    },
-        'scenario': {
-        'sres-a1b': 'SRES A1B',
-        'rcp26': 'RCP 2.6',
-        'rcp45': 'RCP 4.5',
-        'rcp60': 'RCP 6.0',
-        'rcp85': 'RCP 8.5'
-    },
         'temporal_average_type': {
         # frequency in UKCP18_CVs
         'ann': 'Annual',
         'seas': 'Seasonal',
         'mon': 'Monthly'
-    },
-        # the following are not currently in UKCP18
-        'baseline': {
-        'b6190': '1961 - 1990',
-        'b8100': '1981 - 2000',
-        'b8110': '1981 - 2010',
     },
         'data_type': {
         'cdf': 'cdf',
@@ -268,12 +188,12 @@ class Vocab(object):
 
     COLLECTION_LABELS = {
         'area_type': 'Area',
-        'baseline': 'Baseline',
+        'baseline_period': 'Baseline',
         'climate_change_type': 'Climate Change Type',
         'colour_mode': 'Colour Mode',
         'convert_to_percentiles': 'Convert To Percentiles',
         'data_format': 'Data Format',
-        'data_source': 'Data Source',
+        'collection': 'Data Source',
         'data_type': 'Data Type',
         'ensemble': 'Members',
         'font_size': 'Font Size',
@@ -322,36 +242,45 @@ class Vocab(object):
         self.vocab['sampling_temporal_average_1'] = self.vocab['time_period']
         self.vocab['sampling_temporal_average_2'] = self.vocab['time_period']
 
-        self.variables = self._load_json_variables()
+        self._load_cv_variables(CV_Type.VARIABLE)
         self.vocab['sampling_variable_1'] = self.vocab['variable']
         self.vocab['sampling_variable_2'] = self.vocab['variable']
+
+        self._load_cv(CV_Type.BASELINE_PERIOD)
         self._load_cv(CV_Type.CLIMATE_CHANGE_TYPE)
+        self._load_cv(CV_Type.COLLECTION)
+        self._load_cv(CV_Type.SCENARIO)
         self._load_cv(CV_Type.TIME_SLICE_TYPE)
 
-    def _load_json_variables(self):
-        # TODO quick hack to get UKCP18_CVs
-        var_file = path.join(
-            ROOT_DIR, 'ukcp_dp/vocab_manager/UKCP18_variable.json')
-        with open(var_file) as json_data:
-            variables = json.load(json_data)['variable']
-        self.vocab['variable'] = {}
-        for key in variables.keys():
-            try:
-                self.vocab['variable'][key] = variables[key]['plot_label']
-            except KeyError:
-                pass
+        self._load_cv(CV_Type.ADMIN_REGION)
+        self.vocab[CV_Type.ADMIN_REGION]['all'] = 'All administrative regions'
+        self._load_cv(CV_Type.COUNTRY)
+        self.vocab[CV_Type.COUNTRY]['all'] = 'All countries'
+        self._load_cv(CV_Type.RIVER_BASIN)
+        self.vocab[CV_Type.RIVER_BASIN]['all'] = 'All river basins',
 
     def _load_cv(self, cv_type):
         """
         Load in UKCP18 vocab.
-        
+
+        @param cv_type (CV_Type): the vocabulary to load in
+        """
+        terms = get_cv(cv_type)[cv_type]
+        self.vocab[cv_type] = {}
+        for key in terms.keys():
+            self.vocab[cv_type][key] = terms[key]
+
+    def _load_cv_variables(self, cv_type):
+        """
+        Load in UKCP18 vocab for variables.
+
         @param cv_type (CV_Type): the vocabulary to load in
         """
         terms = get_cv(cv_type)[cv_type]
         self.vocab[cv_type] = {}
         for key in terms.keys():
             try:
-                self.vocab[cv_type][key] = terms[key]
+                self.vocab[cv_type][key] = terms[key]['plot_label']
             except KeyError:
                 pass
 
@@ -480,5 +409,5 @@ def get_seasons():
     return SEASONS
 
 
-def get_ensemble_member_set(data_source):
-    return ENSEMBLE_MEMBER_SET.get(data_source)
+def get_ensemble_member_set(collection):
+    return ENSEMBLE_MEMBER_SET.get(collection)

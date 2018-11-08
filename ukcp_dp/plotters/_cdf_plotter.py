@@ -6,7 +6,7 @@ import iris.quickplot as qplt
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
-from ukcp_dp.constants import CDF_LABEL, DATA_SOURCE_PROB, InputType, \
+from ukcp_dp.constants import CDF_LABEL, COLLECTION_PROB, InputType, \
     SCENARIO_COLOURS, SCENARIO_GREYSCALES
 
 
@@ -33,8 +33,8 @@ class CdfPlotter(GraphPlotter):
         else:
             colours = SCENARIO_GREYSCALES
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) !=
-                DATA_SOURCE_PROB):
+        if (self.input_data.get_value(InputType.COLLECTION) !=
+                COLLECTION_PROB):
             raise Exception('A CDF plot requires probabilistic data')
 
         for scenario_cube in self.cube_list:

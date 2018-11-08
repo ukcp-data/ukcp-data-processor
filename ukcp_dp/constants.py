@@ -12,11 +12,11 @@ def enum(**named_values):
 
 InputType = enum(
     AREA='area_type',
-    BASELINE='baseline',
+    BASELINE='baseline_period',
     COLOUR_MODE='colour_mode',
     CONVERT_TO_PERCENTILES='convert_to_percentiles',
     DATA_FORMAT='data_format',
-    DATA_SOURCE='data_source',
+    COLLECTION='collection',
     DATA_TYPE='data_type',
     ENSEMBLE='ensemble',
     FONT_SIZE='font_size',
@@ -53,7 +53,7 @@ INPUT_TYPES_SINGLE_VALUE = [InputType.BASELINE,
                             InputType.COLOUR_MODE,
                             InputType.CONVERT_TO_PERCENTILES,
                             InputType.DATA_FORMAT,
-                            InputType.DATA_SOURCE,
+                            InputType.COLLECTION,
                             InputType.FONT_SIZE,
                             InputType.IMAGE_FORMAT,
                             InputType.IMAGE_SIZE,
@@ -91,7 +91,7 @@ INPUT_TYPES = INPUT_TYPES_SINGLE_VALUE + INPUT_TYPES_MULTI_VALUE
 INPUT_TYPES.append(InputType.AREA)
 
 DATA_SELECTION_TYPES = [InputType.BASELINE,
-                        InputType.DATA_SOURCE,
+                        InputType.COLLECTION,
                         InputType.DATA_TYPE,
                         InputType.ENSEMBLE,
                         InputType.METHOD,
@@ -159,14 +159,14 @@ LOGO_LARGE = path.join(
 
 TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 
-DATA_SOURCE_PROB = 'land-prob'
-DATA_SOURCE_PROB_MIN_YEAR = 1961
-DATA_SOURCE_GCM = 'land-gcm'
-DATA_SOURCE_RCM = 'land-rcm'
-DATA_SOURCE_RCM_MIN_YEAR = 1980
-DATA_SOURCE_MARINE = 'marine-sim'
-DATA_SOURCE_MARINE_MIN_YEAR = 2007
-DATA_SOURCE_MARINE_MAX_YEAR = 2300
+COLLECTION_PROB = 'land-prob'
+COLLECTION_PROB_MIN_YEAR = 1961
+COLLECTION_GCM = 'land-gcm'
+COLLECTION_RCM = 'land-rcm'
+COLLECTION_RCM_MIN_YEAR = 1980
+COLLECTION_MARINE = 'marine-sim'
+COLLECTION_MARINE_MIN_YEAR = 2007
+COLLECTION_MARINE_MAX_YEAR = 2300
 OTHER_MAX_YEAR = 2100
 
 # Marine data stuff

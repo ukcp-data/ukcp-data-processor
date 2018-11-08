@@ -9,7 +9,7 @@ the entry point for this package.
 
 from iris.cube import CubeList
 from ukcp_dp._input_data import InputData
-from ukcp_dp.constants import DATA_SOURCE_PROB, InputType, PlotType, VERSION
+from ukcp_dp.constants import COLLECTION_PROB, InputType, PlotType, VERSION
 from ukcp_dp.data_extractor import DataExtractor, get_probability_levels
 from ukcp_dp.file_finder import get_absolute_paths, get_file_lists
 from ukcp_dp.file_writers import write_file
@@ -182,8 +182,8 @@ class UKCPDataProcessor(object):
         if (self.plot_type is not None and
             (self.plot_type == PlotType.PLUME_PLOT or
              self.plot_type == PlotType.THREE_MAPS) and
-            (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_PROB)):
+            (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_PROB)):
             cubes = CubeList()
             for cube in self.cube_list:
                 # the cube contains all of the percentiles but we only plotted

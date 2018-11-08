@@ -1,7 +1,7 @@
 import logging
 
 import iris
-from ukcp_dp.constants import DATA_SOURCE_MARINE, DATA_SOURCE_PROB
+from ukcp_dp.constants import COLLECTION_MARINE, COLLECTION_PROB
 from ukcp_dp.constants import InputType, RETURN_PERIODS
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 from ukcp_dp.file_writers._utils import convert_to_2dp
@@ -21,8 +21,8 @@ class PlumeCsvWriter(BaseCsvWriter):
         """
         Write out the data, in CSV format, associated with a plume plot.
         """
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_MARINE and
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_MARINE and
                 self.input_data.get_value(InputType.METHOD).startswith(
                 RETURN_PERIODS)):
             self.header.append('Return period(years)')
@@ -30,10 +30,10 @@ class PlumeCsvWriter(BaseCsvWriter):
             self.header.append('Date')
         key_list = []
 
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_PROB or
-                self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_MARINE):
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_PROB or
+                self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_MARINE):
             self._write_csv_plume_percentiles(key_list)
         else:
             self._write_csv_plume_ensemble(key_list)
@@ -93,8 +93,8 @@ class PlumeCsvWriter(BaseCsvWriter):
             self._read_x_cube(_slice, key_list)
 
     def _read_x_cube(self, cube, key_list):
-        if (self.input_data.get_value(InputType.DATA_SOURCE) ==
-                DATA_SOURCE_MARINE and
+        if (self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_MARINE and
                 self.input_data.get_value(InputType.METHOD).startswith(
                 RETURN_PERIODS)):
             self._read_returnlevel_cube(cube, key_list)
