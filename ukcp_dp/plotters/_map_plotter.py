@@ -59,12 +59,6 @@ class MapPlotter(BasePlotter):
         result = self._generate_subplots(
             cube, plot_settings, fig, metadata_bbox)
 
-        # TODO Remove water mark
-        # Add a water mark
-        fig.text(0.5, 0.5, 'DRAFT - NOT FOR USE',
-                 fontsize=45, color='gray',
-                 ha='center', va='center',  rotation=30, alpha=0.8)
-
         # Add the title
         fig.suptitle(title, fontsize='larger')
 

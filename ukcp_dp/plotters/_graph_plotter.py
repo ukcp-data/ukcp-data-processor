@@ -32,12 +32,6 @@ class GraphPlotter(BasePlotter):
         self._add_logo(fig)
         metadata_bbox = self._add_metadata_text(fig)
 
-        # TODO Remove water mark
-        # Add a water mark
-        fig.text(0.5, 0.5, 'DRAFT - NOT FOR USE',
-                 fontsize=45, color='gray',
-                 ha='center', va='center',  rotation=30, alpha=0.8)
-
         # Set the area below the metadata and allow room for the labels
         fig.add_axes(Bbox([[0.07, 0.08], [0.99, metadata_bbox.y0 - 0.06]]))
 

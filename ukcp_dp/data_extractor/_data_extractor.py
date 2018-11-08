@@ -455,7 +455,7 @@ class DataExtractor(object):
         if (self.input_data.get_value(
                 InputType.TEMPORAL_AVERAGE_TYPE) == TemporalAverageType.ANNUAL
                 or self.input_data.get_value(InputType.TIME_PERIOD) == 'all'):
-            title = ('Demonstration Version - {temporal_type} average '
+            title = ('{temporal_type} average '
                      '{variable}\n'
                      'for'.format(
                          temporal_type=self.input_data.get_value_label(
@@ -464,12 +464,11 @@ class DataExtractor(object):
 
         elif (self.input_data.get_value(
                 InputType.TEMPORAL_AVERAGE_TYPE) is None):
-            title = ('Demonstration Version - '
-                     '{variable}\n'
+            title = ('{variable}\n'
                      'for'.format(variable=variable))
 
         else:
-            title = ('Demonstration Version - {temporal_type} average '
+            title = ('{temporal_type} average '
                      '{variable} for\n'
                      '{time_period} in'.format(
                          temporal_type=self.input_data.get_value_label(
