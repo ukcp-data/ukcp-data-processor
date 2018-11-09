@@ -144,7 +144,7 @@ OVERLAY_COASTLINE = path.join(
     ROOT_DIR, 'ukcp_dp/public/shapefiles/UKCoastline')
 OVERLAY_COASTLINE_SMALL = path.join(
     ROOT_DIR, 'ukcp_dp/public/shapefiles/UKCoastlineSmall')
-OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK')
+OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/BritishIsles')
 OVERLAY_RIVER = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/river_basins')
 
 LOGO_SMALL = path.join(
