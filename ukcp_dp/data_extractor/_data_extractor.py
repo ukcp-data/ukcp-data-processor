@@ -456,21 +456,18 @@ class DataExtractor(object):
                 InputType.TEMPORAL_AVERAGE_TYPE) == TemporalAverageType.ANNUAL
                 or self.input_data.get_value(InputType.TIME_PERIOD) == 'all'):
             title = ('{temporal_type} average '
-                     '{variable}\n'
-                     'for'.format(
+                     '{variable} for'.format(
                          temporal_type=self.input_data.get_value_label(
                              InputType.TEMPORAL_AVERAGE_TYPE),
                          variable=variable))
 
         elif (self.input_data.get_value(
                 InputType.TEMPORAL_AVERAGE_TYPE) is None):
-            title = ('{variable}\n'
-                     'for'.format(variable=variable))
+            title = ('{variable} for'.format(variable=variable))
 
         else:
             title = ('{temporal_type} average '
-                     '{variable} for\n'
-                     '{time_period} in'.format(
+                     '{variable} for {time_period} in'.format(
                          temporal_type=self.input_data.get_value_label(
                              InputType.TEMPORAL_AVERAGE_TYPE),
                          time_period=self.input_data.get_value_label(
@@ -488,21 +485,21 @@ class DataExtractor(object):
                 t=title, start_year=start_year, end_year=end_year)
 
         if self.input_data.get_area_type() == AreaType.POINT:
-            grid_x = (self.cubes[0].coord('projection_x_coordinate')
-                      .bounds[0][0])
-            grid_y = (self.cubes[0].coord('projection_y_coordinate')
-                      .bounds[0][0])
-            title = "{t} for grid square {x}, {y}".format(
+            grid_x = int(self.cubes[0].coord('projection_x_coordinate')
+                         .bounds[0][0])
+            grid_y = int(self.cubes[0].coord('projection_y_coordinate')
+                         .bounds[0][0])
+            title = "{t}\nfor grid square {x}, {y}".format(
                 t=title, x=grid_x, y=grid_y)
 
         elif self.input_data.get_area_type() == AreaType.BBOX:
             x_bounds = self.cubes[0].coord('projection_x_coordinate').bounds
             y_bounds = self.cubes[0].coord('projection_y_coordinate').bounds
-            grid_x1 = (x_bounds[0][0])
-            grid_y1 = (y_bounds[0][0])
-            grid_x2 = (x_bounds[-1][1])
-            grid_y2 = (y_bounds[-1][1])
-            title = "{t} in area {x1}, {y1} to {x2}, {y2}".format(
+            grid_x1 = int(x_bounds[0][0])
+            grid_y1 = int(y_bounds[0][0])
+            grid_x2 = int(x_bounds[-1][1])
+            grid_y2 = int(y_bounds[-1][1])
+            title = "{t}\nin area {x1}, {y1} to {x2}, {y2}".format(
                 t=title, x1=grid_x1, y1=grid_y1, x2=grid_x2, y2=grid_y2)
 
         elif (self.input_data.get_area_type() in
@@ -518,6 +515,18 @@ class DataExtractor(object):
         else:
             title = "{t} in {area}".format(
                 t=title, area=self.input_data.get_area_label())
+
+        # add baseline
+        title = "{t}, using baseline {baseline}".format(
+            t=title, baseline=self.input_data.get_value_label(
+                InputType.BASELINE))
+
+        # add scenario, if only one of them. If len > 1 then the scenarios will
+        # be on the plot legend
+        scenario = self.input_data.get_value_label(InputType.SCENARIO)
+        if len(scenario) == 1:
+            title = "{t}, and scenario {scenario}".format(
+                t=title, scenario=scenario[0])
 
         return title.decode('utf-8')
 

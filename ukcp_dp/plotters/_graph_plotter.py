@@ -30,10 +30,9 @@ class GraphPlotter(BasePlotter):
 
         # Add the logo and metadata box
         self._add_logo(fig)
-        metadata_bbox = self._add_metadata_text(fig)
 
-        # Set the area below the metadata and allow room for the labels
-        fig.add_axes(Bbox([[0.07, 0.08], [0.99, metadata_bbox.y0 - 0.06]]))
+        # Set the area below the title and allow room for the labels
+        fig.add_axes(Bbox([[0.07, 0.08], [0.97, 0.88]]))
 
         self._generate_graph()
 

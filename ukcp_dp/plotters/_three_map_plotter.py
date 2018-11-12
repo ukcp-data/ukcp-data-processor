@@ -19,18 +19,17 @@ class ThreeMapPlotter(MapPlotter):
     plot_settings).
     """
 
-    def _generate_subplots(self, cube, plot_settings, fig, metadata_bbox):
+    def _generate_subplots(self, cube, plot_settings, fig):
         """
         Override base class method.
 
         @param cube (iris cube): a cube containing the selected data
         @param plot_settings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
-        @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
         log.debug('_generate_subplots')
 
-        gs_top = metadata_bbox.y0 - 0.06
+        gs_top = 0.88
         gs_left = 0.02
         gs_right = 0.98
 

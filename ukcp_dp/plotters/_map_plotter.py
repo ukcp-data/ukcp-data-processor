@@ -22,7 +22,7 @@ class MapPlotter(BasePlotter):
 
     This class extends BasePlotter with _generate_plot(self, output_path,
     title). This class should be extended with a _generate_subplots(self, cube,
-    plot_settings, fig, metadata_bbox) method to plot the map.
+    plot_settings, fig) method to plot the map.
     """
 
     def _generate_plot(self, output_path, plot_settings, title):
@@ -53,11 +53,9 @@ class MapPlotter(BasePlotter):
 
         # Add the logo and metadata box
         self._add_logo(fig)
-        metadata_bbox = self._add_metadata_text(fig)
 
         # Call the method to generate the maps
-        result = self._generate_subplots(
-            cube, plot_settings, fig, metadata_bbox)
+        result = self._generate_subplots(cube, plot_settings, fig)
 
         # Add the title
         fig.suptitle(title, fontsize='larger')
@@ -71,14 +69,13 @@ class MapPlotter(BasePlotter):
 #         plotgeneral.set_standard_margins(settings=None, fig=fig)
         end_figure(output_path)
 
-    def _generate_subplots(self, cube, plot_settings, fig, metadata_bbox):
+    def _generate_subplots(self, cube, plot_settings, fig):
         """
         This method should be overridden to produce the sub-plots.
 
         @param cube (iris cube): a cube containing the selected data
         @param plot_settings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
-        @param metadata_bbox (Bbox): the bbox surrounding the metadata table
         """
         pass
 
