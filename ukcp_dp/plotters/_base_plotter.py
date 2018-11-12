@@ -1,14 +1,12 @@
 from __future__ import unicode_literals
 
 import logging
-import math
 
 import matplotlib.cbook as cbook
 import matplotlib.gridspec as gridspec
 import matplotlib.image as image
 from matplotlib.transforms import Bbox
-from ukcp_dp.constants import DATA_SELECTION_TYPES, InputType, \
-    LOGO_SMALL, LOGO_MEDIUM, LOGO_LARGE
+from ukcp_dp.constants import InputType, LOGO_SMALL, LOGO_MEDIUM, LOGO_LARGE
 
 
 log = logging.getLogger(__name__)
