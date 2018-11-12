@@ -1,8 +1,4 @@
-import json
-from os import path
-
 from ukcp_cv import CV_Type, get_cv
-from ukcp_dp.constants import ROOT_DIR
 
 
 class Vocab(object):
