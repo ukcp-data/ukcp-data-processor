@@ -137,7 +137,7 @@ CONTOUR_FILL = ['#D3D3D3', '#9E9E9E', '#6C6C6C']
 OVERLAY_COLOUR = 'black'
 OVERLAY_LINE_WIDTH = 0.3
 
-ROOT_DIR = '/usr/local/cows_venv_py27/cows_venv/lib/python2.7/site-packages'
+ROOT_DIR = '/usr/local/miniconda/lib/python2.7/site-packages'
 
 OVERLAY_ADMIN = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK_Admin')
 OVERLAY_COASTLINE = path.join(
@@ -176,7 +176,7 @@ EXTENDED_PROJECTIONS = ['msl-proj-expl', 'return-periods-ext']
 CDF_LABEL = 'Probability of being less than (%)'
 PDF_LABEL = 'Relative probability'
 
-DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit/example_data/ukcp18/data'
+DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit2/ukcp18/data'
 DATA_SERVICE_URL = 'http://data.ceda.ac.uk/badc/ukcp18/data'
 
 # Area types
