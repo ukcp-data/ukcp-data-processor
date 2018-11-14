@@ -167,13 +167,13 @@ def get_time_series(cube, slice_and_sel_coord):
                        (366.0 if calendar.isleap(t.year) else 365.0)
                        for t in tsteps]
 
-        elif (isinstance(tsteps[0], cf_units.netcdftime.datetime) or
+        elif (isinstance(tsteps[0], cf_units.cftime.datetime) or
                 isinstance(tsteps[0],
-                           cf_units.netcdftime._netcdftime.Datetime360Day)):
+                           cf_units.cftime.Datetime360Day)):
             if tcoord.units.calendar == "360_day":
                 tpoints = [t.year + t.dayofyr / 360.0 for t in tsteps]
             else:
-                raise Exception("Got time points as netcdftime objects, "
+                raise Exception("Got time points as cftime objects, "
                                 "but NOT on a 360-day calendar.")
 
         else:
@@ -228,13 +228,13 @@ def set_x_limits(cube, ax):
                        (366.0 if calendar.isleap(t.year) else 365.0)
                        for t in xlims]
 
-    elif (isinstance(xlims[0], cf_units.netcdftime.datetime) or
+    elif (isinstance(xlims[0], cf_units.cftime.datetime) or
             isinstance(xlims[0],
-                       cf_units.netcdftime._netcdftime.Datetime360Day)):
+                       cf_units.cftime.Datetime360Day)):
         # Strictly-speaking, this might not be on a 360-day calendar,
         # but in practice we're unlikely to get this kind of object
         # unless a 360-day calendar is involved.
-        log.info("Time axis limits specified with netcdftime.datetime "
+        log.info("Time axis limits specified with cftime.datetime "
                  "objects, ASSUMEING they're on a 360-day calendar.")
         xlims_touse = [t.year + t.dayofyr / 360.0 for t in xlims]
 
