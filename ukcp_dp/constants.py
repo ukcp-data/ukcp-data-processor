@@ -137,7 +137,7 @@ CONTOUR_FILL = ['#D3D3D3', '#9E9E9E', '#6C6C6C']
 OVERLAY_COLOUR = 'black'
 OVERLAY_LINE_WIDTH = 0.3
 
-ROOT_DIR = '/usr/local/miniconda/lib/python2.7/site-packages'
+ROOT_DIR = path.dirname(path.dirname(path.abspath(__file__)))
 
 OVERLAY_ADMIN = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK_Admin')
 OVERLAY_COASTLINE = path.join(
