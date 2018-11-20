@@ -517,7 +517,7 @@ class DataExtractor(object):
                 t=title, area=self.input_data.get_area_label())
 
         # add baseline
-        if self.input_data.get_value_label(InputType.BASELINE) is not None:
+        if self.input_data.get_value(InputType.BASELINE) is not None:
             title = "{t}, using baseline {baseline}".format(
                 t=title, baseline=self.input_data.get_value_label(
                     InputType.BASELINE))
