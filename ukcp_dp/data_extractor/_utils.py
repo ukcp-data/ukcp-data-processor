@@ -33,7 +33,7 @@ def get_anomaly(cube_baseline, cube_absoute, baseline, preferred_unit,
     if temporal_average_type == TemporalAverageType.MONTHLY:
         periods = _get_selected_month_numbers(time_period)
     elif temporal_average_type == TemporalAverageType.SEASONAL:
-        periods = _get_selected_season_numbers()
+        periods = _get_selected_season_numbers(time_period)
     else:
         # TODO annual
         pass
