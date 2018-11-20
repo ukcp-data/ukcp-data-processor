@@ -509,11 +509,11 @@ class DataExtractor(object):
 #                          .bounds[0][0]) TODO
             longitude = round(self.cubes[0].coord('longitude').points[0], 2)
 #                          .bounds[0][0]) TODO
-            title = "{t} for grid square {latitude}°, {longitude}°".format(
+            title = "{t}\nfor grid square {latitude}°, {longitude}°".format(
                 t=title, latitude=latitude, longitude=longitude)
 
         else:
-            title = "{t} in {area}".format(
+            title = "{t}\n in {area}".format(
                 t=title, area=self.input_data.get_area_label())
 
         # add baseline
