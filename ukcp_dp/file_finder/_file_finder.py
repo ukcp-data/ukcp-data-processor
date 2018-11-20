@@ -233,11 +233,16 @@ def _get_prob_file_path(data_type, input_data, scenario,
 
 def _get_prob_file_name(data_type, input_data, scenario,
                         spatial_representation, variable, year):
-    # the year starts in December, so subtract 1 from the year
-    start_date = '{year}{mon_day}'.format(
-        year=year - 1, mon_day=START_MONTH_DAY)
-    end_date = '{year}{mon_day}'.format(
-        year=year, mon_day=END_MONTH_DAY)
+
+    if input_data.get_value(InputType.TIME_SLICE_TYPE) == '1y':
+        # the year starts in December, so subtract 1 from the year
+        start_date = '{year}{mon_day}'.format(
+            year=year - 1, mon_day=START_MONTH_DAY)
+        end_date = '{year}{mon_day}'.format(
+            year=year, mon_day=END_MONTH_DAY)
+    else:  # 20y or 30y
+        start_date = '20091201'
+        end_date = '20991130'
 
     file_name = ('{variable}_{scenario}_{collection}_uk_'
                  '{spatial_representation}_{data_type}_{baseline}_'
