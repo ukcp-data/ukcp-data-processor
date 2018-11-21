@@ -4,7 +4,6 @@ from ukcp_dp.constants import DATA_DIR, DATA_SERVICE_URL, COLLECTION_PROB, \
     COLLECTION_PROB_MIN_YEAR, COLLECTION_GCM, COLLECTION_RCM, \
     COLLECTION_MARINE, InputType, OTHER_MAX_YEAR, AreaType, \
     TemporalAverageType
-from ukcp_dp.utils import get_baseline_range
 
 import logging
 log = logging.getLogger(__name__)
@@ -166,14 +165,21 @@ def _get_file_list_per_scenario(input_data, scenario, spatial_representation,
 
         scenario_file_list = []
 
-        for year in range(year_minimum, (year_maximum + 1)):
-            # We cannot check for COLLECTION_PROB as this may be an
-            # overlay
-            if (input_data.get_value(InputType.COLLECTION) !=
-                    COLLECTION_MARINE and year == OTHER_MAX_YEAR):
-                # there is not data for December of the last year
-                continue
-            file_name = _get_prob_file_name(
+        if input_data.get_value(InputType.TIME_SLICE_TYPE) == '1y':
+            for year in range(year_minimum, (year_maximum + 1)):
+                # We cannot check for COLLECTION_PROB as this may be an
+                # overlay
+                if (input_data.get_value(InputType.COLLECTION) !=
+                        COLLECTION_MARINE and year == OTHER_MAX_YEAR):
+                    # there is not data for December of the last year
+                    continue
+                file_name = _get_prob_file_name_for_year(
+                    data_type, input_data, scenario, spatial_representation,
+                    variable, year)
+                scenario_file_list.append(os.path.join(file_path, file_name))
+        else:
+            # InputType.TIME_SLICE_TYPE) == '20y' or '30y'
+            file_name = _get_prob_file_name_for_slice(
                 data_type, input_data, scenario, spatial_representation,
                 variable, year)
             scenario_file_list.append(os.path.join(file_path, file_name))
@@ -229,6 +235,32 @@ def _get_prob_file_path(data_type, input_data, scenario,
             VERSION)
 
     return file_path
+
+
+def _get_prob_file_name_for_year(data_type, input_data, scenario,
+                                 spatial_representation, variable, year):
+
+    # input_data.get_value(InputType.TIME_SLICE_TYPE) == '1y':
+    # the year starts in December, so subtract 1 from the year
+    start_date = '{year}{mon_day}'.format(
+        year=year - 1, mon_day=START_MONTH_DAY)
+    end_date = '{year}{mon_day}'.format(
+        year=year, mon_day=END_MONTH_DAY)
+
+    return _get_prob_file_name(data_type, input_data, scenario,
+                               spatial_representation, variable, start_date,
+                               end_date)
+
+
+def _get_prob_file_name_for_slice(data_type, input_data, scenario,
+                                  spatial_representation, variable):
+    # input_data.get_value(InputType.TIME_SLICE_TYPE) == 20y or 30y
+    start_date = '20091201'
+    end_date = '20991130'
+
+    return _get_prob_file_name(data_type, input_data, scenario,
+                               spatial_representation, variable, start_date,
+                               end_date)
 
 
 def _get_prob_file_name(data_type, input_data, scenario,
