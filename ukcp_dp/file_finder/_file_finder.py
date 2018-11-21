@@ -181,7 +181,7 @@ def _get_file_list_per_scenario(input_data, scenario, spatial_representation,
             # InputType.TIME_SLICE_TYPE) == '20y' or '30y'
             file_name = _get_prob_file_name_for_slice(
                 data_type, input_data, scenario, spatial_representation,
-                variable, year)
+                variable)
             scenario_file_list.append(os.path.join(file_path, file_name))
 
         file_list_per_data_type.append(scenario_file_list)
