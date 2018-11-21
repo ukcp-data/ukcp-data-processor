@@ -276,10 +276,7 @@ def _get_cm_file_list(input_data):
             each list is a list of files per scenario, per variable, including
             their full paths
     """
-    year_minimum = input_data.get_value(InputType.YEAR_MINIMUM)
-    year_maximum = input_data.get_value(InputType.YEAR_MAXIMUM)
-    return _get_cm_file_list_for_range(
-        input_data, year_minimum, year_maximum)
+    return _get_cm_file_list_for_range(input_data, None)
 
 
 def _get_file_list_for_baseline(input_data):
@@ -296,12 +293,10 @@ def _get_file_list_for_baseline(input_data):
             their full paths
     """
     baseline = input_data.get_value(InputType.BASELINE)
-    year_minimum,  year_maximum = get_baseline_range(baseline)
-    return _get_cm_file_list_for_range(input_data, year_minimum,
-                                       year_maximum)
+    return _get_cm_file_list_for_range(input_data, baseline=baseline)
 
 
-def _get_cm_file_list_for_range(input_data, year_minimum, year_maximum):
+def _get_cm_file_list_for_range(input_data, baseline):
     variables = input_data.get_value(InputType.VARIABLE)
 
     spatial_representation = _get_cm_spatial_representation(input_data)
@@ -322,9 +317,15 @@ def _get_cm_file_list_for_range(input_data, year_minimum, year_maximum):
                 file_path = _get_cm_file_path(
                     input_data, spatial_representation, variable_prefix,
                     scenario, ensemble)
-                # there will only be one file
-                ensemble_file_list.append(os.path.join(file_path, '*'))
-
+                if baseline is None:
+                    # there will only be one file
+                    ensemble_file_list.append(os.path.join(file_path, '*'))
+                else:
+                    file_name = _get_cm_baseline_file_name(
+                        input_data, spatial_representation, variable, scenario,
+                        ensemble, baseline)
+                    ensemble_file_list.append(
+                        os.path.join(file_path, file_name))
             file_list_per_scenario.append(ensemble_file_list)
 
         file_lists_per_variable[variable] = file_list_per_scenario
@@ -344,7 +345,17 @@ def _get_cm_spatial_representation(input_data):
 
 
 def _get_cm_file_path(input_data, spatial_representation, variable, scenario,
-                      ensemble):
+                      ensemble, baseline):
+    if baseline is None:
+        temporal_average_type = input_data.get_value(
+            InputType.TEMPORAL_AVERAGE_TYPE)
+    elif baseline == 'b8100':
+        temporal_average_type = '{}-20y'.format(
+            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
+    else:
+        temporal_average_type = '{}-30y'.format(
+            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
+
     file_path = os.path.join(
         DATA_DIR,
         input_data.get_value(InputType.COLLECTION),
@@ -353,7 +364,35 @@ def _get_cm_file_path(input_data, spatial_representation, variable, scenario,
         scenario,
         ensemble,
         variable,
-        input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+        temporal_average_type,
         VERSION)
 
     return file_path
+
+
+def _get_cm_baseline_file_name(input_data, spatial_representation, variable,
+                               scenario, ensemble, baseline):
+    if baseline == 'b8100':
+        temporal_average_type = '{}-20y'.format(
+            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
+        baseline_date = '198012-200011'
+    elif baseline == 'b6190':
+        temporal_average_type = '{}-30y'.format(
+            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
+        baseline_date = '196112-199011'
+    else:
+        temporal_average_type = '{}-30y'.format(
+            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
+        baseline_date = '198012-201011'
+
+    file_name = ('{variable}_{scenario}_{collection}_uk_'
+                 '{spatial_representation}_{ensemble}_'
+                 '{temporal_average_type}_{date}.nc'.format(
+                     variable=variable, scenario=scenario,
+                     collection=input_data.get_value(InputType.COLLECTION),
+                     spatial_representation=spatial_representation,
+                     ensemble=ensemble,
+                     temporal_average_type=temporal_average_type,
+                     date=baseline_date))
+
+    return file_name
