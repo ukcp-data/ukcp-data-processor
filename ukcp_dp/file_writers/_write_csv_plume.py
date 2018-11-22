@@ -105,9 +105,11 @@ class PlumeCsvWriter(BaseCsvWriter):
         """
         Slice the cube over 'return_period' and update data_dict
         """
-        for _slice in cube.slices_over('return_period'):
-            value = convert_to_2dp(_slice.data)
-            time_str = int(round(_slice.coord('return_period').cell(0).point))
+        data = cube.data[:]
+        coords = cube.coord('return_period')[:]
+        for p in range(0, data.shape[0]):
+            value = convert_to_2dp(data[p])
+            time_str = int(round(coords[p].cell(0).point))
             try:
                 self.data_dict[time_str].append(value)
             except KeyError:
@@ -118,10 +120,12 @@ class PlumeCsvWriter(BaseCsvWriter):
         """
         Slice the cube over 'time' and update data_dict
         """
-        for _slice in cube.slices_over('time'):
-            value = convert_to_2dp(_slice.data)
+        data = cube.data[:]
+        coords = cube.coord('time')[:]
+        for t in range(0, data.shape[0]):
+            value = convert_to_2dp(data[t])
             with iris.FUTURE.context(cell_datetime_objects=True):
-                time_str = _slice.coord('time').cell(
+                time_str = coords[t].cell(
                     0).point.strftime('%Y-%m-%d')
             try:
                 self.data_dict[time_str].append(value)
