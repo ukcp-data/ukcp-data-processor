@@ -426,6 +426,13 @@ class DataExtractor(object):
         if baseline is True:
             year_min,  year_max = get_baseline_range(self.input_data.get_value(
                 InputType.BASELINE))
+
+        elif self.input_data.get_value(InputType.TIME_SLICE_TYPE) == '20y':
+            year_min, year_max = self._get_20y_range()
+
+        elif self.input_data.get_value(InputType.TIME_SLICE_TYPE) == '30y':
+            year_min, year_max = self._get_30y_range()
+
         else:
             if self.input_data.get_value(InputType.YEAR) is not None:
                 # year
@@ -442,6 +449,16 @@ class DataExtractor(object):
                 time=lambda t: year_min <= t.point.year < year_max)
 
         return time_slice_constraint
+
+    def _get_20y_range(self):
+        year_min = self.input_data.get_value(InputType.YEAR_MINIMUM) + 8
+        year_max = self.input_data.get_value(InputType.YEAR_MAXIMUM) - 8
+        return year_min, year_max
+
+    def _get_30y_range(self):
+        year_min = self.input_data.get_value(InputType.YEAR_MINIMUM) + 12
+        year_max = self.input_data.get_value(InputType.YEAR_MAXIMUM) - 12
+        return year_min, year_max
 
     def get_title(self):
         """
