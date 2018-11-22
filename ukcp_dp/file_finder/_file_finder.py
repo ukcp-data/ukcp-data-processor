@@ -345,8 +345,8 @@ def _get_cm_file_list_for_range(input_data, baseline):
                     ensemble_file_list.append(os.path.join(file_path, '*'))
                 else:
                     file_name = _get_cm_baseline_file_name(
-                        input_data, spatial_representation, variable, scenario,
-                        ensemble, baseline)
+                        input_data, spatial_representation, variable_prefix,
+                        scenario, ensemble, baseline)
                     ensemble_file_list.append(
                         os.path.join(file_path, file_name))
             file_list_per_scenario.append(ensemble_file_list)
@@ -402,7 +402,7 @@ def _get_cm_baseline_file_name(input_data, spatial_representation, variable,
     elif baseline == 'b6190':
         temporal_average_type = '{}-30y'.format(
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
-        baseline_date = '196112-199011'
+        baseline_date = '196012-199011'
     else:
         temporal_average_type = '{}-30y'.format(
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
