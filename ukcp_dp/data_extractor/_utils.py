@@ -12,12 +12,12 @@ from ukcp_dp.vocab_manager import get_months, get_seasons
 log = logging.getLogger(__name__)
 
 
-def get_anomaly(cube_baseline, cube_absoute, baseline, preferred_unit,
+def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
                 temporal_average_type, time_period):
     """
     Generate a cube containing the anomaly values.
 
-    @param cube_baseline (iris.cube): a cube containing the baseline data
+    @param cube_climatology (iris.cube): a cube containing the climatology data
     @param cube_absoute (iris.cube): a cube containing the absolute data to be
         changed into anomalies
     @param baseline (str): the value to be used added as the baseline
@@ -27,9 +27,6 @@ def get_anomaly(cube_baseline, cube_absoute, baseline, preferred_unit,
         type
     @param time_period(str): the name of a month or season or 'all'
     """
-    cube_climatology = _make_climatology(
-        cube_baseline, temporal_average_type)
-
     if temporal_average_type == TemporalAverageType.MONTHLY:
         periods = _get_selected_month_numbers(time_period)
     elif temporal_average_type == TemporalAverageType.SEASONAL:
@@ -185,78 +182,6 @@ def _make_anomaly(datacube, reference_cube, preferred_unit=None):
     # original datacube though.
 
     return anomaly
-
-
-def _make_climatology(acube, climtype):
-    """
-    Make a "climatology", i.e. a mean calculated over a long period of
-    time.
-
-    You can also do monthly or seasonal climatologies:
-    climtype ("climatology type")  must be one of 'annual', 'seasonal',
-    'monthly'. (actually, just starting with seas* or month* will do)
-
-    Seasons and month categorical AuxCoords will be added if necessary
-
-    In the case of seasonal/monthly climatologies,
-    the resulting cube has an anonymous leading dimension (DimCoord),
-    which is linked to time, year, and season or month & month_number
-    AuxCoords.
-
-    The climatology will be calculated over all timesteps in acube.
-
-    """
-
-    thiscube = acube
-    operation = iris.analysis.MEAN
-
-    if climtype == TemporalAverageType.SEASONAL:
-        theseasons = ('djf', 'mam', 'jja', 'son')
-        try:
-            iris.coord_categorisation.add_season(thiscube, 'time',
-                                                 name='season',
-                                                 seasons=theseasons)
-        except ValueError:
-            pass
-
-        # Now we are safe to aggregate:
-        climatol = acube.aggregated_by('season', operation)
-        # This is likely to result in an anonymous dimension
-        # with time, season and season_year (and possibly other) aux coords.
-
-        # It might be nice to have an option to automatically remove these,
-        # and promote the season aux coord to the dim coord.
-        # Promoting is easy
-        # (http://scitools.org.uk/iris/docs/v1.9.0/html/iris/iris/util.html#iris.util.promote_aux_coord_to_dim_coord)
-        # but it's probably a pain to get the list of other aux coords in that
-        # dimension and remove them in a loop.
-        # So, the user will have to do this themselves if required.
-
-    elif climtype == TemporalAverageType.MONTHLY:
-        try:
-            iris.coord_categorisation.add_month_number(
-                thiscube, 'time', name='month_number')
-        except ValueError:
-            pass
-
-        # Now we are safe to aggregate:
-        climatol = acube.aggregated_by('month_number', operation)
-        # As with seasonal, this will result in an anonymous dim coord
-        # covering time, month, month_number etc,
-        # but in this case we'd want to retain BOTH month and month_number.
-        # So it's even less clear how to automatically tidy in this case.
-
-    elif climtype == TemporalAverageType.ANNUAL:
-        # Now we are safe to aggregate -- actually, we want to COLLAPSE
-        # over all time in this case!
-        climatol = acube.collapsed('time', operation)
-
-    else:
-        raise UserWarning("Climate type (" + climtype +
-                          ") not recognised! \n" +
-                          "Use annual, seasonal or monthly.")
-
-    return climatol
 
 
 def _get_selected_month_numbers(time_period):

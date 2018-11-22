@@ -114,16 +114,16 @@ class DataExtractor(object):
     def _get_anomaly_cube(self, file_list, baseline_file_list):
         log.debug('_get_anomaly_cube')
         # anomalies have been selected for something other than LS1,
-        # therefore we need to calculate the climatology using the
-        # baseline and then the anomalies
+        # therefore we need to calculate the anomalies using the
+        # climatology
         cube_absoute = self._get_cube(file_list)
 
-        cube_baseline = self._get_cube(baseline_file_list, baseline=True)
+        cube_climatology = self._get_cube(baseline_file_list, baseline=True)
 
         baseline = self.input_data.get_value(InputType.BASELINE)
 
         anomaly = get_anomaly(
-            cube_baseline, cube_absoute, baseline,
+            cube_climatology, cube_absoute, baseline,
             self.plot_settings.preferred_unit,
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
             self.input_data.get_value(InputType.TIME_PERIOD))
