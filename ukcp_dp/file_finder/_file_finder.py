@@ -339,7 +339,7 @@ def _get_cm_file_list_for_range(input_data, baseline):
             for ensemble in input_data.get_value(InputType.ENSEMBLE):
                 file_path = _get_cm_file_path(
                     input_data, spatial_representation, variable_prefix,
-                    scenario, ensemble)
+                    scenario, ensemble, baseline)
                 if baseline is None:
                     # there will only be one file
                     ensemble_file_list.append(os.path.join(file_path, '*'))
