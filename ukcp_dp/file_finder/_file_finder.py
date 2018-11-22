@@ -161,11 +161,10 @@ def _get_file_list_per_scenario(input_data, scenario, spatial_representation,
             file_name = '*'
             file_list_per_data_type.append(
                 [os.path.join(file_path, file_name)])
-            continue
 
-        scenario_file_list = []
+        elif input_data.get_value(InputType.TIME_SLICE_TYPE) == '1y':
+            scenario_file_list = []
 
-        if input_data.get_value(InputType.TIME_SLICE_TYPE) == '1y':
             for year in range(year_minimum, (year_maximum + 1)):
                 # We cannot check for COLLECTION_PROB as this may be an
                 # overlay
@@ -177,14 +176,16 @@ def _get_file_list_per_scenario(input_data, scenario, spatial_representation,
                     data_type, input_data, scenario, spatial_representation,
                     variable, year)
                 scenario_file_list.append(os.path.join(file_path, file_name))
+
+            file_list_per_data_type.append(scenario_file_list)
+
         else:
             # InputType.TIME_SLICE_TYPE) == '20y' or '30y'
             file_name = _get_prob_file_name_for_slice(
                 data_type, input_data, scenario, spatial_representation,
                 variable)
-            scenario_file_list.append(os.path.join(file_path, file_name))
-
-        file_list_per_data_type.append(scenario_file_list)
+            file_list_per_data_type.append(
+                [os.path.join(file_path, file_name)])
 
     return file_list_per_data_type
 
@@ -316,7 +317,7 @@ def _get_file_list_for_baseline(input_data):
             their full paths
     """
     baseline = input_data.get_value(InputType.BASELINE)
-    return _get_cm_file_list_for_range(input_data, baseline=baseline)
+    return _get_cm_file_list_for_range(input_data, baseline)
 
 
 def _get_cm_file_list_for_range(input_data, baseline):
@@ -340,15 +341,13 @@ def _get_cm_file_list_for_range(input_data, baseline):
                 file_path = _get_cm_file_path(
                     input_data, spatial_representation, variable_prefix,
                     scenario, ensemble, baseline)
-                if baseline is None:
-                    # there will only be one file
-                    ensemble_file_list.append(os.path.join(file_path, '*'))
-                else:
-                    file_name = _get_cm_baseline_file_name(
-                        input_data, spatial_representation, variable_prefix,
-                        scenario, ensemble, baseline)
-                    ensemble_file_list.append(
-                        os.path.join(file_path, file_name))
+
+                file_name = _get_cm_file_name(
+                    input_data, spatial_representation, variable_prefix,
+                    scenario, ensemble, baseline)
+                ensemble_file_list.append(
+                    os.path.join(file_path, file_name))
+
             file_list_per_scenario.append(ensemble_file_list)
 
         file_lists_per_variable[variable] = file_list_per_scenario
@@ -369,15 +368,24 @@ def _get_cm_spatial_representation(input_data):
 
 def _get_cm_file_path(input_data, spatial_representation, variable, scenario,
                       ensemble, baseline):
-    if baseline is None:
+    if (baseline is None and
+            input_data.get_value(InputType.TIME_SLICE_TYPE) is None):
         temporal_average_type = input_data.get_value(
             InputType.TEMPORAL_AVERAGE_TYPE)
-    elif baseline == 'b8100':
+
+    elif (baseline == 'b8100' or
+          input_data.get_value(InputType.TIME_SLICE_TYPE) == '20y'):
         temporal_average_type = '{}-20y'.format(
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
-    else:
+
+    elif (baseline == 'b6190' or baseline == 'b8110' or
+          input_data.get_value(InputType.TIME_SLICE_TYPE) == '30y'):
         temporal_average_type = '{}-30y'.format(
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
+
+    else:
+        temporal_average_type = input_data.get_value(
+            InputType.TEMPORAL_AVERAGE_TYPE)
 
     file_path = os.path.join(
         DATA_DIR,
@@ -393,20 +401,37 @@ def _get_cm_file_path(input_data, spatial_representation, variable, scenario,
     return file_path
 
 
-def _get_cm_baseline_file_name(input_data, spatial_representation, variable,
+def _get_cm_file_name(input_data, spatial_representation, variable,
                                scenario, ensemble, baseline):
-    if baseline == 'b8100':
+    if baseline is None:
+        if (input_data.get_value(InputType.TIME_SLICE_TYPE) is None or
+                input_data.get_value(InputType.TIME_SLICE_TYPE) == '1y'):
+            # there will only be one file
+            return '*'
+
+        temporal_average_type = '{}-{}'.format(
+            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+            input_data.get_value(InputType.TIME_SLICE_TYPE))
+
+        if input_data.get_value(InputType.COLLECTION) == COLLECTION_GCM:
+            date_range = '200912-209911'
+        else:
+            date_range = '200912-207911'
+
+    elif baseline == 'b8100':
         temporal_average_type = '{}-20y'.format(
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
-        baseline_date = '198012-200011'
+        date_range = '198012-200011'
+
     elif baseline == 'b6190':
         temporal_average_type = '{}-30y'.format(
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
-        baseline_date = '196012-199011'
-    else:
+        date_range = '196012-199011'
+
+    elif baseline == 'b8110':
         temporal_average_type = '{}-30y'.format(
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE))
-        baseline_date = '198012-201011'
+        date_range = '198012-201011'
 
     file_name = ('{variable}_{scenario}_{collection}_uk_'
                  '{spatial_representation}_{ensemble}_'
@@ -416,6 +441,6 @@ def _get_cm_baseline_file_name(input_data, spatial_representation, variable,
                      spatial_representation=spatial_representation,
                      ensemble=ensemble,
                      temporal_average_type=temporal_average_type,
-                     date=baseline_date))
+                     date=date_range))
 
     return file_name
