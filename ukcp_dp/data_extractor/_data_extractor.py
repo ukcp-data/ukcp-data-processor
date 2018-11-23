@@ -122,6 +122,9 @@ class DataExtractor(object):
 
         baseline = self.input_data.get_value(InputType.BASELINE)
 
+        log.debug('cube_absoute\n{}'.format(cube_absoute))
+        log.debug('cube_climatology\n{}'.format(cube_climatology))
+
         anomaly = get_anomaly(
             cube_climatology, cube_absoute, baseline,
             self.plot_settings.preferred_unit,
