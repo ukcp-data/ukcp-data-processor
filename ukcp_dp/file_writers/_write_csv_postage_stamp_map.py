@@ -42,21 +42,22 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
             ensemble_name = ensemble_slice.coord(
                 'ensemble_member_id').points[0]
 
+            ### New Code
+            # get the numpy representation of the sub-cube
+            data = ensemble_slice.data
+            # get the coordinates for the sub-cube
+            y_coords = ensemble_slice.coord('projection_y_coordinate').points
+            x_coords = ensemble_slice.coord('projection_x_coordinate').points
+
             # rows of data
-            for projection_y_slice in ensemble_slice.slices_over(
-                    'projection_y_coordinate'):
-                y_coord = str(projection_y_slice.coord(
-                    'projection_y_coordinate').points[0])
-
+            for y in range(0, y_coords.shape[0]):
+                y_coord = str(y_coords[y])
                 # columns of data
-                for projection_x_slice in projection_y_slice.slices_over(
-                        'projection_x_coordinate'):
+                for x in range(0, x_coords.shape[0]):
                     if write_header is True:
-                        x_coord = str(projection_x_slice.coord(
-                            'projection_x_coordinate').points[0])
-                        self.header.append(x_coord)
+                        self.header.append(str(x_coords[x]))
 
-                    value = convert_to_2dp(projection_x_slice.data)
+                    value = convert_to_2dp(data[y, x])
                     try:
                         self.data_dict[y_coord].append(value)
                     except KeyError:
@@ -68,6 +69,7 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
                 '_{}'.format(ensemble_name))
             self._write_data_dict(output_data_file_path, key_list)
             output_file_list.append(output_data_file_path)
+            ###
 
         return output_file_list
 
