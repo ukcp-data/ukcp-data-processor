@@ -220,3 +220,26 @@ def make_standard_bar(settings, fig, barlabel=None,
                          levels, barlabel, colmappable=colmappable,
                          bar_pos=bar_pos)
     return bar
+
+
+def wrap_string(text, width):
+    """
+    Wrap a string so that each line is no more than <width> characters long.
+    Insert line breaks to wrap.
+    This is to enable titles to be plotted without overlapping the logos.
+    """
+    # split the string so that we can recombine into a new string with line
+    # breaks at the wrap width
+    split_text = text.split(" ")
+    new_text = ""
+    new_line_length = 0
+    for st in split_text:
+        # if it's over the width then add a line break and reset the line length
+        # counter
+        if new_line_length + len(st) > width:
+            new_line_length = 0
+            new_text += "\n"
+        # add the string plus a space to the new string and increase the line length
+        new_text += st + " "
+        new_line_length += (len(st) + 1)
+    return new_text
