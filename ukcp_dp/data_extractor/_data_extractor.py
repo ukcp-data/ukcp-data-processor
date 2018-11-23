@@ -90,7 +90,6 @@ class DataExtractor(object):
                         self.input_data.get_value(InputType.COLLECTION) not in
                         [COLLECTION_PROB, COLLECTION_MARINE]):
                     # we need anomalies so lets calculate them
-                    # TODO we may get these directly from file in future
                     cube = self._get_anomaly_cube(
                         file_list, self.file_lists['baseline'][variable][i])
 
@@ -107,18 +106,19 @@ class DataExtractor(object):
 
                 cubes.append(cube)
 
-        log.debug(cubes)
+        log.debug('Final cubes:\n{}'.format(cubes))
 
         return cubes
 
-    def _get_anomaly_cube(self, file_list, baseline_file_list):
+    def _get_anomaly_cube(self, file_list, climatology_file_list):
         log.debug('_get_anomaly_cube')
         # anomalies have been selected for something other than LS1,
         # therefore we need to calculate the anomalies using the
         # climatology
         cube_absoute = self._get_cube(file_list)
 
-        cube_climatology = self._get_cube(baseline_file_list, baseline=True)
+        cube_climatology = self._get_cube(
+            climatology_file_list, climatology=True)
 
         baseline = self.input_data.get_value(InputType.BASELINE)
 
@@ -161,19 +161,26 @@ class DataExtractor(object):
 
         return overlay_cube
 
-    def _get_cube(self, file_list, baseline=False,
+    def _get_cube(self, file_list, climatology=False,
                   overlay_probability_levels=False):
         """
         Get an iris cube based on the given files using selection criteria
         from the input_data.
 
         @param file_list (list[str]): a list of file name to retrieve data from
-        @param baseline (boolean): if True calculate the baseline data
+        @param climatology (boolean): if True extract the climatology data
         @param overlay_probability_levels (boolean): if True only include the
             10th, 50th and 90th percentile data
 
         @return an iris cube
         """
+        if climatology is True:
+            log.info('_get_cube for climatology')
+        elif overlay_probability_levels is True:
+            log.info('_get_cube, overlay probability levels')
+        else:
+            log.info('_get_cube')
+
         if log.getEffectiveLevel() == logging.DEBUG:
             log.debug('_get_cube from {} files'.format(len(file_list)))
             for fpath in file_list:
@@ -234,7 +241,7 @@ class DataExtractor(object):
 
         log.debug('Concatenated cube:\n{}'.format(cube))
 
-        if baseline is True:
+        if climatology is True:
             # generate a time slice constraint based on the baseline
             time_slice_constraint = self._time_slice_selector(True)
         else:
