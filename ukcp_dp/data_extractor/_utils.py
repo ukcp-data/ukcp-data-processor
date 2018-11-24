@@ -30,10 +30,10 @@ def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
     if temporal_average_type == TemporalAverageType.MONTHLY:
         periods = _get_selected_month_numbers(time_period)
     elif temporal_average_type == TemporalAverageType.SEASONAL:
-        periods = _get_selected_season_numbers(time_period)
+        periods = _get_selected_seasons(time_period)
     else:
-        # TODO annual
-        pass
+        # annual
+        periods = ['ann']
 
     # generate the anomaly for each time period, i.e. month or season
     anomaly_cubes = iris.cube.CubeList()
@@ -42,14 +42,18 @@ def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
             constraint = iris.Constraint(month_number=period)
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
-            constraint = iris.Constraint(season_number=period)
+            constraint = iris.Constraint(season=period)
 
         else:
-            # TODO annual
-            pass
+            # annual
+            constraint = None
 
-        cube_absoute_period = cube_absoute.extract(constraint)
-        cube_climatology_period = cube_climatology.extract(constraint)
+        if constraint is None:
+            cube_absoute_period = cube_absoute
+            cube_climatology_period = cube_climatology
+        else:
+            cube_absoute_period = cube_absoute.extract(constraint)
+            cube_climatology_period = cube_climatology.extract(constraint)
 
         cube_anomaly_period = _make_anomaly(
             cube_absoute_period, cube_climatology_period, preferred_unit)
@@ -194,11 +198,8 @@ def _get_selected_month_numbers(time_period):
             return [i + 1]
 
 
-def _get_selected_season_numbers(time_period):
+def _get_selected_seasons(time_period):
     if time_period == 'all':
-        seasons = [1, 2, 3, 4]
+        seasons = ['djf', 'mam', 'jja', 'son']
         return seasons
-    for i, term in enumerate(get_seasons()):
-        if term == time_period:
-            # i is the index not the season number
-            return [i + 1]
+    return [time_period]
