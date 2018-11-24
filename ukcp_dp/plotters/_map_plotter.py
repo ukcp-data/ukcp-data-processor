@@ -9,7 +9,7 @@ from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, \
     OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER, \
     OVERLAY_COASTLINE_SMALL, AreaType
 from ukcp_dp.plotters.utils._plotting_utils import end_figure, \
-    make_standard_bar, start_standard_figure
+    make_standard_bar, start_standard_figure, wrap_string
 from ukcp_dp.plotters.utils._region_utils import reg_from_cube
 
 
@@ -58,7 +58,8 @@ class MapPlotter(BasePlotter):
         result = self._generate_subplots(cube, plot_settings, fig)
 
         # Add the title
-        fig.suptitle(title, fontsize='larger')
+        new_title = wrap_string(title, 110)
+        fig.suptitle(new_title, fontsize='larger')
 
         # Add the colourbar
         make_standard_bar(plot_settings, fig,

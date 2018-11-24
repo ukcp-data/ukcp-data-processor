@@ -36,12 +36,23 @@ class JpPlotter(GraphPlotter):
 
         h, xedges, yedges = np.histogram2d(x, y, bins=10)
 
-        xbins = xedges[:-1] + (xedges[1] - xedges[0]) / 2
-        ybins = yedges[:-1] + (yedges[1] - yedges[0]) / 2
+        # x width and y width, and half widths
+        xw = xedges[1] - xedges[0]
+        yw = yedges[1] - yedges[0]
+        xw_2 = xw*0
+        yw_2 = yw*0
 
-        x_min, x_max = _get_limits(h, xedges)
+        # copy the data into the middle of an array that falls to zero at each
+        # edge
+        xbins = xedges[0] - xw_2 + [x*xw for x in range(0, len(xedges)+1)]
+        ybins = yedges[0] - yw_2 + [y*yw for y in range(0, len(yedges)+1)]
+
+        new_h = np.zeros([len(xbins), len(ybins)], h.dtype)
+        new_h[1:-1,1:-1] = h
+
+        x_min, x_max = _get_limits(new_h, xbins)
         h = h.T
-        y_min, y_max = _get_limits(h, yedges)
+        y_min, y_max = _get_limits(new_h, ybins)
 
         ax = plt.gca()
         ax.set_xlim(x_min, x_max)
@@ -49,12 +60,12 @@ class JpPlotter(GraphPlotter):
 
         levels = [10, 50, 90]
         # fill the contours
-        contour_fill = plt.contourf(xbins, ybins, h, levels,
+        contour_fill = plt.contourf(xbins, ybins, new_h, levels,
                                     colors=CONTOUR_FILL,
                                     extend='max', label=levels)
 
         # now add the lines
-        plt.contour(xbins, ybins, h, levels, colors=CONTOUR_LINE)
+        plt.contour(xbins, ybins, new_h, levels, colors=CONTOUR_LINE)
 
         plt.xlabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
         plt.ylabel(self.input_data.get_value_label(InputType.VARIABLE)[1])

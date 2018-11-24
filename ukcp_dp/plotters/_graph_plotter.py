@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
 from ukcp_dp.constants import InputType
 from ukcp_dp.plotters.utils._plotting_utils import end_figure, \
-    start_standard_figure
+    start_standard_figure, wrap_string
 
 
 class GraphPlotter(BasePlotter):
@@ -37,7 +37,8 @@ class GraphPlotter(BasePlotter):
         self._generate_graph()
 
         # Add the title
-        fig.suptitle(title, fontsize='larger')
+        new_title = wrap_string(title, 110)
+        fig.suptitle(new_title, fontsize='larger')
 
         # Add the legend
         plt.legend(loc=self.input_data.get_value(InputType.LEGEND_POSITION))
