@@ -223,7 +223,9 @@ class InputData(object):
         if type(area) is list:
             # this will be a bbox or point, i.e.
             # ['point',430311.27,253673.63]
-            area_type = area.pop(0)
+            # First value will be area type
+            area_type = area[0]
+            area = area[1:]
 
             if (area_type not in
                     [AreaType.BBOX, AreaType.POINT, AreaType.COAST_POINT,
