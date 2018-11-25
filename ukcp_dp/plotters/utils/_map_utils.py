@@ -321,8 +321,7 @@ def plot_map(dcube_input, fig=None, ax=None,
             ylims = [dcube_masked.coord('latitude').points.min(),
                      dcube_masked.coord('latitude').points.max()]
 
-        # And set the Axes limits in lat/lon coordinates:
-        ax.set_extent(xlims + ylims, crs=ccrs.PlateCarree())
+        ax.set_extent(xlims + ylims, crs=proj)
 
     # Only label the axes if we're in the Plate Carrée projection:
     if proj == ccrs.PlateCarree():

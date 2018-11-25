@@ -7,7 +7,7 @@ import numpy as np
 import shapefile as shp
 from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, \
     OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER, \
-    OVERLAY_COASTLINE_SMALL, AreaType, InputType, COLLECTION_RCM
+    OVERLAY_COASTLINE_SMALL, AreaType
 from ukcp_dp.plotters.utils._plotting_utils import end_figure, \
     make_standard_bar, start_standard_figure, wrap_string
 from ukcp_dp.plotters.utils._region_utils import reg_from_cube
@@ -38,13 +38,8 @@ class MapPlotter(BasePlotter):
 
         if self.input_data.get_area_type() == AreaType.BBOX:
 
-            if (self.input_data.get_value(InputType.COLLECTION) ==
-                    COLLECTION_RCM):
-                # RCM is on a rotated grid
-                reg = reg_from_cube(cube, lat_name="grid_latitude",
-                                    lon_name="grid_longitude")
-            else:
-                reg = reg_from_cube(cube)
+            reg = reg_from_cube(cube, lat_name="projection_y_coordinate",
+                                lon_name="projections_x_coordinate")
         else:
             # Some form of region, therefore it is the whole of UK
             reg = {'lons': [-10.9818, 2.2398], 'lats': [48.8957, 60.9531]}
