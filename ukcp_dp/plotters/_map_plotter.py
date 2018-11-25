@@ -39,7 +39,7 @@ class MapPlotter(BasePlotter):
         if self.input_data.get_area_type() == AreaType.BBOX:
 
             reg = reg_from_cube(cube, lat_name="projection_y_coordinate",
-                                lon_name="projections_x_coordinate")
+                                lon_name="projection_x_coordinate")
         else:
             # Some form of region, therefore it is the whole of UK
             reg = {'lons': [-10.9818, 2.2398], 'lats': [48.8957, 60.9531]}
