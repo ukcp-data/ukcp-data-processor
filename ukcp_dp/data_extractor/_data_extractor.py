@@ -206,30 +206,6 @@ class DataExtractor(object):
                 if cube.name() != 'time_bnds':
                     cubes.append(cube)
 
-        # TODO Temp hack until data updated
-        #
-        #     int region(region) ;
-        #         region:units = "1" ;
-        #         region:standard_name = "region" ;
-        #     char geo_region(region, string24) ;
-        #         geo_region:units = "1" ;
-        #         geo_region:standard_name = "region" ;
-        #         geo_region:long_name = "Administrative Region" ;
-        #
-        # The reuse of standard_name = "region" results in a region coord in
-        # "Dimension coordinates" and "Auxiliary coordinates"
-
-        if (self.input_data.get_value(InputType.COLLECTION) ==
-                COLLECTION_GCM or
-                self.input_data.get_value(InputType.COLLECTION) ==
-                COLLECTION_RCM):
-            for cube in cubes:
-                coords = cube.coords(var_name='region')
-                for coord in coords:
-                    cube.remove_coord(coord)
-
-        # END TEMP HACK
-
         if len(cubes) == 0:
             log.warn('No data was retrieved from the following files:{}'.
                      format(file_list))
