@@ -3,7 +3,7 @@ from os import path
 import cartopy.crs as ccrs
 
 
-VERSION = "0.1.0dev4"
+VERSION = "1.0.0"
 
 
 def enum(**named_values):
