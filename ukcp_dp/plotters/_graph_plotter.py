@@ -25,6 +25,9 @@ class GraphPlotter(BasePlotter):
         @param plot_settings (StandardMap): an object containing plot settings
         @param title (str): a title for the plot
         """
+        # By default we want to show the legend
+        self.show_legend = True
+
         # First create the figure
         fig, _, _ = start_standard_figure(plot_settings)
 
@@ -40,8 +43,9 @@ class GraphPlotter(BasePlotter):
         new_title = wrap_string(title, 110)
         fig.suptitle(new_title, fontsize='larger')
 
-        # Add the legend
-        plt.legend(loc=self.input_data.get_value(InputType.LEGEND_POSITION))
+        if self.show_legend is True:
+            # Add the legend
+            plt.legend(loc=self.input_data.get_value(InputType.LEGEND_POSITION))
 
         # Put a grid on the plot.
         plt.grid(True)

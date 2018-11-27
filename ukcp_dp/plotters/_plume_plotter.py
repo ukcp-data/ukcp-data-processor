@@ -147,6 +147,9 @@ class PlumePlotter(GraphPlotter):
                         linestyle='dotted',
                         color=ENSEMBLE_LOWLIGHT, zorder=1)
 
+        if highlighted_counter == 0:
+            self.show_legend = False
+
 
 def get_return_periods(cube, slice_and_sel_coord):
     tcoord = cube.slices_over(
