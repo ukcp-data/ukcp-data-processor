@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
+from os import path
 
 import cf_units
 import iris
@@ -193,8 +194,10 @@ class DataExtractor(object):
         try:
             cubes = iris.load(file_list)
         except IOError:
-            log.warn('No data was retrieved from the following files:{}'.
-                     format(file_list))
+            for file_name in file_list:
+                file_name = file_name.split('*')[0]
+                if not path.exists(file_name):
+                    log.error('File not found: {}'.format(file_name))
             raise Exception('No data found for given selection options')
 
         # Remove time_bnds cubes
@@ -206,6 +209,13 @@ class DataExtractor(object):
                 if cube.name() != 'time_bnds':
                     cubes.append(cube)
 
+        # Different creation dates will stop cubes concatenating, so lets
+        # remove them
+        for cube in cubes:
+            coords = cube.coords(var_name='creation_date')
+            for coord in coords:
+                cube.remove_coord(coord)
+
         if len(cubes) == 0:
             log.warn('No data was retrieved from the following files:{}'.
                      format(file_list))
@@ -216,7 +226,12 @@ class DataExtractor(object):
 
         iris.experimental.equalise_cubes.equalise_attributes(cubes)
         unify_time_units(cubes)
-        cube = cubes.concatenate_cube()
+
+        try:
+            cube = cubes.concatenate_cube()
+        except iris.exceptions.ConcatenateError:
+            log.error('Failed to concatenate cubes:\n{}'.format(cubes))
+            raise Exception('No data found for given selection options')
 
         log.debug('Concatenated cube:\n{}'.format(cube))
 
