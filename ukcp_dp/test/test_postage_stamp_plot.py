@@ -49,10 +49,10 @@ def set_inputs():
 
 if __name__ == '__main__':
 
+    st_time = time.time()
     dp = set_inputs()
     dp.select_data()
     output_dir = '/tmp'
     dp.write_plot(PlotType.POSTAGE_STAMP_MAPS, output_dir, ImageFormat.PNG)
-    st_time = time.time()
-    dp.write_data_files(output_dir, DataFormat.CSV)
     print (time.time() - st_time)
+    dp.write_data_files(output_dir, DataFormat.CSV)
