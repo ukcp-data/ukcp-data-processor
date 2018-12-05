@@ -3,7 +3,7 @@ import logging
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
 from ukcp_dp.constants import OVERLAY_ADMIN, OVERLAY_RIVER, OVERLAY_COUNTRY, \
-    UKCP_OSGB
+    UKCP_OSGB, OVERLAY_COUNTRY_SMALL, OVERLAY_ADMIN_SMALL, OVERLAY_RIVER_SMALL
 
 
 log = logging.getLogger(__name__)
