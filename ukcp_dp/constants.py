@@ -140,12 +140,15 @@ OVERLAY_LINE_WIDTH = 0.3
 ROOT_DIR = path.dirname(path.dirname(path.abspath(__file__)))
 
 OVERLAY_ADMIN = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK_Admin')
+OVERLAY_ADMIN_SMALL = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK_AdminSmall')
 OVERLAY_COASTLINE = path.join(
     ROOT_DIR, 'ukcp_dp/public/shapefiles/UKCoastline')
 OVERLAY_COASTLINE_SMALL = path.join(
     ROOT_DIR, 'ukcp_dp/public/shapefiles/UKCoastlineSmall')
-OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/BritishIsles')
+OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/BritishIslesReduced')
+OVERLAY_COUNTRY_SMALL = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/BritishIslesReducedSmall')
 OVERLAY_RIVER = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/river_basins')
+OVERLAY_RIVER_SMALL = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/river_basinsSmall')
 
 LOGO_SMALL = path.join(
     ROOT_DIR,
