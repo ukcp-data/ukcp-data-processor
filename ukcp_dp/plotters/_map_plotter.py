@@ -7,7 +7,8 @@ import numpy as np
 import shapefile as shp
 from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, \
     OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER, \
-    OVERLAY_COASTLINE_SMALL, AreaType
+    OVERLAY_COASTLINE_SMALL, OVERLAY_COUNTRY_SMALL, OVERLAY_RIVER_SMALL, \
+    OVERLAY_ADMIN_SMALL, AreaType
 from ukcp_dp.plotters.utils._plotting_utils import end_figure, \
     make_standard_bar, start_standard_figure, wrap_string
 from ukcp_dp.plotters.utils._region_utils import reg_from_cube
@@ -116,24 +117,31 @@ class MapPlotter(BasePlotter):
             overlay = 'coast_line'
 
         if overlay == AreaType.COUNTRY:
-            sf = shp.Reader(OVERLAY_COUNTRY)
+            if hi_res:
+                sf = shp.Reader(OVERLAY_COUNTRY)
+            else:
+                sf = shp.Reader(OVERLAY_COUNTRY_SMALL)
         elif overlay == AreaType.ADMIN_REGION:
-            sf = shp.Reader(OVERLAY_ADMIN)
+            if hi_res:
+                sf = shp.Reader(OVERLAY_ADMIN)
+            else:
+                sf = shp.Reader(OVERLAY_ADMIN_SMALL)
         elif overlay == AreaType.RIVER_BASIN:
-            sf = shp.Reader(OVERLAY_RIVER)
+            if hi_res:
+                sf = shp.Reader(OVERLAY_RIVER)
+            else:
+                sf = shp.Reader(OVERLAY_RIVER_SMALL)
         else:
             overlay = 'coast_line'
-            if hi_res is True:
+            if hi_res:
                 sf = shp.Reader(OVERLAY_COASTLINE)
             else:
                 sf = shp.Reader(OVERLAY_COASTLINE_SMALL)
-
         log.debug('adding overlay for {}'.format(overlay))
 
         for shape in list(sf.iterShapes()):
             npoints = len(shape.points)  # total points
             nparts = len(shape.parts)  # total parts
-
             # loop over parts of each shape, plot separately
             for ip in range(nparts):
                 i0 = shape.parts[ip]
@@ -148,7 +156,6 @@ class MapPlotter(BasePlotter):
                 for ip in range(len(seg)):
                     x_lon[ip] = seg[ip][0]
                     y_lat[ip] = seg[ip][1]
-
                 plt.plot(x_lon, y_lat, color=OVERLAY_COLOUR,
                          linewidth=OVERLAY_LINE_WIDTH)
         log.debug('overlay added')
