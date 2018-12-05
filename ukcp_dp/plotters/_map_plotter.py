@@ -49,6 +49,7 @@ class MapPlotter(BasePlotter):
         # Turn off grid lines for maps
         plot_settings.dxgrid = 1000
         plot_settings.dygrid = 1000
+        plot_settings.gridlcol = None
 
         # First create the figure
         fig, _, _ = start_standard_figure(plot_settings)
