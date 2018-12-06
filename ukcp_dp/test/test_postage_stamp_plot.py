@@ -16,8 +16,8 @@ def set_inputs():
 
     data = {}
     data[InputType.BASELINE] = 'b8100'
-    data[InputType.COLLECTION] = 'land-gcm'
-    data[InputType.VARIABLE] = 'tasmax'
+    data[InputType.COLLECTION] = 'land-rcm'
+    data[InputType.VARIABLE] = 'tasmaxAnom'
     data[InputType.SCENARIO] = 'rcp85'
 
     # image options
@@ -28,17 +28,18 @@ def set_inputs():
     data[InputType.TIME_PERIOD] = 'may'
     data[InputType.TIME_SLICE_TYPE] = '1y'
     data[InputType.TEMPORAL_AVERAGE_TYPE] = 'mon'
-    data[InputType.YEAR] = 2019
+    data[InputType.ORDER_BY_MEAN] = True
+    data[InputType.YEAR] = 2030
 
-    data[InputType.AREA] = ['bbox', -84667.14, -114260.00, 676489.68, 1230247.30]
+    data[InputType.AREA] = 'admin_region|all'
 
     # process constants
     data[InputType.DATA_TYPE] = 'cdf'
 
     # ensemble members input
     data[InputType.ENSEMBLE] = [
-        '01', '02', '03', '04', '05', '06', '07', '08', '09',
-        '10', '11', '12', '13', '14', '15']
+        '01', '04', '05', '06', '07', '08', '09', '10', '11',
+        '12', '13', '15']
 
     dp = UKCPDataProcessor('0.0.0-test')
 

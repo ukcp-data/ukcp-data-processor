@@ -28,9 +28,7 @@ def set_inputs():
     data[InputType.TEMPORAL_AVERAGE_TYPE] = 'mon'
     data[InputType.YEAR] = 2019
     data[InputType.SHOW_BOUNDARIES] = 'admin_region' # river_basin | country | admin_region
-
-    #data[InputType.AREA] = ['bbox', -84667.14, -114260.00, 676489.68, 1230247.30]
-    data[InputType.AREA] = 'admin_region|north_west_england'
+    data[InputType.AREA] = ['bbox', -84667.14, -114260.00, 676489.68, 1230247.30]
 
     # process constants
     data[InputType.DATA_TYPE] = 'cdf'
