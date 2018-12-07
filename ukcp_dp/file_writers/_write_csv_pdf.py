@@ -75,7 +75,8 @@ class PdfCsvWriter(BaseCsvWriter):
         Write out the column headers and data_dict.
 
         We have to override the method in the base class as we do not wish all
-        of the scenarios to be written to the headers
+        of the scenarios to be written to the headers.
+        We will end up with one file per scenario.
         """
         user_inputs = {}
         all_user_inputs = self.input_data.get_user_inputs()
@@ -95,7 +96,8 @@ class PdfCsvWriter(BaseCsvWriter):
             keys.sort()
             for key in keys:
                 if key == 'Scenario':
-                    output_data_file.write('Scenario,{value}\n'.format(value=scenario))
+                    output_data_file.write('Scenario,{value}\n'.format(
+                        value=scenario))
                 else:
                     output_data_file.write('{key},{value}\n'.format(
                         key=key, value=user_inputs[key]))
@@ -103,9 +105,19 @@ class PdfCsvWriter(BaseCsvWriter):
             output_data_file.write('\n')
 
             for key in key_list:
-                line_out = '{key},{values}\n'.format(
-                    key=key, values=','.join(self.data_dict[key]))
-                output_data_file.write(line_out)
+                # There are cases where there are multiple points with the
+                # same values due to clipping of the data at 1% and 99%
+                # because of reduced confidence in them. Unlike some of the
+                # over plots/maps there should only be two coordinates
+
+                # remove duplicate data points
+                y_values = set(self.data_dict[key])
+
+                # just in case we do have more then one y value
+                for y_value in y_values:
+                    line_out = '{key},{values}\n'.format(
+                        key=key, values=y_value)
+                    output_data_file.write(line_out)
 
         # reset the data dict
         self.data_dict = collections.OrderedDict()
