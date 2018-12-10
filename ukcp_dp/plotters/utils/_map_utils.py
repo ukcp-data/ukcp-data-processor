@@ -116,7 +116,6 @@ def plot_standard_choropleth_map(thecube, settings, fig=None, ax=None,
     """
     resolution = thecube.attributes['resolution']
     shapefile_regions = get_ukcp_shapefile_regions(resolution, hi_res=hi_res)
-    print(thecube)
     if barlab is None:
         barlab = settings.default_barlabel
     if bar_orientation is None:
