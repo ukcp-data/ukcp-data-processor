@@ -3,7 +3,7 @@ import logging
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
 from ukcp_dp.constants import OVERLAY_ADMIN, OVERLAY_RIVER, OVERLAY_COUNTRY, \
-    UKCP_OSGB
+    UKCP_OSGB, OVERLAY_COUNTRY_SMALL, OVERLAY_ADMIN_SMALL, OVERLAY_RIVER_SMALL
 
 
 log = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ def reg_from_cube(acube,
     return dict(lons=lon_lims, lats=lat_lims)
 
 
-def get_ukcp_shapefile_regions(regionset, region_names=None):
+def get_ukcp_shapefile_regions(regionset, region_names=None, hi_res=True):
     """
     Wrapper to get_shapefile_regions,
     for the different standard shapefiles used in the UKCP18 project.
@@ -71,7 +71,10 @@ def get_ukcp_shapefile_regions(regionset, region_names=None):
             regionset, "  ".join(UKSHAPES.keys())))
         raise KeyError()
 
-    sourcefile = regiondata['sourcefile']
+    if hi_res:
+        sourcefile = regiondata['sourcefile']
+    else:
+        sourcefile = regiondata['low_res']
     projection = regiondata['projection']
     attr_key = regiondata['attr_key']
     if regionset == "ukNaturalEarth":
@@ -88,15 +91,18 @@ def get_ukcp_shapefile_regions(regionset, region_names=None):
 UKSHAPES = dict(
     # This includes 16 subnational administrative regions:
     region=dict(sourcefile=OVERLAY_ADMIN,
+                low_res=OVERLAY_ADMIN_SMALL,
                 projection=UKCP_OSGB,
                 attr_key="Region"),
     # This includes the 4 constituent countries of the UK,
     # plus the Channel Islands and the Isle of Man
     country=dict(sourcefile=OVERLAY_COUNTRY,
+                 low_res=OVERLAY_COUNTRY_SMALL,
                  projection=UKCP_OSGB,
                  attr_key="Region"),
     # This contains river basin regions:
     river=dict(sourcefile=OVERLAY_RIVER,
+               low_res=OVERLAY_RIVER_SMALL,
                projection=UKCP_OSGB,
                attr_key="Region"),
     # Including the cartopy standard Natural Earth version too,
@@ -108,7 +114,7 @@ UKSHAPES = dict(
 )
 
 
-def _get_ukcp_shapefile_regions(regionset, region_names=None):
+def _get_ukcp_shapefile_regions(regionset, region_names=None, hi_res=True):
     """
     Wrapper to get_shapefile_regions,
     for the different standard shapefiles used in the UKCP18 project.
@@ -134,12 +140,14 @@ def _get_ukcp_shapefile_regions(regionset, region_names=None):
             regionset, "  ".join(UKSHAPES.keys())))
         raise KeyError()
 
-    sourcefile = regiondata['sourcefile']
+    if hi_res:
+        sourcefile = regiondata['sourcefile']
+    else:
+        sourcefile = regiondata['low_res']
     projection = regiondata['projection']
     attr_key = regiondata['attr_key']
     if regionset == "ukNaturalEarth":
         region_names = ["United Kingdom"]
-
     shapefregs = _get_shapefile_regions(sourcefile=sourcefile,
                                         attr_key=attr_key,
                                         attr_vals=region_names,

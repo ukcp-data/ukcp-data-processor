@@ -83,7 +83,8 @@ class ThreeMapPlotter(MapPlotter):
                                                   bar_orientation="none",
                                                   outfnames=None)
 
-        self.plot_overlay(self.input_data.get_value(InputType.SHOW_BOUNDARIES))
+        self.plot_overlay(self.input_data.get_value(InputType.SHOW_BOUNDARIES),
+                          hi_res=True)
 
         ax.set_title(title)
 

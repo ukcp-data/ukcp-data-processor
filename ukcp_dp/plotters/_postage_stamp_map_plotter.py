@@ -166,12 +166,16 @@ class PostageStampMapPlotter(MapPlotter):
                                        ax=ax, barlab=None,
                                        bar_orientation="none",
                                        outfnames=None)
+            # add a coast line
+            self.plot_overlay('', False)
         else:
             result = plot_standard_choropleth_map(ensemble_cube, plot_settings,
                                                   fig=fig,
                                                   ax=ax, barlab=None,
                                                   bar_orientation="none",
-                                                  outfnames=None)
+                                                  outfnames=None, hi_res=False)
+            # don't need the overlay for the choropleth map as the region
+            # geometry contains them.
 
         # add a title
         if ensemble_name.startswith('HadGEM3-GC3.05-r001i1p'):
@@ -180,7 +184,5 @@ class PostageStampMapPlotter(MapPlotter):
             ensemble_name = ensemble_name.split('-r1i1p1')[0]
         ax.set_title(ensemble_name, fontdict={'fontsize': 'medium'})
 
-        # add a coast line
-        self.plot_overlay('', False)
 
         return result
