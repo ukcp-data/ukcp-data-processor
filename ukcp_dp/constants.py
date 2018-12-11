@@ -172,6 +172,14 @@ COLLECTION_MARINE_MIN_YEAR = 2007
 COLLECTION_MARINE_MAX_YEAR = 2300
 OTHER_MAX_YEAR = 2100
 
+# define the precision to use for each of the variables in the CSV files
+VARIABLES_0DP = ['prAnom']
+VARIABLES_1DP = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
+VARIABLES_2DP = ['cltAnom', 'hursAnom', 'hussAnom', 'pslAnom', 'rlsAnom',
+                 'rsdsAnom', 'rssAnom', 'sfcWindAnom', 'uasAnom,vasAnom']
+VARIABLES_3DP = ['seaLevelAnom', 'stillWaterReturnLevel']
+VARIABLES_4DP = []
+
 # Marine data stuff
 RETURN_PERIODS = 'return-periods'
 EXTENDED_PROJECTIONS = ['msl-proj-expl', 'return-periods-ext']

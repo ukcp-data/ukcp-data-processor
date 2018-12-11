@@ -3,7 +3,7 @@ import logging
 
 from ukcp_dp.constants import DataType, InputType, PDF_LABEL
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
-from ukcp_dp.file_writers._utils import convert_to_2dp, convert_to_4dp
+from ukcp_dp.file_writers._utils import convert_to_4dp, round_variable
 
 
 log = logging.getLogger(__name__)
@@ -63,7 +63,8 @@ class PdfCsvWriter(BaseCsvWriter):
         """
         for i, cdf_d in enumerate(cdf_data):
             pdf_point = convert_to_4dp(pdf_data[i])
-            cdf_point = convert_to_2dp(cdf_d)
+            cdf_point = round_variable(self.input_data.get_value(
+                InputType.VARIABLE)[0], cdf_d)
             try:
                 self.data_dict[cdf_point].append(pdf_point)
             except KeyError:
@@ -82,7 +83,7 @@ class PdfCsvWriter(BaseCsvWriter):
         all_user_inputs = self.input_data.get_user_inputs()
         for key in all_user_inputs:
             if key in self.ignore_in_header:
-                    continue
+                continue
             user_inputs[key] = all_user_inputs[key]
         user_inputs['Software Version'] = self.process_version
 

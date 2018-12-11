@@ -2,7 +2,7 @@ import logging
 
 from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
-from ukcp_dp.file_writers._utils import convert_to_2dp
+from ukcp_dp.file_writers._utils import round_variable
 
 
 log = logging.getLogger(__name__)
@@ -32,7 +32,8 @@ class SampleCsvWriter(BaseCsvWriter):
 
             for sample_slice in cube.slices_over('sample'):
                 sample_id = int(sample_slice.coord('sample').points[0])
-                value = convert_to_2dp(sample_slice.data)
+                value = round_variable(self.input_data.get_value(
+                    InputType.VARIABLE)[i], sample_slice.data)
 
                 try:
                     self.data_dict[sample_id].append(value)
