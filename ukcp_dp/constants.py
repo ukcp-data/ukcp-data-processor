@@ -176,7 +176,7 @@ OTHER_MAX_YEAR = 2100
 VARIABLES_0DP = ['prAnom']
 VARIABLES_1DP = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 VARIABLES_2DP = ['cltAnom', 'hursAnom', 'hussAnom', 'pslAnom', 'rlsAnom',
-                 'rsdsAnom', 'rssAnom', 'sfcWindAnom', 'uasAnom,vasAnom']
+                 'rsdsAnom', 'rssAnom', 'sfcWindAnom', 'uasAnom', 'vasAnom']
 VARIABLES_3DP = ['seaLevelAnom', 'stillWaterReturnLevel']
 VARIABLES_4DP = []
 
