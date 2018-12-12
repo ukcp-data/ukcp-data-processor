@@ -173,9 +173,9 @@ COLLECTION_MARINE_MAX_YEAR = 2300
 OTHER_MAX_YEAR = 2100
 
 # define the precision to use for each of the variables in the CSV files
-VARIABLES_0DP = ['prAnom']
+VARIABLES_0DP = ['cltAnom', 'hursAnom', 'hussAnom', 'prAnom']
 VARIABLES_1DP = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
-VARIABLES_2DP = ['cltAnom', 'hursAnom', 'hussAnom', 'pslAnom', 'rlsAnom',
+VARIABLES_2DP = ['pslAnom', 'rlsAnom',
                  'rsdsAnom', 'rssAnom', 'sfcWindAnom', 'uasAnom', 'vasAnom']
 VARIABLES_3DP = ['seaLevelAnom', 'stillWaterReturnLevel']
 VARIABLES_4DP = []
