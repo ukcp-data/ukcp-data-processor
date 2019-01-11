@@ -70,6 +70,6 @@ def _write_dim_csv(cube, dim_names, line_out, index, output_data_file):
 def _get_value(_slice, dim_names):
     if dim_names[0] == 'time':
         with iris.FUTURE.context(cell_datetime_objects=True):
-            return str(_slice.coord(dim_names[0]).cell(0))
+            return _slice.coord(dim_names[0]).cell(0).point.strftime('%Y-%m-%dT%H-%M-%S')
     else:
         return convert_to_2dp(_slice.coord(dim_names[0]).points[0])
