@@ -4,7 +4,7 @@ import iris
 from ukcp_dp.constants import COLLECTION_MARINE, COLLECTION_PROB
 from ukcp_dp.constants import InputType, RETURN_PERIODS
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
-from ukcp_dp.file_writers._utils import convert_to_2dp, convert_to_3dp
+from ukcp_dp.file_writers._utils import round_variable
 
 
 log = logging.getLogger(__name__)
@@ -108,7 +108,8 @@ class PlumeCsvWriter(BaseCsvWriter):
         data = cube.data[:]
         coords = cube.coord('return_period')[:]
         for p in range(0, data.shape[0]):
-            value = convert_to_3dp(data[p])
+            value = round_variable(self.input_data.get_value(
+                InputType.VARIABLE)[0], data[p])
             time_str = int(round(coords[p].cell(0).point))
             try:
                 self.data_dict[time_str].append(value)
@@ -123,11 +124,8 @@ class PlumeCsvWriter(BaseCsvWriter):
         data = cube.data[:]
         coords = cube.coord('time')[:]
         for t in range(0, data.shape[0]):
-            if (self.input_data.get_value(InputType.COLLECTION) ==
-                    COLLECTION_MARINE):
-                value = convert_to_3dp(data[t])
-            else:
-                value = convert_to_2dp(data[t])
+            value = round_variable(self.input_data.get_value(
+                InputType.VARIABLE)[0], data[t])
             with iris.FUTURE.context(cell_datetime_objects=True):
                 time_str = coords[t].cell(
                     0).point.strftime('%Y-%m-%d')

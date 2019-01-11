@@ -3,7 +3,7 @@ import logging
 import numpy as np
 from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
-from ukcp_dp.file_writers._utils import convert_to_2dp
+from ukcp_dp.file_writers._utils import convert_to_2dp, round_variable
 
 
 log = logging.getLogger(__name__)
@@ -40,12 +40,13 @@ class JpCsvWriter(BaseCsvWriter):
         # add the x values to the header
         self.header.append('--')
         for x in xbins:
-            self.header.append(convert_to_2dp(x))
-
+            self.header.append(round_variable(self.input_data.get_value(
+                InputType.VARIABLE)[0], x))
         key_list = []
         # add a line of data for each y value
         for i, y in enumerate(sorted(ybins, reverse=True)):
-            y = convert_to_2dp(y)
+            y = round_variable(self.input_data.get_value(
+                InputType.VARIABLE)[1], y)
             for value in h[len(h) - (1 + i)]:
                 value = convert_to_2dp(value)
                 try:

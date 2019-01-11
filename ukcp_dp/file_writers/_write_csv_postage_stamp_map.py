@@ -3,7 +3,7 @@ import logging
 import iris
 from ukcp_dp.constants import AreaType, InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
-from ukcp_dp.file_writers._utils import convert_to_2dp
+from ukcp_dp.file_writers._utils import round_variable
 
 
 log = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
             ensemble_name = ensemble_slice.coord(
                 'ensemble_member_id').points[0]
 
-            ### New Code
+            # New Code
             # get the numpy representation of the sub-cube
             data = ensemble_slice.data
             # get the coordinates for the sub-cube
@@ -57,7 +57,8 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
                     if write_header is True:
                         self.header.append(str(x_coords[x]))
 
-                    value = convert_to_2dp(data[y, x])
+                    value = round_variable(self.input_data.get_value(
+                        InputType.VARIABLE)[0], data[y, x])
                     try:
                         self.data_dict[y_coord].append(value)
                     except KeyError:
@@ -97,7 +98,8 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
                 region = str(region_slice.coords(var_name='geo_region')[
                     0].points[0])
 
-                value = convert_to_2dp(region_slice.data)
+                value = round_variable(self.input_data.get_value(
+                    InputType.VARIABLE)[0], region_slice.data)
                 try:
                     self.data_dict[region].append(value)
                 except KeyError:

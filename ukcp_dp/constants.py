@@ -140,12 +140,15 @@ OVERLAY_LINE_WIDTH = 0.3
 ROOT_DIR = path.dirname(path.dirname(path.abspath(__file__)))
 
 OVERLAY_ADMIN = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK_Admin')
+OVERLAY_ADMIN_SMALL = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/UK_AdminSmall')
 OVERLAY_COASTLINE = path.join(
     ROOT_DIR, 'ukcp_dp/public/shapefiles/UKCoastline')
 OVERLAY_COASTLINE_SMALL = path.join(
     ROOT_DIR, 'ukcp_dp/public/shapefiles/UKCoastlineSmall')
-OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/BritishIsles')
+OVERLAY_COUNTRY = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/BritishIslesReduced')
+OVERLAY_COUNTRY_SMALL = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/BritishIslesReducedSmall')
 OVERLAY_RIVER = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/river_basins')
+OVERLAY_RIVER_SMALL = path.join(ROOT_DIR, 'ukcp_dp/public/shapefiles/river_basinsSmall')
 
 LOGO_SMALL = path.join(
     ROOT_DIR,
@@ -168,6 +171,14 @@ COLLECTION_MARINE = 'marine-sim'
 COLLECTION_MARINE_MIN_YEAR = 2007
 COLLECTION_MARINE_MAX_YEAR = 2300
 OTHER_MAX_YEAR = 2100
+
+# define the precision to use for each of the variables in the CSV files
+VARIABLES_0DP = ['cltAnom', 'hursAnom', 'hussAnom', 'prAnom']
+VARIABLES_1DP = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
+VARIABLES_2DP = ['pslAnom', 'rlsAnom',
+                 'rsdsAnom', 'rssAnom', 'sfcWindAnom', 'uasAnom', 'vasAnom']
+VARIABLES_3DP = ['seaLevelAnom', 'stillWaterReturnLevel']
+VARIABLES_4DP = []
 
 # Marine data stuff
 RETURN_PERIODS = 'return-periods'

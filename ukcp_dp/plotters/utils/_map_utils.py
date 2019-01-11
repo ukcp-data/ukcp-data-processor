@@ -107,7 +107,7 @@ def plot_standard_map(thecube, settings, fig=None, ax=None,
 
 def plot_standard_choropleth_map(thecube, settings, fig=None, ax=None,
                                  barlab=None, bar_orientation=None,
-                                 outfnames=["x11"]):
+                                 outfnames=["x11"], hi_res=True):
     """
     Wrapper to plot_choropleth_map(),
     where most of the settings are given
@@ -115,8 +115,7 @@ def plot_standard_choropleth_map(thecube, settings, fig=None, ax=None,
 
     """
     resolution = thecube.attributes['resolution']
-    shapefile_regions = get_ukcp_shapefile_regions(resolution)
-
+    shapefile_regions = get_ukcp_shapefile_regions(resolution, hi_res=hi_res)
     if barlab is None:
         barlab = settings.default_barlabel
     if bar_orientation is None:
@@ -349,39 +348,6 @@ def plot_map(dcube_input, fig=None, ax=None,
         # Set the negative linestyle to be solid, like positive.
         # (the default is 'dashed'; 'dotted' doesn't work)
         matplotlib.rcParams['contour.negative_linestyle'] = 'solid'
-
-    # Coastlines:
-    if coastlcol is not None:
-        ax.coastlines("10m", linewidth=coastlw,
-                      color=coastlcol)  # or 110m or 50m
-
-    # Country borders:
-    if countrylcol is not None:
-        # ax.add_feature(cartopy.feature.BORDERS, linestyle='-',color="grey")
-        hires_borders = cartopy.feature.NaturalEarthFeature(
-            'cultural', 'admin_0_boundary_lines_land', '10m')
-        ax.add_feature(hires_borders, edgecolor=countrylcol, facecolor="",
-                       linewidth=countrylw)
-
-    # Subnational borders:
-    if regionlcol is not None:
-        # The 50m admin-1 borders only includes US/Can/Aus.
-        # hires_regions = cartopy.feature.NaturalEarthFeature('cultural',
-        #                                'admin_1_states_provinces_lines','50m')
-        vhires_regions = cartopy.feature.NaturalEarthFeature(
-            'cultural', 'admin_1_states_provinces_lines', '10m')
-        ax.add_feature(vhires_regions, edgecolor=regionlcol, facecolor="",
-                       linewidth=regionlw)
-
-    # Rivers:
-    if riverslcol is not None:
-        # Add rivers...
-        # default_rivers = cartopy.feature.RIVERS
-        # 110m, 50m and 10m are available
-        hires_rivers = cartopy.feature.NaturalEarthFeature(
-            'physical', 'rivers_lake_centerlines', '50m')
-        ax.add_feature(hires_rivers, edgecolor=riverslcol, facecolor="",
-                       linewidth=riverslw)
 
     # The original pbskill_maps.py routine
     # had a bit here for outlining [lat--lon-defined] subregions.
@@ -775,57 +741,6 @@ def plot_choropleth_map(regions, regionaldata_input, regional_sigs=None,
                               facecolor=facecolor,
                               edgecolor=edgecolor, linewidth=regionlw,
                               hatch=hatchsty)
-
-    # Add extra annotations!
-    # e.g. http://www.naturalearthdata.com/downloads/50m-cultural-vectors/
-
-    # Coastlines:
-    if coastlcol is not None:
-        ax.coastlines("10m", linewidth=coastlw,
-                      color=coastlcol)  # or 110m or 50m
-
-    # Country borders:
-    if countrylcol is not None:
-        hires_borders = cartopy.feature.NaturalEarthFeature(
-            'cultural', 'admin_0_boundary_lines_land', '10m')
-        ax.add_feature(hires_borders, edgecolor=countrylcol, facecolor="",
-                       linewidth=countrylw)
-
-    # Subnational borders:
-    if othershapefile is not None:
-        # Read in polygons from another shapefile, and plot them:
-        otherregfile = shpreader.Reader(othershapefile)
-
-        if othershapefile_sel is not None:
-            # Pull out a sub-selection from the shapefile.
-            # subregion_sel['key'] is an attribute key,
-            # subregion_sel['vals'] is a list of the values.
-            selshapes = [r for r in otherregfile.records()
-                         if r.attributes[subregion_sel['key']] in subregion_sel['vals']]
-        else:
-            selshapes = [r for r in otherregfile.records()]
-
-        # Project, if necessary:
-        for i, r in enumerate(selshapes):
-            reg_proj = r.attributes[shapes_projtag]
-            if reg_proj != proj:
-                selshapes[i].geometry = proj.project_geometry(
-                    r.geometry, src_crs=reg_proj)
-
-        # Plot:
-        ax.add_geometries([shp.geometry for shp in selshapes],
-                          ccrs.PlateCarree(), edgecolor=subregionlcol,
-                          facecolor="", linewidth=subregionlw)
-
-    # Rivers:
-    if riverslcol is not None:
-        # Add rivers...
-        # default_rivers = cartopy.feature.RIVERS
-        # 110m, 50m and 10m are available
-        hires_rivers = cartopy.feature.NaturalEarthFeature(
-            'physical', 'rivers_lake_centerlines', '50m')
-        ax.add_feature(hires_rivers, edgecolor=riverslcol, facecolor="",
-                       linewidth=riverslw)
 
     # Add gridlines (and label them on the axes, IF we're in PlateCarree)
     gridlabels = (proj == ccrs.PlateCarree())
