@@ -214,6 +214,7 @@ class Vocab(object):
         'spatial_representation': 'Spatial Representation',
         'temporal_average_type': 'Temporal Average Type',
         'time_period': 'Time Period',
+        'time_slice_type': 'Time Slice Type',
         'variable': 'Variable',
         'year': 'Year',
         'year_minimum': 'Year Minimum',
