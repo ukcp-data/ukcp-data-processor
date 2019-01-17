@@ -346,25 +346,10 @@ class DataExtractor(object):
                     (longitude + half_grid_size))
             area_constraint = latitude_constraint & longitude_constraint
 
-        # TODO temp hack for region, due to differences in LS1 and LS2/3
-
-        elif (self.input_data.get_value(InputType.COLLECTION) !=
-                COLLECTION_PROB and
-                (self.input_data.get_area_type() == AreaType.ADMIN_REGION or
-                 self.input_data.get_area_type() == AreaType.COUNTRY or
-                 self.input_data.get_area_type() == AreaType.RIVER_BASIN)):
-            if self.input_data.get_area() != 'all':
-                area_constraint = iris.Constraint(
-                    coord_values={
-                        'region':
-                        self.input_data.get_area_label()})
-
         elif self.input_data.get_area_type() == AreaType.ADMIN_REGION:
             if self.input_data.get_area() != 'all':
                 area_constraint = iris.Constraint(
-                    coord_values={
-                        'Administrative Region':
-                        self.input_data.get_area_label()})
+                    Region=self.input_data.get_area_label())
 
         elif self.input_data.get_area_type() == AreaType.COUNTRY:
             if self.input_data.get_area() != 'all':
@@ -374,8 +359,7 @@ class DataExtractor(object):
         elif self.input_data.get_area_type() == AreaType.RIVER_BASIN:
             if self.input_data.get_area() != 'all':
                 area_constraint = iris.Constraint(
-                    coord_values={
-                        'River Basin': self.input_data.get_area_label()})
+                    River=self.input_data.get_area_label())
 
         else:
             raise Exception(
