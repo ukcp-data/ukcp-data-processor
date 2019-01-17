@@ -38,7 +38,22 @@ class InputData(object):
         input_labels = {}
         for key in self.validated_inputs:
             key_label = self.vocab.get_collection_label(key)
-            value = self.validated_inputs[key][1]
+            if key == 'area_type':
+                if self.validated_inputs[key][0] in [
+                        AreaType.POINT, AreaType.COAST_POINT,
+                        AreaType.GAUGE_POINT]:
+                    value = '{} {}'.format(self.validated_inputs[key][2][0],
+                                           self.validated_inputs[key][2][1])
+                elif self.validated_inputs[key][0] == AreaType.BBOX:
+                    value = '{} {} {} {}'.format(
+                        self.validated_inputs[key][2][0],
+                        self.validated_inputs[key][2][1],
+                        self.validated_inputs[key][2][2],
+                        self.validated_inputs[key][2][3])
+                else:
+                    value = self.validated_inputs[key][3]
+            else:
+                value = self.validated_inputs[key][1]
             if (len(value) == 0):
                 continue
             if isinstance(value, list):
