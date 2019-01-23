@@ -1,5 +1,6 @@
 import copy
 import logging
+import random
 
 import numpy
 
@@ -89,7 +90,7 @@ class SamplingProcessor(object):
             InputType.RANDOM_SAMPLING_COUNT)
 
         random_ids = self._get_random_ids(
-            cube_list[0], random_sample_count, False)
+            cube_list[0], random_sample_count)
         constraint = iris.Constraint(sample=random_ids)
         selected_cubes = iris.cube.CubeList()
 
@@ -192,16 +193,11 @@ class SamplingProcessor(object):
         sample_ids = [i[1] for i in samples[low_index:high_index]]
         return sample_ids
 
-    def _get_random_ids(self, cube, random_sample_count,
-                        random_seed_value=False):
+    def _get_random_ids(self, cube, random_sample_count):
         """
         Returns a list of randomly sampled sample ids from the cube sent
         in. The number of variants returned is of length
-        random_sample_count and this may include repeats!
-
-        If random_seed_value is not False, then it is an integer and we use
-        it to set the numpy random seed which means the same arguments will
-        always produce the same results.
+        random_sample_count.
 
         @param cube(an iris cube): a cube containing the sample data
         @param random_sample_count(int): the count of sample ids to produce
@@ -210,11 +206,7 @@ class SamplingProcessor(object):
 
         @return a list of sample ids
         """
-        if random_seed_value is not False:
-            numpy.random.seed(random_seed_value)
-
         num_of_samples = len(cube.coord('sample').points)
-        ids = [i for i in numpy.random.randint(
-            0, num_of_samples, random_sample_count)]
+        ids = random.sample(xrange(num_of_samples), random_sample_count)
         ids.sort()
         return ids
