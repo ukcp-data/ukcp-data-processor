@@ -4,7 +4,7 @@ from ukcp_dp.constants import VARIABLES_0DP, VARIABLES_1DP, VARIABLES_2DP, \
     VARIABLES_3DP, VARIABLES_4DP
 
 
-ZERO_PLACES = Decimal(10) ** -0
+ZERO_PLACES = Decimal(10) ** 1
 ONE_PLACES = Decimal(10) ** -1
 TWO_PLACES = Decimal(10) ** -2
 THREE_PLACES = Decimal(10) ** -3
