@@ -90,7 +90,7 @@ def _get_absolute_path(file_path):
     else:
         path = os.path.realpath(file_path)
 
-    path = path.replace(DATA_DIR, DATA_SERVICE_URL)
+    path = DATA_SERVICE_URL + path
     return path
 
 

@@ -187,8 +187,8 @@ EXTENDED_PROJECTIONS = ['msl-proj-expl', 'return-periods-ext']
 CDF_LABEL = 'Probability of being less than (%)'
 PDF_LABEL = 'Relative probability'
 
-DATA_DIR = '/group_workspaces/jasmin2/ukcp18/sandpit2/ukcp18/data'
-DATA_SERVICE_URL = 'http://data.ceda.ac.uk/badc/ukcp18/data'
+DATA_DIR = '/badc/ukcp18/data'
+DATA_SERVICE_URL = 'http://data.ceda.ac.uk'
 
 # Area types
 AreaType = enum(ADMIN_REGION='admin_region',
