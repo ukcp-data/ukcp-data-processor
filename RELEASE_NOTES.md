@@ -11,3 +11,4 @@ Issues address:
 * Fix Datetime serialised in CSV files.
 * Fix location value in CSV files.
 * Fix region selection for GCM and RCM.
+* Fix to ensure random sampling returns correct number of samples
