@@ -2,12 +2,11 @@ import copy
 import logging
 import random
 
-import numpy
-
 import iris
 from ukcp_dp.constants import InputType, TemporalAverageType
 from ukcp_dp.data_extractor import DataExtractor
 from ukcp_dp.file_finder import get_file_lists
+from ukcp_dp.utils import get_plot_settings
 
 
 log = logging.getLogger(__name__)
@@ -145,7 +144,8 @@ class SamplingProcessor(object):
         """
         input_data = self.get_input_data(variable, time_period)
         file_lists = get_file_lists(input_data)
-        data_extractor = DataExtractor(file_lists, input_data)
+        plot_settings = get_plot_settings(self.vocab, None, None, variable)
+        data_extractor = DataExtractor(file_lists, input_data, plot_settings)
         cubes = data_extractor.get_cubes()
         if len(cubes) > 1:
             log.error('Found more than 1 cube')
