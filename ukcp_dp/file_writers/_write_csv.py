@@ -2,14 +2,13 @@ import logging
 
 from ukcp_dp.constants import InputType, PlotType
 from ukcp_dp.file_writers._write_csv_cdf import CdfCsvWriter
-from ukcp_dp.file_writers._write_csv_default import write_csv as \
-    write_default_csv
 from ukcp_dp.file_writers._write_csv_jp import JpCsvWriter
 from ukcp_dp.file_writers._write_csv_pdf import PdfCsvWriter
 from ukcp_dp.file_writers._write_csv_plume import PlumeCsvWriter
 from ukcp_dp.file_writers._write_csv_postage_stamp_map import \
     PostageStampMapCsvWriter
 from ukcp_dp.file_writers._write_csv_sample import SampleCsvWriter
+from ukcp_dp.file_writers._write_csv_subset import SubsetCsvWriter
 from ukcp_dp.file_writers._write_csv_three_map import ThreeMapCsvWriter
 
 
@@ -53,7 +52,7 @@ def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
         csv_writer = SampleCsvWriter()
 
     else:
-        return write_default_csv(cube_list, title, output_data_file_path)
+        csv_writer = SubsetCsvWriter()
 
     return csv_writer.write_csv(input_data, cube_list, output_data_file_path,
                                 vocab, plot_type, process_version, overlay_cube)

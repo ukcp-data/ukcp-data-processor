@@ -79,6 +79,21 @@ class BaseCsvWriter(object):
         """
         Write out the column headers and data_dict.
         """
+        self._write_headers(output_data_file_path)
+
+        with open(output_data_file_path, 'a') as output_data_file:
+            for key in key_list:
+                line_out = '{key},{values}\n'.format(
+                    key=key, values=','.join(self.data_dict[key]))
+                output_data_file.write(line_out)
+
+        # reset the data dict
+        self.data_dict = collections.OrderedDict()
+
+    def _write_headers(self, output_data_file_path):
+        """
+        Write out the column headers.
+        """
         user_inputs = {}
         all_user_inputs = self.input_data.get_user_inputs()
         for key in all_user_inputs:
@@ -100,18 +115,14 @@ class BaseCsvWriter(object):
             output_data_file.write(header_string)
             output_data_file.write('\n')
 
-            for key in key_list:
-                line_out = '{key},{values}\n'.format(
-                    key=key, values=','.join(self.data_dict[key]))
-                output_data_file.write(line_out)
-
-        # reset the data dict
-        self.data_dict = collections.OrderedDict()
-
     def _get_full_file_name(self, file_name_suffix=None):
         if file_name_suffix is None:
             file_name_suffix = ''
+        try:
+            plot_type = self.plot_type.lower()
+        except AttributeError:
+            plot_type = 'subset'
         file_name = '{plot_type}_{timestamp}{suffix}.csv'.format(
-            plot_type=self.plot_type.lower(), timestamp=self.timestamp,
+            plot_type=plot_type, timestamp=self.timestamp,
             suffix=file_name_suffix)
         return os.path.join(self.output_data_file_path, file_name)
