@@ -107,8 +107,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         cube = self.cube_list[0]
 
         # update the header
-        self.header.append(str(
-            cube.coords(var_name='geo_region')[0].long_name))
+        self.header.append('Date')
 
         key_list = []
         for ensemble_slice in cube.slices_over('ensemble_member'):
@@ -121,18 +120,19 @@ class SubsetCsvWriter(BaseCsvWriter):
             self.header.append('{var}({ensemble})'.format(
                 ensemble=ensemble_name, var=var))
 
-            # rows of data
-            for region_slice in ensemble_slice.slices_over('region'):
-                region = str(region_slice.coords(var_name='geo_region')[
-                    0].points[0])
+            # loop over times
+            for time_slice in ensemble_slice.slices_over('time'):
+                with iris.FUTURE.context(cell_datetime_objects=True):
+                    time_str = time_slice.coord('time').cell(
+                        0).point.strftime('%Y-%m-%d')
 
                 value = round_variable(self.input_data.get_value(
-                    InputType.VARIABLE)[0], region_slice.data)
+                    InputType.VARIABLE)[0], time_slice.data)
                 try:
-                    self.data_dict[region].append(value)
+                    self.data_dict[time_str].append(value)
                 except KeyError:
-                    key_list = [region] + key_list
-                    self.data_dict[region] = [value]
+                    key_list = [time_str] + key_list
+                    self.data_dict[time_str] = [value]
 
         output_data_file_path = self._get_full_file_name()
         self._write_data_dict(output_data_file_path, key_list)
