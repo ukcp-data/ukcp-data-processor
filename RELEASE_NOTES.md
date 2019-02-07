@@ -1,3 +1,10 @@
+# Release 1.0.2
+
+This release addresses:
+
+* Fixes to CSV output for subsets of GCM and RCM
+
+
 # Release 1.0.1
 
 Issues address:
