@@ -107,7 +107,7 @@ class DataExtractor(object):
 
                 cubes.append(cube)
 
-        log.debug('Final cubes:\n{}'.format(cubes))
+        log.debug('Final cubes:\n%s', cubes)
 
         return cubes
 
@@ -123,8 +123,8 @@ class DataExtractor(object):
 
         baseline = self.input_data.get_value(InputType.BASELINE)
 
-        log.debug('cube_absoute\n{}'.format(cube_absoute))
-        log.debug('cube_climatology\n{}'.format(cube_climatology))
+        log.debug('cube_absoute\n%s', cube_absoute)
+        log.debug('cube_climatology\n%s', cube_climatology)
 
         anomaly = get_anomaly(
             cube_climatology, cube_absoute, baseline,
@@ -161,7 +161,7 @@ class DataExtractor(object):
                     if variable in TEMP_ANOMS:
                         overlay_cube.units = cf_units.Unit("Celsius")
 
-        log.debug('Overlay cube:\n{}'.format(overlay_cube))
+        log.debug('Overlay cube:\n%s', overlay_cube)
 
         return overlay_cube
 
@@ -186,9 +186,9 @@ class DataExtractor(object):
             log.info('_get_cube')
 
         if log.getEffectiveLevel() == logging.DEBUG:
-            log.debug('_get_cube from {} files'.format(len(file_list)))
+            log.debug('_get_cube from %s files', len(file_list))
             for fpath in file_list:
-                log.debug(' - FILE: {}'.format(fpath))
+                log.debug(' - FILE: %s', fpath)
 
         # Load the cubes
         try:
@@ -197,7 +197,7 @@ class DataExtractor(object):
             for file_name in file_list:
                 file_name = file_name.split('*')[0]
                 if not path.exists(file_name):
-                    log.error('File not found: {}'.format(file_name))
+                    log.error('File not found: %s', file_name)
             raise Exception('No data found for given selection options')
 
         # Remove time_bnds cubes
@@ -217,12 +217,12 @@ class DataExtractor(object):
                 cube.remove_coord(coord)
 
         if len(cubes) == 0:
-            log.warn('No data was retrieved from the following files:{}'.
-                     format(file_list))
+            log.warn('No data was retrieved from the following files:%s',
+                     file_list)
             raise Exception('No data found for given selection options')
 
-        log.debug('First cube:\n{}'.format(cubes[0]))
-        log.debug('Concatenate cubes:\n{}'.format(cubes))
+        log.debug('First cube:\n%s', cubes[0])
+        log.debug('Concatenate cubes:\n%s', cubes)
 
         iris.experimental.equalise_cubes.equalise_attributes(cubes)
         unify_time_units(cubes)
@@ -230,10 +230,10 @@ class DataExtractor(object):
         try:
             cube = cubes.concatenate_cube()
         except iris.exceptions.ConcatenateError:
-            log.error('Failed to concatenate cubes:\n{}'.format(cubes))
+            log.error('Failed to concatenate cubes:\n%s', cubes)
             raise Exception('No data found for given selection options')
 
-        log.debug('Concatenated cube:\n{}'.format(cube))
+        log.debug('Concatenated cube:\n%s', cube)
 
         if climatology is True:
             # generate a time slice constraint based on the baseline
@@ -248,7 +248,7 @@ class DataExtractor(object):
         if cube is None:
             if time_slice_constraint is not None:
                 log.warn('Time slice constraint resulted in no cubes being '
-                         'returned: {}'.format(time_slice_constraint))
+                         'returned: %s', time_slice_constraint)
             raise Exception('Selection constraints resulted in no data being'
                             ' selected')
 
@@ -261,7 +261,7 @@ class DataExtractor(object):
         if cube is None:
             if temporal_constraint is not None:
                 log.warn('Temporal constraint resulted in no cubes being '
-                         'returned: {}'.format(temporal_constraint))
+                         'returned: %s', temporal_constraint)
             raise Exception('Selection constraints resulted in no data being'
                             ' selected')
 
@@ -277,7 +277,7 @@ class DataExtractor(object):
         if cube is None:
             if area_constraint is not None:
                 log.warn('Area constraint resulted in no cubes being '
-                         'returned: {}'.format(area_constraint))
+                         'returned: %s', area_constraint)
             raise Exception('Selection constraints resulted in no data being'
                             ' selected')
 
@@ -348,8 +348,14 @@ class DataExtractor(object):
 
         elif self.input_data.get_area_type() == AreaType.ADMIN_REGION:
             if self.input_data.get_area() != 'all':
-                area_constraint = iris.Constraint(
-                    Region=self.input_data.get_area_label())
+                if self.input_data in [COLLECTION_GCM, COLLECTION_RCM]:
+                    area_constraint = iris.Constraint(
+                        Region=self.input_data.get_area_label())
+                else:
+                    area_constraint = iris.Constraint(
+                        coord_values={
+                            'Administrative Region':
+                            self.input_data.get_area_label()})
 
         elif self.input_data.get_area_type() == AreaType.COUNTRY:
             if self.input_data.get_area() != 'all':
@@ -358,9 +364,14 @@ class DataExtractor(object):
 
         elif self.input_data.get_area_type() == AreaType.RIVER_BASIN:
             if self.input_data.get_area() != 'all':
-                area_constraint = iris.Constraint(
-                    River=self.input_data.get_area_label())
-
+                if self.input_data in [COLLECTION_GCM, COLLECTION_RCM]:
+                    area_constraint = iris.Constraint(
+                        River=self.input_data.get_area_label())
+                else:
+                    area_constraint = iris.Constraint(
+                        coord_values={
+                            'River Basin':
+                            self.input_data.get_area_label()})
         else:
             raise Exception(
                 "Unknown area type: {}.".format(
