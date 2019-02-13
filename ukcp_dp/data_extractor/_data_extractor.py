@@ -348,7 +348,8 @@ class DataExtractor(object):
 
         elif self.input_data.get_area_type() == AreaType.ADMIN_REGION:
             if self.input_data.get_area() != 'all':
-                if self.input_data in [COLLECTION_GCM, COLLECTION_RCM]:
+                if (self.input_data.get_value(InputType.COLLECTION) in
+                        [COLLECTION_GCM, COLLECTION_RCM]):
                     area_constraint = iris.Constraint(
                         Region=self.input_data.get_area_label())
                 else:
@@ -364,7 +365,8 @@ class DataExtractor(object):
 
         elif self.input_data.get_area_type() == AreaType.RIVER_BASIN:
             if self.input_data.get_area() != 'all':
-                if self.input_data in [COLLECTION_GCM, COLLECTION_RCM]:
+                if (self.input_data.get_value(InputType.COLLECTION) in
+                        [COLLECTION_GCM, COLLECTION_RCM]):
                     area_constraint = iris.Constraint(
                         River=self.input_data.get_area_label())
                 else:
