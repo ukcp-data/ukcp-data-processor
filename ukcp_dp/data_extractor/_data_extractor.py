@@ -312,18 +312,10 @@ class DataExtractor(object):
 
         if self.input_data.get_area_type() == AreaType.POINT:
             # coordinates are coming in as OSGB, x, y
-            resolution = self._get_resolution_m(cube)
-            half_grid_size = resolution / 2
             bng_x = self.input_data.get_area()[0]
             bng_y = self.input_data.get_area()[1]
-            x_constraint = iris.Constraint(
-                projection_x_coordinate=lambda cell:
-                (bng_x - half_grid_size) <= cell <
-                    (bng_x + half_grid_size))
-            y_constraint = iris.Constraint(
-                projection_y_coordinate=lambda cell:
-                (bng_y - half_grid_size) <= cell <
-                    (bng_y + half_grid_size))
+            x_constraint = iris.Constraint(projection_x_coordinate=bng_x)
+            y_constraint = iris.Constraint(projection_y_coordinate=bng_y)
             area_constraint = x_constraint & y_constraint
 
         elif self.input_data.get_area_type() == AreaType.BBOX:
