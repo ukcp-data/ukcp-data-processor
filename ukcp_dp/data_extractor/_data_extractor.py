@@ -334,10 +334,12 @@ class DataExtractor(object):
             bng_n = self.input_data.get_area()[3]
             x_constraint = iris.Constraint(
                 projection_x_coordinate=lambda cell:
-                (bng_w - half_grid_size) <= cell < (bng_e + half_grid_size))
+                (bng_w - half_grid_size) <= cell.point < (
+                    bng_e + half_grid_size))
             y_constraint = iris.Constraint(
                 projection_y_coordinate=lambda cell:
-                (bng_s - half_grid_size) <= cell < (bng_n + half_grid_size))
+                (bng_s - half_grid_size) <= cell.point < (
+                    bng_n + half_grid_size))
             area_constraint = x_constraint & y_constraint
 
         elif (self.input_data.get_area_type() in
@@ -476,6 +478,10 @@ class DataExtractor(object):
             dim_coords.append(coord.name())
         if 'projection_x_coordinate' not in dim_coords:
             cube = iris.util.new_axis(cube, 'projection_x_coordinate')
+            # move the x coord to the end to ensure it comes after y
+            dimension_order = range(1, len(dim_coords) + 1)
+            dimension_order.append(0)
+            cube.transpose()
         if 'projection_y_coordinate' not in dim_coords:
             cube = iris.util.new_axis(cube, 'projection_y_coordinate')
         return cube
