@@ -239,10 +239,12 @@ class DataExtractor(object):
                 except iris.exceptions.ConcatenateError as ex:
                     message = ''
                     try:
-                        message = ' {}'.format(cube.coord('ensemble_member_id').points[0])
+                        message = ' {}'.format(
+                            cube.coord('ensemble_member_id').points[0])
                     except iris.exceptions.CoordinateNotFoundError:
                         pass
-                    log.error('Error when concatenating cube%s:\n%s\n%s', message, ex, error_cube)
+                    log.error('Error when concatenating cube%s:\n%s\n%s',
+                              message, ex, error_cube)
                     break
             raise Exception('No data found for given selection options')
 
@@ -286,6 +288,10 @@ class DataExtractor(object):
         area_constraint = self._get_spatial_selector(cube)
         if area_constraint is not None:
             cube = cube.extract(area_constraint)
+            if self.input_data.get_area_type() == AreaType.BBOX:
+                # Make sure we still have x, y dimension coordinated for
+                # bboxes
+                cube = self._promote_x_y_coords(cube)
 
         if cube is None:
             if area_constraint is not None:
@@ -462,6 +468,17 @@ class DataExtractor(object):
         year_min = self.input_data.get_value(InputType.YEAR_MINIMUM) + 12
         year_max = self.input_data.get_value(InputType.YEAR_MAXIMUM) - 12
         return year_min, year_max
+
+    def _promote_x_y_coords(self, cube):
+        # ensure the x and y coordinates are dimension coordinates
+        dim_coords = []
+        for coord in cube.coords(dim_coords=True):
+            dim_coords.append(coord.name())
+        if 'projection_x_coordinate' not in dim_coords:
+            cube = iris.util.new_axis(cube, 'projection_x_coordinate')
+        if 'projection_y_coordinate' not in dim_coords:
+            cube = iris.util.new_axis(cube, 'projection_y_coordinate')
+        return cube
 
     def get_title(self):
         """
