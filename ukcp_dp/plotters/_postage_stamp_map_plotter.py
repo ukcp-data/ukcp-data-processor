@@ -47,6 +47,14 @@ class PostageStampMapPlotter(MapPlotter):
                         gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3],
                         gs[2, 0], gs[2, 1], gs[2, 2], gs[2, 3]]
 
+            elif ensemble_count == 15:
+                gs = gridspec.GridSpec(3, 5)
+                gs.update(top=gs_top, bottom=0.10, left=gs_left,
+                          right=gs_right)
+                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
+                        gs[2, 0], gs[2, 1], gs[2, 2], gs[2, 3], gs[2, 4]]
+
             else:  # ensemble_count == 28:
                 gs = gridspec.GridSpec(4, 7)
                 gs.update(top=gs_top, bottom=0.10, left=gs_left,
@@ -69,6 +77,15 @@ class PostageStampMapPlotter(MapPlotter):
                         gs[0, 5],
                         gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
                         gs[1, 5]]
+
+            elif ensemble_count == 15:
+                gs = gridspec.GridSpec(2, 8)
+                gs.update(top=gs_top, bottom=0.10, left=gs_left,
+                          right=gs_right)
+                grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 3], gs[0, 4],
+                        gs[0, 5], gs[0, 6], gs[0, 7],
+                        gs[1, 0], gs[1, 1], gs[1, 2], gs[1, 3], gs[1, 4],
+                        gs[1, 5], gs[1, 6], gs[1, 7]]
 
             else:  # if ensemble_count == 28:
                 gs = gridspec.GridSpec(3, 10)
