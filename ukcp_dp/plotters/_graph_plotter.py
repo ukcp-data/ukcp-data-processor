@@ -12,18 +12,17 @@ class GraphPlotter(BasePlotter):
     """
     The graph plotter class.
 
-    This class extends BasePlotter with _generate_plot(self, output_path,
-    title). This class should be extended with a _generate_graph(self) method
-    to plot the map.
+    This class extends BasePlotter with _generate_plot(self, output_path). This
+    class should be extended with a _generate_graph(self) method to plot the
+    map.
     """
 
-    def _generate_plot(self, output_path, plot_settings, title):
+    def _generate_plot(self, output_path, plot_settings):
         """
         Override base class method.
 
         @param output_path (str): the full path to the file
         @param plot_settings (StandardMap): an object containing plot settings
-        @param title (str): a title for the plot
         """
         # By default we want to show the legend
         self.show_legend = True
@@ -40,7 +39,7 @@ class GraphPlotter(BasePlotter):
         self._generate_graph()
 
         # Add the title
-        new_title = wrap_string(title, 110)
+        new_title = wrap_string(self.title, 110)
         fig.suptitle(new_title, fontsize='larger')
 
         if self.show_legend is True:
