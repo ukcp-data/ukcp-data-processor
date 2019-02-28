@@ -3,6 +3,7 @@
 This release addresses:
 
 * Add region selections for Land Prob data
+* Add the option to select the Hadley 15 members for GMC products
 
 
 # Release 1.0.2
