@@ -176,6 +176,16 @@ class PlumePlotter(GraphPlotter):
                         facecolor=fill_colour, zorder=0,
                         alpha=0.1)
 
+        self.show_legend = False
+        self.title = ('%s, showing the 5th, 10th, 25th, 50th, 75th, 90th and '
+                      '95th percentiles' % self.title)
+
+        if self.input_data.get_value(InputType.SHOW_LABELS):
+            self._add_line_labels(ax, t_points, vals_5, vals_10, vals_25,
+                                  vals_50, vals_75, vals_90, vals_95)
+
+    def _add_line_labels(self, ax, t_points, vals_5, vals_10, vals_25, vals_50,
+                         vals_75, vals_90, vals_95):
         # Generate the lines so we can add labels
         plt.plot(t_points, vals_5.data, label='5th', alpha=0)
         plt.plot(t_points, vals_10.data, label='10th', alpha=0)
@@ -201,10 +211,6 @@ class PlumePlotter(GraphPlotter):
                 child.set_bbox(dict(alpha=0))
             except AttributeError:
                 pass
-
-        self.show_legend = False
-        self.title = ('%s, showing the 5th, 10th, 25th, 50th, 75th, 90th and '
-                      '95th percentiles' % self.title)
 
     def _plot_ensemble(self, cube, ax):
         # Line plots of ensembles, highlighting selected members

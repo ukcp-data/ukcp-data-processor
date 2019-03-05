@@ -151,6 +151,10 @@ class Vocab(object):
         True: 'True',
         False: 'False'
     },
+        'show_labels': {
+        True: 'True',
+        False: 'False'
+    },
         'sampling_method': {
         'all': 'all',
         'id': 'id',
