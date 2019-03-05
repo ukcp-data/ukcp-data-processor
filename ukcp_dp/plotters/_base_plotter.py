@@ -17,12 +17,13 @@ class BasePlotter(object):
     The base class for plotters.
 
     This class should be extended with a
-    _generate_plot(self, output_path, title) method to plot
-    the data.
+    _generate_plot(self, output_path) method to plot the data.
     The following variables are available to overriding methods:
         self.input_data
         self.cube_list
         self.overlay_cube
+        self.title
+        self.vocab
     """
 
     def generate_plot(self, input_data, cube_list, overlay_cube, output_path,
@@ -46,17 +47,17 @@ class BasePlotter(object):
         # an iris cube list containing one cube per scenario, per variable
         self.cube_list = cube_list
         self.overlay_cube = overlay_cube
+        self.title = title
         self.vocab = vocab
 
-        self._generate_plot(output_path, plot_settings, title)
+        self._generate_plot(output_path, plot_settings)
 
-    def _generate_plot(self, output_path, plot_settings, title):
+    def _generate_plot(self, output_path, plot_settings):
         """
         This method should be overridden to produce the plots.
 
         @param output_path (str): the full path to the file
         @param plot_settings (StandardMap): an object containing plot settings
-        @param title (str): a title for the plot
         """
         pass
 

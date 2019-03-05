@@ -184,12 +184,19 @@ class UKCPDataProcessor(object):
              self.plot_type == PlotType.THREE_MAPS) and
             (self.input_data.get_value(InputType.COLLECTION) ==
                 COLLECTION_PROB)):
+
+            if (self.input_data.get_value(InputType.COLLECTION) ==
+                    COLLECTION_PROB):
+                extended_range = True
+            else:
+                extended_range = False
+
             cubes = CubeList()
             for cube in self.cube_list:
                 # the cube contains all of the percentiles but we only plotted
                 # three of them, therefore extract 10th, 50th and 90th
-                # percentiles
-                cubes.append(get_probability_levels(cube))
+                # percentiles and optionally the 5th, 25th, 75th and 95th
+                cubes.append(get_probability_levels(cube, extended_range))
 
         output_file_list = write_file(cubes, self.overlay_cube, self.title,
                                       output_data_file_path, data_format,

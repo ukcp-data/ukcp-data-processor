@@ -282,7 +282,7 @@ class DataExtractor(object):
 
         # extract 10, 50 and 90 percentiles
         if (overlay_probability_levels is True):
-            cube = get_probability_levels(cube)
+            cube = get_probability_levels(cube, False)
 
         # generate an area constraint
         area_constraint = self._get_spatial_selector(cube)
@@ -580,15 +580,28 @@ class DataExtractor(object):
         return int(resolution.split('km')[0]) * 1000
 
 
-def get_probability_levels(cube):
+def get_probability_levels(cube, extended_range):
     """
-    Extract a the 10, 50 and 90 percentiles from a cube.
+    Extract a the 10th, 50th and 90th percentiles from a cube and optionally
+    the 5th, 25th, 75th and 95th dependent on extended_range
 
-    @return a cube containing the 10, 50 and 90 percentiles
+    @param cube(Cube): the original data
+    @param extended_range(boolean): if True also return the 5th, 25th, 75th
+                and 95th
+
+    @return a cube containing the 10th, 50th and 90th percentiles and
+                optionally the 5th, 25th, 75th and 95th
     """
     log.debug('get_probability_levels')
     percentile_cubes = iris.cube.CubeList()
     percentile_cubes.append(cube.extract(iris.Constraint(percentile=10)))
     percentile_cubes.append(cube.extract(iris.Constraint(percentile=50)))
     percentile_cubes.append(cube.extract(iris.Constraint(percentile=90)))
+
+    if extended_range is True:
+        percentile_cubes.append(cube.extract(iris.Constraint(percentile=5)))
+        percentile_cubes.append(cube.extract(iris.Constraint(percentile=25)))
+        percentile_cubes.append(cube.extract(iris.Constraint(percentile=75)))
+        percentile_cubes.append(cube.extract(iris.Constraint(percentile=95)))
+
     return percentile_cubes.merge_cube()

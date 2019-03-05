@@ -21,18 +21,17 @@ class MapPlotter(BasePlotter):
     """
     The map plotter class.
 
-    This class extends BasePlotter with _generate_plot(self, output_path,
-    title). This class should be extended with a _generate_subplots(self, cube,
+    This class extends BasePlotter with _generate_plot(self, output_path). This
+    class should be extended with a _generate_subplots(self, cube,
     plot_settings, fig) method to plot the map.
     """
 
-    def _generate_plot(self, output_path, plot_settings, title):
+    def _generate_plot(self, output_path, plot_settings):
         """
         Override base class method.
 
         @param output_path (str): the full path to the file
         @param plot_settings (StandardMap): an object containing plot settings
-        @param title (str): a title for the plot
         """
         # TODO we can only produce a map for a single scenario and variable
         cube = self.cube_list[0]
@@ -62,7 +61,7 @@ class MapPlotter(BasePlotter):
         result = self._generate_subplots(cube, plot_settings, fig)
 
         # Add the title
-        new_title = wrap_string(title, 110)
+        new_title = wrap_string(self.title, 110)
         fig.suptitle(new_title, fontsize='larger')
 
         # Add the colourbar
