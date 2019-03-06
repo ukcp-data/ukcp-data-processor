@@ -352,7 +352,7 @@ UKCPNEAT = StandardMap("UKCPneat", cont=False, vrange=[276, 288], vstep=1,
                        proj=UKCP_OSGB,
                        marlft=0.01, marrgt=1.00, martop=0.99, marbot=0.02,
                        countrylw=1, countrylcol='grey',
-                       regionlw=1, regionlcol=None,
+                       regionlw=0.3, regionlcol=None,
                        coastlw=1, coastlcol="black", dxgrid=1, dygrid=1,
                        xlims=REG_BI_FULL['lons'], ylims=REG_BI_FULL['lats']
                        )
@@ -406,8 +406,8 @@ UKCP_PRECIP.default_barlabel = "Precipitation rate, mm day$^{-1}$"
 UKCP_PRECIP.preferred_unit = cf_units.Unit("mm/day")
 UKCP_PRECIP.extendcolbar = "max"
 UKCP_PRECIP.cpal = "Blues"
-UKCP_PRECIP.undercol="#3a240b"
-UKCP_PRECIP.overcol="#09382e"
+UKCP_PRECIP.undercol = "#3a240b"
+UKCP_PRECIP.overcol = "#09382e"
 UKCP_PRECIP.vrange = [0.0, 8.0]
 UKCP_PRECIP.vmid = None
 UKCP_PRECIP.vstep = 1.0
@@ -426,8 +426,8 @@ UKCP_PRECIP_ANOM.default_barlabel = "Precipitation rate anomaly, %"
 # UKCP_PRECIP_ANOM.default_barlabel = "Precipitation rate anomaly, mm/day"
 UKCP_PRECIP_ANOM.extendcolbar = "both"
 UKCP_PRECIP_ANOM.cpal = "BrBG"
-UKCP_PRECIP_ANOM.undercol="#3a240b"
-UKCP_PRECIP_ANOM.overcol="#09382e"
+UKCP_PRECIP_ANOM.undercol = "#3a240b"
+UKCP_PRECIP_ANOM.overcol = "#09382e"
 UKCP_PRECIP_ANOM.vrange = [-80.0, 60.0]
 UKCP_PRECIP_ANOM.vmid = 0.0
 UKCP_PRECIP_ANOM.vstep = 10.0
