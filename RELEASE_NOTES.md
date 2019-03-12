@@ -2,8 +2,9 @@
 
 This release addresses:
 
-* Add region selections for Land Prob data
-* Add the option to select the Hadley 15 members for GMC products
+* Fix issue when selecting a single cell with a bounding box.
+* Add the option to select the Hadley 15 members for GMC products.
+* Update Land Prob plume plots with a colour option and 5th, 25th, 75th and 95th percentile data.
 
 
 # Release 1.0.2
