@@ -215,6 +215,7 @@ class Vocab(object):
         'sampling_variable_2': 'Sampling Variable 2',
         'scenario': 'Scenario',
         'show_boundaries': 'Show Boundaries',
+        'show_labels': 'Show Labels',
         'spatial_representation': 'Spatial Representation',
         'temporal_average_type': 'Temporal Average Type',
         'time_period': 'Time Period',
