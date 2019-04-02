@@ -84,12 +84,9 @@ def get_absolute_paths(file_lists):
 
 
 def _get_absolute_path(file_path):
-    if '*' in file_path:
-        path = os.path.realpath(file_path.split('*')[0])
-        path = os.path.join(path, '*')
-    else:
-        path = os.path.realpath(file_path)
-
+    real_dir_name = os.path.dirname(os.path.realpath(file_path))
+    path = os.path.join(os.path.abspath(file_path).replace(
+        'latest', os.path.basename(real_dir_name)))
     path = DATA_SERVICE_URL + path
     return path
 
