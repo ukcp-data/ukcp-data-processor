@@ -1,3 +1,10 @@
+# Release 1.0.4
+
+This release addresses:
+
+* Fix links to the data on the CEDA achieve on the jobs output page 
+
+
 # Release 1.0.3
 
 This release addresses:
