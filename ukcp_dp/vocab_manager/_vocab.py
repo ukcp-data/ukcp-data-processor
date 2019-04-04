@@ -259,7 +259,7 @@ class Vocab(object):
         self._load_cv(CV_Type.COUNTRY)
         self.vocab[CV_Type.COUNTRY]['all'] = 'All countries'
         self._load_cv(CV_Type.RIVER_BASIN)
-        self.vocab[CV_Type.RIVER_BASIN]['all'] = 'All river basins',
+        self.vocab[CV_Type.RIVER_BASIN]['all'] = 'All river basins'
 
     def _load_cv(self, cv_type):
         """
