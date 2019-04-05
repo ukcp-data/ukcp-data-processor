@@ -77,14 +77,15 @@ class ThreeMapPlotter(MapPlotter):
                                        ax=ax, barlab=None,
                                        bar_orientation="none",
                                        outfnames=None)
+            self.plot_overlay(self.input_data.get_value(
+                InputType.SHOW_BOUNDARIES), hi_res=True)
         else:
             result = plot_standard_choropleth_map(data, plot_settings, fig=fig,
                                                   ax=ax, barlab=None,
                                                   bar_orientation="none",
-                                                  outfnames=None)
-
-        self.plot_overlay(self.input_data.get_value(InputType.SHOW_BOUNDARIES),
-                          hi_res=True)
+                                                  outfnames=None, hi_res=False)
+            # don't need the overlay for the choropleth map as the region
+            # geometry contains them.
 
         ax.set_title(title)
 

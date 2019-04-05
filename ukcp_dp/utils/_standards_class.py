@@ -352,7 +352,7 @@ UKCPNEAT = StandardMap("UKCPneat", cont=False, vrange=[276, 288], vstep=1,
                        proj=UKCP_OSGB,
                        marlft=0.01, marrgt=1.00, martop=0.99, marbot=0.02,
                        countrylw=1, countrylcol='grey',
-                       regionlw=0.3, regionlcol=None,
+                       regionlw=0.3, regionlcol='black',
                        coastlw=1, coastlcol="black", dxgrid=1, dygrid=1,
                        xlims=REG_BI_FULL['lons'], ylims=REG_BI_FULL['lats']
                        )
