@@ -1,3 +1,10 @@
+# Release 1.0.5
+
+This release addresses:
+
+* Ensure boundaries are drawn on choropleth maps 
+
+
 # Release 1.0.4
 
 This release addresses:
