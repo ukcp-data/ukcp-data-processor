@@ -1,6 +1,6 @@
 import logging
 
-from ukcp_dp.constants import InputType, PlotType
+from ukcp_dp.constants import InputType, PlotType, COLLECTION_MARINE
 from ukcp_dp.file_writers._write_csv_cdf import CdfCsvWriter
 from ukcp_dp.file_writers._write_csv_jp import JpCsvWriter
 from ukcp_dp.file_writers._write_csv_pdf import PdfCsvWriter
@@ -45,11 +45,20 @@ def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
         elif plot_type == PlotType.POSTAGE_STAMP_MAPS:
             csv_writer = PostageStampMapCsvWriter()
 
+    # it is not a plot therefore it is a sample or subset
+
     elif input_data.get_value(InputType.SAMPLING_METHOD) is not None:
         # a bit of a fudge, need to rename plot_type
         plot_type = 'sampling_{}'.format(
             input_data.get_value(InputType.SAMPLING_METHOD).lower())
         csv_writer = SampleCsvWriter()
+
+    # it is a subset
+
+    elif input_data.get_value(InputType.COLLECTION) == COLLECTION_MARINE:
+        # this is a marine sebset, we can use the Plume plot code to write the
+        # data
+            csv_writer = PlumeCsvWriter()
 
     else:
         csv_writer = SubsetCsvWriter()
