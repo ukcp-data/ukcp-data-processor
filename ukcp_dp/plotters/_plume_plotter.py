@@ -26,6 +26,33 @@ class PlumePlotter(GraphPlotter):
     This class extends BasePlotter with a _generate_graph(self).
     """
 
+    PROB_LABELS = {COLLECTION_PROB:
+                   ['5th', '10th', '25th', '50th', '75th', '90th', '95th'],
+                   COLLECTION_MARINE:
+                   ['5th', '10th', '30th', '33rd', '50th', '67th', '70th',
+                    '90th', '95th']
+                   }
+
+    PERCENTILES = {COLLECTION_PROB:
+                   [5, 10, 25, 50, 75, 90, 95],
+                   COLLECTION_MARINE:
+                   [5, 10, 30, 33, 50, 67, 70, 90, 95]
+                   }
+
+    FILL_FADE = {COLLECTION_PROB:
+                 [0.1, 0.2, 0.3, 0.3, 0.2, 0.1],
+                 COLLECTION_MARINE:
+                 [0.075, 0.2, 0.315, 0.5, 0.5, 0.315, 0.2, 0.075],
+                 }
+
+    PLOT_TITLE = {COLLECTION_PROB:
+                  'showing the 5th, 10th, 25th, 50th, 75th, 90th and 95th '
+                  'percentiles',
+                  COLLECTION_MARINE:
+                  'showing the 5th, 10th, 30th, 33rd, 50th, 67th, 70th, 90th '
+                  'and 95th percentiles'
+                  }
+
     def _generate_graph(self):
         """
         Override base class method.
@@ -93,7 +120,13 @@ class PlumePlotter(GraphPlotter):
             line_colour = PERCENTILE_LINE_COLOUR
 
             if (self.input_data.get_value(InputType.COLLECTION) ==
-                    COLLECTION_PROB):
+                    COLLECTION_MARINE and
+                    self.input_data.get_value(InputType.METHOD).startswith(
+                    RETURN_PERIODS)):
+                ax.plot(t_points, percentile_cube.data,
+                        label='50th Percentile', color=line_colour)
+
+            else:
 
                 if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
                     line_colour = SCENARIO_COLOURS[
@@ -102,15 +135,13 @@ class PlumePlotter(GraphPlotter):
                 ax.plot(t_points, percentile_cube.data,
                         color=line_colour)
 
-            else:
-                ax.plot(t_points, percentile_cube.data,
-                        label='50th Percentile', color=line_colour)
-
         if (self.input_data.get_value(InputType.COLLECTION) ==
-                COLLECTION_PROB):
-            self._multi_fills(cube, ax, t_points)
-        else:
+                COLLECTION_MARINE and
+                self.input_data.get_value(InputType.METHOD).startswith(
+                RETURN_PERIODS)):
             self._single_fill(cube, ax, t_points)
+        else:
+            self._multi_fills(cube, ax, t_points)
 
     def _single_fill(self, cube, ax, t_points):
         # fill between the 5th and 95th
@@ -128,72 +159,50 @@ class PlumePlotter(GraphPlotter):
                         label=label)
 
     def _multi_fills(self, cube, ax, t_points):
-        # fill between the 10th and 90th
-        # 5, 10, 25, 75, 90, 95
-        vals_5 = cube.extract(iris.Constraint(percentile=5))
-        vals_10 = cube.extract(iris.Constraint(percentile=10))
-        vals_25 = cube.extract(iris.Constraint(percentile=25))
-        vals_50 = cube.extract(iris.Constraint(percentile=50))
-        vals_75 = cube.extract(iris.Constraint(percentile=75))
-        vals_90 = cube.extract(iris.Constraint(percentile=90))
-        vals_95 = cube.extract(iris.Constraint(percentile=95))
-
-        if (vals_5 is None or vals_10 is None or vals_25 is None
-                or vals_75 is None or vals_90 is None or vals_95 is None):
-            raise Exception(
-                'Attempted to plot the fills, but no data found')
+        # fill between the percentile bounds
+        percentile_data = []
+        for percentile in self.PERCENTILES[self.input_data.get_value(
+                InputType.COLLECTION)]:
+            percentile_data.append(cube.extract(
+                iris.Constraint(percentile=percentile)).data)
 
         if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
             fill_colour = SCENARIO_COLOURS[cube.attributes['scenario']][0]
         else:
             fill_colour = SCENARIO_GREYSCALES[cube.attributes['scenario']][0]
 
-        label = '5th-10th & 90th-95th Percentiles'
-        ax.fill_between(t_points, vals_5.data, y2=vals_10.data,
-                        edgecolor="none", linewidth=0,
-                        facecolor=fill_colour, zorder=0,
-                        label=label, alpha=0.1)
-
-        label = '10th-25th & 75th-90th Percentiles'
-        ax.fill_between(t_points, vals_10.data, y2=vals_25.data,
-                        edgecolor="none", linewidth=0,
-                        facecolor=fill_colour, zorder=0,
-                        label=label, alpha=0.2)
-
-        label = '25th-75th Percentiles'
-        ax.fill_between(t_points, vals_25.data, y2=vals_75.data,
-                        edgecolor="none", linewidth=0,
-                        facecolor=fill_colour, zorder=0,
-                        label=label, alpha=0.3)
-
-        ax.fill_between(t_points, vals_75.data, y2=vals_90.data,
-                        edgecolor="none", linewidth=0,
-                        facecolor=fill_colour, zorder=0,
-                        alpha=0.2)
-
-        ax.fill_between(t_points, vals_90.data, y2=vals_95.data,
-                        edgecolor="none", linewidth=0,
-                        facecolor=fill_colour, zorder=0,
-                        alpha=0.1)
+        for i in range(0, (len(percentile_data) - 1)):
+            ax.fill_between(t_points, percentile_data[i],
+                            y2=percentile_data[i+1],
+                            edgecolor="none", linewidth=0,
+                            facecolor=fill_colour, zorder=0,
+                            alpha=self.FILL_FADE[self.input_data.get_value(
+                                InputType.COLLECTION)][i])
 
         self.show_legend = False
-        self.title = ('%s, showing the 5th, 10th, 25th, 50th, 75th, 90th and '
-                      '95th percentiles' % self.title)
+        self.title = ('%s, %s' % (
+            self.title,
+            self.PLOT_TITLE[self.input_data.get_value(InputType.COLLECTION)]))
 
         if self.input_data.get_value(InputType.SHOW_LABELS):
-            self._add_line_labels(ax, t_points, vals_5, vals_10, vals_25,
-                                  vals_50, vals_75, vals_90, vals_95)
+            self._add_line_labels(ax, t_points, percentile_data)
 
-    def _add_line_labels(self, ax, t_points, vals_5, vals_10, vals_25, vals_50,
-                         vals_75, vals_90, vals_95):
+    def _add_line_labels(self, ax, t_points, percentile_data):
+        """
+        Add labels to the boundaries between percentiles.
+
+        We need to draw invisible lines first and then add labels to the lines.
+
+        @param ax (Axes): axes
+        @param t_points ([float]): time points
+        @param percentile_data ([numpy.ndarray]): a list of arrays, with each
+            array representing a percentiles data
+        """
         # Generate the lines so we can add labels
-        plt.plot(t_points, vals_5.data, label='5th', alpha=0)
-        plt.plot(t_points, vals_10.data, label='10th', alpha=0)
-        plt.plot(t_points, vals_25.data, label='25th', alpha=0)
-        plt.plot(t_points, vals_50.data, label='50th', alpha=0)
-        plt.plot(t_points, vals_75.data, label='75th', alpha=0)
-        plt.plot(t_points, vals_90.data, label='90th', alpha=0)
-        plt.plot(t_points, vals_95.data, label='95th', alpha=0)
+        for i, data in enumerate(percentile_data):
+            plt.plot(t_points, data,
+                     label=self.PROB_LABELS[self.input_data.get_value(
+                         InputType.COLLECTION)][i], alpha=0)
 
         # work out where to put the line labels along the x axis
         x_min, x_max = ax.get_xlim()
