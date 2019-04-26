@@ -1,3 +1,11 @@
+# Release 1.0.6
+
+This release addresses:
+
+* Update sea level anomalies plume plots to show 5th, 10th, 30th, 33rd, 50th, 67th, 70th, 90th and 95th percentiles
+* Add processes to subset sea level anomaly data
+
+
 # Release 1.0.5
 
 This release addresses:
