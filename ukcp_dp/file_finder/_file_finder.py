@@ -340,7 +340,7 @@ def _get_cm_file_list_for_range(input_data, baseline):
                     input_data, spatial_representation, variable_prefix,
                     scenario, ensemble, baseline)
 
-                , = _get_cm_file_name(
+                file_name = _get_cm_file_name(
                     input_data, spatial_representation, variable_prefix,
                     scenario, ensemble, baseline)
                 ensemble_file_list.append(
