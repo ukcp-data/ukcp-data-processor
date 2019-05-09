@@ -88,6 +88,7 @@ def _get_absolute_path(file_path):
     path = os.path.join(os.path.abspath(file_path).replace(
         'latest', os.path.basename(real_dir_name)))
     path = DATA_SERVICE_URL + path
+    path = path.rstrip('*')
     return path
 
 
@@ -339,7 +340,7 @@ def _get_cm_file_list_for_range(input_data, baseline):
                     input_data, spatial_representation, variable_prefix,
                     scenario, ensemble, baseline)
 
-                file_name = _get_cm_file_name(
+                , = _get_cm_file_name(
                     input_data, spatial_representation, variable_prefix,
                     scenario, ensemble, baseline)
                 ensemble_file_list.append(
