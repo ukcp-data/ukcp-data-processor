@@ -94,6 +94,9 @@ def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
             # up so they can be concatenated later on.
             # At the same time we are promoting 'time' back to a coordinate
             for anomaly_slice in cube_anomaly_period.slices_over('time'):
+                # Flip the coordinates around so when they are transposed after
+                # 'time' is added they will be the right way round
+                anomaly_slice.transpose()
                 anomaly_cubes.append(
                     iris.util.new_axis(anomaly_slice, 'time'))
         else:
