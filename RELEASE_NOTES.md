@@ -1,3 +1,10 @@
+# Release 1.0.7
+
+This release addresses:
+
+* Fix issue generating anomalies when all months or all seasons are selected. This issue resulted in no data being returned.
+
+
 # Release 1.0.6
 
 This release addresses:
