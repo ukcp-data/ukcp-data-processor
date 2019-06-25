@@ -529,9 +529,9 @@ class DataExtractor(object):
 
         if self.input_data.get_area_type() == AreaType.POINT:
             grid_x = int(self.cubes[0].coord('projection_x_coordinate')
-                         .bounds[0][0])
+                         .points[0])
             grid_y = int(self.cubes[0].coord('projection_y_coordinate')
-                         .bounds[0][0])
+                         .points[0])
             title = "{t} for grid square {x}, {y}".format(
                 t=title, x=grid_x, y=grid_y)
 
@@ -549,9 +549,7 @@ class DataExtractor(object):
               [AreaType.COAST_POINT, AreaType.GAUGE_POINT]):
             # coordinates are coming in as lat, long
             latitude = round(self.cubes[0].coord('latitude').points[0], 2)
-#                          .bounds[0][0]) TODO
             longitude = round(self.cubes[0].coord('longitude').points[0], 2)
-#                          .bounds[0][0]) TODO
             title = "{t} for grid square {latitude}°, {longitude}°".format(
                 t=title, latitude=latitude, longitude=longitude)
 
