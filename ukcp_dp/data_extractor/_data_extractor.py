@@ -10,8 +10,8 @@ import iris.plot as iplt
 import iris.quickplot as qplt
 from iris.util import unify_time_units
 from ukcp_dp.constants import COLLECTION_PROB, InputType, TEMP_ANOMS, \
-    COLLECTION_MARINE, AreaType, TemporalAverageType, COLLECTION_GCM, \
-    COLLECTION_RCM
+    COLLECTION_MARINE, AreaType, TemporalAverageType, COLLECTION_CPM, \
+    COLLECTION_GCM, COLLECTION_RCM
 from ukcp_dp.data_extractor._utils import get_anomaly
 from ukcp_dp.utils import get_baseline_range
 from ukcp_dp.vocab_manager import get_months
@@ -362,7 +362,7 @@ class DataExtractor(object):
         elif self.input_data.get_area_type() == AreaType.ADMIN_REGION:
             if self.input_data.get_area() != 'all':
                 if (self.input_data.get_value(InputType.COLLECTION) in
-                        [COLLECTION_GCM, COLLECTION_RCM]):
+                        [COLLECTION_CPM, COLLECTION_GCM, COLLECTION_RCM]):
                     area_constraint = iris.Constraint(
                         Region=self.input_data.get_area_label())
                 else:
@@ -379,7 +379,7 @@ class DataExtractor(object):
         elif self.input_data.get_area_type() == AreaType.RIVER_BASIN:
             if self.input_data.get_area() != 'all':
                 if (self.input_data.get_value(InputType.COLLECTION) in
-                        [COLLECTION_GCM, COLLECTION_RCM]):
+                        [COLLECTION_CPM, COLLECTION_GCM, COLLECTION_RCM]):
                     area_constraint = iris.Constraint(
                         River=self.input_data.get_area_label())
                 else:
