@@ -1,3 +1,10 @@
+# Release 1.0.8
+
+This release addresses:
+
+* The title for plots now use the grid reference of the centre of a grid cell, when the selection method is grid cell
+
+
 # Release 1.0.7
 
 This release addresses:
