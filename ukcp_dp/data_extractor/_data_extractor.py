@@ -383,10 +383,13 @@ class DataExtractor(object):
                     area_constraint = iris.Constraint(
                         River=self.input_data.get_area_label())
                 else:
+                    if self.input_data.get_area_label() == "Orkney and Shetland":
+                        basin = "Orkney and Shetlands"
+                    else:
+                        basin = self.input_data.get_area_label()
                     area_constraint = iris.Constraint(
                         coord_values={
-                            'River Basin':
-                            self.input_data.get_area_label()})
+                            'River Basin': basin})
         else:
             raise Exception(
                 "Unknown area type: {}.".format(
