@@ -378,18 +378,19 @@ class DataExtractor(object):
 
         elif self.input_data.get_area_type() == AreaType.RIVER_BASIN:
             if self.input_data.get_area() != 'all':
+
+                if self.input_data.get_area_label() == "Orkney and Shetland":
+                    basin = "Orkney and Shetlands"
+                else:
+                    basin = self.input_data.get_area_label()
+
                 if (self.input_data.get_value(InputType.COLLECTION) in
                         [COLLECTION_GCM, COLLECTION_RCM]):
                     area_constraint = iris.Constraint(
-                        River=self.input_data.get_area_label())
+                        River=basin)
                 else:
-                    if self.input_data.get_area_label() == "Orkney and Shetland":
-                        basin = "Orkney and Shetlands"
-                    else:
-                        basin = self.input_data.get_area_label()
                     area_constraint = iris.Constraint(
-                        coord_values={
-                            'River Basin': basin})
+                        coord_values={'River Basin': basin})
         else:
             raise Exception(
                 "Unknown area type: {}.".format(
