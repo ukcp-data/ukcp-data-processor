@@ -685,6 +685,12 @@ def plot_choropleth_map(regions, regionaldata_input, regional_sigs=None,
     # Plot the data!
     for i, region in enumerate(regions):
         reg_name = region.attributes[reg_key]
+
+        # TODO Fix due to inconsistencies in shape file and netcdf
+        if reg_name == "Orkney and Shetland":
+            reg_name = "Orkney and Shetlands"
+        log.error(reg_name)
+
         if reg_name not in regdata_dict.keys():
             continue
         else:
