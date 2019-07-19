@@ -108,9 +108,9 @@ DATA_SELECTION_TYPES = [InputType.BASELINE,
                         InputType.YEAR_MAXIMUM
                         ]
 
-FONT_SIZE_SMALL = 6
-FONT_SIZE_MEDIUM = 9
-FONT_SIZE_LARGE = 14
+FONT_SIZE_SMALL = 12
+FONT_SIZE_MEDIUM = 18
+FONT_SIZE_LARGE = 36
 
 # colours
 

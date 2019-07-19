@@ -100,9 +100,8 @@ class BasePlotter(object):
             x = 0.80
             font_size = 12
         else:  # 2400
-            x = 0.85
-            font_size = 18
+            x = 0.80
+            font_size = 24
 
         textstr = 'Funded by BEIS and Defra'
         fig.text(x, 0.02, textstr, fontsize=font_size)
-
