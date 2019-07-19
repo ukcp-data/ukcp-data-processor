@@ -4,7 +4,6 @@ import logging
 import iris
 from ukcp_dp.constants import AreaType, InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
-from ukcp_dp.file_writers._utils import round_variable
 
 
 log = logging.getLogger(__name__)
@@ -70,8 +69,7 @@ class SubsetCsvWriter(BaseCsvWriter):
                         if write_header is True:
                             x_values.append(str(x_coords[x]))
 
-                        value = round_variable(self.input_data.get_value(
-                            InputType.VARIABLE)[0], data[y, x])
+                        value = data[y, x]
                         try:
                             self.data_dict[y_coord].append(value)
                         except KeyError:
@@ -126,8 +124,7 @@ class SubsetCsvWriter(BaseCsvWriter):
                     time_str = time_slice.coord('time').cell(
                         0).point.strftime('%Y-%m-%d')
 
-                value = round_variable(self.input_data.get_value(
-                    InputType.VARIABLE)[0], time_slice.data)
+                value = time_slice.data
                 try:
                     self.data_dict[time_str].append(value)
                 except KeyError:
