@@ -166,6 +166,7 @@ TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 
 COLLECTION_PROB = 'land-prob'
 COLLECTION_PROB_MIN_YEAR = 1961
+COLLECTION_CPM = 'land-cpm'
 COLLECTION_GCM = 'land-gcm'
 COLLECTION_RCM = 'land-rcm'
 COLLECTION_RCM_MIN_YEAR = 1980

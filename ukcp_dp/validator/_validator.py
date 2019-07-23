@@ -2,9 +2,9 @@ import logging
 
 from ukcp_dp.constants import COLLECTION_PROB, COLLECTION_PROB_MIN_YEAR, \
     COLLECTION_MARINE, COLLECTION_MARINE_MIN_YEAR, \
-    COLLECTION_MARINE_MAX_YEAR, COLLECTION_RCM, \
-    COLLECTION_RCM_MIN_YEAR, EXTENDED_PROJECTIONS, InputType, \
-    OTHER_MAX_YEAR, AreaType, TemporalAverageType
+    COLLECTION_MARINE_MAX_YEAR, COLLECTION_CPM, COLLECTION_GCM, \
+    COLLECTION_RCM, COLLECTION_RCM_MIN_YEAR, EXTENDED_PROJECTIONS, \
+    InputType, OTHER_MAX_YEAR, AreaType, TemporalAverageType
 from ukcp_dp.vocab_manager import get_ensemble_member_set
 
 
@@ -48,11 +48,15 @@ class Validator(object):
             if (self.input_data.get_area_type() in
                     [AreaType.BBOX, AreaType.POINT]):
                 if (self.input_data.get_value(InputType.COLLECTION) ==
-                        'land-gcm'):
+                        COLLECTION_GCM):
                     self.input_data.set_value(
                         InputType.SPATIAL_REPRESENTATION, '60km')
                 elif (self.input_data.get_value(InputType.COLLECTION) ==
-                        'land-rcm'):
+                        COLLECTION_CPM):
+                    self.input_data.set_value(
+                        InputType.SPATIAL_REPRESENTATION, '5km')
+                elif (self.input_data.get_value(InputType.COLLECTION) ==
+                        COLLECTION_RCM):
                     self.input_data.set_value(
                         InputType.SPATIAL_REPRESENTATION, '12km')
                 elif (self.input_data.get_value(InputType.COLLECTION) ==
@@ -126,8 +130,8 @@ class Validator(object):
         elif (self.input_data.get_value(InputType.COLLECTION) ==
                 COLLECTION_MARINE):
             min_allowed_year = COLLECTION_MARINE_MIN_YEAR
-        elif (self.input_data.get_value(InputType.COLLECTION) ==
-                COLLECTION_RCM):
+        elif (self.input_data.get_value(InputType.COLLECTION) in
+                [COLLECTION_CPM, COLLECTION_RCM]):
             min_allowed_year = COLLECTION_RCM_MIN_YEAR
         else:
             min_allowed_year = min(
@@ -216,9 +220,9 @@ class Validator(object):
                 time_period=time_period, type_label=type_label))
 
     def _validate_baseline(self):
-        # only a subset of values are allowed for RCM
-        if (self.input_data.get_value(InputType.COLLECTION) ==
-                COLLECTION_RCM):
+        # only a subset of values are allowed for CPM and RCM
+        if (self.input_data.get_value(InputType.COLLECTION) in
+                [COLLECTION_CPM, COLLECTION_RCM]):
             baseline = self.input_data.get_value(InputType.BASELINE)
             if baseline is None:
                 return

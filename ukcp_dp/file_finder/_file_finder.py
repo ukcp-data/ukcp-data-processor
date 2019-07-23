@@ -1,8 +1,8 @@
 import os
 
 from ukcp_dp.constants import DATA_DIR, DATA_SERVICE_URL, COLLECTION_PROB, \
-    COLLECTION_PROB_MIN_YEAR, COLLECTION_GCM, COLLECTION_RCM, \
-    COLLECTION_MARINE, InputType, OTHER_MAX_YEAR, AreaType, \
+    COLLECTION_PROB_MIN_YEAR, COLLECTION_CPM, COLLECTION_GCM, \
+    COLLECTION_RCM, COLLECTION_MARINE, InputType, OTHER_MAX_YEAR, AreaType, \
     TemporalAverageType
 
 import logging
@@ -42,7 +42,7 @@ def get_file_lists(input_data):
         file_list['main'] = _get_prob_file_list(input_data)
 
     elif (input_data.get_value(InputType.COLLECTION) in
-            [COLLECTION_GCM, COLLECTION_RCM]):
+            [COLLECTION_CPM, COLLECTION_GCM, COLLECTION_RCM]):
         file_list['main'] = _get_cm_file_list(input_data)
 
         if input_data.get_value(InputType.BASELINE) is not None:
@@ -400,7 +400,7 @@ def _get_cm_file_path(input_data, spatial_representation, variable, scenario,
 
 
 def _get_cm_file_name(input_data, spatial_representation, variable,
-                               scenario, ensemble, baseline):
+                      scenario, ensemble, baseline):
     if baseline is None:
         if (input_data.get_value(InputType.TIME_SLICE_TYPE) is None or
                 input_data.get_value(InputType.TIME_SLICE_TYPE) == '1y'):

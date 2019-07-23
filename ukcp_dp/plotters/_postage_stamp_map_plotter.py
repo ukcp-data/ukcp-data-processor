@@ -3,7 +3,8 @@ import logging
 from _map_plotter import MapPlotter
 import iris
 import matplotlib.gridspec as gridspec
-from ukcp_dp.constants import AreaType, InputType, COLLECTION_RCM
+from ukcp_dp.constants import AreaType, InputType, COLLECTION_CPM, \
+    COLLECTION_RCM
 from ukcp_dp.plotters.utils._map_utils import plot_standard_map, \
     plot_standard_choropleth_map
 
@@ -122,8 +123,8 @@ class PostageStampMapPlotter(MapPlotter):
 
         if self.input_data.get_area_type() == AreaType.BBOX:
 
-            if (self.input_data.get_value(InputType.COLLECTION) ==
-                    COLLECTION_RCM):
+            if (self.input_data.get_value(InputType.COLLECTION) in
+                    [COLLECTION_CPM, COLLECTION_RCM]):
                 # RCM is on a rotated grid
                 ensemble_mean_cube = cube.collapsed(
                     ['projection_x_coordinate', 'projection_y_coordinate',
@@ -200,6 +201,5 @@ class PostageStampMapPlotter(MapPlotter):
         elif ensemble_name.endswith('-r1i1p1'):
             ensemble_name = ensemble_name.split('-r1i1p1')[0]
         ax.set_title(ensemble_name, fontdict={'fontsize': 'medium'})
-
 
         return result
