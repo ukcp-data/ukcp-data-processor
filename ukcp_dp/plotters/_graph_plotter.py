@@ -53,7 +53,7 @@ class GraphPlotter(BasePlotter):
 
         # Add the title
         new_title = wrap_string(self.title, width)
-        fig.suptitle(new_title)
+        fig.suptitle(new_title, fontsize=self.input_data.get_font_size())
 
         if self.show_legend is True:
             # Add the legend

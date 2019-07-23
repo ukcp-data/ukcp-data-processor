@@ -70,7 +70,7 @@ class MapPlotter(BasePlotter):
             width = 100 - (self.input_data.get_font_size() * 1)
 
         new_title = wrap_string(self.title, width)
-        fig.suptitle(new_title)
+        fig.suptitle(new_title, fontsize=self.input_data.get_font_size())
 
         # Add the colourbar
         bar = make_standard_bar(plot_settings, fig,
