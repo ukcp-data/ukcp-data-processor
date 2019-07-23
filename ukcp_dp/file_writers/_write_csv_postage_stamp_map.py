@@ -56,7 +56,7 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
                     if write_header is True:
                         self.header.append(str(x_coords[x]))
 
-                    value = data[y, x]
+                    value = str(data[y, x])
                     try:
                         self.data_dict[y_coord].append(value)
                     except KeyError:
@@ -96,7 +96,7 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
                 region = str(region_slice.coords(var_name='geo_region')[
                     0].points[0])
 
-                value = region_slice.data
+                value = str(region_slice.data)
                 try:
                     self.data_dict[region].append(value)
                 except KeyError:

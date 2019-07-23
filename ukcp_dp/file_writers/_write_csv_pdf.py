@@ -60,8 +60,9 @@ class PdfCsvWriter(BaseCsvWriter):
         """
         Slice the cube over 'percentile' and update data_dict
         """
-        for i, cdf_point in enumerate(cdf_data):
-            pdf_point = pdf_data[i]
+        for i, cdf_d in enumerate(cdf_data):
+            pdf_point = str(pdf_data[i])
+            cdf_point = str(cdf_d)
             try:
                 self.data_dict[cdf_point].append(pdf_point)
             except KeyError:

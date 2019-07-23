@@ -46,7 +46,7 @@ class SampleCsvWriter(BaseCsvWriter):
 
         for sample_slice in cube.slices_over('sample'):
             sample_id = int(sample_slice.coord('sample').points[0])
-            value = sample_slice.data
+            value = str(sample_slice.data)
 
             try:
                 self.data_dict[sample_id].append(value)
@@ -74,7 +74,7 @@ class SampleCsvWriter(BaseCsvWriter):
         data = cube.data[:]
         coords = cube.coord('time')[:]
         for t in range(0, data.shape[0]):
-            value = data[t]
+            value = str(data[t])
             with iris.FUTURE.context(cell_datetime_objects=True):
                 time_str = coords[t].cell(
                     0).point.strftime('%Y-%m-%d')

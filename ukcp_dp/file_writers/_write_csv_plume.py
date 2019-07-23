@@ -107,7 +107,7 @@ class PlumeCsvWriter(BaseCsvWriter):
         data = cube.data[:]
         coords = cube.coord('return_period')[:]
         for p in range(0, data.shape[0]):
-            value = data[p]
+            value = str(data[p])
             time_str = int(round(coords[p].cell(0).point))
             try:
                 self.data_dict[time_str].append(value)
@@ -122,7 +122,7 @@ class PlumeCsvWriter(BaseCsvWriter):
         data = cube.data[:]
         coords = cube.coord('time')[:]
         for t in range(0, data.shape[0]):
-            value = data[t]
+            value = str(data[t])
             with iris.FUTURE.context(cell_datetime_objects=True):
                 time_str = coords[t].cell(
                     0).point.strftime('%Y-%m-%d')

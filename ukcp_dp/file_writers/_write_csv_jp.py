@@ -39,11 +39,13 @@ class JpCsvWriter(BaseCsvWriter):
         # add the x values to the header
         self.header.append('--')
         for x in xbins:
-            self.header.append(x)
+            self.header.append(str(x))
         key_list = []
         # add a line of data for each y value
         for i, y in enumerate(sorted(ybins, reverse=True)):
+            y = str(y)
             for value in h[len(h) - (1 + i)]:
+                value = str(value)
                 try:
                     self.data_dict[y].append(value)
                 except KeyError:

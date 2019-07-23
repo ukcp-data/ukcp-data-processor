@@ -69,7 +69,7 @@ class SubsetCsvWriter(BaseCsvWriter):
                         if write_header is True:
                             x_values.append(str(x_coords[x]))
 
-                        value = data[y, x]
+                        value = str(data[y, x])
                         try:
                             self.data_dict[y_coord].append(value)
                         except KeyError:
@@ -124,7 +124,7 @@ class SubsetCsvWriter(BaseCsvWriter):
                     time_str = time_slice.coord('time').cell(
                         0).point.strftime('%Y-%m-%d')
 
-                value = time_slice.data
+                value = str(time_slice.data)
                 try:
                     self.data_dict[time_str].append(value)
                 except KeyError:
