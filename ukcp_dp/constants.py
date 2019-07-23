@@ -166,6 +166,7 @@ TEMP_ANOMS = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
 
 COLLECTION_PROB = 'land-prob'
 COLLECTION_PROB_MIN_YEAR = 1961
+COLLECTION_CPM = 'land-cpm'
 COLLECTION_GCM = 'land-gcm'
 COLLECTION_RCM = 'land-rcm'
 COLLECTION_RCM_MIN_YEAR = 1980
@@ -173,14 +174,6 @@ COLLECTION_MARINE = 'marine-sim'
 COLLECTION_MARINE_MIN_YEAR = 2007
 COLLECTION_MARINE_MAX_YEAR = 2300
 OTHER_MAX_YEAR = 2100
-
-# define the precision to use for each of the variables in the CSV files
-VARIABLES_0DP = ['cltAnom', 'hursAnom', 'hussAnom', 'prAnom']
-VARIABLES_1DP = ['tasAnom', 'tasmaxAnom', 'tasminAnom']
-VARIABLES_2DP = ['pslAnom', 'rlsAnom',
-                 'rsdsAnom', 'rssAnom', 'sfcWindAnom', 'uasAnom', 'vasAnom']
-VARIABLES_3DP = ['seaLevelAnom', 'stillWaterReturnLevel']
-VARIABLES_4DP = []
 
 # Marine data stuff
 RETURN_PERIODS = 'return-periods'

@@ -42,6 +42,7 @@ class Vocab(object):
         # admin_region is just region in UKCP18_resolution
         '12km': '12km grid',
         '2km': '2.2km grid',
+        '5km': '5km grid',
         '25km': '25km grid',
         '60km': '60km grid',
         'admin_region': 'Administrative Region',
@@ -388,8 +389,8 @@ ENSEMBLE_MEMBER_SET = {
                   '11', '12', '13', '14', '15'],
     'land-rcm': ['01', '04', '05', '06', '07', '08', '09', '10', '11', '12',
                  '13', '15'],
-    'cpm': ['01', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13',
-            '15']
+    'land-cpm': ['01', '04', '05', '06', '07', '08', '09', '10', '11', '12',
+                 '13', '15']
 }
 
 

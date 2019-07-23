@@ -142,9 +142,9 @@ class InputData(object):
                 # a user defined value
                 self.validated_inputs[value_type] = [value, None]
             else:
-
-                raise Exception("Unknown {value_type}: {value}.".format(
-                    value_type=value_type, value=value))
+                possible_values = self.vocab.get_collection_terms(value_type)
+                raise Exception("Unknown {value_type}: {value}. Should be one of {possible_values}".format(
+                    value_type=value_type, value=value, possible_values=possible_values))
 
         self.validated_inputs[value_type] = [value, label]
 

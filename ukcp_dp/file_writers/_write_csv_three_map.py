@@ -3,7 +3,6 @@ import logging
 import iris
 from ukcp_dp.constants import AreaType, InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
-from ukcp_dp.file_writers._utils import round_variable
 
 
 log = logging.getLogger(__name__)
@@ -58,8 +57,7 @@ class ThreeMapCsvWriter(BaseCsvWriter):
                     if write_header is True:
                         self.header.append(str(x_coords[x]))
 
-                    value = round_variable(self.input_data.get_value(
-                        InputType.VARIABLE)[0], data[y, x])
+                    value = data[y, x]
                     try:
                         self.data_dict[y_coord].append(value)
                     except KeyError:
@@ -100,8 +98,7 @@ class ThreeMapCsvWriter(BaseCsvWriter):
                 region = str(region_slice.coords(var_name='geo_region')[
                     0].points[0])
 
-                value = round_variable(self.input_data.get_value(
-                    InputType.VARIABLE)[0], region_slice.data)
+                value = region_slice.data
                 try:
                     self.data_dict[region].append(value)
                 except KeyError:

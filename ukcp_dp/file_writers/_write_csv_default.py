@@ -3,7 +3,6 @@ import os
 from time import gmtime, strftime
 
 import iris
-from ukcp_dp.file_writers._utils import convert_to_2dp
 
 
 log = logging.getLogger(__name__)
@@ -62,7 +61,7 @@ def _write_dim_csv(cube, dim_names, line_out, index, output_data_file):
             # write data
             # we have come all the way down the dimensional hierarchy so there
             # should only be one data value
-            line_out[index + 1] = convert_to_2dp(_slice.data)
+            line_out[index + 1] = _slice.data
             output_data_file.write(','.join(line_out))
             output_data_file.write('\n')
 
@@ -72,4 +71,4 @@ def _get_value(_slice, dim_names):
         with iris.FUTURE.context(cell_datetime_objects=True):
             return _slice.coord(dim_names[0]).cell(0).point.strftime('%Y-%m-%dT%H-%M-%S')
     else:
-        return convert_to_2dp(_slice.coord(dim_names[0]).points[0])
+        return _slice.coord(dim_names[0]).points[0]

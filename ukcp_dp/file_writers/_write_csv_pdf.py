@@ -3,7 +3,6 @@ import logging
 
 from ukcp_dp.constants import DataType, InputType, PDF_LABEL
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
-from ukcp_dp.file_writers._utils import convert_to_4dp, round_variable
 
 
 log = logging.getLogger(__name__)
@@ -61,10 +60,8 @@ class PdfCsvWriter(BaseCsvWriter):
         """
         Slice the cube over 'percentile' and update data_dict
         """
-        for i, cdf_d in enumerate(cdf_data):
-            pdf_point = convert_to_4dp(pdf_data[i])
-            cdf_point = round_variable(self.input_data.get_value(
-                InputType.VARIABLE)[0], cdf_d)
+        for i, cdf_point in enumerate(cdf_data):
+            pdf_point = pdf_data[i]
             try:
                 self.data_dict[cdf_point].append(pdf_point)
             except KeyError:
