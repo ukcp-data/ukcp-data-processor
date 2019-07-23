@@ -48,7 +48,7 @@ class JpPlotter(GraphPlotter):
         ybins = yedges[0] - yw_2 + [y*yw for y in range(0, len(yedges)+1)]
 
         new_h = np.zeros([len(xbins), len(ybins)], h.dtype)
-        new_h[1:-1,1:-1] = h
+        new_h[1:-1, 1:-1] = h
 
         x_min, x_max = _get_limits(new_h, xbins)
         h = h.T
@@ -73,23 +73,26 @@ class JpPlotter(GraphPlotter):
         legend_box = [plt.Rectangle((0, 0), 1, 1, fc=pc.get_facecolor()[0])
                       for pc in contour_fill.collections]
 
+        legend_font_size = self.input_data.get_font_size() * 0.7
         plt.legend(legend_box, ["Central 90% of projections",
                                 "Central 50% of projections",
                                 "Central 10% of projections"],
-                   loc=self.input_data.get_value(InputType.LEGEND_POSITION))
+                   loc=self.input_data.get_value(InputType.LEGEND_POSITION),
+                   prop={'size': legend_font_size})
 
         # if temp anom and pr anom, then add annotations
         if ((x_id == 'tasAnom' or y_id == 'tasAnom') and
                 (x_id == 'prAnom' or y_id == 'prAnom')):
-            font_size = self.input_data.get_font_size() + 10
 
             at = AnchoredText("hotter and wetter",
-                              prop=dict(color='#612020', size=font_size),
+                              prop=dict(color='#612020',
+                                        size=self.input_data.get_font_size()),
                               frameon=False, loc=1)
             ax.add_artist(at)
 
             at = AnchoredText("colder and drier",
-                              prop=dict(color='#2F7676', size=font_size),
+                              prop=dict(color='#2F7676',
+                                        size=self.input_data.get_font_size()),
                               frameon=False, loc=3)
             ax.add_artist(at)
 

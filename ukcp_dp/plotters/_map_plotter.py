@@ -8,7 +8,7 @@ import shapefile as shp
 from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, \
     OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER, \
     OVERLAY_COASTLINE_SMALL, OVERLAY_COUNTRY_SMALL, OVERLAY_RIVER_SMALL, \
-    OVERLAY_ADMIN_SMALL, AreaType
+    OVERLAY_ADMIN_SMALL, AreaType, InputType
 from ukcp_dp.plotters.utils._plotting_utils import end_figure, \
     make_standard_bar, start_standard_figure, wrap_string
 from ukcp_dp.plotters.utils._region_utils import reg_from_cube
@@ -61,13 +61,24 @@ class MapPlotter(BasePlotter):
         result = self._generate_subplots(cube, plot_settings, fig)
 
         # Add the title
-        new_title = wrap_string(self.title, 110)
-        fig.suptitle(new_title, fontsize='larger')
+        width = 105
+        if self.input_data.get_value(InputType.IMAGE_SIZE) == 900:
+            width = 105 - (self.input_data.get_font_size() * 3)
+        if self.input_data.get_value(InputType.IMAGE_SIZE) == 1200:
+            width = 100 - (self.input_data.get_font_size() * 2)
+        elif self.input_data.get_value(InputType.IMAGE_SIZE) == 2400:
+            width = 100 - (self.input_data.get_font_size() * 1)
+
+        new_title = wrap_string(self.title, width)
+        fig.suptitle(new_title)
 
         # Add the colourbar
-        make_standard_bar(plot_settings, fig,
-                          bar_pos=plot_settings.bar_position,
-                          colmappable=result[1])
+        bar = make_standard_bar(plot_settings, fig,
+                                bar_pos=plot_settings.bar_position,
+                                colmappable=result[1])
+        # Set the colorbar font size
+        labelsize = self.input_data.get_font_size() * 0.6
+        bar.ax.tick_params(labelsize=labelsize)
 
         # Set the margins, and save/display & close the plot:
 #         plotgeneral.set_standard_margins(settings=None, fig=fig)

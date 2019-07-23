@@ -34,17 +34,32 @@ class GraphPlotter(BasePlotter):
         self._add_logo(fig)
 
         # Set the area below the title and allow room for the labels
-        fig.add_axes(Bbox([[0.07, 0.08], [0.97, 0.88]]))
-
+        # [[left, bottom], [right, top]]
+        fig.add_axes(Bbox([[0.11, 0.1], [0.95, 0.82]]))
         self._generate_graph()
 
+        # Set the title width and tick label padding
+        width = 105
+        ax = plt.gca()
+        if self.input_data.get_value(InputType.IMAGE_SIZE) == 900:
+            width = 105 - (self.input_data.get_font_size() * 3)
+            ax.tick_params(axis='both', which='major', pad=5)
+        if self.input_data.get_value(InputType.IMAGE_SIZE) == 1200:
+            width = 100 - (self.input_data.get_font_size() * 2)
+            ax.tick_params(axis='both', which='major', pad=10)
+        elif self.input_data.get_value(InputType.IMAGE_SIZE) == 2400:
+            width = 100 - (self.input_data.get_font_size() * 1)
+            ax.tick_params(axis='both', which='major', pad=20)
+
         # Add the title
-        new_title = wrap_string(self.title, 110)
-        fig.suptitle(new_title, fontsize='larger')
+        new_title = wrap_string(self.title, width)
+        fig.suptitle(new_title)
 
         if self.show_legend is True:
             # Add the legend
-            plt.legend(loc=self.input_data.get_value(InputType.LEGEND_POSITION))
+            legend_font_size = self.input_data.get_font_size() * 0.7
+            plt.legend(loc=self.input_data.get_value(InputType.LEGEND_POSITION),
+                       prop={'size': legend_font_size})
 
         # Put a grid on the plot.
         plt.grid(True)
