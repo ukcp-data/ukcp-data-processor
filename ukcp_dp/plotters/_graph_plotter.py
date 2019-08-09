@@ -27,6 +27,14 @@ class GraphPlotter(BasePlotter):
         # By default we want to show the legend
         self.show_legend = True
 
+        # Set plot line width
+        if self.input_data.get_value(InputType.IMAGE_SIZE) == 900:
+            self.line_width = 1
+        if self.input_data.get_value(InputType.IMAGE_SIZE) == 1200:
+            self.line_width = 2
+        elif self.input_data.get_value(InputType.IMAGE_SIZE) == 2400:
+            self.line_width = 3
+
         # First create the figure
         fig, _, _ = start_standard_figure(plot_settings)
 

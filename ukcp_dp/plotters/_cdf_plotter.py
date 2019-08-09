@@ -44,7 +44,8 @@ class CdfPlotter(GraphPlotter):
                 scenario_cube.data, scenario_cube.coord('percentile').points,
                 label=label,
                 linestyle=colours[scenario_cube.attributes['scenario']][1],
-                color=colours[scenario_cube.attributes['scenario']][0])
+                color=colours[scenario_cube.attributes['scenario']][0],
+                linewidth=self.line_width)
 
         plt.xlabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
         plt.ylabel(CDF_LABEL)

@@ -124,7 +124,8 @@ class PlumePlotter(GraphPlotter):
                     self.input_data.get_value(InputType.METHOD).startswith(
                     RETURN_PERIODS)):
                 ax.plot(t_points, percentile_cube.data,
-                        label='50th Percentile', color=line_colour)
+                        label='50th Percentile', color=line_colour,
+                        linewidth=self.line_width)
 
             else:
 
@@ -133,7 +134,8 @@ class PlumePlotter(GraphPlotter):
                         cube.attributes['scenario']][0]
 
                 ax.plot(t_points, percentile_cube.data,
-                        color=line_colour)
+                        color=line_colour,
+                        linewidth=self.line_width)
 
         if (self.input_data.get_value(InputType.COLLECTION) ==
                 COLLECTION_MARINE and
@@ -238,6 +240,17 @@ class PlumePlotter(GraphPlotter):
 
         t_points = get_time_series(cube, 'ensemble_member')
 
+        # Set plot line width
+        if self.input_data.get_value(InputType.IMAGE_SIZE) == 900:
+            highlighted_line_width = 0.7
+            lowlighted_line_width = 0.4
+        if self.input_data.get_value(InputType.IMAGE_SIZE) == 1200:
+            highlighted_line_width = 1
+            lowlighted_line_width = 0.5
+        elif self.input_data.get_value(InputType.IMAGE_SIZE) == 2400:
+            highlighted_line_width = 2
+            lowlighted_line_width = 1
+
         highlighted_counter = 0
         for ensemble_slice in cube.slices_over('ensemble_member'):
             ensemble = ensemble_slice.coord('ensemble_member').points[0]
@@ -248,12 +261,14 @@ class PlumePlotter(GraphPlotter):
             if ensemble in highlighted_ensemble_members:
                 ax.plot(t_points, ensemble_slice.data, label=ensemble_name,
                         linestyle=linestyle[highlighted_counter],
-                        color=colours[highlighted_counter], zorder=2)
+                        color=colours[highlighted_counter], zorder=2,
+                        linewidth=highlighted_line_width)
                 highlighted_counter += 1
             else:
                 ax.plot(t_points, ensemble_slice.data,
                         linestyle='dotted',
-                        color=ENSEMBLE_LOWLIGHT, zorder=1)
+                        color=ENSEMBLE_LOWLIGHT, zorder=1,
+                        linewidth=lowlighted_line_width)
 
         if highlighted_counter == 0:
             self.show_legend = False
