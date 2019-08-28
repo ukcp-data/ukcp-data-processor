@@ -1,3 +1,11 @@
+# Release 1.1.0
+
+This release addresses:
+
+* Add support for land-cpm data
+* Adjust font sizes and line thicknesses on the plots and maps
+
+
 # Release 1.0.8
 
 This release addresses:
