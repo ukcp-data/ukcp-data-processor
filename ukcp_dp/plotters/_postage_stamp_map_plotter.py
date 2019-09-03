@@ -203,6 +203,8 @@ class PostageStampMapPlotter(MapPlotter):
             ensemble_name = ensemble_name.split('HadGEM3-GC3.05-r001i1p')[1]
         elif ensemble_name.startswith('HadREM3-GA705-r001i1p'):
             ensemble_name = ensemble_name.split('HadREM3-GA705-r001i1p')[1]
+        elif ensemble_name.startswith('HadREM3-RA11M-r001i1p'):
+            ensemble_name = ensemble_name.split('HadREM3-RA11M-r001i1p')[1]
         elif ensemble_name.endswith('-r1i1p1'):
             ensemble_name = ensemble_name.split('-r1i1p1')[0]
         ax.set_title(ensemble_name, fontdict={'fontsize': title_font_size})
