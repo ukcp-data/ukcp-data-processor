@@ -33,7 +33,7 @@ class PostageStampMapPlotter(MapPlotter):
         gs_top = 0.82
         gs_left = 0.02
         gs_right = 0.98
-        gs_bottom = 0.10
+        gs_bottom = 0.12
 
         ensemble_count = len(cube.coord('ensemble_member').points)
         title_font_size = self.input_data.get_font_size()
@@ -201,6 +201,8 @@ class PostageStampMapPlotter(MapPlotter):
         # add a title
         if ensemble_name.startswith('HadGEM3-GC3.05-r001i1p'):
             ensemble_name = ensemble_name.split('HadGEM3-GC3.05-r001i1p')[1]
+        elif ensemble_name.startswith('HadREM3-GA705-r001i1p'):
+            ensemble_name = ensemble_name.split('HadREM3-GA705-r001i1p')[1]
         elif ensemble_name.endswith('-r1i1p1'):
             ensemble_name = ensemble_name.split('-r1i1p1')[0]
         ax.set_title(ensemble_name, fontdict={'fontsize': title_font_size})
