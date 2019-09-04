@@ -229,18 +229,23 @@ class DataExtractor(object):
 
         try:
             cube = cubes.concatenate_cube()
-        except iris.exceptions.ConcatenateError:
-            log.error('Failed to concatenate cubes:\n%s', cubes)
+        except iris.exceptions.ConcatenateError as ex:
+            log.error('Failed to concatenate cubes:\n%s\n%s', ex, cubes)
             error_cubes = CubeList()
             for error_cube in cubes:
                 error_cubes.append(error_cube)
+                try:
+                    log.info('Appending %s',
+                             error_cube.coord('ensemble_member_id').points[0])
+                except iris.exceptions.CoordinateNotFoundError:
+                    pass
                 try:
                     error_cubes.concatenate_cube()
                 except iris.exceptions.ConcatenateError as ex:
                     message = ''
                     try:
                         message = ' {}'.format(
-                            cube.coord('ensemble_member_id').points[0])
+                            error_cube.coord('ensemble_member_id').points[0])
                     except iris.exceptions.CoordinateNotFoundError:
                         pass
                     log.error('Error when concatenating cube%s:\n%s\n%s',
