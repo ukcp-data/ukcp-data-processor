@@ -57,16 +57,18 @@ def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
 
         # we need to remove these so that we can subtract the cubes
         if temporal_average_type == TemporalAverageType.MONTHLY:
-            try:
-                cube_absoute_period.remove_coord('year')
-            except iris.exceptions.CoordinateNotFoundError:
-                pass
+            for coord in ['year', 'yyyymm']:
+                try:
+                    cube_absoute_period.remove_coord(coord)
+                except iris.exceptions.CoordinateNotFoundError:
+                    pass
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
-            try:
-                cube_absoute_period.remove_coord('month_number')
-            except iris.exceptions.CoordinateNotFoundError:
-                pass
+            for coord in ['month_number', 'season_year']:
+                try:
+                    cube_absoute_period.remove_coord(coord)
+                except iris.exceptions.CoordinateNotFoundError:
+                    pass
 
         # now generate the anomaly
         cube_anomaly_period = _make_anomaly(
@@ -125,6 +127,11 @@ def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
         try:
             iris.coord_categorisation.add_year(
                 cube_anomaly, 'time', name='year')
+        except CoordinateNotFoundError:
+            pass
+        try:
+            iris.coord_categorisation.add_season_year(
+                cube_anomaly, 'time', name='season_year')
         except CoordinateNotFoundError:
             pass
         try:
