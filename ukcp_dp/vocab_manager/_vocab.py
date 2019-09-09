@@ -53,7 +53,8 @@ class Vocab(object):
         # frequency in UKCP18_CVs
         'ann': 'Annual',
         'seas': 'Seasonal',
-        'mon': 'Monthly'
+        'mon': 'Monthly',
+        'day': 'Daily'
     },
         'data_type': {
         'cdf': 'cdf',
@@ -83,6 +84,9 @@ class Vocab(object):
         'oct': 'October',
         'nov': 'November',
         'dec': 'December'
+    },
+        'day': {
+        'day': 'Daily'
     },
         'area_type': {
         'bbox': 'Bounding box',
@@ -241,6 +245,7 @@ class Vocab(object):
         time_period.update(self.vocab['ann'])
         time_period.update(self.vocab['seas'])
         time_period.update(self.vocab['mon'])
+        time_period.update(self.vocab['day'])
         self.vocab['time_period'] = time_period
         self.vocab['sampling_temporal_average_1'] = self.vocab['time_period']
         self.vocab['sampling_temporal_average_2'] = self.vocab['time_period']

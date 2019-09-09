@@ -411,6 +411,7 @@ class DataExtractor(object):
             InputType.TEMPORAL_AVERAGE_TYPE)
 
         if (self.input_data.get_value(InputType.TIME_PERIOD) == 'all' or
+                temporal_average_type == TemporalAverageType.DAILY or
                 temporal_average_type == TemporalAverageType.ANNUAL or
                 temporal_average_type is None):
             # we want everything, so no need to add a restriction
@@ -467,6 +468,7 @@ class DataExtractor(object):
             # we have some form of time slice
             time_slice_constraint = iris.Constraint(
                 time=lambda t: year_min <= t.point.year < year_max)
+            log.debug('Constraint(%s <= t.point.year < %s)' % (year_min, year_max))
 
         return time_slice_constraint
 

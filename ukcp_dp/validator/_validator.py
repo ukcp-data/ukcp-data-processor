@@ -208,7 +208,8 @@ class Validator(object):
             temporal_average_type)
 
         # special case for all
-        if ((temporal_average_type == TemporalAverageType.MONTHLY or
+        if ((temporal_average_type == TemporalAverageType.DAILY or
+                temporal_average_type == TemporalAverageType.MONTHLY or
                 temporal_average_type == TemporalAverageType.SEASONAL)
                 and time_period == 'all'):
             return
