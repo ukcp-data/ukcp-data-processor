@@ -23,7 +23,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         if self.input_data.get_area_type() == AreaType.BBOX:
             return self._write_x_y_csv()
         else:
-            return self._write_region_csv()
+            return self._write_region_or_point_csv()
 
     def _write_x_y_csv(self):
         cube = self.cube_list[0]
@@ -100,8 +100,11 @@ class SubsetCsvWriter(BaseCsvWriter):
         # reset the data dict
         self.data_dict = collections.OrderedDict()
 
-    def _write_region_csv(self):
-
+    def _write_region_or_point_csv(self):
+        """
+        Slice the cube over 'ensemble_member' and 'time' and update data_dict/
+        The data should be for a single region or grid square.
+        """
         cube = self.cube_list[0]
 
         # update the header
@@ -118,20 +121,29 @@ class SubsetCsvWriter(BaseCsvWriter):
             self.header.append('{var}({ensemble})'.format(
                 ensemble=ensemble_name, var=var))
 
-            # loop over times
-            for time_slice in ensemble_slice.slices_over('time'):
-                with iris.FUTURE.context(cell_datetime_objects=True):
-                    time_str = time_slice.coord('time').cell(
-                        0).point.strftime('%Y-%m-%d')
-
-                value = str(time_slice.data)
-                try:
-                    self.data_dict[time_str].append(value)
-                except KeyError:
-                    key_list = [time_str] + key_list
-                    self.data_dict[time_str] = [value]
+            self._write_time_cube(ensemble_slice, key_list)
 
         output_data_file_path = self._get_full_file_name()
         self._write_data_dict(output_data_file_path, key_list)
 
         return [output_data_file_path]
+
+
+
+    def _write_time_cube(self, cube, key_list):
+        """
+        Slice the cube over 'time' and update data_dict/
+        """
+        data = cube.data[:]
+        coords = cube.coord('time')[:]
+        for t in range(0, data.shape[0]):
+            value = str(data[t])
+            with iris.FUTURE.context(cell_datetime_objects=True):
+                time_str = coords[t].cell(
+                    0).point.strftime('%Y-%m-%d')
+            try:
+                self.data_dict[time_str].append(value)
+            except KeyError:
+                key_list.append(time_str)
+                self.data_dict[time_str] = [value]
+
