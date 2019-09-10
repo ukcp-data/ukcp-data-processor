@@ -128,8 +128,6 @@ class SubsetCsvWriter(BaseCsvWriter):
 
         return [output_data_file_path]
 
-
-
     def _write_time_cube(self, cube, key_list):
         """
         Slice the cube over 'time' and update data_dict
@@ -146,4 +144,3 @@ class SubsetCsvWriter(BaseCsvWriter):
             except KeyError:
                 key_list.append(time_str)
                 self.data_dict[time_str] = [value]
-
