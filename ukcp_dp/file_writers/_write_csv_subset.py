@@ -132,7 +132,7 @@ class SubsetCsvWriter(BaseCsvWriter):
 
     def _write_time_cube(self, cube, key_list):
         """
-        Slice the cube over 'time' and update data_dict/
+        Slice the cube over 'time' and update data_dict
         """
         data = cube.data[:]
         coords = cube.coord('time')[:]
