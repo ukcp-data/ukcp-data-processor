@@ -5,7 +5,7 @@ import cf_units
 import iris
 import iris.coord_categorisation
 from iris.exceptions import CoordinateNotFoundError
-from ukcp_dp.constants import TemporalAverageType
+from ukcp_dp.constants import COLLECTION_CPM, TemporalAverageType
 from ukcp_dp.vocab_manager import get_months, get_seasons
 
 
@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 
 def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
-                temporal_average_type, time_period):
+                temporal_average_type, time_period, collection):
     """
     Generate a cube containing the anomaly values.
 
@@ -26,6 +26,7 @@ def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
     @param temporal_average_type (TemporalAverageType): the temporal average
         type
     @param time_period(str): the name of a month or season or 'all'
+    @param collection(str): the collection
     """
     if temporal_average_type == TemporalAverageType.MONTHLY:
         periods = _get_selected_month_numbers(time_period)
@@ -57,20 +58,28 @@ def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
 
         # we need to remove these so that we can subtract the cubes
         if temporal_average_type == TemporalAverageType.MONTHLY:
-            for coord in ['year', 'yyyymm']:
-                try:
-                    cube_absoute_period.remove_coord(coord)
-                except iris.exceptions.CoordinateNotFoundError:
-                    pass
             try:
-                cube_climatology_period.remove_coord('year')
+                cube_absoute_period.remove_coord('year')
             except iris.exceptions.CoordinateNotFoundError:
                 pass
+            if collection == COLLECTION_CPM:
+                try:
+                    cube_absoute_period.remove_coord('yyyymm')
+                except iris.exceptions.CoordinateNotFoundError:
+                    pass
+                try:
+                    cube_climatology_period.remove_coord('year')
+                except iris.exceptions.CoordinateNotFoundError:
+                    pass
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
-            for coord in ['month_number', 'season_year']:
+            try:
+                cube_absoute_period.remove_coord('month_number')
+            except iris.exceptions.CoordinateNotFoundError:
+                pass
+            if collection == COLLECTION_CPM:
                 try:
-                    cube_absoute_period.remove_coord(coord)
+                    cube_absoute_period.remove_coord('season_year')
                 except iris.exceptions.CoordinateNotFoundError:
                     pass
 
