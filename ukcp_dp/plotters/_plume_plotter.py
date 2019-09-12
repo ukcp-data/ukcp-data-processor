@@ -327,26 +327,23 @@ def set_x_limits(cube, ax):
         if tcoord.units.name.startswith('hour'):
             # Can't easily use dt.timedelta objects with netcdfdatetimes,
             # which is likely to be what these are.
-            # Place the limits at +/-1 year around the first & last time points
-            xlims = [tcoord.units.num2date(tcoord.points[0] - 24 * 360),
-                     tcoord.units.num2date(tcoord.points[-1] + 24 * 360)]
+            xlims = [tcoord.units.num2date(tcoord.points[0]),
+                     tcoord.units.num2date(tcoord.points[-1])]
         elif tcoord.units.name.startswith('day'):
             # Can't easily use dt.timedelta objects with netcdfdatetimes,
             # which is likely to be what these are.
-            # Place the limits at +/-1 year around the first & last time points
-            xlims = [tcoord.units.num2date(tcoord.points[0] - 360),
-                     tcoord.units.num2date(tcoord.points[-1] + 360)]
+            xlims = [tcoord.units.num2date(tcoord.points[0]),
+                     tcoord.units.num2date(tcoord.points[-1])]
         else:
             raise Exception("Time coord units are " + str(tcoord.units)
                             + " but I can only handle days and hours!")
     else:
         # x-axis will be in units of integer years.
-        # Place the limits at +/-1 year around the first & last time points:
         log.info("Time coord points are not date-like objects, ASSUMEING they "
                  "are in year-fractions.")
         tsteps = tcoord.points
-        xlims = [tsteps[0] - 1.0,
-                 tsteps[-1] + 1.0]
+        xlims = [tsteps[0],
+                 tsteps[-1]]
 
     # Now we've got proposed x-axis limits (as some data type),
     # we convert those x-axis limits into fractions of years.
