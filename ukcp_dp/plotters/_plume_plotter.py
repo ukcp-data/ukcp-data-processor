@@ -9,6 +9,7 @@ from labellines import labelLines
 import matplotlib.cm as cmx
 import matplotlib.colors as colors
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 import numpy as np
 from ukcp_dp.constants import COLLECTION_PROB, \
     COLLECTION_MARINE, ENSEMBLE_COLOURS, ENSEMBLE_GREYSCALES, \
@@ -374,3 +375,4 @@ def set_x_limits(cube, ax):
 
     # Finally, apply the limits:
     ax.set_xlim(xlims_touse)
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
