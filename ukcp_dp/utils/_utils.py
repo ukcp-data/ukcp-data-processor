@@ -18,6 +18,20 @@ def get_plot_settings(vocab, cmsize, fsize, var_id):
         else:
             plot_settings = stds.UKCP_TEMP.copy()
 
+    elif 'prsn' in var_id:
+        # Snowfall Flux anomaly (%)
+        if 'Anom' in var_id:
+            plot_settings = stds.UKCP_SNOW_FLUX_ANOM.copy()
+        else:
+            plot_settings = stds.UKCP_SNOW_FLUX.copy()
+
+    elif 'snw' in var_id:
+        # Surface snow amount anomaly (mm)
+        if 'Anom' in var_id:
+            plot_settings = stds.UKCP_SNOW_ANOM.copy()
+        else:
+            plot_settings = stds.UKCP_SNOW.copy()
+
     elif 'pr' in var_id:
         # Precipitation rate (mm/day)
         if 'Anom' in var_id:
@@ -25,7 +39,7 @@ def get_plot_settings(vocab, cmsize, fsize, var_id):
         else:
             plot_settings = stds.UKCP_PRECIP.copy()
 
-    elif 'sfcWind' in var_id:
+    elif 'sfcWind' in var_id or 'wsgmax10m' in var_id:
         # Wind speed at 10m (m s-1)
         if 'Anom' in var_id:
             plot_settings = stds.UKCP_WIND_ANOM.copy()

@@ -433,6 +433,56 @@ UKCP_PRECIP_ANOM.vmid = 0.0
 UKCP_PRECIP_ANOM.vstep = 10.0
 
 
+# Snowfall flux at surface
+UKCP_SNOW_FLUX = UKCPNEAT.copy()
+UKCP_SNOW_FLUX.tag = "UKCP_snow_flux"
+UKCP_SNOW_FLUX.default_barlabel = "Snowfall Flux, mm day$^{-1}$"
+UKCP_SNOW_FLUX.preferred_unit = cf_units.Unit("mm/day")
+UKCP_SNOW_FLUX.extendcolbar = "max"
+UKCP_SNOW_FLUX.cpal = "PuOr"
+UKCP_SNOW_FLUX.undercol = "#3a240b"
+UKCP_SNOW_FLUX.overcol = "#240938"
+UKCP_SNOW_FLUX.vrange = [0.0, 8.0]
+UKCP_SNOW_FLUX.vmid = None
+UKCP_SNOW_FLUX.vstep = 1.0
+
+# Snowfall flux at surface anomalies
+UKCP_SNOW_FLUX_ANOM = UKCP_SNOW_FLUX.copy()
+UKCP_SNOW_FLUX_ANOM.tag = "UKCP_snow_flux_anom"
+UKCP_SNOW_FLUX_ANOM.preferred_unit = cf_units.Unit("%")
+UKCP_SNOW_FLUX_ANOM.default_barlabel = "Snowfall Flux anomaly, %"
+UKCP_SNOW_FLUX_ANOM.extendcolbar = "both"
+UKCP_SNOW_FLUX_ANOM.cpal = "PuOr"
+UKCP_SNOW_FLUX_ANOM.vrange = [-100.0, 50.0]
+UKCP_SNOW_FLUX_ANOM.vmid = 0.0
+UKCP_SNOW_FLUX_ANOM.vstep = 10
+
+
+# Amount of snow on the ground
+UKCP_SNOW = UKCPNEAT.copy()
+UKCP_SNOW.tag = "UKCP_snow"
+UKCP_SNOW.default_barlabel = "Surface snow amount anomaly, mm"
+UKCP_SNOW.preferred_unit = cf_units.Unit("mm")
+UKCP_SNOW.extendcolbar = "max"
+UKCP_SNOW.cpal = "PuOr"
+UKCP_SNOW.undercol = "#492f0b"
+UKCP_SNOW.overcol = "#240938"
+UKCP_SNOW.vrange = [0.0, 8.0]
+UKCP_SNOW.vmid = None
+UKCP_SNOW.vstep = 1.0
+
+# Amount of snow on the ground anomalies
+UKCP_SNOW_ANOM = UKCP_SNOW.copy()
+UKCP_SNOW_ANOM.tag = "UKCP_snow_anom"
+UKCP_SNOW_ANOM.preferred_unit = cf_units.Unit("mm")
+UKCP_SNOW_ANOM.default_barlabel = "Surface snow amount, mm"
+UKCP_SNOW_ANOM.extendcolbar = "both"
+UKCP_SNOW_ANOM.cpal = "PuOr"
+UKCP_SNOW_ANOM.vrange = [-6.0, 2.0]
+UKCP_SNOW_ANOM.vmid = 0.0
+UKCP_SNOW_ANOM.vstep = 0.5
+
+
 # Wind speed.
 UKCP_WIND = UKCPNEAT.copy()
 UKCP_WIND.tag = "UKCP_wind"
