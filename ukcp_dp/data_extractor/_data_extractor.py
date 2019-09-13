@@ -522,7 +522,7 @@ class DataExtractor(object):
 
         else:
             title = ('{temporal_type} average '
-                     '{variable} for {time_period}'.format(
+                     '{variable} for {time_period} in'.format(
                          temporal_type=self.input_data.get_value_label(
                              InputType.TEMPORAL_AVERAGE_TYPE),
                          time_period=self.input_data.get_value_label(
@@ -531,13 +531,13 @@ class DataExtractor(object):
 
         if (self.input_data.get_value(InputType.YEAR_MINIMUM) ==
                 self.input_data.get_value(InputType.YEAR_MAXIMUM)):
-            title = '{t} in {year}'.format(
+            title = '{t} {year}'.format(
                 t=title, year=self.input_data.get_value(InputType.YEAR))
         else:
             start_year = self.input_data.get_value(InputType.YEAR_MINIMUM)
             end_year = self.input_data.get_value(InputType.YEAR_MAXIMUM)
-            title = '{t} from {start_year} up to {end_year}'.format(
-                t=title, start_year=start_year, end_year=end_year)
+            title = '{t} years {start_year} up to and including {end_year},'.format(
+                t=title, start_year=start_year, end_year=end_year - 1)
 
         if self.input_data.get_area_type() == AreaType.POINT:
             grid_x = int(self.cubes[0].coord('projection_x_coordinate')

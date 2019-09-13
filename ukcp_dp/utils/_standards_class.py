@@ -461,7 +461,7 @@ UKCP_SNOW_FLUX_ANOM.vstep = 10
 # Amount of snow on the ground
 UKCP_SNOW = UKCPNEAT.copy()
 UKCP_SNOW.tag = "UKCP_snow"
-UKCP_SNOW.default_barlabel = "Surface snow amount anomaly, mm"
+UKCP_SNOW.default_barlabel = "Surface snow amount, mm"
 UKCP_SNOW.preferred_unit = cf_units.Unit("mm")
 UKCP_SNOW.extendcolbar = "max"
 UKCP_SNOW.cpal = "PuOr"
@@ -475,7 +475,7 @@ UKCP_SNOW.vstep = 1.0
 UKCP_SNOW_ANOM = UKCP_SNOW.copy()
 UKCP_SNOW_ANOM.tag = "UKCP_snow_anom"
 UKCP_SNOW_ANOM.preferred_unit = cf_units.Unit("mm")
-UKCP_SNOW_ANOM.default_barlabel = "Surface snow amount, mm"
+UKCP_SNOW_ANOM.default_barlabel = "Surface snow amount anomaly, mm"
 UKCP_SNOW_ANOM.extendcolbar = "both"
 UKCP_SNOW_ANOM.cpal = "PuOr"
 UKCP_SNOW_ANOM.vrange = [-6.0, 2.0]
