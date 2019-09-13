@@ -507,7 +507,7 @@ UKCP_WIND_ANOM.undercol = "#380935"
 UKCP_WIND_ANOM.overcol = "#2f3809"
 UKCP_WIND_ANOM.vrange = [-2.0, 2.0]
 UKCP_WIND_ANOM.vmid = 0.0
-UKCP_WIND_ANOM.vstep = 1.0
+UKCP_WIND_ANOM.vstep = 0.5
 
 
 UKCP_WIND_EASTWARD = UKCP_WIND.copy()
