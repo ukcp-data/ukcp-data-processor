@@ -67,14 +67,14 @@ class PlumePlotter(GraphPlotter):
                 self.input_data.get_value(InputType.COLLECTION) ==
                 COLLECTION_MARINE):
             # plot the percentiles
-            self._plot_probability_levels(self.cube_list[0], ax, True)
+            self._plot_probability_levels(self.cube_list[0], ax, False)
 
         else:
             if self.overlay_cube is not None:
                 # plot the ensemble members
                 self._plot_ensemble(self.cube_list[0], ax)
                 # add overlay
-                self._plot_probability_levels(self.overlay_cube, ax, False)
+                self._plot_probability_levels(self.overlay_cube, ax, True)
             else:
                 # plot the ensemble members
                 self._plot_ensemble(self.cube_list[0], ax)
@@ -99,7 +99,7 @@ class PlumePlotter(GraphPlotter):
 
         plt.ylabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
 
-    def _plot_probability_levels(self, cube, ax, plot_fifty):
+    def _plot_probability_levels(self, cube, ax, is_overlay):
         # plot a shaded area between the 10th and 90th percentiles
 
         if (self.input_data.get_value(InputType.COLLECTION) ==
@@ -110,47 +110,54 @@ class PlumePlotter(GraphPlotter):
         else:
             t_points = get_time_series(cube, 'percentile')
 
-        # plot a line for the 50th
-        if plot_fifty is True:
-            percentile_cube = cube.extract(
-                iris.Constraint(percentile=50))
-            if percentile_cube is None:
-                raise Exception(
-                    'Attempted to plot the 50th percentile, but no data found')
+        if not is_overlay:
+            self._plot_fiftieth_percentile_line(cube, ax, t_points)
 
-            line_colour = PERCENTILE_LINE_COLOUR
+        if ((self.input_data.get_value(InputType.COLLECTION) ==
+                COLLECTION_MARINE and
+                self.input_data.get_value(InputType.METHOD).startswith(
+                RETURN_PERIODS)) or is_overlay):
+            self._single_fill(cube, ax, t_points, is_overlay)
+        else:
+            self._multi_fills(cube, ax, t_points)
 
-            if (self.input_data.get_value(InputType.COLLECTION) ==
-                    COLLECTION_MARINE and
-                    self.input_data.get_value(InputType.METHOD).startswith(
-                    RETURN_PERIODS)):
-                ax.plot(t_points, percentile_cube.data,
-                        label='50th Percentile', color=line_colour,
-                        linewidth=self.line_width)
+    def _plot_fiftieth_percentile_line(self, cube, ax, t_points):
+        # plot a line for the 50th percentile
+        percentile_cube = cube.extract(iris.Constraint(percentile=50))
+        if percentile_cube is None:
+            raise Exception('Attempted to plot the 50th percentile, but no data found')
 
-            else:
-
-                if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
-                    line_colour = SCENARIO_COLOURS[
-                        cube.attributes['scenario']][0]
-
-                ax.plot(t_points, percentile_cube.data,
-                        color=line_colour,
-                        linewidth=self.line_width)
+        line_colour = PERCENTILE_LINE_COLOUR
 
         if (self.input_data.get_value(InputType.COLLECTION) ==
                 COLLECTION_MARINE and
                 self.input_data.get_value(InputType.METHOD).startswith(
                 RETURN_PERIODS)):
-            self._single_fill(cube, ax, t_points)
-        else:
-            self._multi_fills(cube, ax, t_points)
+            ax.plot(t_points, percentile_cube.data,
+                    label='50th Percentile', color=line_colour,
+                    linewidth=self.line_width)
 
-    def _single_fill(self, cube, ax, t_points):
-        # fill between the 5th and 95th
-        lovals = cube.extract(iris.Constraint(percentile=5))
-        hivals = cube.extract(iris.Constraint(percentile=95))
-        label = '5th to 95th Percentile'
+        else:
+
+            if self.input_data.get_value(InputType.COLOUR_MODE) == 'c':
+                line_colour = SCENARIO_COLOURS[
+                    cube.attributes['scenario']][0]
+
+            ax.plot(t_points, percentile_cube.data,
+                    color=line_colour,
+                    linewidth=self.line_width)
+
+    def _single_fill(self, cube, ax, t_points, is_overlay):
+        if is_overlay:
+            # fill between the 10th and 90th
+            lovals = cube.extract(iris.Constraint(percentile=10))
+            hivals = cube.extract(iris.Constraint(percentile=90))
+            label = 'Probabilistic (25km) 10th to 90th Percentile'
+        else:
+            # fill between the 5th and 95th
+            lovals = cube.extract(iris.Constraint(percentile=5))
+            hivals = cube.extract(iris.Constraint(percentile=95))
+            label = '5th to 95th Percentile'
 
         if lovals is None or hivals is None:
             raise Exception(
