@@ -151,7 +151,7 @@ class DataExtractor(object):
             self.input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is
                 not None and
             self.input_data.get_value(InputType.OVERLAY_PROBABILITY_LEVELS) is
-                True):
+                True and 'overlay' in self.file_lists.keys()):
 
             for variable in self.file_lists['overlay'].keys():
                 # for each variable there is a list of files per scenario
