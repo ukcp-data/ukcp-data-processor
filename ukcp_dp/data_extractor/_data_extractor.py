@@ -177,7 +177,7 @@ class DataExtractor(object):
         @param overlay_probability_levels (boolean): if True only include the
             10th, 50th and 90th percentile data
 
-        @return an iris cube
+        @return an iris cube, maybe 'None' if overlay_probability_levels=True
         """
         if climatology is True:
             log.info('_get_cube for climatology')
@@ -195,6 +195,9 @@ class DataExtractor(object):
         try:
             cubes = iris.load(file_list)
         except IOError:
+            if overlay_probability_levels is True:
+                # not all variables have corresponding probabilistic data
+                return None
             for file_name in file_list:
                 file_name = file_name.split('*')[0]
                 if not path.exists(file_name):
