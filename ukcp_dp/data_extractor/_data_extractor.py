@@ -159,7 +159,7 @@ class DataExtractor(object):
 
                     overlay_cube = (self._get_cube(
                         file_list, overlay_probability_levels=True))
-                    if variable in TEMP_ANOMS:
+                    if overlay_cube is not None and variable in TEMP_ANOMS:
                         overlay_cube.units = cf_units.Unit("Celsius")
 
         log.debug('Overlay cube:\n%s', overlay_cube)
@@ -204,9 +204,13 @@ class DataExtractor(object):
                     log.error('File not found: %s', file_name)
             raise Exception('No data found for given selection options')
 
+        if overlay_probability_levels is True:
+            collection = COLLECTION_PROB
+        else:
+            collection = self.input_data.get_value(InputType.COLLECTION)
+
         # Remove time_bnds cubes
-        if (self.input_data.get_value(InputType.COLLECTION) ==
-                COLLECTION_PROB) or overlay_probability_levels is True:
+        if (collection == COLLECTION_PROB):
             unfiltered_cubes = cubes
             cubes = CubeList()
             for cube in unfiltered_cubes:
@@ -294,7 +298,7 @@ class DataExtractor(object):
             cube = get_probability_levels(cube, False)
 
         # generate an area constraint
-        area_constraint = self._get_spatial_selector(cube)
+        area_constraint = self._get_spatial_selector(cube, collection)
         if area_constraint is not None:
             cube = cube.extract(area_constraint)
             if self.input_data.get_area_type() == AreaType.BBOX:
@@ -320,7 +324,7 @@ class DataExtractor(object):
             'percentile_over_ensemble_member').long_name = 'percentile'
         return result
 
-    def _get_spatial_selector(self, cube):
+    def _get_spatial_selector(self, cube, collection):
         log.debug('_get_spatial_selector')
         # generate an area constraint
         area_constraint = None
@@ -370,7 +374,7 @@ class DataExtractor(object):
 
         elif self.input_data.get_area_type() == AreaType.ADMIN_REGION:
             if self.input_data.get_area() != 'all':
-                if (self.input_data.get_value(InputType.COLLECTION) in
+                if (collection in
                         [COLLECTION_CPM, COLLECTION_GCM, COLLECTION_RCM]):
                     area_constraint = iris.Constraint(
                         Region=self.input_data.get_area_label())
@@ -393,7 +397,7 @@ class DataExtractor(object):
                 else:
                     basin = self.input_data.get_area_label()
 
-                if (self.input_data.get_value(InputType.COLLECTION) in
+                if (collection in
                         [COLLECTION_CPM, COLLECTION_GCM, COLLECTION_RCM]):
                     area_constraint = iris.Constraint(
                         River=basin)

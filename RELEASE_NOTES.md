@@ -1,3 +1,10 @@
+# Release 1.1.1
+
+This release addresses:
+
+* Fix issues with plume plots when overlaying land_prob data
+
+
 # Release 1.1.0
 
 This release addresses:
