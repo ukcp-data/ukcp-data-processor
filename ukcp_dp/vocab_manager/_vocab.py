@@ -54,7 +54,9 @@ class Vocab(object):
         'ann': 'Annual',
         'seas': 'Seasonal',
         'mon': 'Monthly',
-        'day': 'Daily'
+        'day': 'Daily',
+        '3hr': '3-hourly',
+        '1hr': 'Hourly'
     },
         'data_type': {
         'cdf': 'cdf',
@@ -87,6 +89,12 @@ class Vocab(object):
     },
         'day': {
         'day': 'Daily'
+    },
+        '3hr': {
+        '3hr': '3-hourly'
+    },
+        '1hr': {
+        '1hr': 'Hourly'
     },
         'area_type': {
         'bbox': 'Bounding box',
@@ -246,6 +254,8 @@ class Vocab(object):
         time_period.update(self.vocab['seas'])
         time_period.update(self.vocab['mon'])
         time_period.update(self.vocab['day'])
+        time_period.update(self.vocab['3hr'])
+        time_period.update(self.vocab['1hr'])
         self.vocab['time_period'] = time_period
         self.vocab['sampling_temporal_average_1'] = self.vocab['time_period']
         self.vocab['sampling_temporal_average_2'] = self.vocab['time_period']
