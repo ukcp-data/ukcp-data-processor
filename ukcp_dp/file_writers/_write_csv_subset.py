@@ -26,6 +26,7 @@ class SubsetCsvWriter(BaseCsvWriter):
             return self._write_region_or_point_csv()
 
     def _write_x_y_csv(self):
+        log.debug("_write_x_y_csv")
         cube = self.cube_list[0]
 
         # add axis titles to the header
@@ -105,6 +106,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         Slice the cube over 'ensemble_member' and 'time' and update data_dict/
         The data should be for a single region or grid square.
         """
+        log.debug("_write_region_or_point_csv")
         cube = self.cube_list[0]
 
         # update the header
@@ -132,13 +134,19 @@ class SubsetCsvWriter(BaseCsvWriter):
         """
         Slice the cube over 'time' and update data_dict
         """
+        log.debug("_write_time_cube")
+        if self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
+            log.debug("subdaily")
+            date_format = "%Y-%m-%dT%H:%M"
+        else:
+            date_format = "%Y-%m-%d"
         data = cube.data[:]
         coords = cube.coord('time')[:]
         for t in range(0, data.shape[0]):
             value = str(data[t])
             with iris.FUTURE.context(cell_datetime_objects=True):
                 time_str = coords[t].cell(
-                    0).point.strftime('%Y-%m-%d')
+                    0).point.strftime(date_format)
             try:
                 self.data_dict[time_str].append(value)
             except KeyError:

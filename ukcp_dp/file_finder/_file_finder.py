@@ -13,6 +13,8 @@ log = logging.getLogger(__name__)
 START_MONTH_DAY = '1201'
 END_MONTH_DAY = '1130'
 
+MONTH_NUMBERS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+
 VERSION = 'latest'
 
 RIVER = 'river'
@@ -340,11 +342,31 @@ def _get_cm_file_list_for_range(input_data, baseline):
                     input_data, spatial_representation, variable_prefix,
                     scenario, ensemble, baseline)
 
-                file_name = _get_cm_file_name(
-                    input_data, spatial_representation, variable_prefix,
-                    scenario, ensemble, baseline)
-                ensemble_file_list.append(
-                    os.path.join(file_path, file_name))
+                if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
+                    # we need lots of files
+                    for year in (range(input_data.get_value(InputType.YEAR_MINIMUM) - 1,
+                                       input_data.get_value(InputType.YEAR_MAXIMUM))):
+                        for month in range(0, 12):
+                            if (year == input_data.get_value(InputType.YEAR_MINIMUM) - 1
+                                    and month < 11):
+                                continue
+                            if (year == input_data.get_value(InputType.YEAR_MAXIMUM) -1
+                                    and month > 10):
+                                continue
+                            date_range = '{year}{month}01-{year}{month_end}30'.format(
+                                year=year, month=MONTH_NUMBERS[month],
+                                month_end=MONTH_NUMBERS[month])
+                            file_name = _get_cm_file_name(
+                                input_data, spatial_representation, variable_prefix,
+                                scenario, ensemble, baseline, date_range)
+                            ensemble_file_list.append(
+                                os.path.join(file_path, file_name))
+                else:
+                    file_name = _get_cm_file_name(
+                        input_data, spatial_representation, variable_prefix,
+                        scenario, ensemble, baseline)
+                    ensemble_file_list.append(
+                        os.path.join(file_path, file_name))
 
             file_list_per_scenario.append(ensemble_file_list)
 
@@ -400,21 +422,27 @@ def _get_cm_file_path(input_data, spatial_representation, variable, scenario,
 
 
 def _get_cm_file_name(input_data, spatial_representation, variable,
-                      scenario, ensemble, baseline):
+                      scenario, ensemble, baseline, year=None):
     if baseline is None:
-        if (input_data.get_value(InputType.TIME_SLICE_TYPE) is None or
-                input_data.get_value(InputType.TIME_SLICE_TYPE) == '1y'):
+        if ((input_data.get_value(InputType.TIME_SLICE_TYPE) is None or
+                input_data.get_value(InputType.TIME_SLICE_TYPE) == '1y') and
+                input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) not in ["1hr", "3hr"]):
             # there will only be one file
             return '*'
 
-        temporal_average_type = '{}-{}'.format(
-            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
-            input_data.get_value(InputType.TIME_SLICE_TYPE))
+        if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
+            temporal_average_type = input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
+        else:
+            temporal_average_type = '{}-{}'.format(
+                input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+                input_data.get_value(InputType.TIME_SLICE_TYPE))
 
         if input_data.get_value(InputType.COLLECTION) == COLLECTION_GCM:
             date_range = '200912-209911'
         elif input_data.get_value(InputType.COLLECTION) == COLLECTION_CPM:
-            if input_data.get_value(InputType.YEAR_MINIMUM) == 1981:
+            if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
+                date_range = '{}'.format(year)
+            elif input_data.get_value(InputType.YEAR_MINIMUM) == 1981:
                 date_range = '198012-200011'
             elif input_data.get_value(InputType.YEAR_MINIMUM) == 2021:
                 date_range = '202012-204011'

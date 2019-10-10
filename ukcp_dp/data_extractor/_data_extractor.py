@@ -419,9 +419,11 @@ class DataExtractor(object):
             InputType.TEMPORAL_AVERAGE_TYPE)
 
         if (self.input_data.get_value(InputType.TIME_PERIOD) == 'all' or
-                temporal_average_type == TemporalAverageType.DAILY or
-                temporal_average_type == TemporalAverageType.ANNUAL or
-                temporal_average_type is None):
+                temporal_average_type in [TemporalAverageType.HOURLY,
+                                          TemporalAverageType.THREE_HOURLY,
+                                          TemporalAverageType.DAILY,
+                                          TemporalAverageType.ANNUAL,
+                                          None]):
             # we want everything, so no need to add a restriction
             pass
 
