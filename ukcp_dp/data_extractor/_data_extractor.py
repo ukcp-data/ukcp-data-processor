@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import glob
 import logging
 from os import path
 
@@ -192,8 +193,13 @@ class DataExtractor(object):
                 log.debug(' - FILE: %s', fpath)
 
         # Load the cubes
+        cubes = CubeList()
         try:
-            cubes = iris.load(file_list)
+            for file_path in file_list:
+                fl = glob.glob(file_path)
+                cube_list = [iris.load_cube(f) for f in fl]
+                cubes.extend(cube_list)
+
         except IOError:
             if overlay_probability_levels is True:
                 # not all variables have corresponding probabilistic data
