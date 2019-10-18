@@ -216,7 +216,7 @@ ImageFormat = enum(JPG='jpg',
                    PNG='png')
 
 # Temporal average types
-TemporalAverageType = enum(HOURLY='hr',
+TemporalAverageType = enum(HOURLY='1hr',
                            THREE_HOURLY='3hr',
                            DAILY='day',
                            MONTHLY='mon',
