@@ -1,3 +1,10 @@
+# Release 1.1.2
+
+This release addresses:
+
+* Provide daily data for the GCM and RCM
+
+
 # Release 1.1.1
 
 This release addresses:
