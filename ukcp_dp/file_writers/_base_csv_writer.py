@@ -4,10 +4,10 @@ import os
 from time import gmtime, strftime
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
-class BaseCsvWriter(object):
+class BaseCsvWriter:
     """
     The base class for CSV writers.
 
@@ -25,11 +25,31 @@ class BaseCsvWriter(object):
         self.process_version
         self.timestamp
     """
-    ignore_in_header = ['Colour Mode', 'Font Size', 'Image Size',
-                        'Legend Position']
 
-    def write_csv(self, input_data, cube_list, output_data_file_path, vocab,
-                  plot_type, process_version, overlay_cube=None):
+    ignore_in_header = ["Colour Mode", "Font Size", "Image Size", "Legend Position"]
+
+    def __init__(self):
+        self.input_data = None
+        self.cube_list = None
+        self.overlay_cube = None
+        self.vocab = None
+        self.data_dict = None
+        self.header = None
+        self.output_data_file_path = None
+        self.timestamp = None
+        self.plot_type = None
+        self.process_version = None
+
+    def write_csv(
+        self,
+        input_data,
+        cube_list,
+        output_data_file_path,
+        vocab,
+        plot_type,
+        process_version,
+        overlay_cube=None,
+    ):
         """
         Write a CSV file.
 
@@ -44,7 +64,7 @@ class BaseCsvWriter(object):
         @param overlay_cube (iris cube): a cube containing the data for
             the overlay
         """
-        log.info('write_csv, {plot}'.format(plot=plot_type))
+        LOG.info("write_csv, %s", plot_type)
         # an object containing user defined values
         self.input_data = input_data
         # an iris cube list
@@ -53,8 +73,7 @@ class BaseCsvWriter(object):
         self.vocab = vocab
         self.data_dict = collections.OrderedDict()
         self.header = []
-        self.output_data_file_path = output_data_file_path.split('output.csv')[
-            0]
+        self.output_data_file_path = output_data_file_path.split("output.csv")[0]
         self.timestamp = strftime("%Y-%m-%dT%H-%M-%S", gmtime())
         self.plot_type = plot_type
         self.process_version = process_version
@@ -73,7 +92,7 @@ class BaseCsvWriter(object):
 
         @return a list of file names
         """
-        pass
+        raise NotImplementedError
 
     def _write_data_dict(self, output_data_file_path, key_list):
         """
@@ -81,10 +100,11 @@ class BaseCsvWriter(object):
         """
         self._write_headers(output_data_file_path)
 
-        with open(output_data_file_path, 'a') as output_data_file:
+        with open(output_data_file_path, "a") as output_data_file:
             for key in key_list:
-                line_out = '{key},{values}\n'.format(
-                    key=key, values=','.join(self.data_dict[key]))
+                line_out = "{key},{values}\n".format(
+                    key=key, values=",".join(self.data_dict[key])
+                )
                 output_data_file.write(line_out)
 
         # reset the data dict
@@ -98,31 +118,31 @@ class BaseCsvWriter(object):
         all_user_inputs = self.input_data.get_user_inputs()
         for key in all_user_inputs:
             if key in self.ignore_in_header:
-                    continue
+                continue
             user_inputs[key] = all_user_inputs[key]
-        user_inputs['Software Version'] = self.process_version
-        header_string = ','.join(self.header)
-        header_string = header_string.replace('\n,', '\n')
-        header_length = len(header_string.split('\n')) + \
-            len(user_inputs.keys()) + 1
-        with open(output_data_file_path, 'w') as output_data_file:
-            output_data_file.write('header length,{}\n'.format(header_length))
+        user_inputs["Software Version"] = self.process_version
+        header_string = ",".join(self.header)
+        header_string = header_string.replace("\n,", "\n")
+        header_length = len(header_string.split("\n")) + len(user_inputs.keys()) + 1
+        with open(output_data_file_path, "w") as output_data_file:
+            output_data_file.write("header length,{}\n".format(header_length))
             keys = user_inputs.keys()
             keys.sort()
             for key in keys:
-                output_data_file.write('{key},{value}\n'.format(
-                    key=key, value=user_inputs[key]))
+                output_data_file.write(
+                    "{key},{value}\n".format(key=key, value=user_inputs[key])
+                )
             output_data_file.write(header_string)
-            output_data_file.write('\n')
+            output_data_file.write("\n")
 
     def _get_full_file_name(self, file_name_suffix=None):
         if file_name_suffix is None:
-            file_name_suffix = ''
+            file_name_suffix = ""
         try:
             plot_type = self.plot_type.lower()
         except AttributeError:
-            plot_type = 'subset'
-        file_name = '{plot_type}_{timestamp}{suffix}.csv'.format(
-            plot_type=plot_type, timestamp=self.timestamp,
-            suffix=file_name_suffix)
+            plot_type = "subset"
+        file_name = "{plot_type}_{timestamp}{suffix}.csv".format(
+            plot_type=plot_type, timestamp=self.timestamp, suffix=file_name_suffix
+        )
         return os.path.join(self.output_data_file_path, file_name)

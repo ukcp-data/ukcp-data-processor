@@ -4,7 +4,7 @@ from ukcp_dp.constants import InputType, CDF_LABEL
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class CdfCsvWriter(BaseCsvWriter):
@@ -23,12 +23,11 @@ class CdfCsvWriter(BaseCsvWriter):
 
         for cube in self.cube_list:
             scenario = self.vocab.get_collection_term_label(
-                InputType.SCENARIO, cube.attributes['scenario'])
+                InputType.SCENARIO, cube.attributes["scenario"]
+            )
             # the CDF plot will be of the first variable
-            var = self.input_data.get_value_label(
-                InputType.VARIABLE)[0].encode('utf-8')
-            self.header.append('{var}({scenario})'.format(
-                scenario=scenario, var=var))
+            var = self.input_data.get_value_label(InputType.VARIABLE)[0].encode("utf-8")
+            self.header.append("{var}({scenario})".format(scenario=scenario, var=var))
             self._read_percentile_cube(cube, key_list)
 
         # now write the data
@@ -41,9 +40,9 @@ class CdfCsvWriter(BaseCsvWriter):
         """
         Slice the cube over 'percentile' and update data_dict
         """
-        for _slice in cube.slices_over('percentile'):
+        for _slice in cube.slices_over("percentile"):
             x = str(_slice.data)
-            y = str(_slice.coord('percentile').points[0])
+            y = str(_slice.coord("percentile").points[0])
             try:
                 self.data_dict[y].append(x)
             except KeyError:

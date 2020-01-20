@@ -5,7 +5,7 @@ from ukcp_dp.constants import DataType, InputType, PDF_LABEL
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class PdfCsvWriter(BaseCsvWriter):
@@ -24,27 +24,27 @@ class PdfCsvWriter(BaseCsvWriter):
         output_file_list = []
 
         for cube in self.cube_list:
-            if cube.attributes['prob_data_type'] == DataType.PDF:
+            if cube.attributes["prob_data_type"] == DataType.PDF:
                 continue
 
             key_list = []
 
             scenario = self.vocab.get_collection_term_label(
-                InputType.SCENARIO, cube.attributes['scenario'])
+                InputType.SCENARIO, cube.attributes["scenario"]
+            )
 
-            var = self.input_data.get_value_label(
-                InputType.VARIABLE)[0].encode('utf-8')
-            self.header.append('{var}'.format(var=var))
+            var = self.input_data.get_value_label(InputType.VARIABLE)[0].encode("utf-8")
+            self.header.append("{var}".format(var=var))
             self.header.append(PDF_LABEL)
 
-            pdf_data = self._get_pdf_data_for_scenario(
-                cube.attributes['scenario'])
+            pdf_data = self._get_pdf_data_for_scenario(cube.attributes["scenario"])
             cdf_data = cube.data
             self._add_data(cdf_data, pdf_data, key_list)
 
             # now write the data
             output_data_file_path = self._get_full_file_name(
-                '_{}'.format(cube.attributes['scenario']))
+                "_{}".format(cube.attributes["scenario"])
+            )
             self._write_data_dict(output_data_file_path, key_list, scenario)
             output_file_list.append(output_data_file_path)
 
@@ -52,8 +52,10 @@ class PdfCsvWriter(BaseCsvWriter):
 
     def _get_pdf_data_for_scenario(self, scenario):
         for scenario_cube in self.cube_list:
-            if (scenario_cube.attributes['prob_data_type'] == DataType.PDF and
-                    scenario_cube.attributes['scenario'] == scenario):
+            if (
+                scenario_cube.attributes["prob_data_type"] == DataType.PDF
+                and scenario_cube.attributes["scenario"] == scenario
+            ):
                 return scenario_cube.data
 
     def _add_data(self, cdf_data, pdf_data, key_list):
@@ -83,25 +85,24 @@ class PdfCsvWriter(BaseCsvWriter):
             if key in self.ignore_in_header:
                 continue
             user_inputs[key] = all_user_inputs[key]
-        user_inputs['Software Version'] = self.process_version
+        user_inputs["Software Version"] = self.process_version
 
-        header_string = ','.join(self.header)
-        header_string = header_string.replace('\n,', '\n')
-        header_length = len(header_string.split('\n')) + \
-            len(user_inputs.keys()) + 1
-        with open(output_data_file_path, 'w') as output_data_file:
-            output_data_file.write('header length,{}\n'.format(header_length))
+        header_string = ",".join(self.header)
+        header_string = header_string.replace("\n,", "\n")
+        header_length = len(header_string.split("\n")) + len(user_inputs.keys()) + 1
+        with open(output_data_file_path, "w") as output_data_file:
+            output_data_file.write("header length,{}\n".format(header_length))
             keys = user_inputs.keys()
             keys.sort()
             for key in keys:
-                if key == 'Scenario':
-                    output_data_file.write('Scenario,{value}\n'.format(
-                        value=scenario))
+                if key == "Scenario":
+                    output_data_file.write("Scenario,{value}\n".format(value=scenario))
                 else:
-                    output_data_file.write('{key},{value}\n'.format(
-                        key=key, value=user_inputs[key]))
+                    output_data_file.write(
+                        "{key},{value}\n".format(key=key, value=user_inputs[key])
+                    )
             output_data_file.write(header_string)
-            output_data_file.write('\n')
+            output_data_file.write("\n")
 
             for key in key_list:
                 # There are cases where there are multiple points with the
@@ -114,8 +115,7 @@ class PdfCsvWriter(BaseCsvWriter):
 
                 # just in case we do have more then one y value
                 for y_value in y_values:
-                    line_out = '{key},{values}\n'.format(
-                        key=key, values=y_value)
+                    line_out = "{key},{values}\n".format(key=key, values=y_value)
                     output_data_file.write(line_out)
 
         # reset the data dict

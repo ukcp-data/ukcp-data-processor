@@ -1,11 +1,15 @@
 from __future__ import unicode_literals
 
-from _base_plotter import BasePlotter
-import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
+
+import matplotlib.pyplot as plt
 from ukcp_dp.constants import InputType
-from ukcp_dp.plotters.utils._plotting_utils import end_figure, \
-    start_standard_figure, wrap_string
+from ukcp_dp.plotters._base_plotter import BasePlotter
+from ukcp_dp.plotters.utils._plotting_utils import (
+    end_figure,
+    start_standard_figure,
+    wrap_string,
+)
 
 
 class GraphPlotter(BasePlotter):
@@ -16,6 +20,11 @@ class GraphPlotter(BasePlotter):
     class should be extended with a _generate_graph(self) method to plot the
     map.
     """
+
+    def __init__(self, *args, **kwargs):
+        BasePlotter.__init__(self, *args, **kwargs)
+        self.line_width = None
+        self.show_legend = True
 
     def _generate_plot(self, output_path, plot_settings):
         """
@@ -51,13 +60,13 @@ class GraphPlotter(BasePlotter):
         ax = plt.gca()
         if self.input_data.get_value(InputType.IMAGE_SIZE) == 900:
             width = 105 - (self.input_data.get_font_size() * 3)
-            ax.tick_params(axis='both', which='major', pad=5)
+            ax.tick_params(axis="both", which="major", pad=5)
         if self.input_data.get_value(InputType.IMAGE_SIZE) == 1200:
             width = 100 - (self.input_data.get_font_size() * 2)
-            ax.tick_params(axis='both', which='major', pad=10)
+            ax.tick_params(axis="both", which="major", pad=10)
         elif self.input_data.get_value(InputType.IMAGE_SIZE) == 2400:
             width = 100 - (self.input_data.get_font_size() * 1)
-            ax.tick_params(axis='both', which='major', pad=20)
+            ax.tick_params(axis="both", which="major", pad=20)
 
         # Add the title
         new_title = wrap_string(self.title, width)
@@ -66,20 +75,20 @@ class GraphPlotter(BasePlotter):
         if self.show_legend is True:
             # Add the legend
             legend_font_size = self.input_data.get_font_size() * 0.7
-            plt.legend(loc=self.input_data.get_value(InputType.LEGEND_POSITION),
-                       prop={'size': legend_font_size})
+            plt.legend(
+                loc=self.input_data.get_value(InputType.LEGEND_POSITION),
+                prop={"size": legend_font_size},
+            )
 
         # Put a grid on the plot.
         plt.grid(True)
 
         # Output the plot
-#         plotgeneral.set_standard_margins(settings=None, fig=fig)
+        #         plotgeneral.set_standard_margins(settings=None, fig=fig)
         end_figure(output_path)
-        return
 
     def _generate_graph(self):
         """
         This method should be overridden to produce the plots.
 
         """
-        pass

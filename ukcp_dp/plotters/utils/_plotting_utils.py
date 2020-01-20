@@ -2,16 +2,17 @@
 import logging
 
 import matplotlib
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 # Force matplotlib to use True Type fonts
 # (the default is Type 3, pdf.fonttype 3)
 # http://phyletica.org/matplotlib-fonts/
-matplotlib.rcParams['pdf.fonttype'] = 42
+matplotlib.rcParams["pdf.fonttype"] = 42
 
 
 def start_figure(cmsize, dpi_display, fontfam, fsize, figbackgroundcol=None):
@@ -36,8 +37,8 @@ def start_figure(cmsize, dpi_display, fontfam, fsize, figbackgroundcol=None):
     """
 
     # Change overall font family:
-    oldfont_family = matplotlib.rcParams['font.family']
-    matplotlib.rcParams['font.family'] = fontfam
+    oldfont_family = matplotlib.rcParams["font.family"]
+    matplotlib.rcParams["font.family"] = fontfam
     # (Default is 'sans-serif',
     # which is 'Bitstream Vera Sans','DejaVu Sans', 'Lucida Grande',... )
     # To see a list of available font families, do:
@@ -45,8 +46,8 @@ def start_figure(cmsize, dpi_display, fontfam, fsize, figbackgroundcol=None):
     # matplotlib.font_manager.fontManager.ttflist]))
 
     # Do the same sort of thing with size:
-    oldfont_size = matplotlib.rcParams['font.size']
-    matplotlib.rcParams['font.size'] = fsize  # Default is 12
+    oldfont_size = matplotlib.rcParams["font.size"]
+    matplotlib.rcParams["font.size"] = fsize  # Default is 12
 
     # Set up the figure:
     size_inches = [aside / 2.54 for aside in cmsize]
@@ -71,11 +72,13 @@ def start_standard_figure(settings):
     Again, the original font family and size are returned,
     in a tuple alongsize the Figure object itself.
     """
-    fig, oldfont_family, oldfont_size = start_figure(settings.cmsize,
-                                                     settings.dpi_display,
-                                                     settings.fontfam,
-                                                     settings.fsize,
-                                                     settings.figbackgroundcol)
+    fig, oldfont_family, oldfont_size = start_figure(
+        settings.cmsize,
+        settings.dpi_display,
+        settings.fontfam,
+        settings.fsize,
+        settings.figbackgroundcol,
+    )
     return fig, oldfont_family, oldfont_size
 
 
@@ -111,32 +114,39 @@ def end_figure(outfnames, dpi=None, oldfont_family=None, oldfont_size=None):
         else:
             # We have to explicitly set the "saved" Figure colour
             # to what we (might have) specified earlier:
-            plt.savefig(outf, dpi=dpi,
-                        facecolor=plt.gcf().get_facecolor(), edgecolor='none')
-            log.debug("Plot saved to {}".format(outf))
+            plt.savefig(
+                outf, dpi=dpi, facecolor=plt.gcf().get_facecolor(), edgecolor="none"
+            )
+            LOG.debug("Plot saved to %s", outf)
 
     if showit:
         plt.show()  # Have to do this last, it clears the Figure
 
     # If we made a plot, then close it:
     # plt.close() ## Allows memory to be freed, prevents a warning.
-    plt.close('all')  # Allows memory to be freed, prevents a warning.
+    plt.close("all")  # Allows memory to be freed, prevents a warning.
 
     # Reset font:
-    log.debug("Plot closed")
+    LOG.debug("Plot closed")
     if oldfont_family is not None:
-        log.debug("Resetting font family")
-        matplotlib.rcParams['font.family'] = oldfont_family
+        LOG.debug("Resetting font family")
+        matplotlib.rcParams["font.family"] = oldfont_family
     if oldfont_size is not None:
-        log.debug("Resetting font size")
-        matplotlib.rcParams['font.size'] = oldfont_size
-
-    return
+        LOG.debug("Resetting font size")
+        matplotlib.rcParams["font.size"] = oldfont_size
 
 
-def make_colourbar(fig, bar_orientation, extendcolbar, levels,
-                   barlabel, colmappable=None, bar_pos=None,
-                   ticklen=0, ticklabs=None):
+def make_colourbar(
+    fig,
+    bar_orientation,
+    extendcolbar,
+    levels,
+    barlabel,
+    colmappable=None,
+    bar_pos=None,
+    ticklen=0,
+    ticklabs=None,
+):
     """
     Create a colour bar Axes for maps.
 
@@ -166,22 +176,26 @@ def make_colourbar(fig, bar_orientation, extendcolbar, levels,
     else:
         bar_axes = None
 
-    bar = fig.colorbar(colmappable, cax=bar_axes, orientation=bar_orientation,
-                       drawedges=False, extend=extendcolbar)
-    bar.ax.tick_params(length=ticklen)
-    bar.set_ticks(levels)
+    colour_bar = fig.colorbar(
+        colmappable,
+        cax=bar_axes,
+        orientation=bar_orientation,
+        drawedges=False,
+        extend=extendcolbar,
+    )
+    colour_bar.ax.tick_params(length=ticklen)
+    colour_bar.set_ticks(levels)
 
     if ticklabs is not None:
-        bar.set_ticklabels(ticklabs)
+        colour_bar.set_ticklabels(ticklabs)
 
     if barlabel is not None:
-        bar.set_label(barlabel)
+        colour_bar.set_label(barlabel)
 
-    return bar
+    return colour_bar
 
 
-def make_standard_bar(settings, fig, barlabel=None,
-                      colmappable=None, bar_pos=None):
+def make_standard_bar(settings, fig, barlabel=None, colmappable=None, bar_pos=None):
     """
     Wrapper to make_colourbar above,
     but taking the arguments from 'settings',
@@ -202,10 +216,11 @@ def make_standard_bar(settings, fig, barlabel=None,
     # Compute the levels for the tickmarks
     # from the map value range and steps
     # used to define the colour map originally.
-    levels = np.arange(settings.vrange[0],
-                       settings.vrange[1] + settings.vstep *
-                       settings.bar_tick_spacing,
-                       settings.vstep * settings.bar_tick_spacing)
+    levels = np.arange(
+        settings.vrange[0],
+        settings.vrange[1] + settings.vstep * settings.bar_tick_spacing,
+        settings.vstep * settings.bar_tick_spacing,
+    )
 
     # Same procedure as mapper.plot_standard_map():
     # Use the settings' default barlabel if one wasn't specified,
@@ -216,10 +231,16 @@ def make_standard_bar(settings, fig, barlabel=None,
     if bar_pos is None:
         bar_pos = settings.bar_position
 
-    bar = make_colourbar(fig, settings.bar_orientation, settings.extendcolbar,
-                         levels, barlabel, colmappable=colmappable,
-                         bar_pos=bar_pos)
-    return bar
+    colour_bar = make_colourbar(
+        fig,
+        settings.bar_orientation,
+        settings.extendcolbar,
+        levels,
+        barlabel,
+        colmappable=colmappable,
+        bar_pos=bar_pos,
+    )
+    return colour_bar
 
 
 def wrap_string(text, width):
@@ -241,5 +262,5 @@ def wrap_string(text, width):
             new_text += "\n"
         # add the string plus a space to the new string and increase the line length
         new_text += st + " "
-        new_line_length += (len(st) + 1)
+        new_line_length += len(st) + 1
     return new_text

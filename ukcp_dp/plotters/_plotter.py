@@ -1,17 +1,26 @@
 import os
 from time import gmtime, strftime
 
-from _cdf_plotter import CdfPlotter
-from _jp_plotter import JpPlotter
-from _pdf_plotter import PdfPlotter
-from _plume_plotter import PlumePlotter
-from _postage_stamp_map_plotter import PostageStampMapPlotter
-from _three_map_plotter import ThreeMapPlotter
 from ukcp_dp.constants import PlotType
+from ukcp_dp.plotters._cdf_plotter import CdfPlotter
+from ukcp_dp.plotters._jp_plotter import JpPlotter
+from ukcp_dp.plotters._pdf_plotter import PdfPlotter
+from ukcp_dp.plotters._plume_plotter import PlumePlotter
+from ukcp_dp.plotters._postage_stamp_map_plotter import PostageStampMapPlotter
+from ukcp_dp.plotters._three_map_plotter import ThreeMapPlotter
 
 
-def write_plot(plot_type, output_path, image_format, input_data, cube_list,
-               overlay_cube, title, vocab, plot_settings):
+def write_plot(
+    plot_type,
+    output_path,
+    image_format,
+    input_data,
+    cube_list,
+    overlay_cube,
+    title,
+    vocab,
+    plot_settings,
+):
     """
     Generate a plot based on the plot type.
 
@@ -42,20 +51,21 @@ def write_plot(plot_type, output_path, image_format, input_data, cube_list,
     elif plot_type == PlotType.THREE_MAPS:
         plotter = ThreeMapPlotter()
     else:
-        raise Exception('Invalid plot type: {}'.format(plot_type))
+        raise Exception("Invalid plot type: {}".format(plot_type))
 
-    plotter.generate_plot(input_data, cube_list, overlay_cube, image_file,
-                          title, vocab, plot_settings)
+    plotter.generate_plot(
+        input_data, cube_list, overlay_cube, image_file, title, vocab, plot_settings
+    )
 
     return image_file
 
 
 def _get_image_file(output_path, image_format, plot_type):
     timestamp = strftime("%Y-%m-%dT%H-%M-%S", gmtime())
-    plot_type_string = ''
+    plot_type_string = ""
     if plot_type is not None:
-        plot_type_string = '{}_'.format(plot_type.lower())
-    file_name = '{plot_type}{timestamp}.{image_format}'.format(
-        plot_type=plot_type_string, timestamp=timestamp,
-        image_format=image_format)
+        plot_type_string = "{}_".format(plot_type.lower())
+    file_name = "{plot_type}{timestamp}.{image_format}".format(
+        plot_type=plot_type_string, timestamp=timestamp, image_format=image_format
+    )
     return os.path.join(output_path, file_name)

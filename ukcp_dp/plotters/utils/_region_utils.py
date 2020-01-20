@@ -2,17 +2,27 @@ import logging
 
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
-from ukcp_dp.constants import OVERLAY_ADMIN, OVERLAY_RIVER, OVERLAY_COUNTRY, \
-    UKCP_OSGB, OVERLAY_COUNTRY_SMALL, OVERLAY_ADMIN_SMALL, OVERLAY_RIVER_SMALL
+from ukcp_dp.constants import (
+    OVERLAY_ADMIN,
+    OVERLAY_RIVER,
+    OVERLAY_COUNTRY,
+    UKCP_OSGB,
+    OVERLAY_COUNTRY_SMALL,
+    OVERLAY_ADMIN_SMALL,
+    OVERLAY_RIVER_SMALL,
+)
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
-def reg_from_cube(acube,
-                  lat_keys=["region_latmin", "region_latmax"],
-                  lon_keys=["region_lonmin", "region_lonmax"],
-                  lat_name="latitude", lon_name="longitude"):
+def reg_from_cube(
+    acube,
+    lat_keys=["region_latmin", "region_latmax"],
+    lon_keys=["region_lonmin", "region_lonmax"],
+    lat_name="latitude",
+    lon_name="longitude",
+):
     """
     Get a region dictionary that describes a given cube.
 
@@ -22,13 +32,13 @@ def reg_from_cube(acube,
     May want to include a halo option in future?
     """
     try:
-        lat_lims = [acube.attributes[lat_keys[0]],
-                    acube.attributes[lat_keys[1]]]
-        lon_lims = [acube.attributes[lon_keys[0]],
-                    acube.attributes[lon_keys[1]]]
+        lat_lims = [acube.attributes[lat_keys[0]], acube.attributes[lat_keys[1]]]
+        lon_lims = [acube.attributes[lon_keys[0]], acube.attributes[lon_keys[1]]]
     except:
-        log.debug("Couldn't get region dictionary from cube attributes, using "
-                  "coords instead.")
+        LOG.debug(
+            "Couldn't get region dictionary from cube attributes, using "
+            "coords instead."
+        )
         latcoord = acube.coord(lat_name)
         loncoord = acube.coord(lon_name)
         #
@@ -67,50 +77,64 @@ def get_ukcp_shapefile_regions(regionset, region_names=None, hi_res=True):
     try:
         regiondata = UKSHAPES[regionset]
     except KeyError:
-        log.error("regionset was {} but it must be one of {}".format(
-            regionset, "  ".join(UKSHAPES.keys())))
+        LOG.error(
+            "regionset was %s but it must be one of %s",
+            regionset,
+            "  ".join(UKSHAPES.keys()),
+        )
         raise KeyError()
 
     if hi_res:
-        sourcefile = regiondata['sourcefile']
+        sourcefile = regiondata["sourcefile"]
     else:
-        sourcefile = regiondata['low_res']
-    projection = regiondata['projection']
-    attr_key = regiondata['attr_key']
+        sourcefile = regiondata["low_res"]
+    projection = regiondata["projection"]
+    attr_key = regiondata["attr_key"]
     if regionset == "ukNaturalEarth":
         region_names = ["United Kingdom"]
 
-    shapefregs = _get_shapefile_regions(sourcefile=sourcefile,
-                                        attr_key=attr_key,
-                                        attr_vals=region_names,
-                                        projection=projection)
+    shapefregs = _get_shapefile_regions(
+        sourcefile=sourcefile,
+        attr_key=attr_key,
+        attr_vals=region_names,
+        projection=projection,
+    )
     return shapefregs
 
 
 # Shapefile locations & other metadata:
 UKSHAPES = dict(
     # This includes 16 subnational administrative regions:
-    region=dict(sourcefile=OVERLAY_ADMIN,
-                low_res=OVERLAY_ADMIN_SMALL,
-                projection=UKCP_OSGB,
-                attr_key="Region"),
+    region=dict(
+        sourcefile=OVERLAY_ADMIN,
+        low_res=OVERLAY_ADMIN_SMALL,
+        projection=UKCP_OSGB,
+        attr_key="Region",
+    ),
     # This includes the 4 constituent countries of the UK,
     # plus the Channel Islands and the Isle of Man
-    country=dict(sourcefile=OVERLAY_COUNTRY,
-                 low_res=OVERLAY_COUNTRY_SMALL,
-                 projection=UKCP_OSGB,
-                 attr_key="Region"),
+    country=dict(
+        sourcefile=OVERLAY_COUNTRY,
+        low_res=OVERLAY_COUNTRY_SMALL,
+        projection=UKCP_OSGB,
+        attr_key="Region",
+    ),
     # This contains river basin regions:
-    river=dict(sourcefile=OVERLAY_RIVER,
-               low_res=OVERLAY_RIVER_SMALL,
-               projection=UKCP_OSGB,
-               attr_key="Region"),
+    river=dict(
+        sourcefile=OVERLAY_RIVER,
+        low_res=OVERLAY_RIVER_SMALL,
+        projection=UKCP_OSGB,
+        attr_key="Region",
+    ),
     # Including the cartopy standard Natural Earth version too,
     # mostly just for reference and comparison.
-    ukNaturalEarth=dict(sourcefile=shpreader.natural_earth(
-        resolution='10m', category='cultural', name='admin_0_countries'),
+    ukNaturalEarth=dict(
+        sourcefile=shpreader.natural_earth(
+            resolution="10m", category="cultural", name="admin_0_countries"
+        ),
         attr_key="NAME",
-        projection=ccrs.PlateCarree()),
+        projection=ccrs.PlateCarree(),
+    ),
 )
 
 
@@ -136,28 +160,37 @@ def _get_ukcp_shapefile_regions(regionset, region_names=None, hi_res=True):
     try:
         regiondata = UKSHAPES[regionset]
     except KeyError:
-        log.error("regionset was {} but it must be one of {}".format(
-            regionset, "  ".join(UKSHAPES.keys())))
+        LOG.error(
+            "regionset was %s but it must be one of %s",
+            regionset,
+            "  ".join(UKSHAPES.keys()),
+        )
         raise KeyError()
 
     if hi_res:
-        sourcefile = regiondata['sourcefile']
+        sourcefile = regiondata["sourcefile"]
     else:
-        sourcefile = regiondata['low_res']
-    projection = regiondata['projection']
-    attr_key = regiondata['attr_key']
+        sourcefile = regiondata["low_res"]
+    projection = regiondata["projection"]
+    attr_key = regiondata["attr_key"]
     if regionset == "ukNaturalEarth":
         region_names = ["United Kingdom"]
-    shapefregs = _get_shapefile_regions(sourcefile=sourcefile,
-                                        attr_key=attr_key,
-                                        attr_vals=region_names,
-                                        projection=projection)
+    shapefregs = _get_shapefile_regions(
+        sourcefile=sourcefile,
+        attr_key=attr_key,
+        attr_vals=region_names,
+        projection=projection,
+    )
     return shapefregs
 
 
-def _get_shapefile_regions(sourcefile, attr_key, attr_vals,
-                           projection=None,
-                           projection_key='projection_forUKCP'):
+def _get_shapefile_regions(
+    sourcefile,
+    attr_key,
+    attr_vals,
+    projection=None,
+    projection_key="projection_forUKCP",
+):
     """
     Get a list of shapefile polygon-based regions
     (i.e.   cartopy.io.shapereader.Record   objects)
@@ -192,41 +225,43 @@ def _get_shapefile_regions(sourcefile, attr_key, attr_vals,
     called   get_ukcp_shapefile_regions().
     """
 
-    log.debug("Reading shapefile {}".format(sourcefile))
+    LOG.debug("Reading shapefile %s", sourcefile)
     # Create the shapefile Reader object:
     regfileReader = shpreader.Reader(sourcefile)
 
     try:
         if attr_vals is None:
-            log.debug("All available regions selected. These are:")
+            LOG.debug("All available regions selected. These are:")
             attr_vals = _list_regions(regfileReader.records(), attr_key)
-            log.debug("   " + "\n   ".join(attr_vals))
+            msg = "   " + "\n   ".join(attr_vals)
+            LOG.debug(msg)
 
         # Note that this DOESN'T preserve the ordering given in attr_vals!
-        selected_regions = [rec for rec in regfileReader.records()
-                            if rec.attributes[attr_key] in attr_vals]
+        selected_regions = [
+            rec
+            for rec in regfileReader.records()
+            if rec.attributes[attr_key] in attr_vals
+        ]
 
     except KeyError:
-        log.error("Failed to extract shapefile regions using key {}".format(
-            attr_key))
-        log.error("Available keys in the shapefile are:")
-        log.error("\t".join(sorted(_list_keys(regfileReader.records()))))
+        LOG.error("Failed to extract shapefile regions using key %s", attr_key)
+        LOG.error("Available keys in the shapefile are:")
+        LOG.error("\t".join(sorted(_list_keys(regfileReader.records()))))
         raise KeyError()
 
     if len(selected_regions) != len(attr_vals):
-        log.warn("Failed to return a region for all requested attribute "
-                 "values!")
-        log.warn("Found {} regions:".format(len(selected_regions)))
-        log.warn("\n".join([aregion.attributes[attr_key]
-                            for aregion in selected_regions]))
-        log.warn("But you requested {}".format(attr_vals))
-        log.warn("Available regions:")
-        log.warn("\n".join(_list_regions(regfileReader.records(), attr_key)))
+        LOG.warning("Failed to return a region for all requested attribute " "values!")
+        LOG.warning("Found %s regions:", len(selected_regions))
+        LOG.warning(
+            "\n".join([aregion.attributes[attr_key] for aregion in selected_regions])
+        )
+        LOG.warning("But you requested %s", attr_vals)
+        LOG.warning("Available regions:")
+        LOG.warning("\n".join(_list_regions(regfileReader.records(), attr_key)))
         raise UserWarning("Region mismatch")
 
     if projection is not None:
-        log.debug("Imposing projection {} on the shapefile regions".format(
-            projection))
+        LOG.debug("Imposing projection %s on the shapefile regions", projection)
         for reg in selected_regions:
             reg.attributes[projection_key] = projection
 
