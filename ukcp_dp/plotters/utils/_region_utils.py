@@ -278,7 +278,7 @@ def _list_keys(records):
     the regions available in a given shapefile.
     """
     reg = records.next()
-    return reg.attributes.keys()
+    return list(reg.attributes)
 
 
 def _list_regions(records, key):

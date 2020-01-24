@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import glob
 import logging
 from os import path
@@ -563,7 +562,7 @@ class DataExtractor:
         LOG.debug("get_title")
         variable = " and ".join(
             self.input_data.get_value_label(InputType.VARIABLE)
-        ).encode("utf-8")
+        )
         if (
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
             == TemporalAverageType.ANNUAL
@@ -645,7 +644,7 @@ class DataExtractor:
         if len(scenario) == 1:
             title = "{t}, and scenario {scenario}".format(t=title, scenario=scenario[0])
 
-        return title.decode("utf-8")
+        return title
 
     def _get_resolution_m(self, cube):
         LOG.debug("_get_resolution_m")

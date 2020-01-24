@@ -114,7 +114,8 @@ def rectify_units(acube, vartag=None, target_unit=None):
         if vartag not in PREFERRED_UNITS.keys():
             LOG.warning("vartag %s found, but target_unit not provided;", vartag)
             LOG.warning(
-                "vartag not in list of known preferred units %s", PREFERRED_UNITS.keys()
+                "vartag not in list of known preferred units %s",
+                ", ".join(PREFERRED_UNITS.keys()),
             )
             raise UserWarning("Unable to convert units.")
 
@@ -222,7 +223,7 @@ def _guess_vartag(acube):
         msg = (
             "Variable tag cannot be identified using standard name "
             "'{name}', from the list of {tags}".format(
-                name=acube.standard_name, tags=VARTAG_CLUES.keys()
+                name=acube.standard_name, tags=", ".join(VARTAG_CLUES.keys())
             )
         )
         LOG.warning(msg)

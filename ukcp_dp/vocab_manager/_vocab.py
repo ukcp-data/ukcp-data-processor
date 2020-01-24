@@ -273,7 +273,7 @@ class Vocab:
         @return a list of str containing the collection terms
         """
         try:
-            return self.vocab[collection].keys()
+            return list(self.vocab[collection])
         except KeyError:
             return None
 

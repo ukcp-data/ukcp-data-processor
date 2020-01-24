@@ -74,7 +74,7 @@ class InputData:
                 continue
             if isinstance(value, list):
                 value = ",".join(value)
-            input_labels[key_label] = value.encode("utf-8")
+            input_labels[key_label] = value
 
         # remove extra year values
         if (

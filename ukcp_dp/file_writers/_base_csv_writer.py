@@ -127,8 +127,8 @@ class BaseCsvWriter:
         with open(output_data_file_path, "w") as output_data_file:
             output_data_file.write("header length,{}\n".format(header_length))
             keys = user_inputs.keys()
-            keys.sort()
-            for key in keys:
+            sorted_keys = sorted(keys)
+            for key in sorted_keys:
                 output_data_file.write(
                     "{key},{value}\n".format(key=key, value=user_inputs[key])
                 )
