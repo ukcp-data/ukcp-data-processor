@@ -92,9 +92,7 @@ class PdfCsvWriter(BaseCsvWriter):
         header_length = len(header_string.split("\n")) + len(user_inputs.keys()) + 1
         with open(output_data_file_path, "w") as output_data_file:
             output_data_file.write("header length,{}\n".format(header_length))
-            keys = user_inputs.keys()
-            sorted_keys = sorted(keys)
-            for key in sorted_keys:
+            for key in sorted(user_inputs.keys()):
                 if key == "Scenario":
                     output_data_file.write("Scenario,{value}\n".format(value=scenario))
                 else:
