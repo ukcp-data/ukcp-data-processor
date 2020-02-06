@@ -1,6 +1,6 @@
 import logging
 
-from mpl_toolkits.axes_grid.anchored_artists import AnchoredText
+from matplotlib.offsetbox import AnchoredText
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -85,6 +85,9 @@ class JpPlotter(GraphPlotter):
             loc=self.input_data.get_value(InputType.LEGEND_POSITION),
             prop={"size": legend_font_size},
         )
+
+        # we have added the legend here so we do not want the default legend added
+        self.show_legend = False
 
         # if temp anom and pr anom, then add annotations
         if (x_id == "tasAnom" or y_id == "tasAnom") and (
