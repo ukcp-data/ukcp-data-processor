@@ -292,8 +292,7 @@ class DataExtractor:
             # generate a time slice constraint
             time_slice_constraint = self._time_slice_selector(False)
         if time_slice_constraint is not None:
-            with iris.FUTURE.context(cell_datetime_objects=True):
-                cube = cube.extract(time_slice_constraint)
+            cube = cube.extract(time_slice_constraint)
 
         if cube is None:
             if time_slice_constraint is not None:
@@ -308,8 +307,7 @@ class DataExtractor:
         # generate a temporal constraint
         temporal_constraint = self._get_temporal_selector()
         if temporal_constraint is not None:
-            with iris.FUTURE.context(cell_datetime_objects=True):
-                cube = cube.extract(temporal_constraint)
+            cube = cube.extract(temporal_constraint)
 
         if cube is None:
             if temporal_constraint is not None:
@@ -560,9 +558,7 @@ class DataExtractor:
         @return a str containing the title
         """
         LOG.debug("get_title")
-        variable = " and ".join(
-            self.input_data.get_value_label(InputType.VARIABLE)
-        )
+        variable = " and ".join(self.input_data.get_value_label(InputType.VARIABLE))
         if (
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
             == TemporalAverageType.ANNUAL

@@ -76,8 +76,7 @@ class SampleCsvWriter(BaseCsvWriter):
         coords = cube.coord("time")[:]
         for time_ in range(0, data.shape[0]):
             value = str(data[time_])
-            with iris.FUTURE.context(cell_datetime_objects=True):
-                time_str = coords[time_].cell(0).point.strftime("%Y-%m-%d")
+            time_str = coords[time_].cell(0).point.strftime("%Y-%m-%d")
             try:
                 self.data_dict[time_str].append(value)
             except KeyError:

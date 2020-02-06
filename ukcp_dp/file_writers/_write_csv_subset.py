@@ -49,10 +49,7 @@ class SubsetCsvWriter(BaseCsvWriter):
 
             # loop over times
             for time_slice in ensemble_slice.slices_over("time"):
-                with iris.FUTURE.context(cell_datetime_objects=True):
-                    time_str = (
-                        time_slice.coord("time").cell(0).point.strftime("%Y-%m-%d")
-                    )
+                time_str = time_slice.coord("time").cell(0).point.strftime("%Y-%m-%d")
                 key_list = []
 
                 # get the numpy representation of the sub-cube
@@ -143,8 +140,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         coords = cube.coord("time")[:]
         for time_ in range(0, data.shape[0]):
             value = str(data[time_])
-            with iris.FUTURE.context(cell_datetime_objects=True):
-                time_str = coords[time_].cell(0).point.strftime(date_format)
+            time_str = coords[time_].cell(0).point.strftime(date_format)
             try:
                 self.data_dict[time_str].append(value)
             except KeyError:

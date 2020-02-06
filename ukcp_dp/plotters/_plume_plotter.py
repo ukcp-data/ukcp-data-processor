@@ -362,10 +362,7 @@ def get_time_series(cube, slice_and_sel_coord):
 
         elif isinstance(
             tsteps[0],
-            (
-                cf_units.cftime.datetime,
-                cf_units.cftime._cftime.Datetime360Day,
-            ),
+            (cf_units.cftime.datetime, cf_units.cftime._cftime.Datetime360Day),
         ):
             if tcoord.units.calendar == "360_day":
                 tpoints = [t.year + t.dayofyr / 360.0 for t in tsteps]
@@ -441,8 +438,7 @@ def set_x_limits(cube, ax):
         ]
 
     elif isinstance(
-        xlims[0],
-        (cf_units.cftime.datetime, cf_units.cftime._cftime.Datetime360Day),
+        xlims[0], (cf_units.cftime.datetime, cf_units.cftime._cftime.Datetime360Day)
     ):
         # Strictly-speaking, this might not be on a 360-day calendar,
         # but in practice we're unlikely to get this kind of object
