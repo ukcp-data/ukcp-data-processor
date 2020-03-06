@@ -790,6 +790,12 @@ UKCP_SPECIFIC_HUMIDITY.vmid = 0.5
 UKCP_SPECIFIC_HUMIDITY.vstep = 0.1
 
 
+UKCP_SPECIFIC_HUMIDITY_ANOM = UKCP_SPECIFIC_HUMIDITY.copy()
+UKCP_SPECIFIC_HUMIDITY_ANOM.tag = "UKCP_sh_anom"
+UKCP_SPECIFIC_HUMIDITY_ANOM.default_barlabel = "Specific humidity anomaly, %"
+UKCP_SPECIFIC_HUMIDITY_ANOM.preferred_unit = cf_units.Unit("%")
+
+
 UKCP_RELATIVE_HUMIDITY = UKCPNEAT.copy()
 UKCP_RELATIVE_HUMIDITY.tag = "UKCP_rh"
 UKCP_RELATIVE_HUMIDITY.default_barlabel = "Relative humidity"

@@ -79,8 +79,7 @@ def get_plot_settings(vocab, cmsize, fsize, var_id):
     elif "huss" in var_id:
         # Specific humidity at 1.5m (1)
         if "Anom" in var_id:
-            # TODO do we need an ANOM version?
-            plot_settings = stds.UKCP_SPECIFIC_HUMIDITY.copy()
+            plot_settings = stds.UKCP_SPECIFIC_HUMIDITY_ANOM.copy()
         else:
             plot_settings = stds.UKCP_SPECIFIC_HUMIDITY.copy()
 
