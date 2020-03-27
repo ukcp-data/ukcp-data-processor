@@ -231,10 +231,8 @@ def _get_shapefile_regions(
 
     try:
         if attr_vals is None:
-            LOG.debug("All available regions selected. These are:")
+            LOG.debug("All available regions selected")
             attr_vals = _list_regions(regfileReader.records(), attr_key)
-            msg = "   " + "\n   ".join(attr_vals)
-            LOG.debug(msg)
 
         # Note that this DOESN'T preserve the ordering given in attr_vals!
         selected_regions = [

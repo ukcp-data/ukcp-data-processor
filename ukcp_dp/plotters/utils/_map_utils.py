@@ -855,7 +855,6 @@ def plot_choropleth_map(
         # TODO Fix due to inconsistencies in shape file and netcdf
         if reg_name == "Orkney and Shetland":
             reg_name = "Orkney and Shetlands"
-        LOG.error(reg_name)
 
         if reg_name not in regdata_dict.keys():
             continue
@@ -865,7 +864,7 @@ def plot_choropleth_map(
         if math.isnan(val):
             continue
 
-        facecolor = cmap(normalizer([val]))
+        facecolor = cmap(normalizer([val])).tolist()
 
         # Project region, if necessary:
         reg_proj = region.attributes["projection_forUKCP"]
