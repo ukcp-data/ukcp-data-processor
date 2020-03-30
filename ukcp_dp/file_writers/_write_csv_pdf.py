@@ -33,7 +33,7 @@ class PdfCsvWriter(BaseCsvWriter):
                 InputType.SCENARIO, cube.attributes["scenario"]
             )
 
-            var = self.input_data.get_value_label(InputType.VARIABLE)[0].encode("utf-8")
+            var = self.input_data.get_value_label(InputType.VARIABLE)[0]
             self.header.append("{var}".format(var=var))
             self.header.append(PDF_LABEL)
 

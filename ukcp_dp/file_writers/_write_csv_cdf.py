@@ -26,7 +26,7 @@ class CdfCsvWriter(BaseCsvWriter):
                 InputType.SCENARIO, cube.attributes["scenario"]
             )
             # the CDF plot will be of the first variable
-            var = self.input_data.get_value_label(InputType.VARIABLE)[0].encode("utf-8")
+            var = self.input_data.get_value_label(InputType.VARIABLE)[0]
             self.header.append("{var}({scenario})".format(scenario=scenario, var=var))
             self._read_percentile_cube(cube, key_list)
 

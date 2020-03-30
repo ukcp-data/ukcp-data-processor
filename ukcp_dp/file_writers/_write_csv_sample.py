@@ -42,7 +42,7 @@ class SampleCsvWriter(BaseCsvWriter):
     def _write_sample(self, cube, i, key_list):
         # add the variable label to the header
         self.header.append(
-            self.input_data.get_value_label(InputType.VARIABLE)[i].encode("utf-8")
+            self.input_data.get_value_label(InputType.VARIABLE)[i]
         )
 
         for sample_slice in cube.slices_over("sample"):
@@ -62,7 +62,7 @@ class SampleCsvWriter(BaseCsvWriter):
         for sample_slice in cube.slices_over("sample"):
             sample_id = int(sample_slice.coord("sample").points[0])
 
-            var = self.input_data.get_value_label(InputType.VARIABLE)[i].encode("utf-8")
+            var = self.input_data.get_value_label(InputType.VARIABLE)[i]
             self.header.append(
                 "{var}(sample {sample_id})".format(sample_id=sample_id, var=var)
             )

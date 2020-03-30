@@ -64,9 +64,7 @@ class PlumeCsvWriter(BaseCsvWriter):
                 ensemble_name = ensemble_slice.coord("ensemble_member_id").points[0]
 
                 # the plume plot will be of the first variable
-                var = self.input_data.get_value_label(InputType.VARIABLE)[0].encode(
-                    "utf-8"
-                )
+                var = self.input_data.get_value_label(InputType.VARIABLE)[0]
                 self.header.append(
                     "{var}({ensemble})".format(ensemble=ensemble_name, var=var)
                 )
@@ -87,7 +85,7 @@ class PlumeCsvWriter(BaseCsvWriter):
         for _slice in cube.slices_over("percentile"):
             percentile = str(_slice.coord("percentile").points[0])
             # the plume plot will be of the first variable
-            var = self.input_data.get_value_label(InputType.VARIABLE)[0].encode("utf-8")
+            var = self.input_data.get_value_label(InputType.VARIABLE)[0]
             self.header.append(
                 "{var}({percentile}th Percentile)".format(
                     percentile=int(float(percentile)), var=var

@@ -82,7 +82,7 @@ class ThreeMapCsvWriter(BaseCsvWriter):
         key_list = []
         for percentile in percentiles:
             # update the header
-            var = self.input_data.get_value_label(InputType.VARIABLE)[0].encode("utf-8")
+            var = self.input_data.get_value_label(InputType.VARIABLE)[0]
             self.header.append(
                 "{var}({percentile}th Percentile)".format(
                     percentile=percentile, var=var

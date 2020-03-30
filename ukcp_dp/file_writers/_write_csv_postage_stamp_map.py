@@ -83,7 +83,7 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
             ensemble_name = str(ensemble_slice.coord("ensemble_member_id").points[0])
 
             # update the header
-            var = self.input_data.get_value_label(InputType.VARIABLE)[0].encode("utf-8")
+            var = self.input_data.get_value_label(InputType.VARIABLE)[0]
             self.header.append(
                 "{var}({ensemble})".format(ensemble=ensemble_name, var=var)
             )

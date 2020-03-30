@@ -29,8 +29,8 @@ class JpCsvWriter(BaseCsvWriter):
         h = h.T
 
         # add axis titles to the header
-        x = self.input_data.get_value_label(InputType.VARIABLE)[0].encode("utf-8")
-        y = self.input_data.get_value_label(InputType.VARIABLE)[1].encode("utf-8")
+        x = self.input_data.get_value_label(InputType.VARIABLE)[0]
+        y = self.input_data.get_value_label(InputType.VARIABLE)[1]
         self.header.append(("x-axis,{}\n").format(x))
         self.header.append(("y-axis,{}\n").format(y))
 

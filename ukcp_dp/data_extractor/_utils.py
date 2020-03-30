@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 
 import cf_units
