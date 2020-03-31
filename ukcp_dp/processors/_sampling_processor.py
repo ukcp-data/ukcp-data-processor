@@ -185,8 +185,8 @@ class SamplingProcessor:
 
         # Work out which indices must be used to subset the data for a range of
         # percentages
-        low_index = (sampling_percentile - 10) * sample_count / 100
-        high_index = (sampling_percentile + 10) * sample_count / 100
+        low_index = int((sampling_percentile - 10) * sample_count / 100)
+        high_index = int((sampling_percentile + 10) * sample_count / 100)
 
         sample_ids = [i[1] for i in samples[low_index:high_index]]
         return sample_ids
