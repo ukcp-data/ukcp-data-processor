@@ -205,6 +205,7 @@ class Vocab:
     def __init__(self):
         self.vocab = self.VOCAB
         self.vocab["year"] = _get_range(1900, 2301)
+        self.vocab["year"].update(_get_range(3000, 3050))
         self.vocab["year_minimum"] = _get_range(1900, 2301)
         self.vocab["year_maximum"] = _get_range(1900, 2301)
         self.vocab["sampling_id"] = _get_range(1, 4001)
