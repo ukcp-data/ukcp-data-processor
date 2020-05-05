@@ -181,11 +181,17 @@ COLLECTION_RCM_MIN_YEAR = 1980
 COLLECTION_MARINE = "marine-sim"
 COLLECTION_MARINE_MIN_YEAR = 2007
 COLLECTION_MARINE_MAX_YEAR = 2300
+COLLECTION_DERIVED = "land-derived"
+COLLECTION_DERIVED_GWL_MIN_YEAR = 3000
+COLLECTION_DERIVED_GWL_MAX_YEAR = 3050
 OTHER_MAX_YEAR = 2100
 
 # Marine data stuff
 RETURN_PERIODS = "return-periods"
 EXTENDED_PROJECTIONS = ["msl-proj-expl", "return-periods-ext"]
+
+# Derived data stuff
+GWL = ["gwl2", "gwl4"]
 
 CDF_LABEL = "Probability of being less than (%)"
 PDF_LABEL = "Relative probability"

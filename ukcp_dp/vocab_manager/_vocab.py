@@ -207,7 +207,9 @@ class Vocab:
         self.vocab["year"] = _get_range(1900, 2301)
         self.vocab["year"].update(_get_range(3000, 3050))
         self.vocab["year_minimum"] = _get_range(1900, 2301)
+        self.vocab["year_minimum"].update(_get_range(3000, 3050))
         self.vocab["year_maximum"] = _get_range(1900, 2301)
+        self.vocab["year_maximum"].update(_get_range(3000, 3050))
         self.vocab["sampling_id"] = _get_range(1, 4001)
         self.vocab["random_sampling_count"] = _get_range(100, 4001)
         self.vocab["highlighted_ensemble_members"] = self.vocab["ensemble"]
@@ -355,6 +357,36 @@ MONTHS = [
 SEASONS = ["djf", "mam", "jja", "son"]
 
 ENSEMBLE_MEMBER_SET = {
+    "land-derived": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+    ],
     "land-gcm": [
         "01",
         "02",

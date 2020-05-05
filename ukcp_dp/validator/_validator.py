@@ -1,6 +1,9 @@
 import logging
 
 from ukcp_dp.constants import (
+    COLLECTION_DERIVED,
+    COLLECTION_DERIVED_GWL_MAX_YEAR,
+    COLLECTION_DERIVED_GWL_MIN_YEAR,
     COLLECTION_PROB,
     COLLECTION_PROB_MIN_YEAR,
     COLLECTION_MARINE,
@@ -11,6 +14,7 @@ from ukcp_dp.constants import (
     COLLECTION_RCM,
     COLLECTION_RCM_MIN_YEAR,
     EXTENDED_PROJECTIONS,
+    GWL,
     InputType,
     OTHER_MAX_YEAR,
     AreaType,
@@ -57,7 +61,11 @@ class Validator:
         if spatial_rep is None:
             # Not set, lets be kind and set it
             if self.input_data.get_area_type() in [AreaType.BBOX, AreaType.POINT]:
-                if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_GCM:
+                if (
+                    self.input_data.get_value(InputType.COLLECTION) == COLLECTION_GCM
+                    or self.input_data.get_value(InputType.COLLECTION)
+                    == COLLECTION_DERIVED
+                ):
                     self.input_data.set_value(InputType.SPATIAL_REPRESENTATION, "60km")
                 elif self.input_data.get_value(InputType.COLLECTION) == COLLECTION_CPM:
                     self.input_data.set_value(InputType.SPATIAL_REPRESENTATION, "5km")
@@ -157,6 +165,11 @@ class Validator:
             COLLECTION_RCM,
         ]:
             min_allowed_year = COLLECTION_RCM_MIN_YEAR
+        elif (
+            self.input_data.get_value(InputType.COLLECTION) == COLLECTION_DERIVED
+            and self.input_data.get_value(InputType.SCENARIO)[0] in GWL
+        ):
+            min_allowed_year = COLLECTION_DERIVED_GWL_MIN_YEAR
         else:
             min_allowed_year = min(self.vocab.get_collection_terms("year_minimum"))
 
@@ -172,6 +185,11 @@ class Validator:
             and self.input_data.get_value(InputType.METHOD) in EXTENDED_PROJECTIONS
         ):
             max_allowed_year = COLLECTION_MARINE_MAX_YEAR
+        elif (
+            self.input_data.get_value(InputType.COLLECTION) == COLLECTION_DERIVED
+            and self.input_data.get_value(InputType.SCENARIO)[0] in GWL
+        ):
+            max_allowed_year = COLLECTION_DERIVED_GWL_MAX_YEAR
         else:
             max_allowed_year = OTHER_MAX_YEAR
 

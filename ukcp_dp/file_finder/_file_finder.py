@@ -7,6 +7,7 @@ from ukcp_dp.constants import (
     COLLECTION_PROB,
     COLLECTION_PROB_MIN_YEAR,
     COLLECTION_CPM,
+    COLLECTION_DERIVED,
     COLLECTION_GCM,
     COLLECTION_RCM,
     COLLECTION_MARINE,
@@ -58,6 +59,7 @@ def get_file_lists(input_data):
 
     elif input_data.get_value(InputType.COLLECTION) in [
         COLLECTION_CPM,
+        COLLECTION_DERIVED,
         COLLECTION_GCM,
         COLLECTION_RCM,
     ]:
