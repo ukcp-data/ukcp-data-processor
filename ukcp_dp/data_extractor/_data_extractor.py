@@ -617,8 +617,8 @@ class DataExtractor:
             AreaType.GAUGE_POINT,
         ]:
             # coordinates are coming in as lat, long
-            latitude = round(self.cubes[0].coord("latitude").points[0], 2)
-            longitude = round(self.cubes[0].coord("longitude").points[0], 2)
+            latitude = str(round(self.cubes[0].coord("latitude").points[0], 2))
+            longitude = str(round(self.cubes[0].coord("longitude").points[0], 2))
             title = "{t} for grid square {latitude}°, {longitude}°".format(
                 t=title, latitude=latitude, longitude=longitude
             )
