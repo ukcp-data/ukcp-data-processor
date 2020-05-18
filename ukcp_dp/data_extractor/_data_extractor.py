@@ -89,7 +89,7 @@ class DataExtractor:
         LOG.debug("_get_main_cubes")
         cubes = iris.cube.CubeList()
 
-        for variable in self.file_lists["main"].keys():
+        for variable in self.input_data.get_value(InputType.VARIABLE):
             # for each variable there is a list of files per scenario
             for i, file_list in enumerate(self.file_lists["main"][variable]):
 
