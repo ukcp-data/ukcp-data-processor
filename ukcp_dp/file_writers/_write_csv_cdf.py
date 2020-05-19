@@ -42,7 +42,8 @@ class CdfCsvWriter(BaseCsvWriter):
         """
         for _slice in cube.slices_over("percentile"):
             x = str(_slice.data)
-            y = str(_slice.coord("percentile").points[0])
+            # ensure the percentile is reported as no more the 2 dp
+            y = str(round(_slice.coord("percentile").points[0], 2))
             try:
                 self.data_dict[y].append(x)
             except KeyError:
