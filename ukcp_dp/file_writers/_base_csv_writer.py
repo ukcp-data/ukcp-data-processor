@@ -149,8 +149,11 @@ class BaseCsvWriter:
 
 
 def value_to_string(self, value):
-    if isinstance(value, np.float32):
-        value_as_string = np.format_float_positional(value, precision=8, unique=False)
-        return value_as_string
+    """
+    Change the type of the given value to a string.
 
-    value = str(value)
+    In the future it may be that we want to do something special, i.e. set the precision
+    of floats, set the precision according to variable etc.
+
+    """
+    return str(value)
