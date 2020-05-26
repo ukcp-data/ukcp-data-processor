@@ -3,7 +3,7 @@ import logging
 import iris
 from ukcp_dp.constants import COLLECTION_MARINE, COLLECTION_PROB
 from ukcp_dp.constants import InputType, RETURN_PERIODS
-from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
 LOG = logging.getLogger(__name__)
@@ -112,7 +112,7 @@ class PlumeCsvWriter(BaseCsvWriter):
         data = cube.data[:]
         coords = cube.coord("return_period")[:]
         for period in range(0, data.shape[0]):
-            value = str(data[period])
+            value = value_to_string(data[period])
             time_str = int(round(coords[period].cell(0).point))
             try:
                 self.data_dict[time_str].append(value)
@@ -127,7 +127,7 @@ class PlumeCsvWriter(BaseCsvWriter):
         data = cube.data[:]
         coords = cube.coord("time")[:]
         for time_ in range(0, data.shape[0]):
-            value = str(data[time_])
+            value = value_to_string(data[time_])
             time_str = coords[time_].cell(0).point.strftime("%Y-%m-%d")
             try:
                 self.data_dict[time_str].append(value)

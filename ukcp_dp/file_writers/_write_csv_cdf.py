@@ -1,7 +1,7 @@
 import logging
 
 from ukcp_dp.constants import InputType, CDF_LABEL
-from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
 LOG = logging.getLogger(__name__)
@@ -41,7 +41,7 @@ class CdfCsvWriter(BaseCsvWriter):
         Slice the cube over 'percentile' and update data_dict
         """
         for _slice in cube.slices_over("percentile"):
-            x = str(_slice.data)
+            x = value_to_string(_slice.data)
             # ensure the percentile is reported as no more the 2 dp
             y = str(round(_slice.coord("percentile").points[0], 2))
             try:

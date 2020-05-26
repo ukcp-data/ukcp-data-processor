@@ -2,7 +2,7 @@ import logging
 
 import iris
 from ukcp_dp.constants import InputType
-from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
 LOG = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class SampleCsvWriter(BaseCsvWriter):
 
         for sample_slice in cube.slices_over("sample"):
             sample_id = int(sample_slice.coord("sample").points[0])
-            value = str(sample_slice.data)
+            value = value_to_string(sample_slice.data)
 
             try:
                 self.data_dict[sample_id].append(value)
@@ -73,7 +73,7 @@ class SampleCsvWriter(BaseCsvWriter):
         data = cube.data[:]
         coords = cube.coord("time")[:]
         for time_ in range(0, data.shape[0]):
-            value = str(data[time_])
+            value = value_to_string(data[time_])
             time_str = coords[time_].cell(0).point.strftime("%Y-%m-%d")
             try:
                 self.data_dict[time_str].append(value)

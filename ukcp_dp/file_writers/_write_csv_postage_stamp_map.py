@@ -1,7 +1,7 @@
 import logging
 
 from ukcp_dp.constants import AreaType, InputType
-from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
 LOG = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
                     if write_header is True:
                         self.header.append(str(x_coords[x]))
 
-                    value = str(data[y, x])
+                    value = value_to_string(data[y, x])
                     try:
                         self.data_dict[y_coord].append(value)
                     except KeyError:
@@ -92,7 +92,7 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
             for region_slice in ensemble_slice.slices_over("region"):
                 region = str(region_slice.coords(var_name="geo_region")[0].points[0])
 
-                value = str(region_slice.data)
+                value = value_to_string(region_slice.data)
                 try:
                     self.data_dict[region].append(value)
                 except KeyError:

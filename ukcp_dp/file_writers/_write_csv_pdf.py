@@ -2,7 +2,7 @@ import collections
 import logging
 
 from ukcp_dp.constants import DataType, InputType, PDF_LABEL
-from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
 LOG = logging.getLogger(__name__)
@@ -63,8 +63,8 @@ class PdfCsvWriter(BaseCsvWriter):
         Slice the cube over 'percentile' and update data_dict
         """
         for i, cdf_d in enumerate(cdf_data):
-            pdf_point = str(pdf_data[i])
-            cdf_point = str(cdf_d)
+            pdf_point = value_to_string(pdf_data[i])
+            cdf_point = value_to_string(cdf_d)
             try:
                 self.data_dict[cdf_point].append(pdf_point)
             except KeyError:

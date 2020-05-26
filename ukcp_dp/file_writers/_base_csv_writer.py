@@ -3,6 +3,8 @@ import logging
 import os
 from time import gmtime, strftime
 
+import numpy as np
+
 
 LOG = logging.getLogger(__name__)
 
@@ -144,3 +146,11 @@ class BaseCsvWriter:
             plot_type=plot_type, timestamp=self.timestamp, suffix=file_name_suffix
         )
         return os.path.join(self.output_data_file_path, file_name)
+
+
+def value_to_string(self, value):
+    if isinstance(value, np.float32):
+        value_as_string = np.format_float_positional(value, precision=8, unique=False)
+        return value_as_string
+
+    value = str(value)

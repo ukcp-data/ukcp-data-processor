@@ -3,7 +3,7 @@ import logging
 
 import iris
 from ukcp_dp.constants import AreaType, InputType
-from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
 LOG = logging.getLogger(__name__)
@@ -66,7 +66,7 @@ class SubsetCsvWriter(BaseCsvWriter):
                         if write_header is True:
                             x_values.append(str(x_coords[x]))
 
-                        value = str(data[y, x])
+                        value = value_to_string(data[y, x])
                         try:
                             self.data_dict[y_coord].append(value)
                         except KeyError:
@@ -139,7 +139,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         data = cube.data[:]
         coords = cube.coord("time")[:]
         for time_ in range(0, data.shape[0]):
-            value = str(data[time_])
+            value = value_to_string(data[time_])
             time_str = coords[time_].cell(0).point.strftime(date_format)
             try:
                 self.data_dict[time_str].append(value)
