@@ -1,3 +1,14 @@
+# Release 2.0.0
+
+This release addresses:
+
+* Migration from Python 2 to Python 3
+* Migration from Iris 1 to Iris 2
+* Migration from Matplotlib 2 to Matplotlib 3
+* Migration from NumPy 1.15 to NumPy 1.1
+* Provide sub-daily data for the CPM
+
+
 # Release 1.1.2
 
 This release addresses:
