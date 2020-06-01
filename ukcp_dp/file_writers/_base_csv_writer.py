@@ -148,7 +148,7 @@ class BaseCsvWriter:
         return os.path.join(self.output_data_file_path, file_name)
 
 
-def value_to_string(self, value):
+def value_to_string(value):
     """
     Change the type of the given value to a string.
 
