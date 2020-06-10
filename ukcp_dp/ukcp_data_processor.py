@@ -20,14 +20,14 @@ from ukcp_dp.vocab_manager import Vocab
 from ukcp_dp.utils import get_plot_settings
 
 
-class UKCPDataProcessor(object):
-
+class UKCPDataProcessor:
     def __init__(self, process_version=None):
         self.cube_list = None
         self.input_data = None
         self.overlay_cube = None
         self.plot_settings = None
         self.plot_type = None
+        self.title = None
         self.vocab = Vocab()
         self.validator = Validator(self.vocab)
         self.validated = False
@@ -70,7 +70,7 @@ class UKCPDataProcessor(object):
 
     def validate_inputs(self):
         if self.input_data is None:
-            raise Exception('Invalid state, input data has not been set')
+            raise Exception("Invalid state, input data has not been set")
 
         self.input_data = self.validator.validate(self.input_data)
         self.validated = True
@@ -94,10 +94,10 @@ class UKCPDataProcessor(object):
             self.vocab,
             self.input_data.get_value(InputType.IMAGE_SIZE),
             self.input_data.get_font_size(),
-            self.input_data.get_value(InputType.VARIABLE)[0])
+            self.input_data.get_value(InputType.VARIABLE)[0],
+        )
 
-        data_extractor = DataExtractor(file_lists, self.input_data,
-                                       self.plot_settings)
+        data_extractor = DataExtractor(file_lists, self.input_data, self.plot_settings)
 
         self.title = data_extractor.get_title()
         self.cube_list = data_extractor.get_cubes()
@@ -105,13 +105,13 @@ class UKCPDataProcessor(object):
 
         if self.input_data.get_value(InputType.SAMPLING_METHOD) is not None:
             sampling_processor = SamplingProcessor(
-                self.cube_list, self.input_data, self.vocab)
+                self.cube_list, self.input_data, self.vocab
+            )
             self.cube_list = sampling_processor.get_cubes()
 
         return get_absolute_paths(file_lists)
 
-    def write_plot(self, plot_type, output_path, image_format=None,
-                   title=None):
+    def write_plot(self, plot_type, output_path, image_format=None, title=None):
         """
         Generate a plot.
 
@@ -138,10 +138,17 @@ class UKCPDataProcessor(object):
         if title is None:
             title = self.title
 
-        image_file = plotter_write_plot(plot_type, output_path, image_format,
-                                        self.input_data, self.cube_list,
-                                        self.overlay_cube, title, self.vocab,
-                                        self.plot_settings)
+        image_file = plotter_write_plot(
+            plot_type,
+            output_path,
+            image_format,
+            self.input_data,
+            self.cube_list,
+            self.overlay_cube,
+            title,
+            self.vocab,
+            self.plot_settings,
+        )
         self.plot_type = plot_type
 
         return image_file
@@ -165,10 +172,15 @@ class UKCPDataProcessor(object):
         if data_format is None:
             raise Exception("data_format cannot be None")
 
-        if (self.vocab.get_collection_term_label(
-                InputType.DATA_FORMAT, data_format) is None):
-            raise Exception("Unknown {value_type}: {value}.".format(
-                value_type=InputType.DATA_FORMAT, value=data_format))
+        if (
+            self.vocab.get_collection_term_label(InputType.DATA_FORMAT, data_format)
+            is None
+        ):
+            raise Exception(
+                "Unknown {value_type}: {value}.".format(
+                    value_type=InputType.DATA_FORMAT, value=data_format
+                )
+            )
 
         if self.cube_list is None:
             self.select_data()
@@ -179,18 +191,18 @@ class UKCPDataProcessor(object):
         # plot. If the data has not been written out since the last plot then
         # we may need to constrain it. Next time round all the data will be
         # written.
-        if (self.plot_type is not None and
-            (self.plot_type == PlotType.PLUME_PLOT or
-             self.plot_type == PlotType.THREE_MAPS) and
-            (self.input_data.get_value(InputType.COLLECTION) ==
-                COLLECTION_PROB)):
+        if (
+            self.plot_type is not None
+            and (
+                self.plot_type == PlotType.PLUME_PLOT
+                or self.plot_type == PlotType.THREE_MAPS
+            )
+            and (self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB)
+        ):
 
-            if (self.input_data.get_value(InputType.COLLECTION) ==
-                    COLLECTION_PROB):
-                extended_range = True
-            else:
-                extended_range = False
-
+            extended_range = bool(
+                self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB
+            )
             cubes = CubeList()
             for cube in self.cube_list:
                 # the cube contains all of the percentiles but we only plotted
@@ -198,9 +210,16 @@ class UKCPDataProcessor(object):
                 # percentiles and optionally the 5th, 25th, 75th and 95th
                 cubes.append(get_probability_levels(cube, extended_range))
 
-        output_file_list = write_file(cubes, self.overlay_cube, self.title,
-                                      output_data_file_path, data_format,
-                                      self.input_data, self.plot_type,
-                                      self.process_version, self.vocab)
+        output_file_list = write_file(
+            cubes,
+            self.overlay_cube,
+            self.title,
+            output_data_file_path,
+            data_format,
+            self.input_data,
+            self.plot_type,
+            self.process_version,
+            self.vocab,
+        )
         self.plot_type = None
         return output_file_list

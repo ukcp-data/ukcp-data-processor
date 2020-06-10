@@ -1,14 +1,16 @@
 import logging
 
-from _map_plotter import MapPlotter
 import iris
 import matplotlib.gridspec as gridspec
 from ukcp_dp.constants import AreaType, InputType
-from ukcp_dp.plotters.utils._map_utils import plot_standard_map, \
-    plot_standard_choropleth_map
+from ukcp_dp.plotters._map_plotter import MapPlotter
+from ukcp_dp.plotters.utils._map_utils import (
+    plot_standard_map,
+    plot_standard_choropleth_map,
+)
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class ThreeMapPlotter(MapPlotter):
@@ -27,7 +29,7 @@ class ThreeMapPlotter(MapPlotter):
         @param plot_settings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
         """
-        log.debug('_generate_subplots')
+        LOG.debug("_generate_subplots")
 
         gs_top = 0.82
         gs_left = 0.02
@@ -49,23 +51,24 @@ class ThreeMapPlotter(MapPlotter):
             bar_grid = bar_gs[0, 1:-1]
             bar_gs.update(top=0.28, bottom=0.08, left=gs_left, right=gs_right)
 
-
         # extract 10th, 50th and 90th percentiles
         percentiles = [10, 50, 90]
         for i, percentile in enumerate(percentiles):
-            percentile_cube = cube.extract(
-                iris.Constraint(percentile=percentile))
-            title = '{}th Percentile'.format(percentile)
+            percentile_cube = cube.extract(iris.Constraint(percentile=percentile))
+            title = "{}th Percentile".format(percentile)
             if percentile_cube is None:
                 raise Exception(
-                    'Attempted to plot the {}th percentile, but no data found'.
-                    format(percentile))
+                    "Attempted to plot the {}th percentile, but no data found".format(
+                        percentile
+                    )
+                )
             result = self._add_sub_plot(
-                fig, grid[i], plot_settings, title, percentile_cube)
+                fig, grid[i], plot_settings, title, percentile_cube
+            )
 
         # add the sub plot to contain the bar
         ax = fig.add_subplot(bar_grid)
-        ax.axis('off')
+        ax.axis("off")
 
         return result
 
@@ -75,17 +78,29 @@ class ThreeMapPlotter(MapPlotter):
         # Setting bar_orientation="none" here to override (prevent) drawing
         # the colorbar
         if self.input_data.get_area_type() == AreaType.BBOX:
-            result = plot_standard_map(data, plot_settings, fig=fig,
-                                       ax=ax, barlab=None,
-                                       bar_orientation="none",
-                                       outfnames=None)
-            self.plot_overlay(self.input_data.get_value(
-                InputType.SHOW_BOUNDARIES), hi_res=True)
+            result = plot_standard_map(
+                data,
+                plot_settings,
+                fig=fig,
+                ax=ax,
+                barlab=None,
+                bar_orientation="none",
+                outfnames=None,
+            )
+            self.plot_overlay(
+                self.input_data.get_value(InputType.SHOW_BOUNDARIES), hi_res=True
+            )
         else:
-            result = plot_standard_choropleth_map(data, plot_settings, fig=fig,
-                                                  ax=ax, barlab=None,
-                                                  bar_orientation="none",
-                                                  outfnames=None, hi_res=False)
+            result = plot_standard_choropleth_map(
+                data,
+                plot_settings,
+                fig=fig,
+                ax=ax,
+                barlab=None,
+                bar_orientation="none",
+                outfnames=None,
+                hi_res=False,
+            )
             # don't need the overlay for the choropleth map as the region
             # geometry contains them.
 

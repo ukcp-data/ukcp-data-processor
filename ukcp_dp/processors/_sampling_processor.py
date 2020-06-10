@@ -9,10 +9,10 @@ from ukcp_dp.file_finder import get_file_lists
 from ukcp_dp.utils import get_plot_settings
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
-class SamplingProcessor(object):
+class SamplingProcessor:
     """
     Extract sample data based on user selection criteria.
     """
@@ -28,7 +28,7 @@ class SamplingProcessor(object):
         self.input_data = input_data
         self.vocab = vocab
         self.cubes = self._sample_cubes(cube_list)
-        log.debug('Processor __init__ finished')
+        LOG.debug("Processor __init__ finished")
 
     def get_cubes(self):
         """
@@ -38,7 +38,7 @@ class SamplingProcessor(object):
 
         @return an iris cube list, one cube per scenario, per variable
         """
-        log.info('get_cubes')
+        LOG.info("get_cubes")
         return self.cubes
 
     def _sample_cubes(self, cube_list):
@@ -51,28 +51,29 @@ class SamplingProcessor(object):
             first cube is used.
         @return an iris cube list containing the selected samples
         """
-        log.debug('_sample_cubes')
+        LOG.debug("_sample_cubes")
 
-        if self.input_data.get_value(InputType.SAMPLING_METHOD) == 'id':
+        if self.input_data.get_value(InputType.SAMPLING_METHOD) == "id":
             return self._sample_cubes_by_id(cube_list)
-        elif self.input_data.get_value(InputType.SAMPLING_METHOD) == 'random':
+        if self.input_data.get_value(InputType.SAMPLING_METHOD) == "random":
             return self._sample_cubes_random(cube_list)
-        elif self.input_data.get_value(InputType.SAMPLING_METHOD) == 'subset':
+        if self.input_data.get_value(InputType.SAMPLING_METHOD) == "subset":
             return self._sample_cubes_by_subset(cube_list)
-        else:  # self.input_data.get_value(InputType.SAMPLING_METHOD) == 'all':
-            return self._sample_cubes_all(cube_list)
+        # self.input_data.get_value(InputType.SAMPLING_METHOD) == 'all':
+        return self._sample_cubes_all(cube_list)
 
     def _sample_cubes_all(self, cube_list):
-        log.debug('_sample_cubes_all')
+        LOG.debug("_sample_cubes_all")
         return cube_list
 
     def _sample_cubes_by_id(self, cube_list):
         """
         Get a cube that contains the samples listed in SAMPLING_ID.
         """
-        log.debug('_sample_cubes_by_id')
-        constraint = iris.Constraint(sample=self.input_data.get_value(
-            InputType.SAMPLING_ID))
+        LOG.debug("_sample_cubes_by_id")
+        constraint = iris.Constraint(
+            sample=self.input_data.get_value(InputType.SAMPLING_ID)
+        )
         selected_cubes = iris.cube.CubeList()
 
         for cube in cube_list:
@@ -84,12 +85,10 @@ class SamplingProcessor(object):
         Get a random selection of samples, the number of samples is
         RANDOM_SAMPLING_COUNT.
         """
-        log.debug('_sample_cubes_random')
-        random_sample_count = self.input_data.get_value(
-            InputType.RANDOM_SAMPLING_COUNT)
+        LOG.debug("_sample_cubes_random")
+        random_sample_count = self.input_data.get_value(InputType.RANDOM_SAMPLING_COUNT)
 
-        random_ids = self._get_random_ids(
-            cube_list[0], random_sample_count)
+        random_ids = self._get_random_ids(cube_list[0], random_sample_count)
         constraint = iris.Constraint(sample=random_ids)
         selected_cubes = iris.cube.CubeList()
 
@@ -98,27 +97,28 @@ class SamplingProcessor(object):
         return selected_cubes
 
     def _sample_cubes_by_subset(self, cube_list):
-        log.debug('_sample_cubes_by_subset')
+        LOG.debug("_sample_cubes_by_subset")
 
         # Get a set of sample ids based on the first sampling variable
         # First get a new cube
         cube_s1 = self._get_cubes_for_subset(
             self.input_data.get_value(InputType.SAMPLING_VARIABLE_1),
-            self.input_data.get_value(InputType.SAMPLING_TEMPORAL_AVERAGE_1))
+            self.input_data.get_value(InputType.SAMPLING_TEMPORAL_AVERAGE_1),
+        )
 
         # Extract the ids based on the sampling percentile
         sample_ids = self._get_percentile_ids(
-            cube_s1,
-            self.input_data.get_value(InputType.SAMPLING_PERCENTILE_1))
+            cube_s1, self.input_data.get_value(InputType.SAMPLING_PERCENTILE_1)
+        )
 
         # If a second sampling variable was provided then further restrict the
         # ids
-        if self.input_data.get_value(InputType.SAMPLING_SUBSET_COUNT) == '2':
+        if self.input_data.get_value(InputType.SAMPLING_SUBSET_COUNT) == "2":
             # First get a new cube
             cube_s2 = self._get_cubes_for_subset(
                 self.input_data.get_value(InputType.SAMPLING_VARIABLE_2),
-                self.input_data.get_value(
-                    InputType.SAMPLING_TEMPORAL_AVERAGE_2))
+                self.input_data.get_value(InputType.SAMPLING_TEMPORAL_AVERAGE_2),
+            )
 
             # Filter the cube based on the ids from the first sampling variable
             constraint = iris.Constraint(sample=sample_ids)
@@ -126,8 +126,8 @@ class SamplingProcessor(object):
 
             # Extract the ids based on the sampling percentile
             sample_ids = self._get_percentile_ids(
-                cube_s2,
-                self.input_data.get_value(InputType.SAMPLING_PERCENTILE_2))
+                cube_s2, self.input_data.get_value(InputType.SAMPLING_PERCENTILE_2)
+            )
 
         constraint = iris.Constraint(sample=sample_ids)
         selected_cubes = iris.cube.CubeList()
@@ -148,7 +148,7 @@ class SamplingProcessor(object):
         data_extractor = DataExtractor(file_lists, input_data, plot_settings)
         cubes = data_extractor.get_cubes()
         if len(cubes) > 1:
-            log.error('Found more than 1 cube')
+            LOG.error("Found more than 1 cube")
         return data_extractor.get_cubes()[0]
 
     def get_input_data(self, variable, time_period):
@@ -160,15 +160,13 @@ class SamplingProcessor(object):
         input_data.set_values(InputType.VARIABLE, [variable])
         input_data.set_value(InputType.TIME_PERIOD, time_period)
 
-        if (time_period in
-                self.vocab.get_collection_terms(TemporalAverageType.MONTHLY)):
+        if time_period in self.vocab.get_collection_terms(TemporalAverageType.MONTHLY):
             temporal_average_type = TemporalAverageType.MONTHLY
         elif time_period == TemporalAverageType.ANNUAL:
             temporal_average_type = TemporalAverageType.ANNUAL
         else:
             temporal_average_type = TemporalAverageType.SEASONAL
-        input_data.set_value(
-            InputType.TEMPORAL_AVERAGE_TYPE, temporal_average_type)
+        input_data.set_value(InputType.TEMPORAL_AVERAGE_TYPE, temporal_average_type)
 
         return input_data
 
@@ -178,8 +176,8 @@ class SamplingProcessor(object):
         sampling_percentile values + and - 10.
         """
         samples = []
-        for sample_slice in cube.slices_over('sample'):
-            sample_id = int(sample_slice.coord('sample').points[0])
+        for sample_slice in cube.slices_over("sample"):
+            sample_id = int(sample_slice.coord("sample").points[0])
             samples.append((sample_slice.data, sample_id))
 
         samples.sort()
@@ -187,8 +185,8 @@ class SamplingProcessor(object):
 
         # Work out which indices must be used to subset the data for a range of
         # percentages
-        low_index = (sampling_percentile - 10) * sample_count / 100
-        high_index = (sampling_percentile + 10) * sample_count / 100
+        low_index = int((sampling_percentile - 10) * sample_count / 100)
+        high_index = int((sampling_percentile + 10) * sample_count / 100)
 
         sample_ids = [i[1] for i in samples[low_index:high_index]]
         return sample_ids
@@ -206,7 +204,7 @@ class SamplingProcessor(object):
 
         @return a list of sample ids
         """
-        num_of_samples = len(cube.coord('sample').points)
-        ids = random.sample(xrange(num_of_samples), random_sample_count)
+        num_of_samples = len(cube.coord("sample").points)
+        ids = random.sample(range(num_of_samples), random_sample_count)
         ids.sort()
         return ids

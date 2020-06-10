@@ -3,16 +3,14 @@ from __future__ import unicode_literals
 import logging
 
 import matplotlib.cbook as cbook
-import matplotlib.gridspec as gridspec
 import matplotlib.image as image
-from matplotlib.transforms import Bbox
 from ukcp_dp.constants import InputType, LOGO_SMALL, LOGO_MEDIUM, LOGO_LARGE
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
-class BasePlotter(object):
+class BasePlotter:
     """
     The base class for plotters.
 
@@ -26,8 +24,23 @@ class BasePlotter(object):
         self.vocab
     """
 
-    def generate_plot(self, input_data, cube_list, overlay_cube, output_path,
-                      title, vocab, plot_settings):
+    def __init__(self):
+        self.cube_list = None
+        self.input_data = None
+        self.overlay_cube = None
+        self.title = None
+        self.vocab = None
+
+    def generate_plot(
+        self,
+        input_data,
+        cube_list,
+        overlay_cube,
+        output_path,
+        title,
+        vocab,
+        plot_settings,
+    ):
         """
         Generate a plot.
 
@@ -41,7 +54,7 @@ class BasePlotter(object):
         @param vocab (Vocab): an instance of the ukcp_dp Vocab class
         @param plot_settings (StandardMap): an object containing plot settings
         """
-        log.info('generate_plot')
+        LOG.info("generate_plot")
         # an object containing user defined values
         self.input_data = input_data
         # an iris cube list containing one cube per scenario, per variable
@@ -59,7 +72,7 @@ class BasePlotter(object):
         @param output_path (str): the full path to the file
         @param plot_settings (StandardMap): an object containing plot settings
         """
-        pass
+        raise NotImplementedError
 
     def _add_logo(self, fig):
         """
@@ -103,5 +116,5 @@ class BasePlotter(object):
             x = 0.80
             font_size = 24
 
-        textstr = 'Funded by BEIS and Defra'
+        textstr = "Funded by BEIS and Defra"
         fig.text(x, 0.02, textstr, fontsize=font_size)

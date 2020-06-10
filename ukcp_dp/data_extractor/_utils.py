@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 
 import cf_units
@@ -6,14 +5,21 @@ import iris
 import iris.coord_categorisation
 from iris.exceptions import CoordinateNotFoundError
 from ukcp_dp.constants import COLLECTION_CPM, TemporalAverageType
-from ukcp_dp.vocab_manager import get_months, get_seasons
+from ukcp_dp.vocab_manager import get_months
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
-def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
-                temporal_average_type, time_period, collection):
+def get_anomaly(
+    cube_climatology,
+    cube_absoute,
+    baseline,
+    preferred_unit,
+    temporal_average_type,
+    time_period,
+    collection,
+):
     """
     Generate a cube containing the anomaly values.
 
@@ -34,7 +40,7 @@ def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
         periods = _get_selected_seasons(time_period)
     else:
         # annual
-        periods = ['ann']
+        periods = ["ann"]
 
     # generate the anomaly for each time period, i.e. month or season
     anomaly_cubes = iris.cube.CubeList()
@@ -59,110 +65,110 @@ def get_anomaly(cube_climatology, cube_absoute, baseline, preferred_unit,
         # we need to remove these so that we can subtract the cubes
         if temporal_average_type == TemporalAverageType.MONTHLY:
             try:
-                cube_absoute_period.remove_coord('year')
+                cube_absoute_period.remove_coord("year")
             except iris.exceptions.CoordinateNotFoundError:
                 pass
             if collection == COLLECTION_CPM:
                 try:
-                    cube_absoute_period.remove_coord('yyyymm')
+                    cube_absoute_period.remove_coord("yyyymm")
                 except iris.exceptions.CoordinateNotFoundError:
                     pass
                 try:
-                    cube_climatology_period.remove_coord('year')
+                    cube_climatology_period.remove_coord("year")
                 except iris.exceptions.CoordinateNotFoundError:
                     pass
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
             try:
-                cube_absoute_period.remove_coord('month_number')
+                cube_absoute_period.remove_coord("month_number")
             except iris.exceptions.CoordinateNotFoundError:
                 pass
             if collection == COLLECTION_CPM:
                 try:
-                    cube_absoute_period.remove_coord('season_year')
+                    cube_absoute_period.remove_coord("season_year")
                 except iris.exceptions.CoordinateNotFoundError:
                     pass
 
         # now generate the anomaly
         cube_anomaly_period = _make_anomaly(
-            cube_absoute_period, cube_climatology_period, preferred_unit)
+            cube_absoute_period, cube_climatology_period, preferred_unit
+        )
 
         # we need to remove these so that we can concatenate the cubes
         if temporal_average_type == TemporalAverageType.MONTHLY:
-            for coord in ['yyyymm', 'month_number']:
+            for coord in ["yyyymm", "month_number"]:
                 try:
                     cube_anomaly_period.remove_coord(coord)
                 except iris.exceptions.CoordinateNotFoundError:
                     pass
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
-            for coord in ['year', 'season']:
+            for coord in ["year", "season"]:
                 try:
                     cube_anomaly_period.remove_coord(coord)
                 except iris.exceptions.CoordinateNotFoundError:
                     pass
 
-        if time_period == 'all':
+        if time_period == "all":
             # At this point the cube will contain all of the values for a
             # specific month/season for the entire time range. We cannot
             # concatenate cubes of this type together so we have to split them
             # up so they can be concatenated later on.
             # At the same time we are promoting 'time' back to a coordinate
-            for anomaly_slice in cube_anomaly_period.slices_over('time'):
+            for anomaly_slice in cube_anomaly_period.slices_over("time"):
                 # Flip the coordinates around so when they are transposed after
                 # 'time' is added they will be the right way round
                 anomaly_slice.transpose()
-                anomaly_cubes.append(
-                    iris.util.new_axis(anomaly_slice, 'time'))
+                anomaly_cubes.append(iris.util.new_axis(anomaly_slice, "time"))
         else:
             anomaly_cubes.append(cube_anomaly_period)
 
     cube_anomaly = anomaly_cubes.concatenate_cube()
 
-    if time_period == 'all':
+    if time_period == "all":
         # Put 'time' back in the correct place
         cube_anomaly.transpose()
 
     # add the aux coords back
     if temporal_average_type == TemporalAverageType.MONTHLY:
         try:
-            iris.coord_categorisation.add_year(
-                cube_anomaly, 'time', name='year')
+            iris.coord_categorisation.add_year(cube_anomaly, "time", name="year")
         except CoordinateNotFoundError:
             pass
         try:
             iris.coord_categorisation.add_month_number(
-                cube_anomaly, 'time', name='month_number')
+                cube_anomaly, "time", name="month_number"
+            )
         except CoordinateNotFoundError:
             pass
 
     elif temporal_average_type == TemporalAverageType.SEASONAL:
         try:
-            iris.coord_categorisation.add_year(
-                cube_anomaly, 'time', name='year')
+            iris.coord_categorisation.add_year(cube_anomaly, "time", name="year")
         except CoordinateNotFoundError:
             pass
         try:
             iris.coord_categorisation.add_season_year(
-                cube_anomaly, 'time', name='season_year')
+                cube_anomaly, "time", name="season_year"
+            )
         except CoordinateNotFoundError:
             pass
         try:
-            iris.coord_categorisation.add_season(
-                cube_anomaly, 'time', name='season')
+            iris.coord_categorisation.add_season(cube_anomaly, "time", name="season")
         except CoordinateNotFoundError:
             pass
         try:
             iris.coord_categorisation.add_month_number(
-                cube_anomaly, 'time', name='month_number')
+                cube_anomaly, "time", name="month_number"
+            )
         except CoordinateNotFoundError:
             pass
 
     # add the attributes back in and add info about the baseline and
     # anomaly
     cube_anomaly.attributes = cube_absoute.attributes
-    cube_anomaly.attributes['baseline_period'] = baseline
-    cube_anomaly.attributes['anomaly_type'] = 'relative_change'
+    cube_anomaly.attributes["baseline_period"] = baseline
+    cube_anomaly.attributes["anomaly_type"] = "relative_change"
 
     return cube_anomaly
 
@@ -240,7 +246,7 @@ def _make_anomaly(datacube, reference_cube, preferred_unit=None):
 
 
 def _get_selected_month_numbers(time_period):
-    if time_period == 'all':
+    if time_period == "all":
         months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
         return months
     for i, term in enumerate(get_months()):
@@ -250,7 +256,7 @@ def _get_selected_month_numbers(time_period):
 
 
 def _get_selected_seasons(time_period):
-    if time_period == 'all':
-        seasons = ['djf', 'mam', 'jja', 'son']
+    if time_period == "all":
+        seasons = ["djf", "mam", "jja", "son"]
         return seasons
     return [time_period]

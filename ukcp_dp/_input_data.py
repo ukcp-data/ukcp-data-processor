@@ -1,9 +1,16 @@
-from constants import InputType, INPUT_TYPES, INPUT_TYPES_SINGLE_VALUE, \
-    INPUT_TYPES_MULTI_VALUE, FONT_SIZE_SMALL, FONT_SIZE_MEDIUM, \
-    FONT_SIZE_LARGE, AreaType
+from ukcp_dp.constants import (
+    InputType,
+    INPUT_TYPES,
+    INPUT_TYPES_SINGLE_VALUE,
+    INPUT_TYPES_MULTI_VALUE,
+    FONT_SIZE_SMALL,
+    FONT_SIZE_MEDIUM,
+    FONT_SIZE_LARGE,
+    AreaType,
+)
 
 
-class InputData(object):
+class InputData:
     """
     This class is designed to validate and store user inputs.
     In most cases validation is done against a set of facet values. Access
@@ -22,10 +29,14 @@ class InputData(object):
         self.allowed_values = {}
 
     def __str__(self):
-        x = ('validated_inputs:{validated_inputs}, allowed_values:'
-             '{allowed_values}'.format(validated_inputs=self.validated_inputs,
-                                       allowed_values=self.allowed_values))
-        return x
+        msg = (
+            "validated_inputs:{validated_inputs}, allowed_values:"
+            "{allowed_values}".format(
+                validated_inputs=self.validated_inputs,
+                allowed_values=self.allowed_values,
+            )
+        )
+        return msg
 
     def get_user_inputs(self):
         """
@@ -38,38 +49,48 @@ class InputData(object):
         input_labels = {}
         for key in self.validated_inputs:
             key_label = self.vocab.get_collection_label(key)
-            if key == 'area_type':
+            if key == "area_type":
                 if self.validated_inputs[key][0] in [
-                        AreaType.POINT, AreaType.COAST_POINT,
-                        AreaType.GAUGE_POINT]:
-                    value = '{} {}'.format(self.validated_inputs[key][2][0],
-                                           self.validated_inputs[key][2][1])
+                    AreaType.POINT,
+                    AreaType.COAST_POINT,
+                    AreaType.GAUGE_POINT,
+                ]:
+                    value = "{} {}".format(
+                        self.validated_inputs[key][2][0],
+                        self.validated_inputs[key][2][1],
+                    )
                 elif self.validated_inputs[key][0] == AreaType.BBOX:
-                    value = '{} {} {} {}'.format(
+                    value = "{} {} {} {}".format(
                         self.validated_inputs[key][2][0],
                         self.validated_inputs[key][2][1],
                         self.validated_inputs[key][2][2],
-                        self.validated_inputs[key][2][3])
+                        self.validated_inputs[key][2][3],
+                    )
                 else:
                     value = self.validated_inputs[key][3]
             else:
                 value = self.validated_inputs[key][1]
-            if (len(value) == 0):
+            if len(value) == 0:
                 continue
             if isinstance(value, list):
-                value = ','.join(value)
-            input_labels[key_label] = value.encode('utf-8')
+                value = ",".join(value)
+            input_labels[key_label] = value
 
         # remove extra year values
-        if ((self.validated_inputs.get(InputType.YEAR) ==
-                self.validated_inputs.get(InputType.YEAR_MINIMUM)) and
-                (self.validated_inputs.get(InputType.YEAR) ==
-                 self.validated_inputs.get(InputType.YEAR_MAXIMUM))):
+        if (
+            self.validated_inputs.get(InputType.YEAR)
+            == self.validated_inputs.get(InputType.YEAR_MINIMUM)
+        ) and (
+            self.validated_inputs.get(InputType.YEAR)
+            == self.validated_inputs.get(InputType.YEAR_MAXIMUM)
+        ):
             try:
-                input_labels.pop(self.vocab.get_collection_label(
-                    InputType.YEAR_MINIMUM))
-                input_labels.pop(self.vocab.get_collection_label(
-                    InputType.YEAR_MAXIMUM))
+                input_labels.pop(
+                    self.vocab.get_collection_label(InputType.YEAR_MINIMUM)
+                )
+                input_labels.pop(
+                    self.vocab.get_collection_label(InputType.YEAR_MAXIMUM)
+                )
             except KeyError:
                 pass
         else:
@@ -130,8 +151,11 @@ class InputData(object):
             # the user has set value(s)
             if value not in self.allowed_values[value_type]:
 
-                raise Exception("Unknown {value_type}: {value}.".format(
-                    value_type=value_type, value=value))
+                raise Exception(
+                    "Unknown {value_type}: {value}.".format(
+                        value_type=value_type, value=value
+                    )
+                )
 
             user_set_value = True
 
@@ -143,8 +167,13 @@ class InputData(object):
                 self.validated_inputs[value_type] = [value, None]
             else:
                 possible_values = self.vocab.get_collection_terms(value_type)
-                raise Exception("Unknown {value_type}: {value}. Should be one of {possible_values}".format(
-                    value_type=value_type, value=value, possible_values=possible_values))
+                raise Exception(
+                    "Unknown {value_type}: {value}. Should be one of {possible_values}".format(
+                        value_type=value_type,
+                        value=value,
+                        possible_values=possible_values,
+                    )
+                )
 
         self.validated_inputs[value_type] = [value, label]
 
@@ -158,8 +187,7 @@ class InputData(object):
         @throws Exception
         """
         if values is None:
-            raise Exception("Unknown {value_type}: None.".format(
-                value_type=value_type))
+            raise Exception("Unknown {value_type}: None.".format(value_type=value_type))
 
         if not isinstance(values, list):
             values = [values]
@@ -167,16 +195,22 @@ class InputData(object):
             for value in values:
 
                 if value not in self.allowed_values[value_type]:
-                    raise Exception("Unknown {value_type}: {value}.".format(
-                        value_type=value_type, value=value))
+                    raise Exception(
+                        "Unknown {value_type}: {value}.".format(
+                            value_type=value_type, value=value
+                        )
+                    )
 
         labels = []
         for value in values:
             label = self.vocab.get_collection_term_label(value_type, value)
 
             if label is None:
-                raise Exception("Unknown {value_type}: {value}.".format(
-                    value_type=value_type, value=value))
+                raise Exception(
+                    "Unknown {value_type}: {value}.".format(
+                        value_type=value_type, value=value
+                    )
+                )
 
             labels.append(label)
         self.validated_inputs[value_type] = [values, labels]
@@ -203,7 +237,7 @@ class InputData(object):
 
         @return the value label for the value_type
         """
-        return(self.validated_inputs[value_type][1])
+        return self.validated_inputs[value_type][1]
 
     # Area
     def _set_area(self, area):
@@ -235,50 +269,59 @@ class InputData(object):
         @throws Exception
 
         """
-        if type(area) is list:
+        if isinstance(area, list):
             # this will be a bbox or point, i.e.
             # ['point',430311.27,253673.63]
             # First value will be area type
             area_type = area[0]
             area = area[1:]
 
-            if (area_type not in
-                    [AreaType.BBOX, AreaType.POINT, AreaType.COAST_POINT,
-                     AreaType.GAUGE_POINT]):
+            if area_type not in [
+                AreaType.BBOX,
+                AreaType.POINT,
+                AreaType.COAST_POINT,
+                AreaType.GAUGE_POINT,
+            ]:
                 raise Exception("Unknown area: {}.".format(area))
 
             area_type_label = self.vocab.get_collection_term_label(
-                InputType.AREA, area_type)
+                InputType.AREA, area_type
+            )
             self.validated_inputs[InputType.AREA] = [
-                area_type, area_type_label, area, area]
+                area_type,
+                area_type_label,
+                area,
+                area,
+            ]
         else:
             # this will be a predefined region, i.e.
             # country|Scotland
-            area_type, area_name = area.split('|', 1)
+            area_type, area_name = area.split("|", 1)
 
             # check the area type
             area_type_label = self.vocab.get_collection_term_label(
-                InputType.AREA, area_type)
+                InputType.AREA, area_type
+            )
             if area_type_label is None:
                 raise Exception("Unknown area type: {}.".format(area_type))
 
             # check the area name
-            area_label = self.vocab.get_collection_term_label(
-                area_type, area_name)
-            if (area_label is None):
+            area_label = self.vocab.get_collection_term_label(area_type, area_name)
+            if area_label is None:
 
                 # currently the names are stored as 'labels' in the shape files
                 # so need to convert the label to the value
                 area_label = area_name
-                area_name = self.vocab.get_collection_term_value(
-                    area_type, area_name)
+                area_name = self.vocab.get_collection_term_value(area_type, area_name)
                 if area_name is None:
                     raise Exception("Unknown area name: {}.".format(area_name))
 
-            self.validated_inputs[InputType.AREA] = [area_type,
-                                                     area_type_label,
-                                                     area_name,
-                                                     area_label]
+            self.validated_inputs[InputType.AREA] = [
+                area_type,
+                area_type_label,
+                area_name,
+                area_label,
+            ]
 
     def get_area_type(self):
         """
@@ -287,7 +330,7 @@ class InputData(object):
         @return a str containing the area type
 
         """
-        return(self.validated_inputs[InputType.AREA][0])
+        return self.validated_inputs[InputType.AREA][0]
 
     def get_area_type_label(self):
         """
@@ -296,7 +339,7 @@ class InputData(object):
         @return a str containing the area type label
 
         """
-        return(self.validated_inputs[InputType.AREA][1])
+        return self.validated_inputs[InputType.AREA][1]
 
     def get_area(self):
         """
@@ -306,7 +349,7 @@ class InputData(object):
             2 or 4 floats for a point or bbox or a string for a region.
 
         """
-        return(self.validated_inputs[InputType.AREA][2])
+        return self.validated_inputs[InputType.AREA][2]
 
     def get_area_label(self):
         """
@@ -315,7 +358,7 @@ class InputData(object):
         @return a str containing the area label
 
         """
-        return(self.validated_inputs[InputType.AREA][3])
+        return self.validated_inputs[InputType.AREA][3]
 
     def get_font_size(self):
         """
@@ -323,17 +366,18 @@ class InputData(object):
 
         @return an int representing the font size
         """
-        if self.get_value(InputType.FONT_SIZE) == 's':
+        if self.get_value(InputType.FONT_SIZE) == "s":
             return FONT_SIZE_SMALL
-        elif self.get_value(InputType.FONT_SIZE) == 'm':
+        if self.get_value(InputType.FONT_SIZE) == "m":
             return FONT_SIZE_MEDIUM
-        elif self.get_value(InputType.FONT_SIZE) == 'l':
+        if self.get_value(InputType.FONT_SIZE) == "l":
             return FONT_SIZE_LARGE
+        return None
 
     def _set_allowed_values(self, allowed_values):
         for key in allowed_values.keys():
             if key in INPUT_TYPES:
-                if type(allowed_values[key]) == list:
+                if isinstance(allowed_values[key], list):
                     self.allowed_values[key] = allowed_values[key]
                 else:
                     self.allowed_values[key] = [allowed_values[key]]

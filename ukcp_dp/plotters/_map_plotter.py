@@ -1,20 +1,33 @@
 import logging
 
-from _base_plotter import BasePlotter
-from iris.exceptions import CoordinateNotFoundError
 import matplotlib.pyplot as plt
 import numpy as np
 import shapefile as shp
-from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, \
-    OVERLAY_ADMIN, OVERLAY_COASTLINE, OVERLAY_COUNTRY, OVERLAY_RIVER, \
-    OVERLAY_COASTLINE_SMALL, OVERLAY_COUNTRY_SMALL, OVERLAY_RIVER_SMALL, \
-    OVERLAY_ADMIN_SMALL, AreaType, InputType
-from ukcp_dp.plotters.utils._plotting_utils import end_figure, \
-    make_standard_bar, start_standard_figure, wrap_string
+from ukcp_dp.constants import (
+    OVERLAY_COLOUR,
+    OVERLAY_LINE_WIDTH,
+    OVERLAY_ADMIN,
+    OVERLAY_COASTLINE,
+    OVERLAY_COUNTRY,
+    OVERLAY_RIVER,
+    OVERLAY_COASTLINE_SMALL,
+    OVERLAY_COUNTRY_SMALL,
+    OVERLAY_RIVER_SMALL,
+    OVERLAY_ADMIN_SMALL,
+    AreaType,
+    InputType,
+)
+from ukcp_dp.plotters._base_plotter import BasePlotter
+from ukcp_dp.plotters.utils._plotting_utils import (
+    end_figure,
+    make_standard_bar,
+    start_standard_figure,
+    wrap_string,
+)
 from ukcp_dp.plotters.utils._region_utils import reg_from_cube
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class MapPlotter(BasePlotter):
@@ -38,11 +51,14 @@ class MapPlotter(BasePlotter):
 
         if self.input_data.get_area_type() == AreaType.BBOX:
 
-            reg = reg_from_cube(cube, lat_name="projection_y_coordinate",
-                                lon_name="projection_x_coordinate")
+            reg = reg_from_cube(
+                cube,
+                lat_name="projection_y_coordinate",
+                lon_name="projection_x_coordinate",
+            )
         else:
             # Some form of region, therefore it is the whole of UK
-            reg = {'lons': [-10.9818, 2.2398], 'lats': [48.8957, 60.9531]}
+            reg = {"lons": [-10.9818, 2.2398], "lats": [48.8957, 60.9531]}
 
         plot_settings.set_xylims(reg)
 
@@ -73,15 +89,18 @@ class MapPlotter(BasePlotter):
         fig.suptitle(new_title, fontsize=self.input_data.get_font_size())
 
         # Add the colourbar
-        bar = make_standard_bar(plot_settings, fig,
-                                bar_pos=plot_settings.bar_position,
-                                colmappable=result[1])
+        colour_bar = make_standard_bar(
+            plot_settings,
+            fig,
+            bar_pos=plot_settings.bar_position,
+            colmappable=result[1],
+        )
         # Set the colorbar font size
         labelsize = self.input_data.get_font_size() * 0.6
-        bar.ax.tick_params(labelsize=labelsize)
+        colour_bar.ax.tick_params(labelsize=labelsize)
 
         # Set the margins, and save/display & close the plot:
-#         plotgeneral.set_standard_margins(settings=None, fig=fig)
+        #         plotgeneral.set_standard_margins(settings=None, fig=fig)
         end_figure(output_path)
 
     def _generate_subplots(self, cube, plot_settings, fig):
@@ -92,7 +111,7 @@ class MapPlotter(BasePlotter):
         @param plot_settings (StandardMap): an object containing plot settings
         @param fig (matplotlib.figure.Figure)
         """
-        pass
+        raise NotImplementedError
 
     def _is_landscape(self, cube, scaling_factor=1):
         """
@@ -109,9 +128,9 @@ class MapPlotter(BasePlotter):
             # portrait
             return False
 
-        y_coords = cube.coord('projection_y_coordinate').points
+        y_coords = cube.coord("projection_y_coordinate").points
         y_range = max(y_coords) - min(y_coords)
-        x_coords = cube.coord('projection_x_coordinate').points
+        x_coords = cube.coord("projection_x_coordinate").points
         x_range = max(x_coords) - min(x_coords)
 
         if y_range * scaling_factor > x_range:
@@ -125,7 +144,7 @@ class MapPlotter(BasePlotter):
         @param overlay (str): the name of the overlay
         """
         if overlay is None:
-            overlay = 'coast_line'
+            overlay = "coast_line"
 
         if overlay == AreaType.COUNTRY:
             if hi_res:
@@ -143,12 +162,12 @@ class MapPlotter(BasePlotter):
             else:
                 sf = shp.Reader(OVERLAY_RIVER_SMALL)
         else:
-            overlay = 'coast_line'
+            overlay = "coast_line"
             if hi_res:
                 sf = shp.Reader(OVERLAY_COASTLINE)
             else:
                 sf = shp.Reader(OVERLAY_COASTLINE_SMALL)
-        log.debug('adding overlay for {}'.format(overlay))
+        LOG.debug("adding overlay for %s", overlay)
 
         for shape in list(sf.iterShapes()):
             npoints = len(shape.points)  # total points
@@ -161,12 +180,13 @@ class MapPlotter(BasePlotter):
                 else:
                     i1 = npoints
 
-                seg = shape.points[i0:i1 + 1]
+                seg = shape.points[i0 : i1 + 1]
                 x_lon = np.zeros((len(seg), 1))
                 y_lat = np.zeros((len(seg), 1))
                 for ip in range(len(seg)):
                     x_lon[ip] = seg[ip][0]
                     y_lat[ip] = seg[ip][1]
-                plt.plot(x_lon, y_lat, color=OVERLAY_COLOUR,
-                         linewidth=OVERLAY_LINE_WIDTH)
-        log.debug('overlay added')
+                plt.plot(
+                    x_lon, y_lat, color=OVERLAY_COLOUR, linewidth=OVERLAY_LINE_WIDTH
+                )
+        LOG.debug("overlay added")

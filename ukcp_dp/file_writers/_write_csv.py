@@ -5,25 +5,32 @@ from ukcp_dp.file_writers._write_csv_cdf import CdfCsvWriter
 from ukcp_dp.file_writers._write_csv_jp import JpCsvWriter
 from ukcp_dp.file_writers._write_csv_pdf import PdfCsvWriter
 from ukcp_dp.file_writers._write_csv_plume import PlumeCsvWriter
-from ukcp_dp.file_writers._write_csv_postage_stamp_map import \
-    PostageStampMapCsvWriter
+from ukcp_dp.file_writers._write_csv_postage_stamp_map import PostageStampMapCsvWriter
 from ukcp_dp.file_writers._write_csv_sample import SampleCsvWriter
 from ukcp_dp.file_writers._write_csv_subset import SubsetCsvWriter
 from ukcp_dp.file_writers._write_csv_three_map import ThreeMapCsvWriter
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
-def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
-                   input_data, plot_type, process_version, vocab):
+def write_csv_file(
+    cube_list,
+    overlay_cube,
+    title,
+    output_data_file_path,
+    input_data,
+    plot_type,
+    process_version,
+    vocab,
+):
     """
     Output the data as csv.
 
     This method will decide on a CSV writer to use dependent on the value given
     for plot type.
     """
-    log.info('Writing data to csv file')
+    LOG.info("Writing data to csv file")
 
     if plot_type is not None:
 
@@ -49,8 +56,9 @@ def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
 
     elif input_data.get_value(InputType.SAMPLING_METHOD) is not None:
         # a bit of a fudge, need to rename plot_type
-        plot_type = 'sampling_{}'.format(
-            input_data.get_value(InputType.SAMPLING_METHOD).lower())
+        plot_type = "sampling_{}".format(
+            input_data.get_value(InputType.SAMPLING_METHOD).lower()
+        )
         csv_writer = SampleCsvWriter()
 
     # it is a subset
@@ -58,10 +66,17 @@ def write_csv_file(cube_list, overlay_cube, title, output_data_file_path,
     elif input_data.get_value(InputType.COLLECTION) == COLLECTION_MARINE:
         # this is a marine sebset, we can use the Plume plot code to write the
         # data
-            csv_writer = PlumeCsvWriter()
+        csv_writer = PlumeCsvWriter()
 
     else:
         csv_writer = SubsetCsvWriter()
 
-    return csv_writer.write_csv(input_data, cube_list, output_data_file_path,
-                                vocab, plot_type, process_version, overlay_cube)
+    return csv_writer.write_csv(
+        input_data,
+        cube_list,
+        output_data_file_path,
+        vocab,
+        plot_type,
+        process_version,
+        overlay_cube,
+    )

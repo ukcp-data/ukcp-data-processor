@@ -2,10 +2,10 @@ import logging
 
 import iris
 from ukcp_dp.constants import InputType
-from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class SampleCsvWriter(BaseCsvWriter):
@@ -21,15 +21,15 @@ class SampleCsvWriter(BaseCsvWriter):
         """
 
         # add the label to the header
-        if self.input_data.get_value(InputType.TIME_PERIOD) == 'all':
-            self.header.append('Date')
+        if self.input_data.get_value(InputType.TIME_PERIOD) == "all":
+            self.header.append("Date")
         else:
-            self.header.append('sample id')
+            self.header.append("sample id")
 
         key_list = []
 
         for i, cube in enumerate(self.cube_list):
-            if self.input_data.get_value(InputType.TIME_PERIOD) == 'all':
+            if self.input_data.get_value(InputType.TIME_PERIOD) == "all":
                 self._write_sample_with_date(cube, i, key_list)
             else:
                 self._write_sample(cube, i, key_list)
@@ -41,12 +41,11 @@ class SampleCsvWriter(BaseCsvWriter):
 
     def _write_sample(self, cube, i, key_list):
         # add the variable label to the header
-        self.header.append(self.input_data.get_value_label(
-            InputType.VARIABLE)[i].encode('utf-8'))
+        self.header.append(self.input_data.get_value_label(InputType.VARIABLE)[i])
 
-        for sample_slice in cube.slices_over('sample'):
-            sample_id = int(sample_slice.coord('sample').points[0])
-            value = str(sample_slice.data)
+        for sample_slice in cube.slices_over("sample"):
+            sample_id = int(sample_slice.coord("sample").points[0])
+            value = value_to_string(sample_slice.data)
 
             try:
                 self.data_dict[sample_id].append(value)
@@ -58,13 +57,13 @@ class SampleCsvWriter(BaseCsvWriter):
         """
         Write out the data, in CSV format.
         """
-        for sample_slice in cube.slices_over('sample'):
-            sample_id = int(sample_slice.coord('sample').points[0])
+        for sample_slice in cube.slices_over("sample"):
+            sample_id = int(sample_slice.coord("sample").points[0])
 
-            var = self.input_data.get_value_label(
-                InputType.VARIABLE)[i].encode('utf-8')
-            self.header.append('{var}(sample {sample_id})'.format(
-                sample_id=sample_id, var=var))
+            var = self.input_data.get_value_label(InputType.VARIABLE)[i]
+            self.header.append(
+                "{var}(sample {sample_id})".format(sample_id=sample_id, var=var)
+            )
             self._write_time_cube(sample_slice, key_list)
 
     def _write_time_cube(self, cube, key_list):
@@ -72,12 +71,10 @@ class SampleCsvWriter(BaseCsvWriter):
         Slice the cube over 'time' and update data_dict
         """
         data = cube.data[:]
-        coords = cube.coord('time')[:]
-        for t in range(0, data.shape[0]):
-            value = str(data[t])
-            with iris.FUTURE.context(cell_datetime_objects=True):
-                time_str = coords[t].cell(
-                    0).point.strftime('%Y-%m-%d')
+        coords = cube.coord("time")[:]
+        for time_ in range(0, data.shape[0]):
+            value = value_to_string(data[time_])
+            time_str = coords[time_].cell(0).point.strftime("%Y-%m-%d")
             try:
                 self.data_dict[time_str].append(value)
             except KeyError:

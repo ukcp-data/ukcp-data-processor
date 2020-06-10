@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 
 import cf_units
@@ -6,7 +5,7 @@ import iris
 import numpy as np
 
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 def add_mask(datacube, maskcube, comparator=">=", threshold=1):
@@ -34,21 +33,27 @@ def add_mask(datacube, maskcube, comparator=">=", threshold=1):
     but the mask is added to the cube if none is present to start with.
     """
     # Parse the comparator into a function:
-    if type(comparator) is str:
+    if isinstance(comparator, str):
         import operator
-        comparators = {"==": operator.eq,
-                       "=": operator.eq,
-                       ">": operator.gt,
-                       ">=": operator.ge,
-                       "<": operator.lt,
-                       "<=": operator.le}
+
+        comparators = {
+            "==": operator.eq,
+            "=": operator.eq,
+            ">": operator.gt,
+            ">=": operator.ge,
+            "<": operator.lt,
+            "<=": operator.le,
+        }
         try:
             comparator_function = comparators[comparator]
         except KeyError:
-            raise UserWarning("Comparator string '" + comparator +
-                              "' not recognised:\n" +
-                              "Try one of '==','=', '>','>=', '<','<='.\n" +
-                              "Failing in common_analysis.py:add_mask()")
+            raise UserWarning(
+                "Comparator string '"
+                + comparator
+                + "' not recognised:\n"
+                + "Try one of '==','=', '>','>=', '<','<='.\n"
+                + "Failing in common_analysis.py:add_mask()"
+            )
     else:
         comparator_function = comparator
 
@@ -89,12 +94,14 @@ def rectify_units(acube, vartag=None, target_unit=None):
     This will probably be modified in future if it becomes clear that
     the vartag--unit mapping is generally useful.
     """
-    PREFERRED_UNITS = dict(tas=cf_units.Unit("Celsius"),
-                           ts=cf_units.Unit("Celsius"),
-                           pr=cf_units.Unit("mm/day"),
-                           # soil moisture content in a layer 8223
-                           mrso=cf_units.Unit("1"),
-                           windspeed=cf_units.Unit("m/s"))
+    PREFERRED_UNITS = dict(
+        tas=cf_units.Unit("Celsius"),
+        ts=cf_units.Unit("Celsius"),
+        pr=cf_units.Unit("mm/day"),
+        # soil moisture content in a layer 8223
+        mrso=cf_units.Unit("1"),
+        windspeed=cf_units.Unit("m/s"),
+    )
 
     # HANDLED_VARTAGS = PREFERRED_UNITS.keys()
 
@@ -104,38 +111,40 @@ def rectify_units(acube, vartag=None, target_unit=None):
             vartag = _guess_vartag(acube)
 
         if vartag not in PREFERRED_UNITS.keys():
-            log.warn("vartag {} found, but target_unit not provided;".format(
-                vartag))
-            log.warn("vartag not in list of known preferred units {}".format(
-                PREFERRED_UNITS.keys()))
+            LOG.warning("vartag %s found, but target_unit not provided;", vartag)
+            LOG.warning(
+                "vartag not in list of known preferred units %s",
+                ", ".join(PREFERRED_UNITS.keys()),
+            )
             raise UserWarning("Unable to convert units.")
 
         # Now we can figure out the preferred unit of this variable:
         target_unit = PREFERRED_UNITS[vartag]
     else:
         # We just need to make sure the target_unit is a Unit object:
-        if type(target_unit) is str:
+        if isinstance(target_unit, str):
             target_unit = cf_units.Unit(target_unit)
 
     # Now we know the variable and therefore the target unit,
     # we can apply it.
 
     # Handle some special cases first:
-    WATER_DENSITY = iris.coords.AuxCoord(1000.0, units=cf_units.Unit('kg m-3'))
-    ONE_METRE = iris.coords.AuxCoord(1.0,   units=cf_units.Unit('m'))
+    WATER_DENSITY = iris.coords.AuxCoord(1000.0, units=cf_units.Unit("kg m-3"))
+    ONE_METRE = iris.coords.AuxCoord(1.0, units=cf_units.Unit("m"))
     # (1m = 1 m³/m² for convenience)
 
-    if (acube.units.is_convertible("kg m^-2 s^-1") and
-            target_unit.is_convertible("m/s")):
+    if acube.units.is_convertible("kg m^-2 s^-1") and target_unit.is_convertible("m/s"):
         # WARNING WE'RE ASSUMING IT'S **PRECIPITATION** MASS FLUX
         #         RATHER THAN SOME OTHER kg/m²/s THING - THIS COULD BE RISKY
 
         # Short-circuit a special, common case:
         # (NOT ACTUALLY SURE THIS IS FASTER THAN DOING IT EXPLICITLY...)
         if acube.units == cf_units.Unit("kg m^-2 s^-1"):
-            log.debug("Precip mass flux in kg/m²/s  with target compatible "
-                      "with m/s detected;")
-            log.debug("Doing short-cut unit conversion")
+            LOG.debug(
+                "Precip mass flux in kg/m²/s  with target compatible "
+                "with m/s detected;"
+            )
+            LOG.debug("Doing short-cut unit conversion")
             # precip mass flux data in kg/m²/s is numerically equivalent
             # to precip volume flux data in mm/s.
             # So just override the current units
@@ -145,8 +154,10 @@ def rectify_units(acube, vartag=None, target_unit=None):
             # mm/day (or whatever)
 
         else:
-            log.debug("Precip mass flux detected; dividing by water density "
-                      "to get volume flux")
+            LOG.debug(
+                "Precip mass flux detected; dividing by water density "
+                "to get volume flux"
+            )
             # This can take a while to explcitly do the division,
             # as Biggus will be forced to load the whole cube into memory.
             acube = acube / WATER_DENSITY
@@ -155,12 +166,12 @@ def rectify_units(acube, vartag=None, target_unit=None):
         acube.standard_name = "lwe_precipitation_rate"
         acube.long_name = "precipitation rate"
 
-    if (acube.units.is_convertible("kg m^-2") and
-            target_unit.is_convertible("1")):
+    if acube.units.is_convertible("kg m^-2") and target_unit.is_convertible("1"):
         # WARNING WE'RE ASSUMING IT'S **SOIL MOISTURE** CONTENT
         #         RATHER THAN SOME OTHER kg/m² THING - THIS COULD BE RISKY
-        log.debug("Soil moisture content detected, dividing by water areal "
-                  "mass density")
+        LOG.debug(
+            "Soil moisture content detected, dividing by water areal " "mass density"
+        )
         # soil moisture is given as an areal mass density, kg/m²
         # We need it as a fraction of the areal mass density of water
         # [mass per unit area]
@@ -196,9 +207,9 @@ def _guess_vartag(acube):
     whereas in future we'll use the variable IDs from the CEDA
     controlled vocabs, which will correspond to the netCDF/cube var_name.
     """
-    VARTAG_CLUES = dict(tas="temperature", ts="temperature",
-                        pr="precip",
-                        windspeed="wind")
+    VARTAG_CLUES = dict(
+        tas="temperature", ts="temperature", pr="precip", windspeed="wind"
+    )
     # Go through the keys in VARTAG_CLUES,
     # testing the cube name for those clues...
     thevartag = None
@@ -208,9 +219,12 @@ def _guess_vartag(acube):
             break
 
     if thevartag is None:
-        msg = ("Variable tag cannot be identified using standard name "
-               "'{name}', from the list of {tags}".format(
-                   name=acube.standard_name, tags=VARTAG_CLUES.keys()))
-        log.warn(msg)
+        msg = (
+            "Variable tag cannot be identified using standard name "
+            "'{name}', from the list of {tags}".format(
+                name=acube.standard_name, tags=", ".join(VARTAG_CLUES.keys())
+            )
+        )
+        LOG.warning(msg)
 
     return thevartag
