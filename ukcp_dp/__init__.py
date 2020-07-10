@@ -11,9 +11,14 @@ import matplotlib
 
 matplotlib.use("agg")
 
+import dask
+
 from ukcp_dp.ukcp_data_processor import UKCPDataProcessor
 from ukcp_dp.constants import DataFormat, ImageFormat, PlotType, InputType, VERSION
 
+
+# Set globally
+dask.config.set(scheduler='synchronous')
 
 __version__ = VERSION
 
