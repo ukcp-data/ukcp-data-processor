@@ -15,6 +15,7 @@ from ukcp_dp.constants import (
     AreaType,
     TemporalAverageType,
     COLLECTION_CPM,
+    COLLECTION_DERIVED,
     COLLECTION_GCM,
     COLLECTION_RCM,
 )
@@ -409,7 +410,12 @@ class DataExtractor:
 
         elif self.input_data.get_area_type() == AreaType.ADMIN_REGION:
             if self.input_data.get_area() != "all":
-                if collection in [COLLECTION_CPM, COLLECTION_GCM, COLLECTION_RCM]:
+                if collection in [
+                    COLLECTION_CPM,
+                    COLLECTION_DERIVED,
+                    COLLECTION_GCM,
+                    COLLECTION_RCM,
+                ]:
                     area_constraint = iris.Constraint(
                         Region=self.input_data.get_area_label()
                     )
@@ -434,7 +440,12 @@ class DataExtractor:
                 else:
                     basin = self.input_data.get_area_label()
 
-                if collection in [COLLECTION_CPM, COLLECTION_GCM, COLLECTION_RCM]:
+                if collection in [
+                    COLLECTION_CPM,
+                    COLLECTION_DERIVED,
+                    COLLECTION_GCM,
+                    COLLECTION_RCM,
+                ]:
                     area_constraint = iris.Constraint(River=basin)
                 else:
                     area_constraint = iris.Constraint(
