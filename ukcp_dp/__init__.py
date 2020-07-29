@@ -18,7 +18,7 @@ from ukcp_dp.constants import DataFormat, ImageFormat, PlotType, InputType, VERS
 
 
 # Set globally
-dask.config.set(scheduler='synchronous')
+dask.config.set(scheduler="synchronous")
 
 __version__ = VERSION
 
