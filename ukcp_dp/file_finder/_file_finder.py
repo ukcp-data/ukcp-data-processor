@@ -536,7 +536,10 @@ def _get_cm_file_name(
                 input_data.get_value(InputType.TIME_SLICE_TYPE),
             )
 
-        if input_data.get_value(InputType.COLLECTION) == COLLECTION_GCM:
+        if input_data.get_value(InputType.COLLECTION) in [
+            COLLECTION_GCM,
+            COLLECTION_DERIVED,
+        ]:
             date_range = "200912-209911"
         elif input_data.get_value(InputType.COLLECTION) == COLLECTION_CPM:
             if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
