@@ -491,9 +491,16 @@ def _get_cm_file_path(
     else:
         temporal_average_type = input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
 
+    collection = input_data.get_value(InputType.COLLECTION)
+
+    if baseline is not None and scenario in ["gwl2", "gwl4"]:
+        # we need to use the GCM RCP8.5 baseline for GWL2 and GWL4
+        collection = COLLECTION_GCM
+        scenario = "rcp85"
+
     file_path = os.path.join(
         DATA_DIR,
-        input_data.get_value(InputType.COLLECTION),
+        collection,
         "uk",
         spatial_representation,
         scenario,
@@ -571,13 +578,20 @@ def _get_cm_file_name(
         )
         date_range = "198012-201011"
 
+    collection = input_data.get_value(InputType.COLLECTION)
+
+    if baseline is not None and scenario in ["gwl2", "gwl4"]:
+        # we need to use the GCM RCP8.5 baseline for GWL2 and GWL4
+        collection = COLLECTION_GCM
+        scenario = "rcp85"
+
     file_name = (
         "{variable}_{scenario}_{collection}_uk_"
         "{spatial_representation}_{ensemble}_"
         "{temporal_average_type}_{date}.nc".format(
             variable=variable,
             scenario=scenario,
-            collection=input_data.get_value(InputType.COLLECTION),
+            collection=collection,
             spatial_representation=spatial_representation,
             ensemble=ensemble,
             temporal_average_type=temporal_average_type,
