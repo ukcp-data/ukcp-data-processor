@@ -4,7 +4,12 @@ import cf_units
 import iris
 import iris.coord_categorisation
 from iris.exceptions import CoordinateNotFoundError
-from ukcp_dp.constants import COLLECTION_CPM, TemporalAverageType
+from ukcp_dp.constants import (
+    COLLECTION_CPM,
+    TemporalAverageType,
+    COLLECTION_DERIVED,
+    GWL,
+)
 from ukcp_dp.vocab_manager import get_months
 
 
@@ -16,6 +21,7 @@ def get_anomaly(
     cube_absoute,
     baseline,
     preferred_unit,
+    scenario,
     temporal_average_type,
     time_period,
     collection,
@@ -29,6 +35,7 @@ def get_anomaly(
     @param baseline (str): the value to be used added as the baseline
         attribute to the resultant cube
     @param preferred_unit(str):
+    @param scenario(str): the scenario
     @param temporal_average_type (TemporalAverageType): the temporal average
         type
     @param time_period(str): the name of a month or season or 'all'
@@ -88,6 +95,14 @@ def get_anomaly(
                     cube_absoute_period.remove_coord("season_year")
                 except iris.exceptions.CoordinateNotFoundError:
                     pass
+
+        if scenario in GWL:
+            # We are calculating the anomalies for the GWL data from the GCM baseline
+            # data. Unfortunately the lat and log are ever so slightly different, a
+            # floating point issue.
+            for param in ["latitude", "longitude"]:
+                cube_absoute_period.remove_coord(param)
+                cube_climatology_period.remove_coord(param)
 
         # now generate the anomaly
         cube_anomaly_period = _make_anomaly(
@@ -197,7 +212,12 @@ def _make_anomaly(datacube, reference_cube, preferred_unit=None):
     This might be the case for precip, where we want anomalies in %.
     """
     # Actually calculating the anomalies is trivial:
-    anomaly = datacube - reference_cube
+    try:
+        anomaly = datacube - reference_cube
+    except Exception as ex:
+        LOG.error("datacube\n%s", datacube)
+        LOG.error("reference_cube\n%s", reference_cube)
+        raise ex
 
     if preferred_unit is not None:
         if preferred_unit == cf_units.Unit("Celsius"):

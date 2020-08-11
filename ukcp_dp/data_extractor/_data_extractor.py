@@ -140,6 +140,7 @@ class DataExtractor:
             cube_absoute,
             baseline,
             self.plot_settings.preferred_unit,
+            self.input_data.get_value(InputType.SCENARIO),
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
             self.input_data.get_value(InputType.TIME_PERIOD),
             self.input_data.get_value(InputType.COLLECTION),
