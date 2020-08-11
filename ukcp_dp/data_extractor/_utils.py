@@ -35,7 +35,7 @@ def get_anomaly(
     @param baseline (str): the value to be used added as the baseline
         attribute to the resultant cube
     @param preferred_unit(str):
-    @param scenario(str): the scenario
+    @param scenario(list[str]): the scenarios
     @param temporal_average_type (TemporalAverageType): the temporal average
         type
     @param time_period(str): the name of a month or season or 'all'
@@ -96,7 +96,7 @@ def get_anomaly(
                 except iris.exceptions.CoordinateNotFoundError:
                     pass
 
-        if scenario in GWL:
+        if scenario[0] in GWL:
             # We are calculating the anomalies for the GWL data from the GCM baseline
             # data. Unfortunately the lat and log are ever so slightly different, a
             # floating point issue.
