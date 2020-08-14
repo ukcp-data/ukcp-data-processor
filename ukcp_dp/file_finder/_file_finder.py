@@ -182,10 +182,14 @@ def _get_file_list_per_scenario(
         )
 
         if (
-            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
-            == TemporalAverageType.ANNUAL
-            or spatial_representation != "25km"
-        ) or (input_data.get_value(InputType.COLLECTION) == COLLECTION_MARINE):
+            (
+                input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
+                == TemporalAverageType.ANNUAL
+                or spatial_representation != "25km"
+            )
+            and input_data.get_value(InputType.RETURN_PERIOD) is None
+            or (input_data.get_value(InputType.COLLECTION) == COLLECTION_MARINE)
+        ):
             # current thinking is that there will only be one file
             file_name = "*"
             file_list_per_data_type.append([os.path.join(file_path, file_name)])
