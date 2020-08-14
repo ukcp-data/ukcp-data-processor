@@ -3,7 +3,7 @@ from os import path
 import cartopy.crs as ccrs
 
 
-VERSION = "2.0.0"
+VERSION = "2.1.0"
 
 
 def enum(**named_values):
@@ -28,6 +28,7 @@ InputType = enum(
     ORDER_BY_MEAN="order_by_mean",
     OVERLAY_PROBABILITY_LEVELS="overlay_probability_levels",
     RANDOM_SAMPLING_COUNT="random_sampling_count",
+    RETURN_PERIOD="return_period",
     SAMPLING_METHOD="sampling_method",
     SAMPLING_ID="sampling_id",
     SAMPLING_SUBSET_COUNT="sampling_subset_count",
@@ -64,6 +65,7 @@ INPUT_TYPES_SINGLE_VALUE = [
     InputType.ORDER_BY_MEAN,
     InputType.OVERLAY_PROBABILITY_LEVELS,
     InputType.RANDOM_SAMPLING_COUNT,
+    InputType.RETURN_PERIOD,
     InputType.SAMPLING_METHOD,
     InputType.SAMPLING_SUBSET_COUNT,
     InputType.SAMPLING_PERCENTILE_1,
@@ -102,6 +104,7 @@ DATA_SELECTION_TYPES = [
     InputType.ENSEMBLE,
     InputType.METHOD,
     InputType.OVERLAY_PROBABILITY_LEVELS,
+    InputType.RETURN_PERIOD,
     InputType.SCENARIO,
     InputType.SPATIAL_REPRESENTATION,
     InputType.TEMPORAL_AVERAGE_TYPE,

@@ -257,19 +257,37 @@ def _get_prob_file_path(
         )
     else:
 
-        file_path = os.path.join(
-            DATA_DIR,
-            COLLECTION_PROB,
-            "uk",
-            spatial_representation,
-            scenario,
-            data_type,
-            input_data.get_value(InputType.BASELINE),
-            input_data.get_value(InputType.TIME_SLICE_TYPE),
-            variable,
-            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
-            VERSION,
-        )
+        return_period = input_data.get_value(InputType.RETURN_PERIOD)
+
+        if return_period is None:
+            file_path = os.path.join(
+                DATA_DIR,
+                COLLECTION_PROB,
+                "uk",
+                spatial_representation,
+                scenario,
+                data_type,
+                input_data.get_value(InputType.BASELINE),
+                input_data.get_value(InputType.TIME_SLICE_TYPE),
+                variable,
+                input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+                VERSION,
+            )
+
+        else:
+            file_path = os.path.join(
+                DATA_DIR,
+                COLLECTION_PROB,
+                "uk",
+                spatial_representation,
+                scenario,
+                data_type,
+                input_data.get_value(InputType.BASELINE),
+                input_data.get_value(InputType.TIME_SLICE_TYPE),
+                variable,
+                input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+                VERSION,
+            )
 
     return file_path
 
@@ -322,23 +340,47 @@ def _get_prob_file_name(
     end_date,
 ):
 
-    file_name = (
-        "{variable}_{scenario}_{collection}_uk_"
-        "{spatial_representation}_{data_type}_{baseline}_"
-        "{time_slice_type}_{temporal_type}_{start_data}-"
-        "{end_date}.nc".format(
-            variable=variable,
-            scenario=scenario,
-            collection=COLLECTION_PROB,
-            spatial_representation=spatial_representation,
-            data_type=data_type,
-            baseline=input_data.get_value(InputType.BASELINE),
-            time_slice_type=input_data.get_value(InputType.TIME_SLICE_TYPE),
-            temporal_type=input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
-            start_data=start_date,
-            end_date=end_date,
+    return_period = input_data.get_value(InputType.RETURN_PERIOD)
+
+    if return_period is None:
+        file_name = (
+            "{variable}_{scenario}_{collection}_uk_"
+            "{spatial_representation}_{data_type}_{baseline}_"
+            "{time_slice_type}_{temporal_type}_{start_data}-"
+            "{end_date}.nc".format(
+                variable=variable,
+                scenario=scenario,
+                collection=COLLECTION_PROB,
+                spatial_representation=spatial_representation,
+                data_type=data_type,
+                baseline=input_data.get_value(InputType.BASELINE),
+                time_slice_type=input_data.get_value(InputType.TIME_SLICE_TYPE),
+                temporal_type=input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+                start_data=start_date,
+                end_date=end_date,
+            )
         )
-    )
+
+    else:
+        file_name = (
+            "{variable}_{return_period}_{scenario}_{collection}_uk_"
+            "{spatial_representation}_{data_type}_{baseline}_"
+            "{time_slice_type}_{temporal_type}_{start_data}-"
+            "{end_date}.nc".format(
+                variable=variable,
+                return_period=return_period,
+                scenario=scenario,
+                collection=COLLECTION_PROB,
+                spatial_representation=spatial_representation,
+                data_type=data_type,
+                baseline=input_data.get_value(InputType.BASELINE),
+                time_slice_type=input_data.get_value(InputType.TIME_SLICE_TYPE),
+                temporal_type=input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+                start_data=start_date,
+                end_date=end_date,
+            )
+        )
+
     return file_name
 
 

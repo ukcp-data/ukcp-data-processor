@@ -160,6 +160,7 @@ class Vocab:
             85: "85",
             90: "90",
         },
+        "return_period": {"rp20": "20 years", "rp50": "50 years", "rp100": "100 years"},
     }
 
     COLLECTION_LABELS = {
@@ -180,6 +181,7 @@ class Vocab:
         "method": "Method",
         "overlay_probability_levels": "Overlay Probability Levels",
         "random_sampling_count": "Random Sampling Count",
+        "return_period": "Return Period",
         "sampling_id": "Sampling IDs",
         "sampling_method": "Sampling Method",
         "sampling_percentile_1": "Sampling Percentile 1",
