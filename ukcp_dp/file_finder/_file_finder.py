@@ -182,12 +182,9 @@ def _get_file_list_per_scenario(
         )
 
         if (
-            (
-                input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
-                == TemporalAverageType.ANNUAL
-                or spatial_representation != "25km"
-            )
-            and input_data.get_value(InputType.RETURN_PERIOD) is None
+            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
+            == TemporalAverageType.ANNUAL
+            or spatial_representation != "25km"
             or (input_data.get_value(InputType.COLLECTION) == COLLECTION_MARINE)
         ):
             # current thinking is that there will only be one file
@@ -261,37 +258,19 @@ def _get_prob_file_path(
         )
     else:
 
-        return_period = input_data.get_value(InputType.RETURN_PERIOD)
-
-        if return_period is None:
-            file_path = os.path.join(
-                DATA_DIR,
-                COLLECTION_PROB,
-                "uk",
-                spatial_representation,
-                scenario,
-                data_type,
-                input_data.get_value(InputType.BASELINE),
-                input_data.get_value(InputType.TIME_SLICE_TYPE),
-                variable,
-                input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
-                VERSION,
-            )
-
-        else:
-            file_path = os.path.join(
-                DATA_DIR,
-                COLLECTION_PROB,
-                "uk",
-                spatial_representation,
-                scenario,
-                data_type,
-                input_data.get_value(InputType.BASELINE),
-                input_data.get_value(InputType.TIME_SLICE_TYPE),
-                variable,
-                input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
-                VERSION,
-            )
+        file_path = os.path.join(
+            DATA_DIR,
+            COLLECTION_PROB,
+            "uk",
+            spatial_representation,
+            scenario,
+            data_type,
+            input_data.get_value(InputType.BASELINE),
+            input_data.get_value(InputType.TIME_SLICE_TYPE),
+            variable,
+            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+            VERSION,
+        )
 
     return file_path
 

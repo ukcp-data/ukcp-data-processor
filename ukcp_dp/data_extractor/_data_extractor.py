@@ -608,6 +608,12 @@ class DataExtractor:
                 t=title, start_year=start_year, end_year=end_year - 1
             )
 
+        if self.input_data.get_value(InputType.RETURN_PERIOD) is not None:
+            title = "{t} for a return period of {return_period},".format(
+                t=title,
+                return_period=self.input_data.get_value(InputType.RETURN_PERIOD),
+            )
+
         if self.input_data.get_area_type() == AreaType.POINT:
             grid_x = int(self.cubes[0].coord("projection_x_coordinate").points[0])
             grid_y = int(self.cubes[0].coord("projection_y_coordinate").points[0])

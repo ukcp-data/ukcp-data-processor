@@ -819,3 +819,51 @@ UKCP_PMSL_ANOM.overcol = "#240938"
 UKCP_PMSL_ANOM.vrange = [-100.0, 100.0]
 UKCP_PMSL_ANOM.vmid = 0.0
 UKCP_PMSL_ANOM.vstep = 20.0
+
+# Amount of precipitation in 1 day
+UKCP_1DAY_PRECIP = UKCPNEAT.copy()
+UKCP_1DAY_PRECIP.tag = "UKCP_1day_precip"
+UKCP_1DAY_PRECIP.default_barlabel = "1-day total precipitation, mm"
+UKCP_1DAY_PRECIP.preferred_unit = cf_units.Unit("mm")
+UKCP_1DAY_PRECIP.extendcolbar = "max"
+UKCP_1DAY_PRECIP.cpal = "Blues"
+UKCP_1DAY_PRECIP.undercol = "#492f0b"
+UKCP_1DAY_PRECIP.overcol = "#240938"
+UKCP_1DAY_PRECIP.vrange = [0, 110]
+UKCP_1DAY_PRECIP.vmid = None
+UKCP_1DAY_PRECIP.vstep = 10
+
+# Amount of precipitation in 1 day anomalies
+UKCP_1DAY_PRECIP_ANOM = UKCP_1DAY_PRECIP.copy()
+UKCP_1DAY_PRECIP_ANOM.tag = "UKCP_1day_precip_anom"
+UKCP_1DAY_PRECIP_ANOM.preferred_unit = cf_units.Unit("mm")
+UKCP_1DAY_PRECIP_ANOM.default_barlabel = "1-day total precipitation anomaly, mm"
+UKCP_1DAY_PRECIP_ANOM.extendcolbar = "both"
+UKCP_1DAY_PRECIP_ANOM.cpal = "Blues"
+UKCP_1DAY_PRECIP_ANOM.vrange = [0, 110]
+UKCP_1DAY_PRECIP_ANOM.vmid = 50
+UKCP_1DAY_PRECIP_ANOM.vstep = 10
+
+# Amount of precipitation in 5 days
+UKCP_5DAY_PRECIP = UKCPNEAT.copy()
+UKCP_5DAY_PRECIP.tag = "UKCP_5DAY_precip"
+UKCP_5DAY_PRECIP.default_barlabel = "5-day total precipitation, mm"
+UKCP_5DAY_PRECIP.preferred_unit = cf_units.Unit("mm")
+UKCP_5DAY_PRECIP.extendcolbar = "max"
+UKCP_5DAY_PRECIP.cpal = "Blues"
+UKCP_5DAY_PRECIP.undercol = "#492f0b"
+UKCP_5DAY_PRECIP.overcol = "#240938"
+UKCP_5DAY_PRECIP.vrange = [0, 110]
+UKCP_5DAY_PRECIP.vmid = None
+UKCP_5DAY_PRECIP.vstep = 10
+
+# Amount of precipitation in 5 days anomalies
+UKCP_5DAY_PRECIP_ANOM = UKCP_5DAY_PRECIP.copy()
+UKCP_5DAY_PRECIP_ANOM.tag = "UKCP_5day_precip_anom"
+UKCP_5DAY_PRECIP_ANOM.preferred_unit = cf_units.Unit("mm")
+UKCP_5DAY_PRECIP_ANOM.default_barlabel = "1-day total precipitation anomaly, mm"
+UKCP_5DAY_PRECIP_ANOM.extendcolbar = "both"
+UKCP_5DAY_PRECIP_ANOM.cpal = "Blues"
+UKCP_5DAY_PRECIP_ANOM.vrange = [0, 110]
+UKCP_5DAY_PRECIP_ANOM.vmid = 50
+UKCP_5DAY_PRECIP_ANOM.vstep = 10
