@@ -32,6 +32,20 @@ def get_plot_settings(vocab, cmsize, fsize, var_id):
         else:
             plot_settings = stds.UKCP_SNOW.copy()
 
+    elif "pr1day" in var_id:
+        # 1-day total precipitation (mm)
+        if "Anom" in var_id:
+            plot_settings = stds.UKCP_1DAY_PRECIP_ANOM.copy()
+        else:
+            plot_settings = stds.UKCP_1DAY_PRECIP.copy()
+
+    elif "pr5day" in var_id:
+        # 5-day total precipitation (mm)
+        if "Anom" in var_id:
+            plot_settings = stds.UKCP_5DAY_PRECIP_ANOM.copy()
+        else:
+            plot_settings = stds.UKCP_5DAY_PRECIP.copy()
+
     elif "pr" in var_id:
         # Precipitation rate (mm/day)
         if "Anom" in var_id:
@@ -114,20 +128,6 @@ def get_plot_settings(vocab, cmsize, fsize, var_id):
             plot_settings = stds.UKCP_SWRAD_NET_MONTHLY_BIAS.copy()
         else:
             plot_settings = stds.UKCP_SWRAD_NET_MONTHLY.copy()
-
-    elif "pr1day" in var_id:
-        # 1-day total precipitation (mm)
-        if "Anom" in var_id:
-            plot_settings = stds.UKCP_1DAY_PRECIP_ANOM.copy()
-        else:
-            plot_settings = stds.UKCP_1DAY_PRECIP.copy()
-
-    elif "pr5day" in var_id:
-        # 5-day total precipitation (mm)
-        if "Anom" in var_id:
-            plot_settings = stds.UKCP_5DAY_PRECIP_ANOM.copy()
-        else:
-            plot_settings = stds.UKCP_5DAY_PRECIP.copy()
 
     else:
         plot_settings = stds.UKCPNEAT.copy()

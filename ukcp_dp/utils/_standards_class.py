@@ -853,7 +853,7 @@ UKCP_5DAY_PRECIP.extendcolbar = "max"
 UKCP_5DAY_PRECIP.cpal = "Blues"
 UKCP_5DAY_PRECIP.undercol = "#492f0b"
 UKCP_5DAY_PRECIP.overcol = "#240938"
-UKCP_5DAY_PRECIP.vrange = [0, 110]
+UKCP_5DAY_PRECIP.vrange = [0, 130]
 UKCP_5DAY_PRECIP.vmid = None
 UKCP_5DAY_PRECIP.vstep = 10
 
@@ -864,6 +864,6 @@ UKCP_5DAY_PRECIP_ANOM.preferred_unit = cf_units.Unit("mm")
 UKCP_5DAY_PRECIP_ANOM.default_barlabel = "1-day total precipitation anomaly, mm"
 UKCP_5DAY_PRECIP_ANOM.extendcolbar = "both"
 UKCP_5DAY_PRECIP_ANOM.cpal = "Blues"
-UKCP_5DAY_PRECIP_ANOM.vrange = [0, 110]
+UKCP_5DAY_PRECIP_ANOM.vrange = [0, 130]
 UKCP_5DAY_PRECIP_ANOM.vmid = 50
 UKCP_5DAY_PRECIP_ANOM.vstep = 10
