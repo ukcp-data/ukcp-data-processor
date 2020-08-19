@@ -2,7 +2,7 @@ import collections
 import logging
 
 import iris
-from ukcp_dp.constants import AreaType, InputType
+from ukcp_dp.constants import AreaType, InputType, COLLECTION_PROB
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
@@ -22,6 +22,9 @@ class SubsetCsvWriter(BaseCsvWriter):
         """
         if self.input_data.get_area_type() == AreaType.BBOX:
             return self._write_x_y_csv()
+
+        if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB:
+            return self._write_csv_percentiles()
 
         return self._write_region_or_point_csv()
 
@@ -97,6 +100,79 @@ class SubsetCsvWriter(BaseCsvWriter):
 
         # reset the data dict
         self.data_dict = collections.OrderedDict()
+
+    def _write_csv_percentiles(self):
+        """
+        Write out the data, in CSV format, associated with a plume plot for
+        land_prob and marine-sim data.
+        """
+        key_list = []
+        for cube in self.cube_list:
+            self._get_percentiles(cube, key_list)
+
+        output_data_file_path = self._get_full_file_name()
+        self._write_data_dict(output_data_file_path, key_list)
+
+        return [output_data_file_path]
+
+    def _get_percentiles(self, cube, key_list):
+        """
+        Update the data dict and header with data from the cube.
+        The cube is sliced over percentile then time.
+        """
+        for _slice in cube.slices_over("percentile"):
+            percentile = _slice.coord("percentile").points[0]
+            # the plume plot will be of the first variable
+            var = self.input_data.get_value_label(InputType.VARIABLE)[0]
+
+            if (
+                percentile < 0.2
+                or (percentile > 0.4 and percentile < 0.6)
+                or (percentile > 1.4 and percentile < 1.6)
+                or (percentile > 2.4 and percentile < 2.6)
+                or (percentile > 97.4 and percentile < 97.6)
+                or (percentile > 98.4 and percentile < 98.6)
+                or (percentile > 99.4 and percentile < 99.6)
+            ):
+
+                percentile = format(percentile, ".1f")
+
+            elif percentile < 1 or (percentile > 99 and percentile < 100):
+                percentile = format(percentile, ".2f")
+
+            else:
+                percentile = format(percentile, ".0f")
+
+            if "." in percentile:
+                pass
+            elif percentile.endswith("1") and percentile != "11":
+                percentile = "{}st".format(percentile)
+            elif percentile.endswith("2") and percentile != "12":
+                percentile = "{}nd".format(percentile)
+            elif percentile.endswith("3") and percentile != "13":
+                percentile = "{}rd".format(percentile)
+            else:
+                percentile = "{}th".format(percentile)
+
+            self.header.append(
+                "{var}({percentile} Percentile)".format(percentile=percentile, var=var)
+            )
+            self._read_time_cube(_slice, key_list)
+
+    def _read_time_cube(self, cube, key_list):
+        """
+        Slice the cube over 'time' and update data_dict
+        """
+        data = cube.data[:]
+        coords = cube.coord("time")[:]
+        for time_ in range(0, data.shape[0]):
+            value = value_to_string(data[time_])
+            time_str = coords[time_].cell(0).point.strftime("%Y-%m-%d")
+            try:
+                self.data_dict[time_str].append(value)
+            except KeyError:
+                key_list.append(time_str)
+                self.data_dict[time_str] = [value]
 
     def _write_region_or_point_csv(self):
         """
