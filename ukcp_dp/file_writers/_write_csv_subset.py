@@ -195,7 +195,19 @@ class SubsetCsvWriter(BaseCsvWriter):
                 "{var}({ensemble})".format(ensemble=ensemble_name, var=var)
             )
 
-            self._write_time_cube(ensemble_slice, key_list)
+            # We need to process the data in manageable size chunks, this is important
+            # were we have 20 years worth of hourly data. Hence we split it up into year
+            # chunks.
+            years = range(
+                self.input_data.get_value(InputType.YEAR_MINIMUM),
+                self.input_data.get_value(InputType.YEAR_MAXIMUM),
+            )
+            for year in years:
+                year_cube = ensemble_slice.extract(
+                    iris.Constraint(coord_values={"year": year})
+                )
+                LOG.debug("extracting data for year {}".format(year))
+                self._write_time_cube(year_cube, key_list)
 
         output_data_file_path = self._get_full_file_name()
         self._write_data_dict(output_data_file_path, key_list)
@@ -207,18 +219,28 @@ class SubsetCsvWriter(BaseCsvWriter):
         Slice the cube over 'time' and update data_dict
         """
         LOG.debug("_write_time_cube")
+        if cube is None:
+            return
+
         if self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
             LOG.debug("subdaily")
             date_format = "%Y-%m-%dT%H:%M"
         else:
             date_format = "%Y-%m-%d"
+
+        LOG.debug("getting data from cube {}". format(cube))
         data = cube.data[:]
+        LOG.debug("data extracted")
+
         coords = cube.coord("time")[:]
         for time_ in range(0, data.shape[0]):
             value = value_to_string(data[time_])
             time_str = coords[time_].cell(0).point.strftime(date_format)
+
             try:
                 self.data_dict[time_str].append(value)
             except KeyError:
                 key_list.append(time_str)
                 self.data_dict[time_str] = [value]
+
+        LOG.debug("data added to dict")
