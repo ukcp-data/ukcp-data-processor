@@ -2,7 +2,7 @@ import collections
 import logging
 
 import iris
-from ukcp_dp.constants import AreaType, InputType, COLLECTION_PROB
+from ukcp_dp.constants import AreaType, InputType, COLLECTION_PROB, TemporalAverageType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
@@ -195,19 +195,27 @@ class SubsetCsvWriter(BaseCsvWriter):
                 "{var}({ensemble})".format(ensemble=ensemble_name, var=var)
             )
 
-            # We need to process the data in manageable size chunks, this is important
-            # were we have 20 years worth of hourly data. Hence we split it up into year
-            # chunks.
-            years = range(
-                self.input_data.get_value(InputType.YEAR_MINIMUM),
-                self.input_data.get_value(InputType.YEAR_MAXIMUM),
-            )
-            for year in years:
-                year_cube = ensemble_slice.extract(
-                    iris.Constraint(coord_values={"year": year})
+            if self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in [
+                TemporalAverageType.HOURLY,
+                TemporalAverageType.THREE_HOURLY,
+                TemporalAverageType.DAILY,
+            ]:
+                # We need to process the data in manageable size chunks, this is
+                # important were we have 20 years worth of hourly data. Hence we split
+                # it up into year chunks.
+                years = range(
+                    self.input_data.get_value(InputType.YEAR_MINIMUM),
+                    self.input_data.get_value(InputType.YEAR_MAXIMUM),
                 )
-                LOG.debug("extracting data for year {}".format(year))
-                self._write_time_cube(year_cube, key_list)
+                for year in years:
+                    year_cube = ensemble_slice.extract(
+                        iris.Constraint(coord_values={"year": year})
+                    )
+                    LOG.debug("extracting data for year {}".format(year))
+                    self._write_time_cube(year_cube, key_list)
+
+            else:
+                self._write_time_cube(ensemble_slice, key_list)
 
         output_data_file_path = self._get_full_file_name()
         self._write_data_dict(output_data_file_path, key_list)
@@ -228,7 +236,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         else:
             date_format = "%Y-%m-%d"
 
-        LOG.debug("getting data from cube {}". format(cube))
+        LOG.debug("getting data from cube {}".format(cube))
         data = cube.data[:]
         LOG.debug("data extracted")
 
