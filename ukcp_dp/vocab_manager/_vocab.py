@@ -1,3 +1,5 @@
+import copy
+
 from ukcp_cv import CV_Type, get_cv
 
 
@@ -487,7 +489,7 @@ def get_months():
 
     @return a list of strings representing the months
     """
-    return MONTHS
+    return copy.deepcopy(MONTHS)
 
 
 def get_seasons():
@@ -497,8 +499,8 @@ def get_seasons():
 
     @return a list of strings representing the seasons
     """
-    return SEASONS
+    return copy.deepcopy(SEASONS)
 
 
 def get_ensemble_member_set(collection):
-    return ENSEMBLE_MEMBER_SET.get(collection)
+    return copy.deepcopy(ENSEMBLE_MEMBER_SET.get(collection))
