@@ -810,15 +810,15 @@ UKCP_RELATIVE_HUMIDITY.vstep = 10.0
 
 UKCP_PMSL_ANOM = UKCPNEAT.copy()
 UKCP_PMSL_ANOM.tag = "UKCP_pmsl_anom"
-UKCP_PMSL_ANOM.default_barlabel = "Air pressure anomaly, hPa"
+UKCP_PMSL_ANOM.default_barlabel = "Sea level pressure anomaly, hPa"
 UKCP_PMSL_ANOM.preferred_unit = cf_units.Unit("hPa")
 UKCP_PMSL_ANOM.extendcolbar = "both"
 UKCP_PMSL_ANOM.cpal = "PuOr"
 UKCP_PMSL_ANOM.undercol = "#492f0b"
 UKCP_PMSL_ANOM.overcol = "#240938"
-UKCP_PMSL_ANOM.vrange = [-100.0, 100.0]
+UKCP_PMSL_ANOM.vrange = [-25.0, 25.0]
 UKCP_PMSL_ANOM.vmid = 0.0
-UKCP_PMSL_ANOM.vstep = 20.0
+UKCP_PMSL_ANOM.vstep = 5.0
 
 # Amount of precipitation in 1 day
 UKCP_1DAY_PRECIP = UKCPNEAT.copy()
