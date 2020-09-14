@@ -1,3 +1,12 @@
+# Release 2.1.0
+
+This release addresses:
+
+* Changes to slurm configuration
+* Fix for sea level pressure data units
+* Changes to the way CSV files are generated for sub daily data
+
+
 # Release 2.0.0
 
 This release addresses:
