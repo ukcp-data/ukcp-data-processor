@@ -556,7 +556,7 @@ class DataExtractor:
         if "projection_x_coordinate" not in dim_coords:
             cube = iris.util.new_axis(cube, "projection_x_coordinate")
             # move the x coord to the end to ensure it comes after y
-            dimension_order = range(1, len(dim_coords) + 1)
+            dimension_order = list(range(1, len(dim_coords) + 1))
             dimension_order.append(0)
             cube.transpose()
         if "projection_y_coordinate" not in dim_coords:
