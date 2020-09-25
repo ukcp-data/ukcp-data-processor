@@ -2,7 +2,7 @@ import logging
 
 import iris
 import matplotlib.gridspec as gridspec
-from ukcp_dp.constants import AreaType, InputType, COLLECTION_CPM, COLLECTION_RCM
+from ukcp_dp.constants import AreaType, InputType, COLLECTION_CPM, COLLECTION_RCM, GWL
 from ukcp_dp.plotters._map_plotter import MapPlotter
 from ukcp_dp.plotters.utils._map_utils import (
     plot_standard_map,
@@ -226,6 +226,11 @@ class PostageStampMapPlotter(MapPlotter):
                         "grid_latitude",
                         "grid_longitude",
                     ],
+                    iris.analysis.MEAN,
+                )
+            elif self.input_data.get_value(InputType.SCENARIO)[0] in GWL:
+                ensemble_mean_cube = cube.collapsed(
+                    ["projection_x_coordinate", "projection_y_coordinate"],
                     iris.analysis.MEAN,
                 )
             else:
