@@ -101,8 +101,14 @@ def get_anomaly(
             # data. Unfortunately the lat and log are ever so slightly different, a
             # floating point issue.
             for param in ["latitude", "longitude"]:
-                cube_absoute_period.remove_coord(param)
-                cube_climatology_period.remove_coord(param)
+                try:
+                    cube_absoute_period.remove_coord(param)
+                except iris.exceptions.CoordinateNotFoundError:
+                    pass
+                try:
+                    cube_climatology_period.remove_coord(param)
+                except iris.exceptions.CoordinateNotFoundError:
+                    pass
 
         # now generate the anomaly
         cube_anomaly_period = _make_anomaly(
