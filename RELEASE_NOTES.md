@@ -1,3 +1,10 @@
+# Release 2.2.0
+
+This release addresses:
+
+* Updates for the derived data and GCM RCM2.6 data
+
+
 # Release 2.1.0
 
 This release addresses:
