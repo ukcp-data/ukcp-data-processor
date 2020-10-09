@@ -210,9 +210,9 @@ class Vocab:
         self.vocab = self.VOCAB
         self.vocab["year"] = _get_range(1900, 2301)
         self.vocab["year"].update(_get_range(3001, 3051))
-        self.vocab["year_minimum"] = _get_range(1900, 2301)
+        self.vocab["year_minimum"] = _get_range(1900, 2302)
         self.vocab["year_minimum"].update(_get_range(3001, 3051))
-        self.vocab["year_maximum"] = _get_range(1900, 2301)
+        self.vocab["year_maximum"] = _get_range(1900, 2302)
         self.vocab["year_maximum"].update(_get_range(3001, 3051))
         self.vocab["sampling_id"] = _get_range(1, 4001)
         self.vocab["random_sampling_count"] = _get_range(100, 4001)
