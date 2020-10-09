@@ -90,11 +90,19 @@ class UKCPDataProcessor:
 
         # The plot settings are customised to the first variable in the list
         # We may want to change this in the future
+        if (
+            self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB
+            and self.input_data.get_value(InputType.RETURN_PERIOD) is not None
+        ):
+            extreme = True
+        else:
+            extreme = False
         self.plot_settings = get_plot_settings(
             self.vocab,
             self.input_data.get_value(InputType.IMAGE_SIZE),
             self.input_data.get_font_size(),
             self.input_data.get_value(InputType.VARIABLE)[0],
+            extreme,
         )
 
         data_extractor = DataExtractor(file_lists, self.input_data, self.plot_settings)

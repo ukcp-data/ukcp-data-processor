@@ -518,6 +518,16 @@ UKCP_TEMP_ANOM.vmid = 0.0
 UKCP_TEMP_ANOM.vstep = 1.0
 
 
+# Air temperatures specifically for use with the probabilistic extremes.
+UKCP_TEMP_EXTREME = UKCP_TEMP.copy()
+UKCP_TEMP_EXTREME.tag = "UKCP_temp_extreme"
+UKCP_TEMP_EXTREME.default_barlabel = "Temperature, $^\circ$C"
+UKCP_TEMP_EXTREME.preferred_unit = cf_units.Unit("Celsius")
+UKCP_TEMP_EXTREME.vrange = [10.0, 40.0]
+UKCP_TEMP_EXTREME.vmid = 0.0
+UKCP_TEMP_EXTREME.vstep = 5.0
+
+
 # Precipitation rate.
 UKCP_PRECIP = UKCPNEAT.copy()
 UKCP_PRECIP.tag = "UKCP_precip"

@@ -2,7 +2,7 @@ from ukcp_dp.constants import InputType
 from ukcp_dp.utils import _standards_class as stds
 
 
-def get_plot_settings(vocab, cmsize, fsize, var_id):
+def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
     """
     Get the plot settings based on the variable being plotted.
 
@@ -13,7 +13,9 @@ def get_plot_settings(vocab, cmsize, fsize, var_id):
         # Mean air temperature at 1.5m (C)
         # Maximum air temperature at 1.5m (C)
         # Minimum air temperature at 1.5m (C)
-        if "Anom" in var_id:
+        if extreme is True:
+             plot_settings = stds.UKCP_TEMP_EXTREME.copy()
+        elif "Anom" in var_id:
             plot_settings = stds.UKCP_TEMP_ANOM.copy()
         else:
             plot_settings = stds.UKCP_TEMP.copy()
