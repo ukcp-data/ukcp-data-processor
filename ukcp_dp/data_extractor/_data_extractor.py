@@ -571,12 +571,17 @@ class DataExtractor:
         """
         LOG.debug("get_title")
         variable = " and ".join(self.input_data.get_value_label(InputType.VARIABLE))
+        if self.input_data.get_value_label(InputType.VARIABLE)[0] in [
+            "hursAnom",
+            "hussAnom",
+        ]:
+            variable = "percentage {variable}".format(variable=variable)
         if (
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
             == TemporalAverageType.ANNUAL
             or self.input_data.get_value(InputType.TIME_PERIOD) == "all"
         ):
-            title = "{temporal_type} average " "{variable} for".format(
+            title = "{temporal_type} average {variable} for".format(
                 temporal_type=self.input_data.get_value_label(
                     InputType.TEMPORAL_AVERAGE_TYPE
                 ),
@@ -587,7 +592,7 @@ class DataExtractor:
             title = "{variable} for".format(variable=variable)
 
         else:
-            title = "{temporal_type} average " "{variable} for {time_period} in".format(
+            title = "{temporal_type} average {variable} for {time_period} in".format(
                 temporal_type=self.input_data.get_value_label(
                     InputType.TEMPORAL_AVERAGE_TYPE
                 ),
