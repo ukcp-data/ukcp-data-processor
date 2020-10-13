@@ -571,7 +571,7 @@ class DataExtractor:
         """
         LOG.debug("get_title")
         variable = " and ".join(self.input_data.get_value_label(InputType.VARIABLE))
-        if self.input_data.get_value_label(InputType.VARIABLE)[0] in [
+        if self.input_data.get_value(InputType.VARIABLE)[0] in [
             "hursAnom",
             "hussAnom",
         ]:
