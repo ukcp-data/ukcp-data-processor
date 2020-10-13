@@ -87,8 +87,7 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
     elif "hurs" in var_id:
         # Relative humidity at 1.5m (%)
         if "Anom" in var_id:
-            # TODO do we need an ANOM version?
-            plot_settings = stds.UKCP_RELATIVE_HUMIDITY.copy()
+            plot_settings = stds.UKCP_RELATIVE_HUMIDITY_ANOM.copy()
         else:
             plot_settings = stds.UKCP_RELATIVE_HUMIDITY.copy()
 
