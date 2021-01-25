@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from datetime import datetime
 import logging
 
 import matplotlib.cbook as cbook
@@ -100,6 +101,10 @@ class BasePlotter:
         fig.figimage(im, 5, v_offset, zorder=3)
         self._add_funder_text(fig)
 
+        if self.input_data.get_value(InputType.PLOT_TITLE) is not None:
+            # if there is a user defined title then include a timestamp
+            self._add_date_stamp(fig)
+
     def _add_funder_text(self, fig):
         """
         Add a logo to the plot.
@@ -118,3 +123,21 @@ class BasePlotter:
 
         textstr = "Funded by BEIS and Defra"
         fig.text(x, 0.02, textstr, fontsize=font_size)
+
+    def _add_date_stamp(self, fig):
+        """
+        Add a date to the plot.
+        """
+        image_size = self.input_data.get_value(InputType.IMAGE_SIZE)
+
+        if image_size == 900:
+            font_size = 10
+        elif image_size == 1200:
+            font_size = 12
+        else:  # 2400
+            font_size = 24
+
+        datetime_obj = datetime.now()
+        date_str = datetime_obj.strftime("%H:%M %d/%m/%y")
+
+        fig.text(0.02, 0.02, date_str, fontsize=font_size)

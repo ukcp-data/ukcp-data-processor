@@ -570,11 +570,16 @@ class DataExtractor:
         @return a str containing the title
         """
         LOG.debug("get_title")
+
+        # user defined title?
+        if (
+            self.input_data.get_value(InputType.PLOT_TITLE) is not None
+            and self.input_data.get_value(InputType.PLOT_TITLE) != ""
+        ):
+            return self.input_data.get_value(InputType.PLOT_TITLE)
+
         variable = " and ".join(self.input_data.get_value_label(InputType.VARIABLE))
-        if self.input_data.get_value(InputType.VARIABLE)[0] in [
-            "hursAnom",
-            "hussAnom",
-        ]:
+        if self.input_data.get_value(InputType.VARIABLE)[0] in ["hursAnom", "hussAnom"]:
             variable = "percentage {variable}".format(variable=variable)
         if (
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)

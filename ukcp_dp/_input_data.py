@@ -1,6 +1,7 @@
 from ukcp_dp.constants import (
     InputType,
     INPUT_TYPES,
+    INPUT_TYPES_FREE_TEXT,
     INPUT_TYPES_SINGLE_VALUE,
     INPUT_TYPES_MULTI_VALUE,
     FONT_SIZE_SMALL,
@@ -132,6 +133,8 @@ class InputData:
                     self.set_values(input_type, inputs[input_type])
                 elif input_type == InputType.AREA:
                     self._set_area(inputs[InputType.AREA])
+                elif input_type in INPUT_TYPES_FREE_TEXT:
+                    self.set_text(input_type, inputs[input_type])
             except KeyError:
                 # looks like this 'type' was not set
                 pass
@@ -214,6 +217,17 @@ class InputData:
 
             labels.append(label)
         self.validated_inputs[value_type] = [values, labels]
+
+    def set_text(self, value_type, value):
+        """
+        Set the value for the given type.
+
+        @param value_type (InputType): the type of the value to set.
+        @param value (str): the value to set
+
+        @throws Exception
+        """
+        self.validated_inputs[value_type] = [value, value]
 
     def get_value(self, value_type):
         """

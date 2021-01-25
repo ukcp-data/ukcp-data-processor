@@ -28,7 +28,13 @@ class BaseCsvWriter:
         self.timestamp
     """
 
-    ignore_in_header = ["Colour Mode", "Font Size", "Image Size", "Legend Position"]
+    ignore_in_header = [
+        "Colour Mode",
+        "Font Size",
+        "Image Size",
+        "Legend Position",
+        "Plot Title",
+    ]
 
     def __init__(self):
         self.input_data = None

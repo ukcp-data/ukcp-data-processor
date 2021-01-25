@@ -182,6 +182,7 @@ class Vocab:
         "legend_position": "Legend Position",
         "method": "Method",
         "overlay_probability_levels": "Overlay Probability Levels",
+        "plot_title": "Plot Title",
         "random_sampling_count": "Random Sampling Count",
         "return_period": "Return Period",
         "sampling_id": "Sampling IDs",
@@ -208,6 +209,7 @@ class Vocab:
 
     def __init__(self):
         self.vocab = self.VOCAB
+        self.vocab["plot_title"] = None
         self.vocab["year"] = _get_range(1900, 2301)
         self.vocab["year"].update(_get_range(3001, 3051))
         self.vocab["year_minimum"] = _get_range(1900, 2302)

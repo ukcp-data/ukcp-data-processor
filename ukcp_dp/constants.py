@@ -28,6 +28,7 @@ InputType = enum(
     ORDER_BY_MEAN="order_by_mean",
     OVERLAY_PROBABILITY_LEVELS="overlay_probability_levels",
     RANDOM_SAMPLING_COUNT="random_sampling_count",
+    PLOT_TITLE="plot_title",
     RETURN_PERIOD="return_period",
     SAMPLING_METHOD="sampling_method",
     SAMPLING_ID="sampling_id",
@@ -50,6 +51,10 @@ InputType = enum(
     YEAR_MINIMUM="year_minimum",
     YEAR_MAXIMUM="year_maximum",
 )
+
+INPUT_TYPES_FREE_TEXT = [
+    InputType.PLOT_TITLE,
+]
 
 INPUT_TYPES_SINGLE_VALUE = [
     InputType.BASELINE,
@@ -96,6 +101,7 @@ INPUT_TYPES_MULTI_VALUE = [
 
 INPUT_TYPES = INPUT_TYPES_SINGLE_VALUE + INPUT_TYPES_MULTI_VALUE
 INPUT_TYPES.append(InputType.AREA)
+INPUT_TYPES.append(InputType.PLOT_TITLE)
 
 DATA_SELECTION_TYPES = [
     InputType.BASELINE,
