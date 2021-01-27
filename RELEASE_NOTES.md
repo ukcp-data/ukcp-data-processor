@@ -1,3 +1,10 @@
+# Release 2.3.0
+
+This release addresses:
+
+* Allow a user defined plot title
+
+
 # Release 2.2.0
 
 This release addresses:
