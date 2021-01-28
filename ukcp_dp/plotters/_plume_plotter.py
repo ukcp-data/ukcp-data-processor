@@ -231,10 +231,11 @@ class PlumePlotter(GraphPlotter):
             )
 
         self.show_legend = False
-        self.title = "%s, %s" % (
-            self.title,
-            self.PLOT_TITLE[self.input_data.get_value(InputType.COLLECTION)],
-        )
+        if self.input_data.get_value(InputType.PLOT_TITLE) is None:
+            self.title = "%s, %s" % (
+                self.title,
+                self.PLOT_TITLE[self.input_data.get_value(InputType.COLLECTION)],
+            )
 
         if self.input_data.get_value(InputType.SHOW_LABELS):
             self._add_line_labels(ax, t_points, percentile_data)
