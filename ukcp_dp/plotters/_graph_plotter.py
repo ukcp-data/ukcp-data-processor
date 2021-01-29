@@ -52,7 +52,7 @@ class GraphPlotter(BasePlotter):
 
         # Set the area below the title and allow room for the labels
         # [[left, bottom], [right, top]]
-        fig.add_axes(Bbox([[0.11, 0.1], [0.95, 0.81]]))
+        fig.add_axes(Bbox([[0.11, 0.12], [0.95, 0.81]]))
         self._generate_graph()
 
         # Set the title width and tick label padding
