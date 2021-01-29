@@ -262,4 +262,11 @@ def wrap_string(text, width):
         # add the string plus a space to the new string and increase the line length
         new_text += st + " "
         new_line_length += len(st) + 1
+
+    # now to try to align vertically
+    if new_text.count("\n") == 0:
+        new_text = f"\n\n{new_text}"
+    elif new_text.count("\n") < 3:
+        new_text = f"\n{new_text}"
+
     return new_text
