@@ -72,7 +72,7 @@ class InputData:
                     value = self.validated_inputs[key][3]
             else:
                 value = self.validated_inputs[key][1]
-            if len(value) == 0:
+            if len(str(value)) == 0:
                 continue
             if isinstance(value, list):
                 value = ",".join(value)
@@ -235,7 +235,6 @@ class InputData:
         except ValueError:
             raise Exception("{} is not a float: {}.".format(value_type, value))
 
-        print("set float")
         self.validated_inputs[value_type] = [value, value]
 
     def set_text(self, value_type, value):
