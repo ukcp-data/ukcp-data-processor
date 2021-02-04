@@ -1,6 +1,7 @@
 from ukcp_dp.constants import (
     InputType,
     INPUT_TYPES,
+    INPUT_TYPES_FLOAT,
     INPUT_TYPES_FREE_TEXT,
     INPUT_TYPES_SINGLE_VALUE,
     INPUT_TYPES_MULTI_VALUE,
@@ -135,6 +136,8 @@ class InputData:
                     self._set_area(inputs[InputType.AREA])
                 elif input_type in INPUT_TYPES_FREE_TEXT:
                     self.set_text(input_type, inputs[input_type])
+                elif input_type in INPUT_TYPES_FLOAT:
+                    self.set_float(input_type, inputs[input_type])
             except KeyError:
                 # looks like this 'type' was not set
                 pass
@@ -217,6 +220,23 @@ class InputData:
 
             labels.append(label)
         self.validated_inputs[value_type] = [values, labels]
+
+    def set_float(self, value_type, value):
+        """
+        Set the value for the given type.
+
+        @param value_type (InputType): the type of the value to set.
+        @param value (str): the value to set
+
+        @throws Exception
+        """
+        try:
+            value = float(value)
+        except ValueError:
+            raise Exception("{} is not a float: {}.".format(value_type, value))
+
+        print("set float")
+        self.validated_inputs[value_type] = [value, value]
 
     def set_text(self, value_type, value):
         """

@@ -47,10 +47,17 @@ InputType = enum(
     TIME_PERIOD="time_period",
     TIME_SLICE_TYPE="time_slice_type",
     VARIABLE="variable",
+    Y_AXIS_MAX="y_axis_max",
+    Y_AXIS_MIN="y_axis_min",
     YEAR="year",
     YEAR_MINIMUM="year_minimum",
     YEAR_MAXIMUM="year_maximum",
 )
+
+INPUT_TYPES_FLOAT = [
+    InputType.Y_AXIS_MAX,
+    InputType.Y_AXIS_MIN,
+]
 
 INPUT_TYPES_FREE_TEXT = [
     InputType.PLOT_TITLE,
@@ -102,6 +109,8 @@ INPUT_TYPES_MULTI_VALUE = [
 INPUT_TYPES = INPUT_TYPES_SINGLE_VALUE + INPUT_TYPES_MULTI_VALUE
 INPUT_TYPES.append(InputType.AREA)
 INPUT_TYPES.append(InputType.PLOT_TITLE)
+INPUT_TYPES.append(InputType.Y_AXIS_MAX)
+INPUT_TYPES.append(InputType.Y_AXIS_MIN)
 
 DATA_SELECTION_TYPES = [
     InputType.BASELINE,

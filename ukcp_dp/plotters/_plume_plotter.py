@@ -113,6 +113,11 @@ class PlumePlotter(GraphPlotter):
             # add axis labels
             plt.xlabel("Date")
 
+        if self.input_data.get_value(InputType.Y_AXIS_MAX) is not None:
+            y_max = float(self.input_data.get_value(InputType.Y_AXIS_MAX))
+            y_min = float(self.input_data.get_value(InputType.Y_AXIS_MIN))
+            ax.set_ylim(y_min, y_max)
+
         plt.ylabel(self.input_data.get_value_label(InputType.VARIABLE)[0])
 
     def _plot_probability_levels(self, cube, ax, is_overlay):
