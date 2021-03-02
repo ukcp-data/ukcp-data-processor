@@ -581,7 +581,14 @@ class DataExtractor:
         variable = " and ".join(self.input_data.get_value_label(InputType.VARIABLE))
         if self.input_data.get_value(InputType.VARIABLE)[0] in ["hursAnom", "hussAnom"]:
             variable = "percentage {variable}".format(variable=variable)
-        if (
+
+        if self.input_data.get_value(InputType.RETURN_PERIOD) is not None:
+            title = "{variable} for {time_period} in".format(
+                time_period=self.input_data.get_value_label(InputType.TIME_PERIOD),
+                variable=variable,
+            )
+
+        elif (
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
             == TemporalAverageType.ANNUAL
             or self.input_data.get_value(InputType.TIME_PERIOD) == "all"
