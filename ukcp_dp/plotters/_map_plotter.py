@@ -3,20 +3,7 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import shapefile as shp
-from ukcp_dp.constants import (
-    OVERLAY_COLOUR,
-    OVERLAY_LINE_WIDTH,
-    OVERLAY_ADMIN,
-    OVERLAY_COASTLINE,
-    OVERLAY_COUNTRY,
-    OVERLAY_RIVER,
-    OVERLAY_COASTLINE_SMALL,
-    OVERLAY_COUNTRY_SMALL,
-    OVERLAY_RIVER_SMALL,
-    OVERLAY_ADMIN_SMALL,
-    AreaType,
-    InputType,
-)
+from ukcp_dp.constants import OVERLAY_COLOUR, OVERLAY_LINE_WIDTH, AreaType, InputType
 from ukcp_dp.plotters._base_plotter import BasePlotter
 from ukcp_dp.plotters.utils._plotting_utils import (
     end_figure,
@@ -25,6 +12,16 @@ from ukcp_dp.plotters.utils._plotting_utils import (
     wrap_string,
 )
 from ukcp_dp.plotters.utils._region_utils import reg_from_cube
+from ukcp_dp.spatial_files import (
+    OVERLAY_ADMIN,
+    OVERLAY_COASTLINE,
+    OVERLAY_COUNTRY,
+    OVERLAY_RIVER,
+    OVERLAY_COASTLINE_SMALL,
+    OVERLAY_COUNTRY_SMALL,
+    OVERLAY_RIVER_SMALL,
+    OVERLAY_ADMIN_SMALL,
+)
 
 
 LOG = logging.getLogger(__name__)

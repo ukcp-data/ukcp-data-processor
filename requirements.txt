@@ -1,5 +1,7 @@
 iris==1.13.0
 ukcp_cv
+ukcp_sf
+PyShp
 
 # For testing
 pytest

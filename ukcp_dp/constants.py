@@ -54,14 +54,9 @@ InputType = enum(
     YEAR_MAXIMUM="year_maximum",
 )
 
-INPUT_TYPES_FLOAT = [
-    InputType.Y_AXIS_MAX,
-    InputType.Y_AXIS_MIN,
-]
+INPUT_TYPES_FLOAT = [InputType.Y_AXIS_MAX, InputType.Y_AXIS_MIN]
 
-INPUT_TYPES_FREE_TEXT = [
-    InputType.PLOT_TITLE,
-]
+INPUT_TYPES_FREE_TEXT = [InputType.PLOT_TITLE]
 
 INPUT_TYPES_SINGLE_VALUE = [
     InputType.BASELINE,
@@ -165,19 +160,6 @@ OVERLAY_LINE_WIDTH = 0.3
 
 ROOT_DIR = path.dirname(path.dirname(path.abspath(__file__)))
 
-OVERLAY_ADMIN = path.join(ROOT_DIR, "ukcp_dp/public/shapefiles/UK_Admin")
-OVERLAY_ADMIN_SMALL = path.join(ROOT_DIR, "ukcp_dp/public/shapefiles/UK_AdminSmall")
-OVERLAY_COASTLINE = path.join(ROOT_DIR, "ukcp_dp/public/shapefiles/UKCoastline")
-OVERLAY_COASTLINE_SMALL = path.join(
-    ROOT_DIR, "ukcp_dp/public/shapefiles/UKCoastlineSmall"
-)
-OVERLAY_COUNTRY = path.join(ROOT_DIR, "ukcp_dp/public/shapefiles/BritishIslesReduced")
-OVERLAY_COUNTRY_SMALL = path.join(
-    ROOT_DIR, "ukcp_dp/public/shapefiles/BritishIslesReducedSmall"
-)
-OVERLAY_RIVER = path.join(ROOT_DIR, "ukcp_dp/public/shapefiles/river_basins")
-OVERLAY_RIVER_SMALL = path.join(ROOT_DIR, "ukcp_dp/public/shapefiles/river_basinsSmall")
-
 LOGO_SMALL = path.join(
     ROOT_DIR, "ukcp_dp/public/img/MOHC_MASTER_black_mono_for_light_backg_RBG_100.jpg"
 )
@@ -239,7 +221,7 @@ PlotType = enum(
 )
 
 # Data formats
-DataFormat = enum(CSV="csv", NET_CDF="netcdf")
+DataFormat = enum(CSV="csv", NET_CDF="netcdf", SHAPEFILE="shp")
 
 # Data types
 DataType = enum(CDF="cdf", PDF="pdf")

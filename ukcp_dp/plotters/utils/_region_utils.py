@@ -2,14 +2,14 @@ import logging
 
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
-from ukcp_dp.constants import (
+from ukcp_dp.constants import UKCP_OSGB
+from ukcp_dp.spatial_files import (
     OVERLAY_ADMIN,
-    OVERLAY_RIVER,
     OVERLAY_COUNTRY,
-    UKCP_OSGB,
+    OVERLAY_RIVER,
     OVERLAY_COUNTRY_SMALL,
-    OVERLAY_ADMIN_SMALL,
     OVERLAY_RIVER_SMALL,
+    OVERLAY_ADMIN_SMALL,
 )
 
 

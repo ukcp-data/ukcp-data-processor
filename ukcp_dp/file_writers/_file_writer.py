@@ -5,6 +5,7 @@ from time import gmtime, strftime
 import iris
 from ukcp_dp.constants import DataFormat
 from ukcp_dp.file_writers._write_csv import write_csv_file
+from ukcp_dp.file_writers._write_shp import write_shp_file
 
 
 LOG = logging.getLogger(__name__)
@@ -37,6 +38,9 @@ def write_file(
 
     if data_format == DataFormat.NET_CDF:
         return _write_netcdf_file(cube_list, output_data_file_path, plot_type)
+
+    if data_format == DataFormat.SHAPEFILE:
+        return write_shp_file(cube_list, output_data_file_path, input_data, plot_type)
 
     raise Exception("Invalid data format: {}".format(data_format))
 
