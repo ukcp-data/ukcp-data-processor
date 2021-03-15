@@ -11,9 +11,9 @@ import numpy.ma as ma
 import shapefile as shp
 from ukcp_dp.constants import AreaType, InputType, COLLECTION_MARINE
 from ukcp_dp.spatial_files import (
-    OVERLAY_ADMIN_SMALL,
-    OVERLAY_COUNTRY_SMALL,
-    OVERLAY_RIVER_SMALL,
+    OVERLAY_ADMIN,
+    OVERLAY_COUNTRY_AGGREGATED,
+    OVERLAY_RIVER,
 )
 
 
@@ -102,18 +102,18 @@ class BaseShpWriter:
         )
 
         if spatial_representation == AreaType.ADMIN_REGION:
-            region_shape_file = shp.Reader(OVERLAY_ADMIN_SMALL)
+            region_shape_file = shp.Reader(OVERLAY_ADMIN)
 
         elif spatial_representation == AreaType.COUNTRY:
-            region_shape_file = shp.Reader(OVERLAY_COUNTRY_SMALL)
+            region_shape_file = shp.Reader(OVERLAY_COUNTRY_AGGREGATED)
 
         elif spatial_representation == AreaType.RIVER_BASIN:
-            region_shape_file = shp.Reader(OVERLAY_RIVER_SMALL)
+            region_shape_file = shp.Reader(OVERLAY_RIVER)
 
         else:
             raise Exception(
                 f"spatial_representation must be one of {AreaType.ADMIN_REGION}, "
-                "{AreaType.COUNTRY}, {AreaType.RIVER_BASIN}"
+                f"{AreaType.COUNTRY}, {AreaType.RIVER_BASIN}"
             )
 
         return region_shape_file
@@ -195,13 +195,16 @@ class BaseShpWriter:
             for region_slice in cube.slices_over("region"):
 
                 region = str(region_slice.coords(var_name="geo_region")[0].points[0])
+                # correct for error in net-cdf files
+                if region == "Orkney and Shetlands":
+                    region = "Orkney and Shetland"
 
                 region_record = _get_region_record_from_shapefile(
                     region_shape_file, region
                 )
 
                 if region_record is None:
-                    return
+                    continue
 
                 region_geometry = region_shape_file.shapeRecord(region_record.oid).shape
 
@@ -230,6 +233,7 @@ def _get_region_record_from_shapefile(region_shape_file, region):
     for record in region_shape_file.records():
         if region in record:
             return record
+    LOG.error(f"region: '{region}' not found in shape file")
     return None
 
 
