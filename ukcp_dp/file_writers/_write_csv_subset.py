@@ -211,7 +211,7 @@ class SubsetCsvWriter(BaseCsvWriter):
                     year_cube = ensemble_slice.extract(
                         iris.Constraint(coord_values={"year": year})
                     )
-                    LOG.debug("extracting data for year {}".format(year))
+                    LOG.debug("extracting data for year %s", year)
                     self._write_time_cube(year_cube, key_list)
 
             else:
@@ -236,7 +236,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         else:
             date_format = "%Y-%m-%d"
 
-        LOG.debug("getting data from cube {}".format(cube))
+        LOG.debug("getting data from cube %s", cube)
         data = cube.data[:]
         LOG.debug("data extracted")
 

@@ -2,8 +2,6 @@ import logging
 import os
 from time import gmtime, strftime
 
-import iris
-
 
 LOG = logging.getLogger(__name__)
 
@@ -67,5 +65,5 @@ def _write_dim_csv(cube, dim_names, line_out, index, output_data_file):
 def _get_value(_slice, dim_names):
     if dim_names[0] == "time":
         return _slice.coord(dim_names[0]).cell(0).point.strftime("%Y-%m-%dT%H-%M-%S")
-    else:
-        return str(_slice.coord(dim_names[0]).points[0])
+
+    return str(_slice.coord(dim_names[0]).points[0])

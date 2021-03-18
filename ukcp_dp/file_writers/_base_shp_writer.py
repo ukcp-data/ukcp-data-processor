@@ -10,6 +10,7 @@ from iris.exceptions import CoordinateNotFoundError
 import numpy.ma as ma
 import shapefile as shp
 from ukcp_dp.constants import AreaType, InputType, COLLECTION_MARINE
+from ukcp_dp.exception import UKCPDPInvalidParameterException
 from ukcp_dp.spatial_files import (
     OVERLAY_ADMIN,
     OVERLAY_COUNTRY_AGGREGATED,
@@ -61,6 +62,7 @@ class BaseShpWriter:
             selected data, one cube per scenario, per variable
         @param output_data_file_path (str): the full path to the file
         @param plot_type (PlotType): the type of the plot
+
         @return a list of file paths/names
 
         """
@@ -85,18 +87,33 @@ class BaseShpWriter:
         """
 
     def _get_file_name(self, file_name_suffix=None):
+        """
+        Get a file name based on the plot type, the time and the file_name_suffix.
+
+        @param file_name_suffix (str): the suffix to add to the file path, maybe None
+
+        @return a str containing the full path to the file
+
+        """
         if file_name_suffix is None:
             file_name_suffix = ""
+
         try:
             plot_type = self.plot_type.lower()
         except AttributeError:
+            # not a plot so must be a subset
             plot_type = "subset"
-        file_name = "{plot_type}_{timestamp}{suffix}".format(
-            plot_type=plot_type, timestamp=self.timestamp, suffix=file_name_suffix
-        )
+
+        file_name = f"{plot_type}_{self.timestamp}{file_name_suffix}"
         return os.path.join(self.output_data_file_path, file_name)
 
     def _get_region_shape_file(self):
+        """
+        Get a region shapefile based on the spatial representation.
+
+        @return a shp.Reader object for the selected region
+
+        """
         spatial_representation = self.input_data.get_value(
             InputType.SPATIAL_REPRESENTATION
         )
@@ -111,29 +128,39 @@ class BaseShpWriter:
             region_shape_file = shp.Reader(OVERLAY_RIVER)
 
         else:
-            raise Exception(
+            raise UKCPDPInvalidParameterException(
                 f"spatial_representation must be one of {AreaType.ADMIN_REGION}, "
                 f"{AreaType.COUNTRY}, {AreaType.RIVER_BASIN}"
             )
 
         return region_shape_file
 
-    def _write_prj_file(self, cube, output_data_file_path):
+    def _write_prj_file(self, cube, prj_file):
+        """
+        Write the projection information to a file based on the collection type.
+
+        @param prj_file (str): the full path to the projection file
+
+        """
         if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_MARINE:
-            _write_marine_prj_file(output_data_file_path)
+            _write_marine_prj_file(prj_file)
         else:
-            _write_land_prj_file(cube, output_data_file_path)
+            _write_land_prj_file(cube, prj_file)
 
     def _write_bbox_data(
-        self,
-        area,
-        cube,
-        half_grid_size,
-        output_data_file_path,
-        output_file_list,
-        var_label,
+        self, area, cube, half_grid_size, output_data_file, output_file_list, var_label
     ):
+        """
+        Write the data for a bbox to a shapefile.
 
+        @param area (float): the area of a grid square
+        @param cube (iris cube): a cube containing the selected data
+        @param half_grid_size (float): half the width of the grid square
+        @param output_data_file (str): the full path to the file
+        @param output_file_list (list): the list to add the file paths of the new files to
+        @param var_label (str): the label to use for the variable in the shapefile
+
+        """
         # get the numpy representation of the sub-cube
         data = cube.data
         # get the coordinates for the sub-cube
@@ -141,7 +168,7 @@ class BaseShpWriter:
         x_coords = cube.coord("projection_x_coordinate").points
 
         try:
-            shape_writer = shp.Writer(output_data_file_path)
+            shape_writer = shp.Writer(output_data_file)
             _write_bbox_field_desc(shape_writer)
 
             # rows of data
@@ -168,27 +195,32 @@ class BaseShpWriter:
         finally:
             shape_writer.close()
 
-        output_file_list.append("{}.dbf".format(output_data_file_path))
-        output_file_list.append("{}.shp".format(output_data_file_path))
-        output_file_list.append("{}.shx".format(output_data_file_path))
+        output_file_list.append(f"{output_data_file}.dbf")
+        output_file_list.append(f"{output_data_file}.shp")
+        output_file_list.append(f"{output_data_file}.shx")
 
         # add the prj file
-        prj_file = "{}.prj".format(output_data_file_path)
+        prj_file = f"{output_data_file}.prj"
         self._write_prj_file(cube, prj_file)
         output_file_list.append(prj_file)
 
     def _write_region_data(
-        self,
-        cube,
-        output_data_file_path,
-        output_file_list,
-        region_shape_file,
-        var_label,
+        self, cube, output_data_file, output_file_list, region_shape_file, var_label
     ):
+        """
+        Write the data for a region to a shapefile.
 
+        @param cube (iris cube): a cube containing the selected data
+        @param half_grid_size (float): half the width of the grid square
+        @param output_data_file (str): the full path to the file
+        @param output_file_list (list): the list to add the file paths of the new files to
+        @param region_shape_file(shp.Reader):the region shapefile
+        @param var_label (str): the label to use for the variable in the shapefile
+
+        """
         try:
             # define the shapefile fields
-            shape_writer = shp.Writer(output_data_file_path)
+            shape_writer = shp.Writer(output_data_file)
             _write_region_field_desc(shape_writer)
 
             # rows of data
@@ -219,12 +251,12 @@ class BaseShpWriter:
         finally:
             shape_writer.close()
 
-        output_file_list.append("{}.dbf".format(output_data_file_path))
-        output_file_list.append("{}.shp".format(output_data_file_path))
-        output_file_list.append("{}.shx".format(output_data_file_path))
+        output_file_list.append(f"{output_data_file}.dbf")
+        output_file_list.append(f"{output_data_file}.shp")
+        output_file_list.append(f"{output_data_file}.shx")
 
         # add the prj file
-        prj_file = "{}.prj".format(output_data_file_path)
+        prj_file = f"{output_data_file}.prj"
         self._write_prj_file(cube, prj_file)
         output_file_list.append(prj_file)
 
@@ -233,7 +265,7 @@ def _get_region_record_from_shapefile(region_shape_file, region):
     for record in region_shape_file.records():
         if region in record:
             return record
-    LOG.error(f"region: '{region}' not found in shape file")
+    LOG.error("region: %s not found in shape file", region)
     return None
 
 
@@ -299,7 +331,15 @@ def _write_region_field_desc(shape_writer):
     shape_writer.field(VAR_VALUE, "N", decimal=7)
 
 
-def _write_land_prj_file(cube, output_data_file_path):
+def _write_land_prj_file(cube, prj_file):
+    """
+    Write the projection file for land data.
+
+    Where possible data will be used from the cube.
+
+    @param prj_file (str): the full path to the projection file
+
+    """
     try:
         longitude_of_prime_meridian = (
             cube.coord_system().ellipsoid.longitude_of_prime_meridian
@@ -344,11 +384,17 @@ def _write_land_prj_file(cube, output_data_file_path):
         'UNIT["Meter",1.0]]'
     )
 
-    with open(output_data_file_path, "w") as output_data_file:
+    with open(prj_file, "w") as output_data_file:
         output_data_file.write(prj)
 
 
-def _write_marine_prj_file(output_data_file_path):
+def _write_marine_prj_file(prj_file):
+    """
+    Write the projection file for land data.
+
+    @param prj_file (str): the full path to the projection file
+
+    """
     prj = (
         'GEOGCS["GCS_WGS_1984",'
         'DATUM["WGS_1984",'
@@ -357,5 +403,5 @@ def _write_marine_prj_file(output_data_file_path):
         'UNIT["Degree",0.0174532925199433]]'
     )
 
-    with open(output_data_file_path, "w") as output_data_file:
+    with open(prj_file, "w") as output_data_file:
         output_data_file.write(prj)

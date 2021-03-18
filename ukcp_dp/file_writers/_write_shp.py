@@ -1,8 +1,12 @@
+"""
+This module is the entry point for writing shapefiles.
+
+"""
 import logging
 
 from ukcp_dp.constants import PlotType
+from ukcp_dp.exception import UKCPDPInvalidParameterException
 from ukcp_dp.file_writers._write_shp_postage_stamp_map import PostageStampMapShpWriter
-from ukcp_dp.file_writers._write_shp_subset import SubsetShpWriter
 from ukcp_dp.file_writers._write_shp_three_map import ThreeMapShpWriter
 
 
@@ -19,7 +23,9 @@ def write_shp_file(cube_list, output_data_file_path, input_data, plot_type):
     @param output_data_file_path (str): the full path to the file
     @param input_data (InputData): an object containing user defined values
     @param plot_type (PlotType): the type of the plot
+
     @return a list of file paths/names
+
     """
     log.info("Writing data to shapefile file")
 
@@ -31,7 +37,10 @@ def write_shp_file(cube_list, output_data_file_path, input_data, plot_type):
         elif plot_type == PlotType.POSTAGE_STAMP_MAPS:
             shp_writer = PostageStampMapShpWriter()
 
+        else:
+            raise UKCPDPInvalidParameterException()
+
     else:
-        shp_writer = SubsetShpWriter()
+        raise UKCPDPInvalidParameterException()
 
     return shp_writer.write_shp(input_data, cube_list, output_data_file_path, plot_type)

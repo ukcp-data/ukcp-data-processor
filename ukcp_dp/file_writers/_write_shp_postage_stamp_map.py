@@ -49,20 +49,23 @@ class PostageStampMapShpWriter(BaseShpWriter):
         for ensemble_slice in cube.slices_over("ensemble_member"):
             ensemble_name = ensemble_slice.coord("ensemble_member_id").points[0]
             ensemble_name = ensemble_name.replace(".", "_")
-            output_data_file_path = self._get_file_name("_{}".format(ensemble_name))
+            output_data_file = self._get_file_name(f"_{ensemble_name}")
 
             self._write_bbox_data(
                 area,
                 ensemble_slice,
                 half_grid_size,
-                output_data_file_path,
+                output_data_file,
                 output_file_list,
                 var_label,
             )
         return output_file_list
 
     def _write_region_shp(self):
+        """
+        Write a shapefile for geographic region.
 
+        """
         cube = self.cube_list[0]
         output_file_list = []
         region_shape_file = self._get_region_shape_file()
@@ -72,11 +75,11 @@ class PostageStampMapShpWriter(BaseShpWriter):
 
             ensemble_name = str(ensemble_slice.coord("ensemble_member_id").points[0])
             ensemble_name = ensemble_name.replace(".", "_")
-            output_data_file_path = self._get_file_name("_{}".format(ensemble_name))
+            output_data_file = self._get_file_name(f"_{ensemble_name}")
 
             self._write_region_data(
                 ensemble_slice,
-                output_data_file_path,
+                output_data_file,
                 output_file_list,
                 region_shape_file,
                 var_label,

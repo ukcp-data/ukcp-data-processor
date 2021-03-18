@@ -4,6 +4,7 @@ from time import gmtime, strftime
 
 import iris
 from ukcp_dp.constants import DataFormat
+from ukcp_dp.exception import UKCPDPInvalidParameterException
 from ukcp_dp.file_writers._write_csv import write_csv_file
 from ukcp_dp.file_writers._write_shp import write_shp_file
 
@@ -14,7 +15,6 @@ LOG = logging.getLogger(__name__)
 def write_file(
     cube_list,
     overlay_cube,
-    title,
     output_data_file_path,
     data_format,
     input_data,
@@ -28,7 +28,6 @@ def write_file(
         return write_csv_file(
             cube_list,
             overlay_cube,
-            title,
             output_data_file_path,
             input_data,
             plot_type,
@@ -42,7 +41,7 @@ def write_file(
     if data_format == DataFormat.SHAPEFILE:
         return write_shp_file(cube_list, output_data_file_path, input_data, plot_type)
 
-    raise Exception("Invalid data format: {}".format(data_format))
+    raise UKCPDPInvalidParameterException("Invalid data format: {}".format(data_format))
 
 
 def _write_netcdf_file(cube_list, output_data_file_path, plot_type):

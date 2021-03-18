@@ -50,13 +50,13 @@ class ThreeMapShpWriter(BaseShpWriter):
         percentiles = [10, 50, 90]
         for percentile in percentiles:
             percentile_cube = cube.extract(iris.Constraint(percentile=percentile))
-            output_data_file_path = self._get_file_name("_{}".format(percentile))
+            output_data_file = self._get_file_name(f"_{percentile}")
 
             self._write_bbox_data(
                 area,
                 percentile_cube,
                 half_grid_size,
-                output_data_file_path,
+                output_data_file,
                 output_file_list,
                 var_label,
             )
@@ -78,11 +78,11 @@ class ThreeMapShpWriter(BaseShpWriter):
         for percentile in percentiles:
 
             percentile_cube = cube.extract(iris.Constraint(percentile=percentile))
-            output_data_file_path = self._get_file_name("_{}".format(percentile))
+            output_data_file = self._get_file_name(f"_{percentile}")
 
             self._write_region_data(
                 percentile_cube,
-                output_data_file_path,
+                output_data_file,
                 output_file_list,
                 region_shape_file,
                 var_label,

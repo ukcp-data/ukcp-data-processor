@@ -221,7 +221,6 @@ class UKCPDataProcessor:
         output_file_list = write_file(
             cubes,
             self.overlay_cube,
-            self.title,
             output_data_file_path,
             data_format,
             self.input_data,

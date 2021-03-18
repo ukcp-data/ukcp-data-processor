@@ -1,6 +1,5 @@
 import logging
 
-import iris
 from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 

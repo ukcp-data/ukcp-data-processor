@@ -3,8 +3,6 @@ import logging
 import os
 from time import gmtime, strftime
 
-import numpy as np
-
 
 LOG = logging.getLogger(__name__)
 
