@@ -1,3 +1,8 @@
+"""
+This module contains the PdfCsvWriter class, which implements the _write_csv method
+from the BaseCsvWriter base class.
+
+"""
 import collections
 import logging
 
@@ -8,11 +13,13 @@ from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 LOG = logging.getLogger(__name__)
 
 
+# pylint: disable=R0903
 class PdfCsvWriter(BaseCsvWriter):
     """
     The PDF CSV writer class.
 
     This class extends BaseCsvWriter with a _write_csv(self).
+
     """
 
     def _write_csv(self):
@@ -20,6 +27,7 @@ class PdfCsvWriter(BaseCsvWriter):
         Write out the data, in CSV format, associated with a PDF plot.
 
         One file is produced per scenario.
+
         """
         output_file_list = []
 
@@ -58,9 +66,12 @@ class PdfCsvWriter(BaseCsvWriter):
             ):
                 return scenario_cube.data
 
+        return None
+
     def _add_data(self, cdf_data, pdf_data, key_list):
         """
         Slice the cube over 'percentile' and update data_dict
+
         """
         for i, cdf_d in enumerate(cdf_data):
             pdf_point = value_to_string(pdf_data[i])
@@ -78,6 +89,7 @@ class PdfCsvWriter(BaseCsvWriter):
         We have to override the method in the base class as we do not wish all
         of the scenarios to be written to the headers.
         We will end up with one file per scenario.
+
         """
         user_inputs = {}
         all_user_inputs = self.input_data.get_user_inputs()

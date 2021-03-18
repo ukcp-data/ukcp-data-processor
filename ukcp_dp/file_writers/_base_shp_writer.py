@@ -157,7 +157,8 @@ class BaseShpWriter:
         @param cube (iris cube): a cube containing the selected data
         @param half_grid_size (float): half the width of the grid square
         @param output_data_file (str): the full path to the file
-        @param output_file_list (list): the list to add the file paths of the new files to
+        @param output_file_list (list): the list to add the file paths of the new files
+                to
         @param var_label (str): the label to use for the variable in the shapefile
 
         """
@@ -213,7 +214,8 @@ class BaseShpWriter:
         @param cube (iris cube): a cube containing the selected data
         @param half_grid_size (float): half the width of the grid square
         @param output_data_file (str): the full path to the file
-        @param output_file_list (list): the list to add the file paths of the new files to
+        @param output_file_list (list): the list to add the file paths of the new files
+                to
         @param region_shape_file(shp.Reader):the region shapefile
         @param var_label (str): the label to use for the variable in the shapefile
 

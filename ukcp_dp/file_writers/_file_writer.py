@@ -1,3 +1,7 @@
+"""
+This module provides the public entry point write_file to the file_writes package.
+
+"""
 import logging
 import os
 from time import gmtime, strftime
@@ -22,6 +26,21 @@ def write_file(
     process_version,
     vocab,
 ):
+    """
+    Write the data to file.
+
+    @param cube_list (iris cube list): a list of cubes containing the
+        selected data, one cube per scenario, per variable
+    @param overlay_cube (iris cube): a cube containing the data for the overlay
+    @param output_data_file_path (str): the full path to the file
+    data_format,
+    @param input_data (InputData): an object containing user defined values
+    @param plot_type (PlotType): the type of the plot
+    @param process_version (str): the version of the process generating
+            this output
+    @param vocab (Vocab): an instance of the ukcp_dp Vocab class
+
+    """
     LOG.debug(cube_list)
 
     if data_format == DataFormat.CSV:

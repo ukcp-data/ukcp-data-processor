@@ -1,3 +1,8 @@
+"""
+This module contains the PostageStampMapCsvWriter class, which implements the _write_csv
+method from the BaseCsvWriter base class.
+
+"""
 import logging
 
 from ukcp_dp.constants import AreaType, InputType
@@ -7,16 +12,19 @@ from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 LOG = logging.getLogger(__name__)
 
 
+# pylint: disable=R0903
 class PostageStampMapCsvWriter(BaseCsvWriter):
     """
     The postage stamp map CSV writer class.
 
     This class extends BaseCsvWriter with a _write_csv(self).
+
     """
 
     def _write_csv(self):
         """
         Write out the data, in CSV format, associated with three maps.
+
         """
         if self.input_data.get_area_type() == AreaType.BBOX:
             return self._write_x_y_csv()
@@ -62,9 +70,7 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
                         self.data_dict[y_coord] = [value]
                 write_header = False
 
-            output_data_file_path = self._get_full_file_name(
-                "_{}".format(ensemble_name)
-            )
+            output_data_file_path = self._get_full_file_name(f"_{ensemble_name}")
             self._write_data_dict(output_data_file_path, key_list)
             output_file_list.append(output_data_file_path)
             ###
@@ -84,9 +90,7 @@ class PostageStampMapCsvWriter(BaseCsvWriter):
 
             # update the header
             var = self.input_data.get_value_label(InputType.VARIABLE)[0]
-            self.header.append(
-                "{var}({ensemble})".format(ensemble=ensemble_name, var=var)
-            )
+            self.header.append(f"{var}({ensemble_name})")
 
             # rows of data
             for region_slice in ensemble_slice.slices_over("region"):

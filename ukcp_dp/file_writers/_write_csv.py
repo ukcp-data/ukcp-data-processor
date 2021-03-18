@@ -1,3 +1,7 @@
+"""
+This module is the entry point for writing CSV files.
+
+"""
 import logging
 
 from ukcp_dp.constants import InputType, PlotType, COLLECTION_MARINE

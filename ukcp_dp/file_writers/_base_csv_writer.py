@@ -1,3 +1,7 @@
+"""
+This module contains the BaseCsvWriter, a base class for CSV writers.
+
+"""
 import collections
 import logging
 import os
@@ -7,6 +11,7 @@ from time import gmtime, strftime
 LOG = logging.getLogger(__name__)
 
 
+# pylint: disable=R0903
 class BaseCsvWriter:
     """
     The base class for CSV writers.
@@ -24,6 +29,7 @@ class BaseCsvWriter:
         self.plot_type
         self.process_version
         self.timestamp
+
     """
 
     ignore_in_header = [
@@ -69,6 +75,7 @@ class BaseCsvWriter:
             this output
         @param overlay_cube (iris cube): a cube containing the data for
             the overlay
+
         """
         LOG.info("write_csv, %s", plot_type)
         # an object containing user defined values
@@ -97,12 +104,14 @@ class BaseCsvWriter:
         self._write_data_dict(output_data_file_path)
 
         @return a list of file names
+
         """
         raise NotImplementedError
 
     def _write_data_dict(self, output_data_file_path, key_list):
         """
         Write out the column headers and data_dict.
+
         """
         self._write_headers(output_data_file_path)
 
@@ -119,6 +128,7 @@ class BaseCsvWriter:
     def _write_headers(self, output_data_file_path):
         """
         Write out the column headers.
+
         """
         user_inputs = {}
         all_user_inputs = self.input_data.get_user_inputs()
