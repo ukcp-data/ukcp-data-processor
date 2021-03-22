@@ -13,19 +13,20 @@ from ukcp_dp.constants import AreaType, InputType, COLLECTION_MARINE
 from ukcp_dp.exception import UKCPDPInvalidParameterException
 from ukcp_dp.spatial_files import (
     OVERLAY_ADMIN,
-    OVERLAY_COUNTRY_AGGREGATED,
+    OVERLAY_COUNTRY,
+    OVERLAY_COUNTRY_ENGLAND_AND_WALES,
     OVERLAY_RIVER,
+    OVERLAY_COUNTRY_UNITED_KINGDOM,
 )
 
 
 LOG = logging.getLogger(__name__)
 
 
-AREA = "area"
-CENTROID_X = "centroid_x"
-CENTROID_Y = "centroid_y"
-ET_ID = "ET_ID"
-REGION = "Region"
+X_COORD = "x_coord"
+Y_COORD = "y_coord"
+ID = "id"
+REGION = "geo_region"
 VAR_NAME = "var_name"
 VAR_VALUE = "var_value"
 
@@ -107,11 +108,11 @@ class BaseShpWriter:
         file_name = f"{plot_type}_{self.timestamp}{file_name_suffix}"
         return os.path.join(self.output_data_file_path, file_name)
 
-    def _get_region_shape_file(self):
+    def _get_region_shape_files(self):
         """
-        Get a region shapefile based on the spatial representation.
+        Get a list of region shapefiles based on the spatial representation.
 
-        @return a shp.Reader object for the selected region
+        @return a list of file names for the selected region
 
         """
         spatial_representation = self.input_data.get_value(
@@ -119,13 +120,17 @@ class BaseShpWriter:
         )
 
         if spatial_representation == AreaType.ADMIN_REGION:
-            region_shape_file = shp.Reader(OVERLAY_ADMIN)
+            region_shape_files = [OVERLAY_ADMIN]
 
         elif spatial_representation == AreaType.COUNTRY:
-            region_shape_file = shp.Reader(OVERLAY_COUNTRY_AGGREGATED)
+            region_shape_files = [
+                OVERLAY_COUNTRY,
+                OVERLAY_COUNTRY_ENGLAND_AND_WALES,
+                OVERLAY_COUNTRY_UNITED_KINGDOM,
+            ]
 
         elif spatial_representation == AreaType.RIVER_BASIN:
-            region_shape_file = shp.Reader(OVERLAY_RIVER)
+            region_shape_files = [OVERLAY_RIVER]
 
         else:
             raise UKCPDPInvalidParameterException(
@@ -133,7 +138,7 @@ class BaseShpWriter:
                 f"{AreaType.COUNTRY}, {AreaType.RIVER_BASIN}"
             )
 
-        return region_shape_file
+        return region_shape_files
 
     def _write_prj_file(self, cube, prj_file):
         """
@@ -148,12 +153,11 @@ class BaseShpWriter:
             _write_land_prj_file(cube, prj_file)
 
     def _write_bbox_data(
-        self, area, cube, half_grid_size, output_data_file, output_file_list, var_label
+        self, cube, half_grid_size, output_data_file, output_file_list, var_label
     ):
         """
         Write the data for a bbox to a shapefile.
 
-        @param area (float): the area of a grid square
         @param cube (iris cube): a cube containing the selected data
         @param half_grid_size (float): half the width of the grid square
         @param output_data_file (str): the full path to the file
@@ -188,7 +192,6 @@ class BaseShpWriter:
                             shape_writer,
                             x_coords[x_coord],
                             y_coords[y_coord],
-                            area,
                             var_label,
                             data[y_coord, x_coord],
                         )
@@ -288,13 +291,9 @@ def _write_polygon(shape_writer, x_coord, y_coord, half_grid_size):
     shape_writer.poly([polygon])
 
 
-def _write_bbox_record(shape_writer, x_coord, y_coord, area, var_label, value):
+def _write_bbox_record(shape_writer, x_coord, y_coord, var_label, value):
     shape_writer.record(
-        centroid_x=x_coord,
-        centroid_y=y_coord,
-        area=area,
-        var_name=var_label,
-        var_value=value,
+        centroid_x=x_coord, centroid_y=y_coord, var_name=var_label, var_value=value
     )
 
 
@@ -303,11 +302,10 @@ def _write_region_record(
 ):
     shape_writer.shape(region_geometry)
     shape_writer.record(
-        ET_ID=region_record[ET_ID],
+        id=region_record[ID],
         Region=region_record[REGION],
-        area=region_record[AREA],
-        centroid_x=region_record[CENTROID_X],
-        centroid_y=region_record[CENTROID_Y],
+        centroid_x=region_record[X_COORD],
+        centroid_y=region_record[Y_COORD],
         var_name=var_label,
         var_value=value,
     )
@@ -315,20 +313,18 @@ def _write_region_record(
 
 def _write_bbox_field_desc(shape_writer):
     # define the shapefile fields
-    shape_writer.field(CENTROID_X, "N", 9)
-    shape_writer.field(CENTROID_Y, "N", 9)
-    shape_writer.field(AREA, "N", 9)
+    shape_writer.field(X_COORD, "N", decimal=6)
+    shape_writer.field(Y_COORD, "N", decimal=6)
     shape_writer.field(VAR_NAME, "C", 100)
     shape_writer.field(VAR_VALUE, "N", decimal=7)
 
 
 def _write_region_field_desc(shape_writer):
     # define the shapefile fields
-    shape_writer.field(ET_ID, "N", 8)
-    shape_writer.field(REGION, "C", 50)
-    shape_writer.field(CENTROID_X, "N", 9)
-    shape_writer.field(CENTROID_Y, "N", 9)
-    shape_writer.field(AREA, "N", 9)
+    shape_writer.field(ID, "N", 6)
+    shape_writer.field(REGION, "C", 27)
+    shape_writer.field(X_COORD, "N", decimal=6)
+    shape_writer.field(Y_COORD, "N", decimal=6)
     shape_writer.field(VAR_NAME, "C", 100)
     shape_writer.field(VAR_VALUE, "N", decimal=7)
 

@@ -5,6 +5,7 @@ from the BaseShpWriter base class.
 """
 import logging
 
+import shapefile as shp
 from ukcp_dp.constants import AreaType, InputType
 from ukcp_dp.file_writers._base_shp_writer import BaseShpWriter, _get_resolution_m
 
@@ -43,7 +44,6 @@ class PostageStampMapShpWriter(BaseShpWriter):
         output_file_list = []
         resolution = _get_resolution_m(cube)
         half_grid_size = resolution / 2
-        area = resolution * resolution
         var_label = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
         for ensemble_slice in cube.slices_over("ensemble_member"):
@@ -52,7 +52,6 @@ class PostageStampMapShpWriter(BaseShpWriter):
             output_data_file = self._get_file_name(f"_{ensemble_name}")
 
             self._write_bbox_data(
-                area,
                 ensemble_slice,
                 half_grid_size,
                 output_data_file,
@@ -68,23 +67,25 @@ class PostageStampMapShpWriter(BaseShpWriter):
         """
         cube = self.cube_list[0]
         output_file_list = []
-        region_shape_file = self._get_region_shape_file()
+        region_shape_files = self._get_region_shape_files()
         var_label = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
-        for ensemble_slice in cube.slices_over("ensemble_member"):
+        for file in region_shape_files:
+            with shp.Reader(file) as region_shape_file:
+                for ensemble_slice in cube.slices_over("ensemble_member"):
 
-            ensemble_name = str(ensemble_slice.coord("ensemble_member_id").points[0])
-            ensemble_name = ensemble_name.replace(".", "_")
-            output_data_file = self._get_file_name(f"_{ensemble_name}")
+                    ensemble_name = str(
+                        ensemble_slice.coord("ensemble_member_id").points[0]
+                    )
+                    ensemble_name = ensemble_name.replace(".", "_")
+                    output_data_file = self._get_file_name(f"_{ensemble_name}")
 
-            self._write_region_data(
-                ensemble_slice,
-                output_data_file,
-                output_file_list,
-                region_shape_file,
-                var_label,
-            )
-
-        region_shape_file.close()
+                    self._write_region_data(
+                        ensemble_slice,
+                        output_data_file,
+                        output_file_list,
+                        region_shape_file,
+                        var_label,
+                    )
 
         return output_file_list

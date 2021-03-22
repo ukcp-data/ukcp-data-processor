@@ -6,6 +6,7 @@ from the BaseShpWriter base class.
 import logging
 
 import iris
+import shapefile as shp
 from ukcp_dp.constants import AreaType, InputType
 from ukcp_dp.file_writers._base_shp_writer import BaseShpWriter, _get_resolution_m
 
@@ -43,7 +44,6 @@ class ThreeMapShpWriter(BaseShpWriter):
         output_file_list = []
         resolution = _get_resolution_m(cube)
         half_grid_size = resolution / 2
-        area = resolution * resolution
         var_label = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
         # extract 10th, 50th and 90th percentiles as sub-cubes
@@ -53,7 +53,6 @@ class ThreeMapShpWriter(BaseShpWriter):
             output_data_file = self._get_file_name(f"_{percentile}")
 
             self._write_bbox_data(
-                area,
                 percentile_cube,
                 half_grid_size,
                 output_data_file,
@@ -70,24 +69,26 @@ class ThreeMapShpWriter(BaseShpWriter):
         """
         cube = self.cube_list[0]
         output_file_list = []
-        region_shape_file = self._get_region_shape_file()
+        region_shape_files = self._get_region_shape_files()
         var_label = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
-        # extract 10th, 50th and 90th percentiles
-        percentiles = [10, 50, 90]
-        for percentile in percentiles:
+        for file in region_shape_files:
+            with shp.Reader(file) as region_shape_file:
+                # extract 10th, 50th and 90th percentiles
+                percentiles = [10, 50, 90]
+                for percentile in percentiles:
 
-            percentile_cube = cube.extract(iris.Constraint(percentile=percentile))
-            output_data_file = self._get_file_name(f"_{percentile}")
+                    percentile_cube = cube.extract(
+                        iris.Constraint(percentile=percentile)
+                    )
+                    output_data_file = self._get_file_name(f"_{percentile}")
 
-            self._write_region_data(
-                percentile_cube,
-                output_data_file,
-                output_file_list,
-                region_shape_file,
-                var_label,
-            )
-
-        region_shape_file.close()
+                    self._write_region_data(
+                        percentile_cube,
+                        output_data_file,
+                        output_file_list,
+                        region_shape_file,
+                        var_label,
+                    )
 
         return output_file_list

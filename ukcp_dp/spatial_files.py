@@ -26,15 +26,26 @@ OVERLAY_COUNTRY_SMALL = path.join(
     DATA_DIR, "ukcp18-uk-land-country-lowres", "ukcp18-uk-land-country-lowres"
 )
 
-OVERLAY_COUNTRY_AGGREGATED = path.join(
+OVERLAY_COUNTRY_ENGLAND_AND_WALES = path.join(
     DATA_DIR,
-    "ukcp18-uk-land-country-aggregated-hires",
-    "ukcp18-uk-land-country-aggregated-hires",
+    "ukcp18-uk-land-country-england_and_wales-hires",
+    "ukcp18-uk-land-country-england_and_wales-hires",
 )
-OVERLAY_COUNTRY_AGGREGATED_SMALL = path.join(
+OVERLAY_COUNTRY_ENGLAND_AND_WALES_SMALL = path.join(
     DATA_DIR,
-    "ukcp18-uk-land-country-aggregated-lowres",
-    "ukcp18-uk-land-country-aggregated-lowres",
+    "ukcp18-uk-land-country-england_and_wales-lowres",
+    "ukcp18-uk-land-country-england_and_wales-lowres",
+)
+
+OVERLAY_COUNTRY_UNITED_KINGDOM = path.join(
+    DATA_DIR,
+    "ukcp18-uk-land-country-united_kingdom-hires",
+    "ukcp18-uk-land-country-united_kingdom-hires",
+)
+OVERLAY_COUNTRY_UNITED_KINGDOM_SMALL = path.join(
+    DATA_DIR,
+    "ukcp18-uk-land-country-united_kingdom-lowres",
+    "ukcp18-uk-land-country-united_kingdom-lowres",
 )
 
 OVERLAY_RIVER = path.join(
