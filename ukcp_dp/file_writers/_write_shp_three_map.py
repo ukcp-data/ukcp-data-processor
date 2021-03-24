@@ -73,6 +73,7 @@ class ThreeMapShpWriter(BaseShpWriter):
         var_label = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
         for file in region_shape_files:
+            LOG.debug("Loading shapefile: %s", file)
             with shp.Reader(file) as region_shape_file:
                 # extract 10th, 50th and 90th percentiles
                 percentiles = [10, 50, 90]

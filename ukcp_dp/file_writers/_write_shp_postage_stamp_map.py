@@ -71,6 +71,7 @@ class PostageStampMapShpWriter(BaseShpWriter):
         var_label = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
         for file in region_shape_files:
+            LOG.debug("Loading shapefile: %s", file)
             with shp.Reader(file) as region_shape_file:
                 for ensemble_slice in cube.slices_over("ensemble_member"):
 

@@ -25,7 +25,6 @@ LOG = logging.getLogger(__name__)
 
 X_COORD = "x_coord"
 Y_COORD = "y_coord"
-ID = "id"
 REGION = "geo_region"
 VAR_NAME = "var_name"
 VAR_VALUE = "var_value"
@@ -293,7 +292,7 @@ def _write_polygon(shape_writer, x_coord, y_coord, half_grid_size):
 
 def _write_bbox_record(shape_writer, x_coord, y_coord, var_label, value):
     shape_writer.record(
-        centroid_x=x_coord, centroid_y=y_coord, var_name=var_label, var_value=value
+        x_coord=x_coord, y_coord=y_coord, var_name=var_label, var_value=value
     )
 
 
@@ -302,10 +301,9 @@ def _write_region_record(
 ):
     shape_writer.shape(region_geometry)
     shape_writer.record(
-        id=region_record[ID],
-        Region=region_record[REGION],
-        centroid_x=region_record[X_COORD],
-        centroid_y=region_record[Y_COORD],
+        geo_region=region_record[REGION],
+        x_coord=region_record[X_COORD],
+        y_coord=region_record[Y_COORD],
         var_name=var_label,
         var_value=value,
     )
@@ -321,7 +319,6 @@ def _write_bbox_field_desc(shape_writer):
 
 def _write_region_field_desc(shape_writer):
     # define the shapefile fields
-    shape_writer.field(ID, "N", 6)
     shape_writer.field(REGION, "C", 27)
     shape_writer.field(X_COORD, "N", decimal=6)
     shape_writer.field(Y_COORD, "N", decimal=6)
