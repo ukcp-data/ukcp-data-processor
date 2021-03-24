@@ -72,14 +72,23 @@ class PostageStampMapShpWriter(BaseShpWriter):
 
         for file in region_shape_files:
             LOG.debug("Loading shapefile: %s", file)
+
             with shp.Reader(file) as region_shape_file:
                 for ensemble_slice in cube.slices_over("ensemble_member"):
 
                     ensemble_name = str(
                         ensemble_slice.coord("ensemble_member_id").points[0]
                     )
+
                     ensemble_name = ensemble_name.replace(".", "_")
                     output_data_file = self._get_file_name(f"_{ensemble_name}")
+                    file_bit = file.split("-")[-2]
+                    if len(region_shape_files) > 1:
+                        suffix = f"_{file_bit}_{ensemble_name}"
+                    else:
+                        suffix = f"_{ensemble_name}"
+
+                    output_data_file = self._get_file_name(suffix)
 
                     self._write_region_data(
                         ensemble_slice,

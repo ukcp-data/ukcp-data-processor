@@ -74,6 +74,7 @@ class ThreeMapShpWriter(BaseShpWriter):
 
         for file in region_shape_files:
             LOG.debug("Loading shapefile: %s", file)
+
             with shp.Reader(file) as region_shape_file:
                 # extract 10th, 50th and 90th percentiles
                 percentiles = [10, 50, 90]
@@ -82,7 +83,14 @@ class ThreeMapShpWriter(BaseShpWriter):
                     percentile_cube = cube.extract(
                         iris.Constraint(percentile=percentile)
                     )
-                    output_data_file = self._get_file_name(f"_{percentile}")
+
+                    file_bit = file.split("-")[-2]
+                    if len(region_shape_files) > 1:
+                        suffix = f"_{file_bit}_{percentile}"
+                    else:
+                        suffix = f"_{percentile}"
+
+                    output_data_file = self._get_file_name(suffix)
 
                     self._write_region_data(
                         percentile_cube,
