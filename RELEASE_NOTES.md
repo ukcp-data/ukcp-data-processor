@@ -1,3 +1,10 @@
+# Release 2.4.0
+
+This release addresses:
+
+* Add option for users to get data as shapesiles for map products
+* Add option for users to set y-axis scale for plume plots
+
 # Release 2.3.0
 
 This release addresses:
