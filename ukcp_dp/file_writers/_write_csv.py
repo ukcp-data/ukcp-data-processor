@@ -1,3 +1,7 @@
+"""
+This module is the entry point for writing CSV files.
+
+"""
 import logging
 
 from ukcp_dp.constants import InputType, PlotType, COLLECTION_MARINE
@@ -17,7 +21,6 @@ LOG = logging.getLogger(__name__)
 def write_csv_file(
     cube_list,
     overlay_cube,
-    title,
     output_data_file_path,
     input_data,
     plot_type,

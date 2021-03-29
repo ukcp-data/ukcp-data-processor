@@ -14,7 +14,7 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
         # Maximum air temperature at 1.5m (C)
         # Minimum air temperature at 1.5m (C)
         if extreme is True:
-             plot_settings = stds.UKCP_TEMP_EXTREME.copy()
+            plot_settings = stds.UKCP_TEMP_EXTREME.copy()
         elif "Anom" in var_id:
             plot_settings = stds.UKCP_TEMP_ANOM.copy()
         else:

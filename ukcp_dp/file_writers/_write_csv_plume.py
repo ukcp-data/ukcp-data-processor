@@ -1,3 +1,8 @@
+"""
+This module contains the PlumeCsvWriter class, which implements the _write_csv method
+from the BaseCsvWriter base class.
+
+"""
 import logging
 
 import iris
@@ -9,16 +14,19 @@ from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 LOG = logging.getLogger(__name__)
 
 
+# pylint: disable=R0903
 class PlumeCsvWriter(BaseCsvWriter):
     """
     The cdf CSV writer class.
 
     This class extends BaseCsvWriter with a _write_csv(self).
+
     """
 
     def _write_csv(self):
         """
         Write out the data, in CSV format, associated with a plume plot.
+
         """
         if self.input_data.get_value(
             InputType.COLLECTION
@@ -50,6 +58,7 @@ class PlumeCsvWriter(BaseCsvWriter):
         """
         Write out the data, in CSV format, associated with a plume plot for
         land_prob and marine-sim data.
+
         """
         for cube in self.cube_list:
             self._get_percentiles(cube, key_list)
@@ -57,6 +66,7 @@ class PlumeCsvWriter(BaseCsvWriter):
     def _write_csv_plume_ensemble(self, key_list):
         """
         Write out the data, in CSV format, associated with a plume plot.
+
         """
         for cube in self.cube_list:
             # there should only be one cube
@@ -81,6 +91,7 @@ class PlumeCsvWriter(BaseCsvWriter):
         """
         Update the data dict and header with data from the cube.
         The cube is sliced over percentile then time.
+
         """
         for _slice in cube.slices_over("percentile"):
             percentile = str(_slice.coord("percentile").points[0])
@@ -108,6 +119,7 @@ class PlumeCsvWriter(BaseCsvWriter):
     def _read_returnlevel_cube(self, cube, key_list):
         """
         Slice the cube over 'return_period' and update data_dict
+
         """
         data = cube.data[:]
         coords = cube.coord("return_period")[:]
@@ -123,6 +135,7 @@ class PlumeCsvWriter(BaseCsvWriter):
     def _read_time_cube(self, cube, key_list):
         """
         Slice the cube over 'time' and update data_dict
+
         """
         data = cube.data[:]
         coords = cube.coord("time")[:]

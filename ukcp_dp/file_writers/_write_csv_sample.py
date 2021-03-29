@@ -1,6 +1,10 @@
+"""
+This module contains the SampleCsvWriter class, which implements the _write_csv method
+from the BaseCsvWriter base class.
+
+"""
 import logging
 
-import iris
 from ukcp_dp.constants import InputType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
@@ -8,16 +12,19 @@ from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 LOG = logging.getLogger(__name__)
 
 
+# pylint: disable=R0903
 class SampleCsvWriter(BaseCsvWriter):
     """
     The sample data CSV writer class.
 
     This class extends BaseCsvWriter with a _write_csv(self).
+
     """
 
     def _write_csv(self):
         """
         Write out the data, in CSV format, associated with sample.
+
         """
 
         # add the label to the header
@@ -56,6 +63,7 @@ class SampleCsvWriter(BaseCsvWriter):
     def _write_sample_with_date(self, cube, i, key_list):
         """
         Write out the data, in CSV format.
+
         """
         for sample_slice in cube.slices_over("sample"):
             sample_id = int(sample_slice.coord("sample").points[0])
@@ -69,6 +77,7 @@ class SampleCsvWriter(BaseCsvWriter):
     def _write_time_cube(self, cube, key_list):
         """
         Slice the cube over 'time' and update data_dict
+
         """
         data = cube.data[:]
         coords = cube.coord("time")[:]

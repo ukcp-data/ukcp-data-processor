@@ -1,3 +1,8 @@
+"""
+This module contains the SubsetCsvWriter class, which implements the _write_csv method
+from the BaseCsvWriter base class.
+
+"""
 import collections
 import logging
 
@@ -9,16 +14,19 @@ from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 LOG = logging.getLogger(__name__)
 
 
+# pylint: disable=R0903
 class SubsetCsvWriter(BaseCsvWriter):
     """
     The subset CSV writer class.
 
     This class extends BaseCsvWriter with a _write_csv(self).
+
     """
 
     def _write_csv(self):
         """
         Write out the data, in CSV format, associated with three maps.
+
         """
         if self.input_data.get_area_type() == AreaType.BBOX:
             return self._write_x_y_csv()
@@ -87,6 +95,7 @@ class SubsetCsvWriter(BaseCsvWriter):
     def _write_data_block(self, output_data_file_path, key_list, time_str, x_values):
         """
         Write out the column headers and data_dict.
+
         """
         with open(output_data_file_path, "a") as output_data_file:
             output_data_file.write(time_str + "\n")
@@ -105,6 +114,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         """
         Write out the data, in CSV format, associated with a plume plot for
         land_prob and marine-sim data.
+
         """
         key_list = []
         for cube in self.cube_list:
@@ -119,6 +129,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         """
         Update the data dict and header with data from the cube.
         The cube is sliced over percentile then time.
+
         """
         for _slice in cube.slices_over("percentile"):
             percentile = _slice.coord("percentile").points[0]
@@ -162,6 +173,7 @@ class SubsetCsvWriter(BaseCsvWriter):
     def _read_time_cube(self, cube, key_list):
         """
         Slice the cube over 'time' and update data_dict
+
         """
         data = cube.data[:]
         coords = cube.coord("time")[:]
@@ -178,6 +190,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         """
         Slice the cube over 'ensemble_member' and 'time' and update data_dict/
         The data should be for a single region or grid square.
+
         """
         LOG.debug("_write_region_or_point_csv")
         cube = self.cube_list[0]
@@ -211,7 +224,7 @@ class SubsetCsvWriter(BaseCsvWriter):
                     year_cube = ensemble_slice.extract(
                         iris.Constraint(coord_values={"year": year})
                     )
-                    LOG.debug("extracting data for year {}".format(year))
+                    LOG.debug("extracting data for year %s", year)
                     self._write_time_cube(year_cube, key_list)
 
             else:
@@ -225,6 +238,7 @@ class SubsetCsvWriter(BaseCsvWriter):
     def _write_time_cube(self, cube, key_list):
         """
         Slice the cube over 'time' and update data_dict
+
         """
         LOG.debug("_write_time_cube")
         if cube is None:
@@ -236,7 +250,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         else:
             date_format = "%Y-%m-%d"
 
-        LOG.debug("getting data from cube {}".format(cube))
+        LOG.debug("getting data from cube %s", cube)
         data = cube.data[:]
         LOG.debug("data extracted")
 

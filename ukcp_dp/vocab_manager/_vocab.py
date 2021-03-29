@@ -106,6 +106,7 @@ class Vocab:
             "none": "Don't save the data",
             "csv": "CSV",
             "netcdf": "CF-netCDF",
+            "shp": "Shapefile",
         },
         "show_boundaries": {
             "none": "None",

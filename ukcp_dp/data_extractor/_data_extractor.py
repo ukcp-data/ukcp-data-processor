@@ -1,3 +1,7 @@
+""""
+This module contains the DataExtractor class.
+
+"""
 import glob
 import logging
 from os import path
@@ -20,6 +24,10 @@ from ukcp_dp.constants import (
     COLLECTION_RCM,
 )
 from ukcp_dp.data_extractor._utils import get_anomaly
+from ukcp_dp.exception import (
+    UKCPDPDataNotFoundException,
+    UKCPDPInvalidParameterException,
+)
 from ukcp_dp.utils import get_baseline_range
 from ukcp_dp.vocab_manager import get_months
 
@@ -213,7 +221,7 @@ class DataExtractor:
                 cube_list = [iris.load_cube(f) for f in f_list]
                 cubes.extend(cube_list)
 
-        except IOError:
+        except IOError as ex:
             if overlay_probability_levels is True:
                 # not all variables have corresponding probabilistic data
                 return None
@@ -221,7 +229,7 @@ class DataExtractor:
                 file_name = file_name.split("*")[0]
                 if not path.exists(file_name):
                     LOG.error("File not found: %s", file_name)
-            raise Exception("No data found for given selection options")
+            raise UKCPDPDataNotFoundException from ex
 
         if overlay_probability_levels is True:
             collection = COLLECTION_PROB
@@ -245,7 +253,9 @@ class DataExtractor:
 
         if len(cubes) == 0:
             LOG.warning("No data was retrieved from the following files:%s", file_list)
-            raise Exception("No data found for given selection options")
+            raise UKCPDPDataNotFoundException(
+                "No data found for given selection options"
+            )
 
         LOG.debug("First cube:\n%s", cubes[0])
         LOG.debug("Concatenate cubes:\n%s", cubes)
@@ -283,7 +293,11 @@ class DataExtractor:
                         error_cube,
                     )
                     break
-            raise Exception("No data found for given selection options")
+
+            # pylint: disable=W0707
+            raise UKCPDPDataNotFoundException(
+                "No data found for given selection options"
+            )
 
         LOG.debug("Concatenated cube:\n%s", cube)
 
@@ -302,7 +316,7 @@ class DataExtractor:
                     "Time slice constraint resulted in no cubes being " "returned: %s",
                     time_slice_constraint,
                 )
-            raise Exception(
+            raise UKCPDPDataNotFoundException(
                 "Selection constraints resulted in no data being" " selected"
             )
 
@@ -317,7 +331,7 @@ class DataExtractor:
                     "Temporal constraint resulted in no cubes being " "returned: %s",
                     temporal_constraint,
                 )
-            raise Exception(
+            raise UKCPDPDataNotFoundException(
                 "Selection constraints resulted in no data being" " selected"
             )
 
@@ -340,7 +354,7 @@ class DataExtractor:
                     "Area constraint resulted in no cubes being " "returned: %s",
                     area_constraint,
                 )
-            raise Exception(
+            raise UKCPDPDataNotFoundException(
                 "Selection constraints resulted in no data being" " selected"
             )
 
@@ -453,7 +467,7 @@ class DataExtractor:
                         coord_values={"River Basin": basin}
                     )
         else:
-            raise Exception(
+            raise UKCPDPInvalidParameterException(
                 "Unknown area type: {}.".format(self.input_data.get_area_type())
             )
 
@@ -494,7 +508,7 @@ class DataExtractor:
             )
 
         else:
-            raise Exception(
+            raise UKCPDPInvalidParameterException(
                 "Unknown temporal average type: {}.".format(
                     self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
                 )

@@ -2,14 +2,14 @@ import logging
 
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
-from ukcp_dp.constants import (
+from ukcp_dp.constants import UKCP_OSGB
+from ukcp_dp.spatial_files import (
     OVERLAY_ADMIN,
-    OVERLAY_RIVER,
     OVERLAY_COUNTRY,
-    UKCP_OSGB,
+    OVERLAY_RIVER,
     OVERLAY_COUNTRY_SMALL,
-    OVERLAY_ADMIN_SMALL,
     OVERLAY_RIVER_SMALL,
+    OVERLAY_ADMIN_SMALL,
 )
 
 
@@ -109,7 +109,7 @@ UKSHAPES = dict(
         sourcefile=OVERLAY_ADMIN,
         low_res=OVERLAY_ADMIN_SMALL,
         projection=UKCP_OSGB,
-        attr_key="Region",
+        attr_key="geo_region",
     ),
     # This includes the 4 constituent countries of the UK,
     # plus the Channel Islands and the Isle of Man
@@ -117,14 +117,14 @@ UKSHAPES = dict(
         sourcefile=OVERLAY_COUNTRY,
         low_res=OVERLAY_COUNTRY_SMALL,
         projection=UKCP_OSGB,
-        attr_key="Region",
+        attr_key="geo_region",
     ),
     # This contains river basin regions:
     river=dict(
         sourcefile=OVERLAY_RIVER,
         low_res=OVERLAY_RIVER_SMALL,
         projection=UKCP_OSGB,
-        attr_key="Region",
+        attr_key="geo_region",
     ),
     # Including the cartopy standard Natural Earth version too,
     # mostly just for reference and comparison.

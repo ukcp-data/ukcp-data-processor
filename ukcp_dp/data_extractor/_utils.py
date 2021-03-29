@@ -1,15 +1,14 @@
+"""
+Utility methods for data extraction.
+
+"""
 import logging
 
 import cf_units
 import iris
 import iris.coord_categorisation
 from iris.exceptions import CoordinateNotFoundError
-from ukcp_dp.constants import (
-    COLLECTION_CPM,
-    TemporalAverageType,
-    COLLECTION_DERIVED,
-    GWL,
-)
+from ukcp_dp.constants import COLLECTION_CPM, TemporalAverageType, GWL
 from ukcp_dp.vocab_manager import get_months
 
 
@@ -279,6 +278,7 @@ def _get_selected_month_numbers(time_period):
         if term == time_period:
             # i is the index not the month number
             return [i + 1]
+    return []
 
 
 def _get_selected_seasons(time_period):
