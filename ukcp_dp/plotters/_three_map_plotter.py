@@ -31,7 +31,7 @@ class ThreeMapPlotter(MapPlotter):
         """
         LOG.debug("_generate_subplots")
 
-        gs_top = 0.82
+        gs_top = 0.79
         gs_left = 0.02
         gs_right = 0.98
 
