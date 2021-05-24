@@ -13,6 +13,7 @@ from ukcp_dp.constants import (
     COLLECTION_GCM,
     COLLECTION_RCM,
     COLLECTION_RCM_MIN_YEAR,
+    COLLECTION_RCM_GWL,
     EXTENDED_PROJECTIONS,
     GWL,
     InputType,
@@ -69,7 +70,10 @@ class Validator:
                     self.input_data.set_value(InputType.SPATIAL_REPRESENTATION, "60km")
                 elif self.input_data.get_value(InputType.COLLECTION) == COLLECTION_CPM:
                     self.input_data.set_value(InputType.SPATIAL_REPRESENTATION, "5km")
-                elif self.input_data.get_value(InputType.COLLECTION) == COLLECTION_RCM:
+                elif self.input_data.get_value(InputType.COLLECTION) in [
+                    COLLECTION_RCM,
+                    COLLECTION_RCM_GWL,
+                ]:
                     self.input_data.set_value(InputType.SPATIAL_REPRESENTATION, "12km")
                 elif self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB:
                     self.input_data.set_value(InputType.SPATIAL_REPRESENTATION, "25km")
@@ -163,6 +167,7 @@ class Validator:
         elif self.input_data.get_value(InputType.COLLECTION) in [
             COLLECTION_CPM,
             COLLECTION_RCM,
+            COLLECTION_RCM_GWL,
         ]:
             min_allowed_year = COLLECTION_RCM_MIN_YEAR
         elif (
@@ -276,6 +281,7 @@ class Validator:
         if self.input_data.get_value(InputType.COLLECTION) in [
             COLLECTION_CPM,
             COLLECTION_RCM,
+            COLLECTION_RCM_GWL,
         ]:
             baseline = self.input_data.get_value(InputType.BASELINE)
             if baseline is None:

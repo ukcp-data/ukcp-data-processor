@@ -10,6 +10,7 @@ from ukcp_dp.constants import (
     COLLECTION_DERIVED,
     COLLECTION_GCM,
     COLLECTION_RCM,
+    COLLECTION_RCM_GWL,
     COLLECTION_MARINE,
     InputType,
     OTHER_MAX_YEAR,
@@ -62,6 +63,7 @@ def get_file_lists(input_data):
         COLLECTION_DERIVED,
         COLLECTION_GCM,
         COLLECTION_RCM,
+        COLLECTION_RCM_GWL,
     ]:
         file_list["main"] = _get_cm_file_list(input_data)
 

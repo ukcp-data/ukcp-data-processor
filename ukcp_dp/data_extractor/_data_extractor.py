@@ -22,6 +22,7 @@ from ukcp_dp.constants import (
     COLLECTION_DERIVED,
     COLLECTION_GCM,
     COLLECTION_RCM,
+    COLLECTION_RCM_GWL,
 )
 from ukcp_dp.data_extractor._utils import get_anomaly
 from ukcp_dp.exception import (
@@ -430,6 +431,7 @@ class DataExtractor:
                     COLLECTION_DERIVED,
                     COLLECTION_GCM,
                     COLLECTION_RCM,
+                    COLLECTION_RCM_GWL,
                 ]:
                     area_constraint = iris.Constraint(
                         Region=self.input_data.get_area_label()
@@ -460,6 +462,7 @@ class DataExtractor:
                     COLLECTION_DERIVED,
                     COLLECTION_GCM,
                     COLLECTION_RCM,
+                    COLLECTION_RCM_GWL,
                 ]:
                     area_constraint = iris.Constraint(River=basin)
                 else:

@@ -2,7 +2,14 @@ import logging
 
 import iris
 import matplotlib.gridspec as gridspec
-from ukcp_dp.constants import AreaType, InputType, COLLECTION_CPM, COLLECTION_RCM, GWL
+from ukcp_dp.constants import (
+    AreaType,
+    InputType,
+    COLLECTION_CPM,
+    COLLECTION_RCM,
+    COLLECTION_RCM_GWL,
+    GWL,
+)
 from ukcp_dp.plotters._map_plotter import MapPlotter
 from ukcp_dp.plotters.utils._map_utils import (
     plot_standard_map,
@@ -217,6 +224,7 @@ class PostageStampMapPlotter(MapPlotter):
             if self.input_data.get_value(InputType.COLLECTION) in [
                 COLLECTION_CPM,
                 COLLECTION_RCM,
+                COLLECTION_RCM_GWL,
             ]:
                 # RCM is on a rotated grid
                 ensemble_mean_cube = cube.collapsed(
