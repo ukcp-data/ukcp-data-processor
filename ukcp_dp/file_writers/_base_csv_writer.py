@@ -35,6 +35,7 @@ class BaseCsvWriter:
     ignore_in_header = [
         "Colour Mode",
         "Font Size",
+        "Highlighted Members",
         "Image Size",
         "Legend Position",
         "Plot Title",
