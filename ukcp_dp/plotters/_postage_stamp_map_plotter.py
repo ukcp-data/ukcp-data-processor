@@ -38,7 +38,7 @@ class PostageStampMapPlotter(MapPlotter):
         """
         LOG.debug("_generate_subplots")
 
-        gs_top = 0.82
+        gs_top = 0.80
         gs_left = 0.02
         gs_right = 0.98
         gs_bottom = 0.12
