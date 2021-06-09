@@ -4,9 +4,11 @@ from the BaseCsvWriter base class.
 
 """
 import collections
+from datetime import datetime
 import logging
 
 import iris
+import numpy as np
 from ukcp_dp.constants import AreaType, InputType, COLLECTION_PROB, TemporalAverageType
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
@@ -138,17 +140,17 @@ class SubsetCsvWriter(BaseCsvWriter):
 
             if (
                 percentile < 0.2
-                or (percentile > 0.4 and percentile < 0.6)
-                or (percentile > 1.4 and percentile < 1.6)
-                or (percentile > 2.4 and percentile < 2.6)
-                or (percentile > 97.4 and percentile < 97.6)
-                or (percentile > 98.4 and percentile < 98.6)
-                or (percentile > 99.4 and percentile < 99.6)
+                or (0.4 < percentile < 0.6)
+                or (1.4 < percentile < 1.6)
+                or (2.4 < percentile < 2.6)
+                or (97.4 < percentile < 97.6)
+                or (98.4 < percentile < 98.6)
+                or (99.4 < percentile < 99.6)
             ):
 
                 percentile = format(percentile, ".1f")
 
-            elif percentile < 1 or (percentile > 99 and percentile < 100):
+            elif percentile < 1 or (99 < percentile < 100):
                 percentile = format(percentile, ".2f")
 
             else:
@@ -193,20 +195,21 @@ class SubsetCsvWriter(BaseCsvWriter):
 
         """
         LOG.debug("_write_region_or_point_csv")
-        cube = self.cube_list[0]
 
         # update the header
         self.header.append("Date")
 
-        key_list = []
-        for ensemble_slice in cube.slices_over("ensemble_member"):
-            ensemble_name = str(ensemble_slice.coord("ensemble_member_id").points[0])
+        var = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
+        # There should only be one cube so we only make reference to self.cube_list[0]
+        for ensemble_coord in self.cube_list[0].coord("ensemble_member_id")[:]:
             # update the header
-            var = self.input_data.get_value_label(InputType.VARIABLE)[0]
-            self.header.append(
-                "{var}({ensemble})".format(ensemble=ensemble_name, var=var)
-            )
+            self.header.append(f"{var}({str(ensemble_coord.points[0])})")
+
+        output_data_file_path = self._get_full_file_name()
+        self._write_headers(output_data_file_path)
+
+        with open(output_data_file_path, "a") as output_data_file:
 
             if self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in [
                 TemporalAverageType.HOURLY,
@@ -214,55 +217,53 @@ class SubsetCsvWriter(BaseCsvWriter):
                 TemporalAverageType.DAILY,
             ]:
                 # We need to process the data in manageable size chunks, this is
-                # important were we have 20 years worth of hourly data. Hence we split
-                # it up into year chunks.
+                # important were we have 20 years worth of hourly data or 100 years
+                # worth of daily data. Hence we split it up into year chunks.
                 years = range(
                     self.input_data.get_value(InputType.YEAR_MINIMUM),
                     self.input_data.get_value(InputType.YEAR_MAXIMUM),
                 )
                 for year in years:
-                    year_cube = ensemble_slice.extract(
+                    year_cube = self.cube_list[0].extract(
                         iris.Constraint(coord_values={"year": year})
                     )
                     LOG.debug("extracting data for year %s", year)
-                    self._write_time_cube(year_cube, key_list)
+                    self._write_region_or_point_data(year_cube, output_data_file)
 
             else:
-                self._write_time_cube(ensemble_slice, key_list)
-
-        output_data_file_path = self._get_full_file_name()
-        self._write_data_dict(output_data_file_path, key_list)
+                # monthly, seasonal or annual data
+                self._write_region_or_point_data(self.cube_list[0], output_data_file)
 
         return [output_data_file_path]
 
-    def _write_time_cube(self, cube, key_list):
+    def _write_region_or_point_data(self, cube, output_data_file):
         """
-        Slice the cube over 'time' and update data_dict
+        Loop over the time and write the values to a file.
 
         """
-        LOG.debug("_write_time_cube")
+        LOG.debug("_write_region_or_point_data")
         if cube is None:
             return
 
         if self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
-            LOG.debug("subdaily")
             date_format = "%Y-%m-%dT%H:%M"
         else:
             date_format = "%Y-%m-%d"
 
-        LOG.debug("getting data from cube %s", cube)
+        start_time = datetime.now()
         data = cube.data[:]
-        LOG.debug("data extracted")
+        end_time = datetime.now()
+        LOG.debug("data extracted from cube in %s", end_time - start_time)
 
-        coords = cube.coord("time")[:]
+        time_coords = cube.coord("time")[:]
+        data = np.transpose(data)
         for time_ in range(0, data.shape[0]):
-            value = value_to_string(data[time_])
-            time_str = coords[time_].cell(0).point.strftime(date_format)
+            output_data_file.write(
+                f"{time_coords[time_].cell(0).point.strftime(date_format)},"
+                f"{','.join(['%s' % num for num in data[:][time_]])}"
+                "\n"
+            )
 
-            try:
-                self.data_dict[time_str].append(value)
-            except KeyError:
-                key_list.append(time_str)
-                self.data_dict[time_str] = [value]
+        LOG.debug("data written to file")
 
-        LOG.debug("data added to dict")
+        output_data_file.flush()
