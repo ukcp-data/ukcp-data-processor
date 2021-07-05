@@ -19,6 +19,7 @@ from ukcp_dp.constants import DataFormat, ImageFormat, PlotType, InputType, VERS
 
 # Set globally
 dask.config.set(scheduler="synchronous")
+dask.config.set({"array.chunk-size": "256 MiB"})
 
 __version__ = VERSION
 
