@@ -210,29 +210,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         self._write_headers(output_data_file_path)
 
         with open(output_data_file_path, "a") as output_data_file:
-
-            if self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in [
-                TemporalAverageType.HOURLY,
-                TemporalAverageType.THREE_HOURLY,
-                TemporalAverageType.DAILY,
-            ]:
-                # We need to process the data in manageable size chunks, this is
-                # important were we have 20 years worth of hourly data or 100 years
-                # worth of daily data. Hence we split it up into year chunks.
-                years = range(
-                    self.input_data.get_value(InputType.YEAR_MINIMUM),
-                    self.input_data.get_value(InputType.YEAR_MAXIMUM),
-                )
-                for year in years:
-                    year_cube = self.cube_list[0].extract(
-                        iris.Constraint(coord_values={"year": year})
-                    )
-                    LOG.debug("extracting data for year %s", year)
-                    self._write_region_or_point_data(year_cube, output_data_file)
-
-            else:
-                # monthly, seasonal or annual data
-                self._write_region_or_point_data(self.cube_list[0], output_data_file)
+            self._write_region_or_point_data(self.cube_list[0], output_data_file)
 
         return [output_data_file_path]
 
