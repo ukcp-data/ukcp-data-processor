@@ -9,7 +9,7 @@ import logging
 
 import iris
 import numpy as np
-from ukcp_dp.constants import AreaType, InputType, COLLECTION_PROB, TemporalAverageType
+from ukcp_dp.constants import AreaType, InputType, COLLECTION_PROB
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
