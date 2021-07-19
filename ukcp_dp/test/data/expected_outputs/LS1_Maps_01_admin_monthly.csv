@@ -1,0 +1,30 @@
+header length,14
+Area,All administrative regions
+Baseline,1981-2000
+Data Source,Land probabilistic projections
+Data Type,cdf
+Scenario,RCP 2.6
+Software Version,0.0.0TEST
+Spatial Representation,Administrative Region
+Temporal Average Type,Monthly
+Time Period,August
+Time Slice Type,1-year time slices
+Variable,Mean air temperature anomaly at 1.5m (°C)
+Year,2018
+Administrative Region,Mean air temperature anomaly at 1.5m (°C)(10th Percentile),Mean air temperature anomaly at 1.5m (°C)(50th Percentile),Mean air temperature anomaly at 1.5m (°C)(90th Percentile)
+Wales,-0.9824575,1.0397782,3.0882761
+Northern Ireland,-0.75188404,0.882126,2.550679
+Isle of Man,-0.61935335,0.9136509,2.4729826
+Channel Islands,-0.8132122,0.94893193,2.7543118
+Yorkshire and Humber,-1.0076644,0.7954986,2.667717
+West Scotland,-0.87527865,0.8645043,2.622795
+West Midlands,-1.105764,1.0508416,3.2372155
+South West England,-1.2522111,0.9634677,3.2062092
+South East England,-1.323268,1.0326648,3.4317532
+North West England,-1.0215915,0.87061363,2.7973204
+North Scotland,-0.6290671,0.9588374,2.5643594
+North East England,-0.8940194,0.7831123,2.5149634
+London,-1.321767,1.0362,3.435073
+East Scotland,-0.69255465,0.94914013,2.6122942
+East of England,-1.1322509,0.9793397,3.1254816
+East Midlands,-1.1820732,0.85145557,2.947082
