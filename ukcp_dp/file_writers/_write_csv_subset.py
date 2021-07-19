@@ -183,8 +183,10 @@ class SubsetCsvWriter(BaseCsvWriter):
 
     def _write_region_or_point_csv(self):
         """
-        Slice the cube over 'ensemble_member' and 'time' and update data_dict/
-        The data should be for a single region or grid square.
+        Write out time series data to a file.
+
+        The data should be for a single region or grid square. There may be one or
+        more ensembles.
 
         """
         LOG.debug("_write_region_or_point_csv")
@@ -202,20 +204,16 @@ class SubsetCsvWriter(BaseCsvWriter):
         output_data_file_path = self._get_full_file_name()
         self._write_headers(output_data_file_path)
 
-        with open(output_data_file_path, "a") as output_data_file:
-            self._write_region_or_point_data(self.cube_list[0], output_data_file)
+        self._write_region_or_point_data(self.cube_list[0], output_data_file_path)
 
         return [output_data_file_path]
 
-    def _write_region_or_point_data(self, cube, output_data_file):
+    def _write_region_or_point_data(self, cube, output_data_file_path):
         """
         Loop over the time and write the values to a file.
 
         """
         LOG.debug("_write_region_or_point_data")
-        if cube is None:
-            return
-
         if self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
             date_format = "%Y-%m-%dT%H:%M"
         else:
@@ -228,13 +226,14 @@ class SubsetCsvWriter(BaseCsvWriter):
 
         time_coords = cube.coord("time")[:]
         data = np.transpose(data)
-        for time_ in range(0, data.shape[0]):
-            output_data_file.write(
-                f"{time_coords[time_].cell(0).point.strftime(date_format)},"
-                f"{','.join(['%s' % num for num in data[:][time_]])}"
-                "\n"
-            )
+
+        with open(output_data_file_path, "a") as output_data_file:
+
+            for time_ in range(0, data.shape[0]):
+                output_data_file.write(
+                    f"{time_coords[time_].cell(0).point.strftime(date_format)},"
+                    f"{','.join(['%s' % num for num in data[:][time_]])}"
+                    "\n"
+                )
 
         LOG.debug("data written to file")
-
-        output_data_file.flush()
