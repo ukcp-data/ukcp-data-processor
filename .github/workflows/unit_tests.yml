@@ -32,7 +32,6 @@ jobs:
       run: |
         conda install pytest
         conda install pytest-cov
-        conda install pytest-github-actions-annotate-failures
 
         pytest --exitfirst --verbose --failed-first \
         --cov=. --cov-report html
