@@ -933,22 +933,8 @@ def plot_choropleth_map(
         xlims_for_grid = [-180, 180]
         ylims_for_grid = [-90, 90]
     else:
-        xlims_for_grid = (
-            xlims
-            if xlims is not None
-            else [
-                dcube_masked.coord("longitude").points.min(),
-                dcube_masked.coord("longitude").points.max(),
-            ]
-        )
-        ylims_for_grid = (
-            ylims
-            if ylims is not None
-            else [
-                dcube_masked.coord("latitude").points.min(),
-                dcube_masked.coord("latitude").points.max(),
-            ]
-        )
+        xlims_for_grid = xlims
+        ylims_for_grid = ylims
 
     xgridrange = [dxgrid * np.round(val / dxgrid) for val in xlims_for_grid]
     ygridrange = [dygrid * np.round(val / dygrid) for val in ylims_for_grid]
