@@ -31,4 +31,9 @@ jobs:
     - name: Test with pytest
       run: |
         conda install pytest
-        pytest
+        conda install pytest-cov
+        conda install pytest-github-actions-annotate-failures
+
+        pytest --exitfirst --verbose --failed-first \
+        --cov=. --cov-report html
+        
