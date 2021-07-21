@@ -8,3 +8,4 @@ The `ukcp_data_processor.py` module holds the top-level UKCPDataProcessor
 class that is typically used as the entry point for this package.
 
 
+[![Unit Tests](https://github.com/ukcp-data/ukcp-data-processor/actions/workflows/unit_tests.yml/badge.svg)](https://github.com/ukcp-data/ukcp-data-processor/actions/workflows/unit_tests.yml)
