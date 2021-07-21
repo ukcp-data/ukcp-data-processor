@@ -30,9 +30,13 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
+        cd ukcp_dp/test
         conda install pytest
         conda install pytest-cov
-
         pytest --exitfirst --verbose --failed-first \
         --cov=. --cov-report html
-        
+    - name: Archive code coverage html report
+      uses: actions/upload-artifact@v2
+      with:
+        name: code-coverage-report
+        path: ukcp_dp/test/htmlcov
