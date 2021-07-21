@@ -6,6 +6,7 @@ dependencies:
   - iris=2.4.0
   - python=3.7.6
   - pip:
+    - matplotlib-label-lines==0.3.8
     - git+https://github.com/ukcp-data/UKCP18_CVs.git
     - git+https://github.com/ukcp-data/ukcp-spatial-files.git
 prefix: /usr/local/miniconda/envs/ukcp-dp
