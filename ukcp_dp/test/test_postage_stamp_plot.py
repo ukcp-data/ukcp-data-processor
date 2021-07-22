@@ -8,7 +8,6 @@ Process ls1_maps_01 that holds the LS1_Maps_01 class.
 
 from ukcp_dp import DataFormat, ImageFormat, InputType, PlotType
 from ukcp_dp import UKCPDataProcessor
-from ukcp_dp.file_finder import get_file_lists
 
 import time
 

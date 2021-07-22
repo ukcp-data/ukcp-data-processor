@@ -4,9 +4,7 @@ from os import path
 
 import matplotlib
 
-import cartopy
 import cartopy.crs as ccrs
-import cartopy.io.shapereader as shpreader
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import iris
 import iris.plot as iplt
