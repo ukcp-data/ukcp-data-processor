@@ -4,6 +4,7 @@ channels:
   - defaults
 dependencies:
   - iris=2.4.0
+  - pip=20.0.2
   - python=3.7.6
   - pip:
     - matplotlib-label-lines==0.3.8
