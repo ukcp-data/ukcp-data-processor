@@ -54,7 +54,7 @@ def run_write_test(
 
     diff = ""
     for inx, reference_file_name in enumerate(reference_files):
-        if data_format in [DataFormat.NET_CDF, DataFormat.CSV, DataFormat.SHAPEFILE]:
+        if data_format == DataFormat.CSV:
             with open(
                 output_files[output_file_index[inx]], read_param
             ) as generated_file:
@@ -82,15 +82,22 @@ def run_write_test(
                                 if line.startswith("+ ") or line.startswith("- "):
                                     diff += line
                         except TypeError:
-                            diff += f"ERROR comparing {reference_file_name} and {output_files[output_file_index[inx]]}"
+                            diff += (
+                                f"ERROR comparing {reference_file_name} and "
+                                "{output_files[output_file_index[inx]]}"
+                            )
         else:
             result = cmp(
                 output_files[output_file_index[inx]], reference_file_name, shallow=False
             )
             if result is False:
                 print(
-                    f"Files differ: {output_files[output_file_index[inx]]}, {reference_file_name}\n"
+                    f"Files differ: {output_files[output_file_index[inx]]}, "
+                    f"{reference_file_name}\n"
                 )
-                diff += f"Files differ: {output_files[output_file_index[inx]]}, {reference_file_name}\n"
+                diff += (
+                    f"Files differ: {output_files[output_file_index[inx]]}, "
+                    f"{reference_file_name}\n"
+                )
 
     return diff
