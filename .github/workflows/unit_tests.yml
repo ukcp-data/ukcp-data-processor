@@ -32,8 +32,7 @@ jobs:
       run: |
         conda install pytest
         conda install pytest-cov
-        pytest --exitfirst --verbose --failed-first \
-        --cov=. --cov-report html
+        pytest --verbose --cov=. --cov-report html
     - name: Archive code coverage html report
       uses: actions/upload-artifact@v2
       with:
@@ -42,7 +41,7 @@ jobs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
       with:
-        directory: htmlcov
+        directory: ./htmlcov
         env_vars: OS,PYTHON
         flags: unittests
         verbose: true
