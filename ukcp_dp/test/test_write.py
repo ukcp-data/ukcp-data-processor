@@ -4,7 +4,7 @@ import iris
 
 from ukcp_dp._input_data import InputData
 from ukcp_dp.constants import DataFormat
-from ukcp_dp.file_writers._file_writer import write_file
+from ukcp_dp.file_writers import write_file
 from ukcp_dp.vocab_manager import Vocab
 from filecmp import cmp
 

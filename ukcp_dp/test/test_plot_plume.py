@@ -1,8 +1,8 @@
 from os import path
 import unittest
 
-from ukcp_dp import InputType, PlotType
-from ukcp_dp.test.test_write import run_write_test
+from ukcp_dp import ImageFormat, InputType, PlotType
+from ukcp_dp.test.test_plot import run_plot_test
 
 
 def get_ls1_test_prob_point_data():
@@ -21,6 +21,11 @@ def get_ls1_test_prob_point_data():
     data[InputType.YEAR_MAXIMUM] = 2038
     data[InputType.TIME_SLICE_TYPE] = "1y"
 
+    # image options
+    data[InputType.FONT_SIZE] = "m"
+    data[InputType.IMAGE_SIZE] = 1200
+    data[InputType.LEGEND_POSITION] = 2
+
     # process constants
     data[InputType.BASELINE] = "b8100"
     data[InputType.DATA_TYPE] = "cdf"
@@ -30,49 +35,11 @@ def get_ls1_test_prob_point_data():
         base_path, "data", "input_files", "LS1_Plume_01_point_seasonal.nc"
     )
 
-    reference_files = [
-        path.join(
-            base_path, "data", "expected_outputs", "LS1_Plume_01_point_seasonal.csv"
-        )
-    ]
-
-    output_file_index = [0]
-    return data, input_files, reference_files, output_file_index, None
-
-
-def get_ls1_test_prob_region_data():
-    data = {}
-    data[InputType.AREA] = "country|England"
-    data[InputType.SPATIAL_REPRESENTATION] = "country"
-    data[InputType.COLLECTION] = "land-prob"
-    data[InputType.VARIABLE] = "tasAnom"
-    data[InputType.SCENARIO] = "rcp85"
-    data[InputType.SHOW_LABELS] = True
-
-    # temporal options
-    data[InputType.TIME_PERIOD] = "aug"
-    data[InputType.TEMPORAL_AVERAGE_TYPE] = "mon"
-    data[InputType.YEAR_MINIMUM] = 2018
-    data[InputType.YEAR_MAXIMUM] = 2038
-    data[InputType.TIME_SLICE_TYPE] = "1y"
-
-    # process constants
-    data[InputType.BASELINE] = "b8100"
-    data[InputType.DATA_TYPE] = "cdf"
-
-    base_path = path.abspath(path.dirname(__file__))
-    input_files = path.join(
-        base_path, "data", "input_files", "LS1_Plume_01_country_monthly.nc"
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS1_Plume_01_point_seasonal.png"
     )
 
-    reference_files = [
-        path.join(
-            base_path, "data", "expected_outputs", "LS1_Plume_01_country_monthly.csv"
-        )
-    ]
-
-    output_file_index = [0]
-    return data, input_files, reference_files, output_file_index, None
+    return data, input_files, reference_file, None
 
 
 def get_ls2_test_point_data():
@@ -93,6 +60,12 @@ def get_ls2_test_point_data():
     data[InputType.YEAR_MINIMUM] = 2018
     data[InputType.YEAR_MAXIMUM] = 2038
     data[InputType.TIME_SLICE_TYPE] = "1y"
+
+    # image options
+    data[InputType.FONT_SIZE] = "m"
+    data[InputType.IMAGE_SIZE] = 1200
+    data[InputType.LEGEND_POSITION] = 2
+    data[InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS] = []
 
     # ensemble members input
     data[InputType.ENSEMBLE] = [
@@ -131,25 +104,32 @@ def get_ls2_test_point_data():
         base_path, "data", "input_files", "LS2_Plume_01_point_seasonal.nc"
     )
 
-    reference_files = [
-        path.join(
-            base_path, "data", "expected_outputs", "LS2_Plume_01_point_seasonal.csv"
-        )
-    ]
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS2_Plume_01_point_seasonal.png"
+    )
 
-    output_file_index = [0]
-    return data, input_files, reference_files, output_file_index, None
+    return data, input_files, reference_file, None
 
 
 def get_ls2_test_region_data():
-    data, _, _, _, _ = get_ls2_test_point_data()
+    data, _, _, _ = get_ls2_test_point_data()
     data[InputType.AREA] = "country|England and Wales"
     data[InputType.SPATIAL_REPRESENTATION] = "country"
     data[InputType.OVERLAY_PROBABILITY_LEVELS] = True
 
+    data[InputType.DATA_TYPE] = "cdf"
+
     # temporal options
     data[InputType.TIME_PERIOD] = "aug"
     data[InputType.TEMPORAL_AVERAGE_TYPE] = "mon"
+
+    # image options
+    data[InputType.FONT_SIZE] = "s"
+    data[InputType.IMAGE_SIZE] = 900
+    data[InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS] = ["02", "05"]
+    data[InputType.COLOUR_MODE] = "c"
+    data[InputType.Y_AXIS_MIN] = -1
+    data[InputType.Y_AXIS_MAX] = 3
 
     base_path = path.abspath(path.dirname(__file__))
     input_files = path.join(
@@ -159,14 +139,11 @@ def get_ls2_test_region_data():
         base_path, "data", "input_files", "LS2_Plume_01_country_monthly_overlay.nc"
     )
 
-    reference_files = [
-        path.join(
-            base_path, "data", "expected_outputs", "LS2_Plume_01_country_monthly.csv"
-        )
-    ]
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS2_Plume_01_country_monthly.png"
+    )
 
-    output_file_index = [0]
-    return data, input_files, reference_files, output_file_index, overlay_input_files
+    return data, input_files, reference_file, overlay_input_files
 
 
 def get_ms4_test_gauge_point_data():
@@ -179,6 +156,11 @@ def get_ms4_test_gauge_point_data():
     # temporal options
     data[InputType.YEAR] = 2060
 
+    # image options
+    data[InputType.FONT_SIZE] = "m"
+    data[InputType.IMAGE_SIZE] = 1200
+    data[InputType.LEGEND_POSITION] = 2
+
     # process constants
     data[InputType.METHOD] = "return-periods"
     data[InputType.DATA_TYPE] = "percentile"
@@ -188,49 +170,40 @@ def get_ms4_test_gauge_point_data():
         base_path, "data", "input_files", "MS4_ReturnLevels_01_gauge_point.nc"
     )
 
-    reference_files = [
-        path.join(
-            base_path, "data", "expected_outputs", "MS4_ReturnLevels_01_gauge_point.csv"
-        )
-    ]
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "MS4_ReturnLevels_01_gauge_point.png"
+    )
 
-    output_file_index = [0]
-    return data, input_files, reference_files, output_file_index, None
+    return data, input_files, reference_file, None
 
 
-class PlumeCsvTestCase(unittest.TestCase):
-    def test_plume_csv(self):
+class PlumePlotTestCase(unittest.TestCase):
+    def test_plume_plot(self):
         """
-        Test that the plume csv writer writes the correct csv values.
+        Test that the plume plotter writes the correct plot.
+
         """
         inputs = [
             (get_ls1_test_prob_point_data()),
-            (get_ls1_test_prob_region_data()),
             (get_ls2_test_point_data()),
             (get_ls2_test_region_data()),
             (get_ms4_test_gauge_point_data()),
         ]
 
-        for (
-            data,
-            input_files,
-            reference_files,
-            output_file_index,
-            overlay_input_files,
-        ) in inputs:
+        for (data, input_files, reference_file, overlay_input_files) in inputs:
             with self.subTest(
                 data=data,
                 input_files=input_files,
-                reference_files=reference_files,
-                output_file_index=output_file_index,
+                reference_file=reference_file,
                 overlay_input_files=overlay_input_files,
             ):
-                diff = run_write_test(
+                diff = run_plot_test(
                     data,
                     input_files,
-                    reference_files,
-                    output_file_index,
+                    reference_file,
                     PlotType.PLUME_PLOT,
+                    "Plume Test Plot",
+                    ImageFormat.PNG,
                     overlay_input_files,
                 )
                 self.assertEqual(diff, "", diff)
