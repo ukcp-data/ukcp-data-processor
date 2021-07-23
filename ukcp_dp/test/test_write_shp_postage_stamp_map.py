@@ -53,9 +53,6 @@ def get_ls2_test_bbox_data():
 
     reference_files = [
         path.join(
-            base_path, "data", "expected_outputs", "LS2_Maps_02_bbox_seasonal.dbf"
-        ),
-        path.join(
             base_path, "data", "expected_outputs", "LS2_Maps_02_bbox_seasonal.shp"
         ),
         path.join(
@@ -66,7 +63,7 @@ def get_ls2_test_bbox_data():
         ),
     ]
 
-    output_file_index = [0, 1, 2, 3]
+    output_file_index = [1, 2, 3]
     return data, input_files, reference_files, output_file_index
 
 
@@ -86,9 +83,6 @@ def get_ls2_test_region_data_1():
 
     reference_files = [
         path.join(
-            base_path, "data", "expected_outputs", "LS2_Maps_02_river_monthly.dbf"
-        ),
-        path.join(
             base_path, "data", "expected_outputs", "LS2_Maps_02_river_monthly.shp"
         ),
         path.join(
@@ -99,7 +93,7 @@ def get_ls2_test_region_data_1():
         ),
     ]
 
-    output_file_index = [0, 1, 2, 3]
+    output_file_index = [1, 2, 3]
     return data, input_files, reference_files, output_file_index
 
 
@@ -115,9 +109,6 @@ def get_ls2_test_region_data_2():
 
     reference_files = [
         path.join(
-            base_path, "data", "expected_outputs", "LS2_Maps_02_country_monthly.dbf"
-        ),
-        path.join(
             base_path, "data", "expected_outputs", "LS2_Maps_02_country_monthly.shp"
         ),
         path.join(
@@ -128,7 +119,7 @@ def get_ls2_test_region_data_2():
         ),
     ]
 
-    output_file_index = [0, 1, 2, 3]
+    output_file_index = [1, 2, 3]
     return data, input_files, reference_files, output_file_index
 
 
