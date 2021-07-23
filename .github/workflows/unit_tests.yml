@@ -39,3 +39,10 @@ jobs:
       with:
         name: code-coverage-report
         path: htmlcov
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        directory: htmlcov
+        env_vars: OS,PYTHON
+        flags: unittests
+        verbose: true
