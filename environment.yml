@@ -5,6 +5,7 @@ channels:
 dependencies:
   - _libgcc_mutex=0.1
   - antlr-python-runtime=4.7.2
+  - asn1crypto=0.24.0
   - bokeh=1.1.0
   - bzip2=1.0.8
   - ca-certificates=2021.5.30
