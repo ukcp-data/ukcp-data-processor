@@ -161,7 +161,10 @@ class MapPlotter(BasePlotter):
         else:
             overlay = "coast_line"
             if hi_res:
-                sf = shp.Reader(OVERLAY_COASTLINE)
+                # sf = shp.Reader(OVERLAY_COASTLINE)
+                # TODO use the low res version for now as there is an issue with
+                # the high res version
+                sf = shp.Reader(OVERLAY_COASTLINE_SMALL)
             else:
                 sf = shp.Reader(OVERLAY_COASTLINE_SMALL)
         LOG.debug("adding overlay for %s", overlay)

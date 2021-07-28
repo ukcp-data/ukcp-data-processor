@@ -46,7 +46,7 @@ class ThreeMapPlotter(MapPlotter):
         else:  # portrait
             gs = gridspec.GridSpec(1, 3)
             grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 2]]
-            gs.update(top=gs_top, bottom=0.10, left=gs_left, right=gs_right)
+            gs.update(top=gs_top, bottom=0.14, left=gs_left, right=gs_right)
             bar_gs = gridspec.GridSpec(1, 4)
             bar_grid = bar_gs[0, 1:-1]
             bar_gs.update(top=0.28, bottom=0.08, left=gs_left, right=gs_right)
