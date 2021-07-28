@@ -14,7 +14,14 @@ matplotlib.use("agg")
 import dask
 
 from ukcp_dp.ukcp_data_processor import UKCPDataProcessor
-from ukcp_dp.constants import DataFormat, ImageFormat, PlotType, InputType, VERSION
+from ukcp_dp.constants import (
+    AreaType,
+    DataFormat,
+    ImageFormat,
+    PlotType,
+    InputType,
+    VERSION,
+)
 
 
 # Set globally
@@ -24,4 +31,11 @@ dask.config.set({"array.chunk-size": "256 MiB"})
 __version__ = VERSION
 
 
-__all__ = ["UKCPDataProcessor", "DataFormat", "ImageFormat", "InputType", "PlotType"]
+__all__ = [
+    "UKCPDataProcessor",
+    "AreaType",
+    "DataFormat",
+    "ImageFormat",
+    "InputType",
+    "PlotType",
+]
