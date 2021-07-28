@@ -503,11 +503,16 @@ class DataExtractor:
                     temporal_constraint = iris.Constraint(
                         time=lambda t: i < t.point.month <= i + 1
                     )
+                    LOG.debug("Constraint(%s <= t.point.month <= %s)", i, i + 1)
                     break
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
             temporal_constraint = iris.Constraint(
                 season=self.input_data.get_value(InputType.TIME_PERIOD)
+            )
+            LOG.debug(
+                "Constraint(season=%s)",
+                self.input_data.get_value(InputType.TIME_PERIOD),
             )
 
         else:
