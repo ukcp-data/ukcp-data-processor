@@ -138,52 +138,6 @@ UKSHAPES = dict(
 )
 
 
-def _get_ukcp_shapefile_regions(regionset, region_names=None, hi_res=True):
-    """
-    Wrapper to get_shapefile_regions,
-    for the different standard shapefiles used in the UKCP18 project.
-
-    regionset is a string, converted to lower-case automatically,
-    corresponding to one of the keys in the UKSHAPES dictionary
-    (e.g. "countryplus", "admin", "countries", "riverbasins")
-
-    region_names is an optional list of strings.
-    Leave this as None for the default:  bring back all regions in the
-    shapefiles.
-    Or provide a list of strings to be used to pull out
-    just those selected regions from the shapefile.
-
-    Note this ALWAYS returns a LIST of cartopy.io.shapereader.Record objects
-    -- if len(region_names)=1,  you'll probably want to just take element [0].
-    """
-    regionset = regionset.lower()
-    try:
-        regiondata = UKSHAPES[regionset]
-    except KeyError:
-        LOG.error(
-            "regionset was %s but it must be one of %s",
-            regionset,
-            "  ".join(UKSHAPES.keys()),
-        )
-        raise KeyError()
-
-    if hi_res:
-        sourcefile = regiondata["sourcefile"]
-    else:
-        sourcefile = regiondata["low_res"]
-    projection = regiondata["projection"]
-    attr_key = regiondata["attr_key"]
-    if regionset == "ukNaturalEarth":
-        region_names = ["United Kingdom"]
-    shapefregs = _get_shapefile_regions(
-        sourcefile=sourcefile,
-        attr_key=attr_key,
-        attr_vals=region_names,
-        projection=projection,
-    )
-    return shapefregs
-
-
 def _get_shapefile_regions(
     sourcefile,
     attr_key,
