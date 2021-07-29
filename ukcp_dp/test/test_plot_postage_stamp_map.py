@@ -245,6 +245,40 @@ def get_ls2_test_region_data():
     return data, input_files, reference_file
 
 
+def get_ls2_test_region_small_data():
+    data, input_files, _ = get_ls2_test_region_data()
+    data[InputType.AREA] = "admin_region|all"
+    data[InputType.SPATIAL_REPRESENTATION] = "admin_region"
+
+    # image options
+    data[InputType.FONT_SIZE] = "s"
+    data[InputType.IMAGE_SIZE] = 900
+
+    base_path = path.abspath(path.dirname(__file__))
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS2_Maps_02_admin_monthly.png"
+    )
+
+    return data, input_files, reference_file
+
+
+def get_ls2_test_region_large_data():
+    data, input_files, _ = get_ls2_test_region_data()
+    data[InputType.AREA] = "country|all"
+    data[InputType.SPATIAL_REPRESENTATION] = "country"
+
+    # image options
+    data[InputType.FONT_SIZE] = "l"
+    data[InputType.IMAGE_SIZE] = 2400
+
+    base_path = path.abspath(path.dirname(__file__))
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS2_Maps_02_country_monthly.png"
+    )
+
+    return data, input_files, reference_file
+
+
 def get_ls3_test_bbox_12_data():
     data, _, _ = get_ls2_test_bbox_12_data()
 
@@ -296,6 +330,8 @@ class PostagestampMapTestCase(unittest.TestCase):
             (get_ls2_test_bbox_15_ls_data()),
             (get_ls2_test_bbox_12_ls_data()),
             (get_ls2_test_region_data()),
+            (get_ls2_test_region_small_data()),
+            (get_ls2_test_region_large_data()),
             (get_ls3_test_bbox_12_data()),
             # (get_ls3a_test_bbox_12_data()),
         ]

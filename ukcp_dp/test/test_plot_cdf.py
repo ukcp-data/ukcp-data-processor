@@ -45,22 +45,78 @@ def get_ls1_test_prob_point_data():
     return data, input_files, reference_file
 
 
+def get_ls1_test_prob_point_colour_data():
+    data, input_files, _ = get_ls1_test_prob_point_data()
+
+    # image options
+    data[InputType.COLOUR_MODE] = "c"
+
+    base_path = path.abspath(path.dirname(__file__))
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS1_CDF_01_point_seasonal_c.png"
+    )
+
+    return data, input_files, reference_file
+
+
+def get_ls1_test_prob_point_small_data():
+    data, input_files, _ = get_ls1_test_prob_point_data()
+
+    # image options
+    data[InputType.FONT_SIZE] = "s"
+    data[InputType.IMAGE_SIZE] = 900
+
+    base_path = path.abspath(path.dirname(__file__))
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS1_CDF_01_point_seasonal_s.png"
+    )
+
+    return data, input_files, reference_file
+
+
+def get_ls1_test_prob_point_large_data():
+    data, input_files, _ = get_ls1_test_prob_point_data()
+
+    # image options
+    data[InputType.FONT_SIZE] = "l"
+    data[InputType.IMAGE_SIZE] = 2400
+
+    base_path = path.abspath(path.dirname(__file__))
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS1_CDF_01_point_seasonal_l.png"
+    )
+
+    return data, input_files, reference_file
+
+
 class LS1CDFPlotTestCase(unittest.TestCase):
     def test_ls1_point_plot(self):
         """
         Test that the CDF plotter writes the correct plot.
 
         """
-        data, input_files, reference_file = get_ls1_test_prob_point_data()
-        diff = run_plot_test(
-            data,
-            input_files,
-            reference_file,
-            PlotType.CDF_PLOT,
-            "CDF Test Plot",
-            ImageFormat.PNG,
-        )
-        self.assertEqual(diff, "")
+
+        inputs = [
+            (get_ls1_test_prob_point_data()),
+            (get_ls1_test_prob_point_colour_data()),
+            (get_ls1_test_prob_point_small_data()),
+            (get_ls1_test_prob_point_large_data()),
+        ]
+
+        for data, input_files, reference_file in inputs:
+            with self.subTest(
+                data=data, input_files=input_files, reference_file=reference_file
+            ):
+
+                diff = run_plot_test(
+                    data,
+                    input_files,
+                    reference_file,
+                    PlotType.CDF_PLOT,
+                    "CDF Test Plot",
+                    ImageFormat.PNG,
+                )
+                self.assertEqual(diff, "")
 
 
 if __name__ == "__main__":

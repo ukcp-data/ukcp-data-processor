@@ -42,6 +42,52 @@ def get_ls1_test_prob_point_data():
     return data, input_files, reference_file, None
 
 
+def get_ls1_test_prob_point_small_data():
+    data, input_files, _, _ = get_ls1_test_prob_point_data()
+
+    # image options
+    data[InputType.FONT_SIZE] = "s"
+    data[InputType.IMAGE_SIZE] = 900
+
+    base_path = path.abspath(path.dirname(__file__))
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS1_Plume_01_point_seasonal_s.png"
+    )
+
+    return data, input_files, reference_file, None
+
+
+def get_ls1_test_prob_point_colour_data():
+    data, input_files, _, _ = get_ls1_test_prob_point_data()
+
+    # image options
+    data[InputType.FONT_SIZE] = "l"
+    data[InputType.IMAGE_SIZE] = 2400
+    data[InputType.COLOUR_MODE] = "c"
+
+    base_path = path.abspath(path.dirname(__file__))
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS1_Plume_01_point_seasonal_c.png"
+    )
+
+    return data, input_files, reference_file, None
+
+
+def get_ls1_test_prob_point_ylims_data():
+    data, input_files, _, _ = get_ls1_test_prob_point_data()
+
+    # image options
+    data[InputType.Y_AXIS_MIN] = 0.0
+    data[InputType.Y_AXIS_MAX] = 1.5
+
+    base_path = path.abspath(path.dirname(__file__))
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS1_Plume_01_point_seasonal_y.png"
+    )
+
+    return data, input_files, reference_file, None
+
+
 def get_ls2_test_point_data():
     data = {}
     data[InputType.AREA] = ["point", 450000.0, 270000.0]
@@ -106,6 +152,23 @@ def get_ls2_test_point_data():
 
     reference_file = path.join(
         base_path, "data", "expected_outputs", "LS2_Plume_01_point_seasonal.png"
+    )
+
+    return data, input_files, reference_file, None
+
+
+def get_ls2_test_point_colour_data():
+    data, input_files, _, _ = get_ls2_test_point_data()
+
+    # image options
+    data[InputType.FONT_SIZE] = "l"
+    data[InputType.IMAGE_SIZE] = 2400
+    data[InputType.COLOUR_MODE] = "c"
+    data[InputType.HIGHLIGHTED_ENSEMBLE_MEMBERS] = ["01", "04"]
+
+    base_path = path.abspath(path.dirname(__file__))
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS2_Plume_01_point_seasonal_c.png"
     )
 
     return data, input_files, reference_file, None
@@ -185,7 +248,11 @@ class PlumePlotTestCase(unittest.TestCase):
         """
         inputs = [
             (get_ls1_test_prob_point_data()),
+            (get_ls1_test_prob_point_small_data()),
+            (get_ls1_test_prob_point_colour_data()),
+            (get_ls1_test_prob_point_ylims_data()),
             (get_ls2_test_point_data()),
+            (get_ls2_test_point_colour_data()),
             (get_ls2_test_region_data()),
             (get_ms4_test_gauge_point_data()),
         ]
