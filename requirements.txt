@@ -3,6 +3,3 @@ matplotlib=3.1.2
 ukcp_cv
 ukcp_sf
 PyShp
-
-# For testing
-pytest

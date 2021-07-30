@@ -23,7 +23,7 @@ setup(
     author_email="antony.wilson@stfc.ac.uk",
     url=GIT_REPO,
     packages=find_packages(),
-    install_requires=["iris"],
+    install_requires=reqs,
     tests_require=["pytest"],
     classifiers=[
         "Development Status :: 2 - ???",
