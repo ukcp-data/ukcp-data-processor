@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from ukcp_dp import __version__
+from ukcp_dp.constants import VERSION
 
 
 def readme():
@@ -14,7 +14,7 @@ GIT_REPO = "https://github.com/ukcp-data/ukcp-data-processor"
 
 setup(
     name="ukcp-data-processor",
-    version=__version__,
+    version=VERSION,
     description="Python library for reading, writing, processing and plotting UKCP data.",
     long_description=readme(),
     long_description_content_type="text/markdown",
