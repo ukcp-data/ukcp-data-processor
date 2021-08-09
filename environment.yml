@@ -88,13 +88,13 @@ dependencies:
   - pyasn1-modules=0.2.7
   - pycparser=2.19
   - pyke=1.1.1
-  - pyopenssl=19.0.
+  - pyopenssl=19.0.0
   - pyparsing=2.4.0
   - pyqt=5.12.3
   - pyshp=2.1.0
   - pysocks=1.7.0
   - python=3.7.6
-  - python-dateutil=2.8.2
+  - python-dateutil=2.8.0
   - python_abi=3.7
   - pytz=2019.1
   - pyyaml=5.1
