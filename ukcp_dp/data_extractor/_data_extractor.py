@@ -575,14 +575,37 @@ class DataExtractor:
         dim_coords = []
         for coord in cube.coords(dim_coords=True):
             dim_coords.append(coord.name())
+
+        # no x coordinate
         if "projection_x_coordinate" not in dim_coords:
+            # no x or y coordinate
+            if "projection_y_coordinate" not in dim_coords:
+                # add the y coordinate and mark it as one from the end
+                cube = iris.util.new_axis(cube, "projection_y_coordinate")
+                dimension_order = list(range(2, len(dim_coords) + 2))
+                dimension_order.append(1)
+            else:
+                dimension_order = list(range(1, len(dim_coords) + 1))
+
+            # add the x coordinate and mark it as the end coordinate
             cube = iris.util.new_axis(cube, "projection_x_coordinate")
-            # move the x coord to the end to ensure it comes after y
-            dimension_order = list(range(1, len(dim_coords) + 1))
             dimension_order.append(0)
-            cube.transpose()
-        if "projection_y_coordinate" not in dim_coords:
+            cube.transpose(dimension_order)
+
+        # no y coordinate
+        elif "projection_y_coordinate" not in dim_coords:
+            # add the y coordinate and add it before the y coordinate
             cube = iris.util.new_axis(cube, "projection_y_coordinate")
+            dimension_order = list(range(1, len(dim_coords) + 1))
+
+            # find the x coordinate
+            for ind, coord in enumerate(dim_coords):
+                if coord == "projection_x_coordinate":
+                    x_index = ind
+                    break
+            dimension_order.insert(x_index, 0)
+            cube.transpose(dimension_order)
+
         return cube
 
     def get_title(self):
