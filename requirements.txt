@@ -1,6 +1,5 @@
 iris==2.4.0
 matplotlib==3.1.2
 PyShp
-git+https://github.com/ukcp-data/UKCP18_CVs@master#egg=UKCP18_CVs
-git+https://github.com/ukcp-data/ukcp-spatial-files@master#egg=ukcp-spatial-files
-    
+ukcp_cv
+ukcp_sf
