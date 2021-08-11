@@ -1,4 +1,4 @@
-iris==2.4.0
+scitools-iris==2.4.0
 matplotlib==3.1.2
 PyShp
 ukcp_cv
