@@ -1,5 +1,5 @@
 scitools-iris==2.4.0
 matplotlib==3.1.2
 PyShp
-ukcp_cv
-ukcp_sf
+ukcp-controlled-vocabularies
+ukcp-spatial-files
