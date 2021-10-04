@@ -75,6 +75,42 @@ def get_ls1_test_prob_region_data():
     return data, input_files, reference_files, output_file_index, None
 
 
+def get_ls1_test_prob_extreame_point_data():
+    data = {}
+    data[InputType.AREA] = ["point", 387500.0, 287500.0]
+    data[InputType.SPATIAL_REPRESENTATION] = "25km"
+    data[InputType.COLLECTION] = "land-prob"
+    data[InputType.VARIABLE] = "pr5day"
+    data[InputType.SCENARIO] = "rcp85"
+    data[InputType.RETURN_PERIOD] = "rp50"
+
+    # temporal options
+    data[InputType.TIME_PERIOD] = "mam"
+    data[InputType.TEMPORAL_AVERAGE_TYPE] = "seas"
+    data[InputType.YEAR_MINIMUM] = 2018
+    data[InputType.YEAR_MAXIMUM] = 2028
+
+    # process constants
+    data[InputType.BASELINE] = "b8100"
+    data[InputType.DATA_TYPE] = "cdf"
+    data[InputType.TIME_SLICE_TYPE] = "1y"
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = [path.join(
+
+        base_path, "data", "input_files", "LS1_Subset_02_point_sesonal.nc"),
+        ]
+
+    reference_files = [
+        path.join(
+            base_path, "data", "expected_outputs", "LS1_Plume_02_point_seasonal.csv"
+        )
+    ]
+
+    output_file_index = [0]
+    return data, input_files, reference_files, output_file_index, None
+
+
 def get_ls2_test_point_data():
     data = {}
     data[InputType.AREA] = ["point", 450000.0, 270000.0]
@@ -206,6 +242,7 @@ class PlumeCsvTestCase(unittest.TestCase):
         inputs = [
             (get_ls1_test_prob_point_data()),
             (get_ls1_test_prob_region_data()),
+            (get_ls1_test_prob_extreame_point_data()),
             (get_ls2_test_point_data()),
             (get_ls2_test_region_data()),
             (get_ms4_test_gauge_point_data()),

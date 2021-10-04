@@ -61,7 +61,14 @@ class PlumeCsvWriter(BaseCsvWriter):
 
         """
         for cube in self.cube_list:
-            self._get_percentiles(cube, key_list)
+            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB:
+                for percentile in [5, 10, 25, 50, 75, 90, 95]:
+                    percentile_cube = cube.extract(
+                        iris.Constraint(percentile=percentile)
+                    )
+                    self._get_percentiles(percentile_cube, key_list)
+            else:
+                self._get_percentiles(cube, key_list)
 
     def _write_csv_plume_ensemble(self, key_list):
         """

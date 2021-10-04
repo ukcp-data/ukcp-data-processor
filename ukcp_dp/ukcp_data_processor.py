@@ -165,10 +165,6 @@ class UKCPDataProcessor:
         """
         Write the data to a file.
 
-        If a plot has been written that used a subset of the selected data then
-        only that subset will be written out. Subsequent calls will write all
-        of the selected data.
-
         @param output_data_file_path (str): the full path to the file
         @param data_format (DataFormat): the type of the output data.
             If None the value from the inputs will be used.
@@ -194,29 +190,6 @@ class UKCPDataProcessor:
             self.select_data()
 
         cubes = self.cube_list
-
-        # The data in the cube may contain more data than was used to make a
-        # plot. If the data has not been written out since the last plot then
-        # we may need to constrain it. Next time round all the data will be
-        # written.
-        if (
-            self.plot_type is not None
-            and (
-                self.plot_type == PlotType.PLUME_PLOT
-                or self.plot_type == PlotType.THREE_MAPS
-            )
-            and (self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB)
-        ):
-
-            extended_range = bool(
-                self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB
-            )
-            cubes = CubeList()
-            for cube in self.cube_list:
-                # the cube contains all of the percentiles but we only plotted
-                # three of them, therefore extract 10th, 50th and 90th
-                # percentiles and optionally the 5th, 25th, 75th and 95th
-                cubes.append(get_probability_levels(cube, extended_range))
 
         output_file_list = write_file(
             cubes,

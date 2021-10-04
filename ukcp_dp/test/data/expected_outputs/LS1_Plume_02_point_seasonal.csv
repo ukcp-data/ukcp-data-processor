@@ -1,0 +1,26 @@
+header length,16
+Area,387500.0 287500.0
+Baseline,1981-2000
+Data Source,Land probabilistic projections
+Data Type,cdf
+Return Period,50 years
+Scenario,RCP 8.5
+Software Version,0.0.0TEST
+Spatial Representation,25km grid
+Temporal Average Type,Seasonal
+Time Period,March April May
+Time Slice Type,1-year time slices
+Variable,5-day total precipitation (mm)
+Year Maximum,2028
+Year Minimum,2018
+Date,5-day total precipitation (mm)(5th Percentile),5-day total precipitation (mm)(10th Percentile),5-day total precipitation (mm)(25th Percentile),5-day total precipitation (mm)(50th Percentile),5-day total precipitation (mm)(75th Percentile),5-day total precipitation (mm)(90th Percentile),5-day total precipitation (mm)(95th Percentile)
+2018-04-16,57.547276,59.032246,61.723747,65.064926,68.59172,71.9329,74.34597
+2019-04-16,57.562225,59.065937,61.791416,65.08078,68.6521,72.129425,74.57296
+2020-04-16,57.590733,59.111816,61.773716,65.19616,68.80873,72.23117,74.702934
+2021-04-16,57.616707,59.15583,61.8493,65.31233,68.87156,72.430786,74.83567
+2022-04-16,57.63014,59.189285,61.917797,65.32844,69.03142,72.539505,75.07313
+2023-04-16,57.651104,59.22969,61.992214,65.44537,69.09585,72.74633,75.21287
+2024-04-16,57.679386,59.27683,62.072357,65.566765,69.26086,72.95494,75.45095
+2025-04-16,57.711407,59.327583,62.054882,65.691284,69.42869,73.06509,75.59036
+2026-04-16,57.750828,59.282963,62.14295,65.717926,69.49719,73.27646,75.83002
+2027-04-16,57.76977,59.321777,62.21886,65.84021,69.668495,73.39332,75.979996
