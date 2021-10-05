@@ -90,8 +90,6 @@ def get_ukcp_shapefile_regions(regionset, region_names=None, hi_res=True):
         sourcefile = regiondata["low_res"]
     projection = regiondata["projection"]
     attr_key = regiondata["attr_key"]
-    if regionset == "ukNaturalEarth":
-        region_names = ["United Kingdom"]
 
     shapefregs = _get_shapefile_regions(
         sourcefile=sourcefile,
@@ -125,15 +123,6 @@ UKSHAPES = dict(
         low_res=OVERLAY_RIVER_SMALL,
         projection=UKCP_OSGB,
         attr_key="geo_region",
-    ),
-    # Including the cartopy standard Natural Earth version too,
-    # mostly just for reference and comparison.
-    ukNaturalEarth=dict(
-        sourcefile=shpreader.natural_earth(
-            resolution="10m", category="cultural", name="admin_0_countries"
-        ),
-        attr_key="NAME",
-        projection=ccrs.PlateCarree(),
     ),
 )
 
