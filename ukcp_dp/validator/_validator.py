@@ -11,6 +11,7 @@ from ukcp_dp.constants import (
     COLLECTION_MARINE_MAX_YEAR,
     COLLECTION_CPM,
     COLLECTION_GCM,
+    COLLECTION_OBS,
     COLLECTION_RCM,
     COLLECTION_RCM_MIN_YEAR,
     COLLECTION_RCM_GWL,
@@ -71,6 +72,7 @@ class Validator:
                 elif self.input_data.get_value(InputType.COLLECTION) == COLLECTION_CPM:
                     self.input_data.set_value(InputType.SPATIAL_REPRESENTATION, "5km")
                 elif self.input_data.get_value(InputType.COLLECTION) in [
+                    COLLECTION_OBS,
                     COLLECTION_RCM,
                     COLLECTION_RCM_GWL,
                 ]:

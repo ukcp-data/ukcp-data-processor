@@ -172,6 +172,7 @@ LOGO_LARGE = path.join(
 
 TEMP_ANOMS = ["tasAnom", "tasmaxAnom", "tasminAnom"]
 
+COLLECTION_OBS = "land-obs"
 COLLECTION_PROB = "land-prob"
 COLLECTION_PROB_MIN_YEAR = 1961
 COLLECTION_CPM = "land-cpm"
@@ -199,6 +200,8 @@ PDF_LABEL = "Relative probability"
 
 DATA_DIR = "/badc/ukcp18/data"
 DATA_SERVICE_URL = "http://data.ceda.ac.uk"
+
+HADUK_DIR = "/badc/ukmo-hadobs/data/insitu/MOHC/HadOBS/HadUK-Grid/v1.0.3.0"
 
 # Area types
 AreaType = enum(
