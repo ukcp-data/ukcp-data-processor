@@ -12,6 +12,7 @@ from ukcp_dp.constants import (
     COLLECTION_CPM,
     COLLECTION_GCM,
     COLLECTION_OBS,
+    COLLECTION_OBS_MIN_YEAR,
     COLLECTION_RCM,
     COLLECTION_RCM_MIN_YEAR,
     COLLECTION_RCM_GWL,
@@ -177,6 +178,8 @@ class Validator:
             and self.input_data.get_value(InputType.SCENARIO)[0] in GWL
         ):
             min_allowed_year = COLLECTION_DERIVED_GWL_MIN_YEAR
+        elif self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+            min_allowed_year = COLLECTION_OBS_MIN_YEAR
         else:
             min_allowed_year = min(self.vocab.get_collection_terms("year_minimum"))
 

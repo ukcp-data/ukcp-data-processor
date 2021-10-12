@@ -31,7 +31,9 @@ def get_obs_file_list(input_data):
         ensemble_file_list = []
         file_path = _get_file_path(input_data, spatial_representation, variable)
 
-        if input_data.get_value(InputType.TIME_SLICE_TYPE) is None:
+        if input_data.get_value(
+            InputType.TIME_SLICE_TYPE
+        ) is None and spatial_representation not in [AreaType.COUNTRY, REGION, RIVER]:
 
             # we need lots of files
             for year in range(
@@ -109,3 +111,6 @@ def _get_date_ranges(input_data):
 
     if input_data.get_value(InputType.TIME_SLICE_TYPE) == "30y":
         return ["196101-199012", "198101-201012"]
+
+    # assume this must be a region selection
+    return ["188401-202012"]

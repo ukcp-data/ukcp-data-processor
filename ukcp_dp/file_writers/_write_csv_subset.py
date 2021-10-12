@@ -7,7 +7,7 @@ from datetime import datetime
 import logging
 
 import numpy as np
-from ukcp_dp.constants import AreaType, InputType, COLLECTION_PROB
+from ukcp_dp.constants import AreaType, InputType, COLLECTION_OBS, COLLECTION_PROB
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
@@ -50,13 +50,21 @@ class SubsetCsvWriter(BaseCsvWriter):
         self.header.append("x-axis,Eastings (BNG)\n")
         self.header.append("y-axis,Northings (BNG)\n")
 
-        output_file_list = []
-
         # add the x values to the header
         column_headers = ["--"]
         x_coords = cube.coord("projection_x_coordinate").points
         for x_coord in range(0, x_coords.shape[0]):
             column_headers.append(str(x_coords[x_coord]))
+
+        if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+            output_file_list = self._write_had_obs_data(cube, column_headers)
+        else:
+            output_file_list = self._write_model_data(cube, column_headers)
+
+        return output_file_list
+
+    def _write_model_data(self, cube, column_headers):
+        output_file_list = []
 
         # loop over ensembles
         for ensemble_slice in cube.slices_over("ensemble_member"):
@@ -71,6 +79,19 @@ class SubsetCsvWriter(BaseCsvWriter):
                 self._write_data_block(ensemble_slice, output_data_file, column_headers)
 
             output_file_list.append(output_data_file_path)
+
+        return output_file_list
+
+    def _write_had_obs_data(self, cube, column_headers):
+        output_file_list = []
+
+        output_data_file_path = self._get_full_file_name()
+        self._write_headers(output_data_file_path)
+
+        with open(output_data_file_path, "a") as output_data_file:
+            self._write_data_block(cube, output_data_file, column_headers)
+
+        output_file_list.append(output_data_file_path)
 
         return output_file_list
 
@@ -196,10 +217,14 @@ class SubsetCsvWriter(BaseCsvWriter):
 
         var = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
-        # There should only be one cube so we only make reference to self.cube_list[0]
-        for ensemble_coord in self.cube_list[0].coord("ensemble_member_id")[:]:
-            # update the header
-            self.header.append(f"{var}({str(ensemble_coord.points[0])})")
+        if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+            self.header.append(f"{var}")
+        else:
+            # There should only be one cube so we only make reference to
+            # self.cube_list[0]
+            for ensemble_coord in self.cube_list[0].coord("ensemble_member_id")[:]:
+                # update the header
+                self.header.append(f"{var}({str(ensemble_coord.points[0])})")
 
         output_data_file_path = self._get_full_file_name()
         self._write_headers(output_data_file_path)
@@ -230,10 +255,17 @@ class SubsetCsvWriter(BaseCsvWriter):
         with open(output_data_file_path, "a") as output_data_file:
 
             for time_ in range(0, data.shape[0]):
-                output_data_file.write(
-                    f"{time_coords[time_].cell(0).point.strftime(date_format)},"
-                    f"{','.join(['%s' % num for num in data[:][time_]])}"
-                    "\n"
-                )
+                if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+                    output_data_file.write(
+                        f"{time_coords[time_].cell(0).point.strftime(date_format)},"
+                        f"{data[:][time_]}"
+                        "\n"
+                    )
+                else:
+                    output_data_file.write(
+                        f"{time_coords[time_].cell(0).point.strftime(date_format)},"
+                        f"{','.join(['%s' % num for num in data[:][time_]])}"
+                        "\n"
+                    )
 
         LOG.debug("data written to file")

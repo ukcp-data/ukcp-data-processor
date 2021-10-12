@@ -21,6 +21,7 @@ from ukcp_dp.constants import (
     COLLECTION_CPM,
     COLLECTION_DERIVED,
     COLLECTION_GCM,
+    COLLECTION_OBS,
     COLLECTION_RCM,
     COLLECTION_RCM_GWL,
 )
@@ -507,13 +508,22 @@ class DataExtractor:
                     break
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
-            temporal_constraint = iris.Constraint(
-                season=self.input_data.get_value(InputType.TIME_PERIOD)
-            )
-            LOG.debug(
-                "Constraint(season=%s)",
-                self.input_data.get_value(InputType.TIME_PERIOD),
-            )
+            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+                temporal_constraint = iris.Constraint(
+                    clim_season=self.input_data.get_value(InputType.TIME_PERIOD)
+                )
+                LOG.debug(
+                    "Constraint(clim_season=%s)",
+                    self.input_data.get_value(InputType.TIME_PERIOD),
+                )
+            else:
+                temporal_constraint = iris.Constraint(
+                    season=self.input_data.get_value(InputType.TIME_PERIOD)
+                )
+                LOG.debug(
+                    "Constraint(season=%s)",
+                    self.input_data.get_value(InputType.TIME_PERIOD),
+                )
 
         else:
             raise UKCPDPInvalidParameterException(
@@ -714,18 +724,32 @@ class DataExtractor:
                 t=title, baseline=self.input_data.get_value_label(InputType.BASELINE)
             )
 
-        # add scenario, if only one of them. If len > 1 then the scenarios will
-        # be on the plot legend
-        scenario = self.input_data.get_value_label(InputType.SCENARIO)
-        if len(scenario) == 1:
-            title = "{t}, and scenario {scenario}".format(t=title, scenario=scenario[0])
+        try:
+            # add scenario, if only one of them. If len > 1 then the scenarios will
+            # be on the plot legend
+            scenario = self.input_data.get_value_label(InputType.SCENARIO)
+            if len(scenario) == 1:
+                title = "{t}, and scenario {scenario}".format(
+                    t=title, scenario=scenario[0]
+                )
+        except KeyError:
+            # there is no scenario for the Had Grid Obs data
+            pass
 
         return title
 
     def _get_resolution_m(self, cube):
         LOG.debug("_get_resolution_m")
-        resolution = cube.attributes["resolution"]
-        return int(resolution.split("km")[0]) * 1000
+        try:
+            resolution = cube.attributes["resolution"]
+            resolution = int(resolution.split("km")[0]) * 1000
+        except KeyError:
+            # work out the resolution from the bounds
+            resolution = int(
+                cube.coords("projection_y_coordinate")[0].bounds[1][0]
+                - cube.coords("projection_y_coordinate")[0].bounds[0][0]
+            )
+        return resolution
 
 
 def get_probability_levels(cube, extended_range):

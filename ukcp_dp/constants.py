@@ -173,6 +173,7 @@ LOGO_LARGE = path.join(
 TEMP_ANOMS = ["tasAnom", "tasmaxAnom", "tasminAnom"]
 
 COLLECTION_OBS = "land-obs"
+COLLECTION_OBS_MIN_YEAR = 1884
 COLLECTION_PROB = "land-prob"
 COLLECTION_PROB_MIN_YEAR = 1961
 COLLECTION_CPM = "land-cpm"
