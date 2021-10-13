@@ -46,7 +46,7 @@ def get_obs_file_list(input_data):
                 )
                 ensemble_file_list.append(os.path.join(file_path, file_name))
         else:
-            date_ranges = _get_date_ranges(input_data)
+            date_ranges = _get_date_ranges(input_data, variable)
             for date_range in date_ranges:
                 file_name = _get_file_name(
                     input_data, spatial_representation, variable, date_range
@@ -105,7 +105,7 @@ def _temporal_average_type(input_data):
     return temporal_average_type
 
 
-def _get_date_ranges(input_data):
+def _get_date_ranges(input_data, variable):
     if input_data.get_value(InputType.TIME_SLICE_TYPE) == "20y":
         return ["198101-200012"]
 
@@ -113,4 +113,7 @@ def _get_date_ranges(input_data):
         return ["196101-199012", "198101-201012"]
 
     # assume this must be a region selection
+    if variable == "rainfall":
+        return ["186201-202012"]
+
     return ["188401-202012"]

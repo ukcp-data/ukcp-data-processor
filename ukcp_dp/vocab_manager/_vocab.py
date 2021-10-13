@@ -211,11 +211,11 @@ class Vocab:
     def __init__(self):
         self.vocab = self.VOCAB
         self.vocab["plot_title"] = None
-        self.vocab["year"] = _get_range(1884, 2301)
+        self.vocab["year"] = _get_range(1862, 2301)
         self.vocab["year"].update(_get_range(3001, 3051))
-        self.vocab["year_minimum"] = _get_range(1884, 2302)
+        self.vocab["year_minimum"] = _get_range(1862, 2302)
         self.vocab["year_minimum"].update(_get_range(3001, 3052))
-        self.vocab["year_maximum"] = _get_range(1884, 2302)
+        self.vocab["year_maximum"] = _get_range(1862y, 2302)
         self.vocab["year_maximum"].update(_get_range(3001, 3052))
         self.vocab["sampling_id"] = _get_range(1, 4001)
         self.vocab["random_sampling_count"] = _get_range(100, 4001)
