@@ -8,7 +8,7 @@ import logging
 
 import numpy as np
 from ukcp_dp.constants import AreaType, InputType, COLLECTION_OBS, COLLECTION_PROB
-from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
+from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 
 
 LOG = logging.getLogger(__name__)
@@ -40,7 +40,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         """
         Write out data that has multiple time and x and y coordinates.
 
-        One file will be written per ensemble.
+        One file will be written per ensemble or a single file for observations.
 
         """
         LOG.debug("_write_x_y_csv")
@@ -64,6 +64,10 @@ class SubsetCsvWriter(BaseCsvWriter):
         return output_file_list
 
     def _write_model_data(self, cube, column_headers):
+        """
+        Extract the model data.
+
+        """
         output_file_list = []
 
         # loop over ensembles
@@ -83,6 +87,10 @@ class SubsetCsvWriter(BaseCsvWriter):
         return output_file_list
 
     def _write_had_obs_data(self, cube, column_headers):
+        """
+        Extract the observation data.
+
+        """
         output_file_list = []
 
         output_data_file_path = self._get_full_file_name()
@@ -128,79 +136,40 @@ class SubsetCsvWriter(BaseCsvWriter):
 
     def _write_csv_percentiles(self):
         """
-        Write out the data, in CSV format, associated with a plume plot for
-        land_prob and marine-sim data.
+        Write out the data, in CSV format for land_prob and marine-sim data.
 
         """
-        key_list = []
+        output_file_list = []
+
         for cube in self.cube_list:
-            self._get_percentiles(cube, key_list)
+            output_file_list.append(self._get_percentiles(cube))
 
-        output_data_file_path = self._get_full_file_name()
-        self._write_data_dict(output_data_file_path, key_list)
+        return output_file_list
 
-        return [output_data_file_path]
-
-    def _get_percentiles(self, cube, key_list):
+    def _get_percentiles(self, cube):
         """
-        Update the data dict and header with data from the cube.
-        The cube is sliced over percentile then time.
+        Write out the data, in CSV format for land_prob and marine-sim data.
 
         """
+        LOG.debug("_get_percentiles")
         for _slice in cube.slices_over("percentile"):
             percentile = _slice.coord("percentile").points[0]
             # the plume plot will be of the first variable
             var = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
-            if (
-                percentile < 0.2
-                or (0.4 < percentile < 0.6)
-                or (1.4 < percentile < 1.6)
-                or (2.4 < percentile < 2.6)
-                or (97.4 < percentile < 97.6)
-                or (98.4 < percentile < 98.6)
-                or (99.4 < percentile < 99.6)
-            ):
+            percentile = _fromat_percentile(percentile)
 
-                percentile = format(percentile, ".1f")
-
-            elif percentile < 1 or (99 < percentile < 100):
-                percentile = format(percentile, ".2f")
-
-            else:
-                percentile = format(percentile, ".0f")
-
-            if "." in percentile:
-                pass
-            elif percentile.endswith("1") and percentile != "11":
-                percentile = "{}st".format(percentile)
-            elif percentile.endswith("2") and percentile != "12":
-                percentile = "{}nd".format(percentile)
-            elif percentile.endswith("3") and percentile != "13":
-                percentile = "{}rd".format(percentile)
-            else:
-                percentile = "{}th".format(percentile)
-
+            # update the header
             self.header.append(
                 "{var}({percentile} Percentile)".format(percentile=percentile, var=var)
             )
-            self._read_time_cube(_slice, key_list)
 
-    def _read_time_cube(self, cube, key_list):
-        """
-        Slice the cube over 'time' and update data_dict
+        output_data_file_path = self._get_full_file_name()
+        self._write_headers(output_data_file_path)
 
-        """
-        data = cube.data[:]
-        coords = cube.coord("time")[:]
-        for time_ in range(0, data.shape[0]):
-            value = value_to_string(data[time_])
-            time_str = coords[time_].cell(0).point.strftime("%Y-%m-%d")
-            try:
-                self.data_dict[time_str].append(value)
-            except KeyError:
-                key_list.append(time_str)
-                self.data_dict[time_str] = [value]
+        self._write_data(self.cube_list[0], output_data_file_path)
+
+        return output_data_file_path
 
     def _write_region_or_point_csv(self):
         """
@@ -229,16 +198,16 @@ class SubsetCsvWriter(BaseCsvWriter):
         output_data_file_path = self._get_full_file_name()
         self._write_headers(output_data_file_path)
 
-        self._write_region_or_point_data(self.cube_list[0], output_data_file_path)
+        self._write_data(self.cube_list[0], output_data_file_path)
 
         return [output_data_file_path]
 
-    def _write_region_or_point_data(self, cube, output_data_file_path):
+    def _write_data(self, cube, output_data_file_path):
         """
         Loop over the time and write the values to a file.
 
         """
-        LOG.debug("_write_region_or_point_data")
+        LOG.debug("_write_data")
         if self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
             date_format = "%Y-%m-%dT%H:%M"
         else:
@@ -250,7 +219,8 @@ class SubsetCsvWriter(BaseCsvWriter):
         LOG.debug("data extracted from cube in %s", end_time - start_time)
 
         time_coords = cube.coord("time")[:]
-        data = np.transpose(data)
+        if self.input_data.get_value(InputType.COLLECTION) != COLLECTION_PROB:
+            data = np.transpose(data)
 
         with open(output_data_file_path, "a") as output_data_file:
 
@@ -269,3 +239,39 @@ class SubsetCsvWriter(BaseCsvWriter):
                     )
 
         LOG.debug("data written to file")
+
+
+def _fromat_percentile(percentile):
+    """
+    Format the percentile depending on its value.
+
+    """
+    if (
+        percentile < 0.2
+        or (0.4 < percentile < 0.6)
+        or (1.4 < percentile < 1.6)
+        or (2.4 < percentile < 2.6)
+        or (97.4 < percentile < 97.6)
+        or (98.4 < percentile < 98.6)
+        or (99.4 < percentile < 99.6)
+    ):
+
+        percentile = format(percentile, ".1f")
+
+    elif percentile < 1 or (99 < percentile < 100):
+        percentile = format(percentile, ".2f")
+
+    else:
+        percentile = format(percentile, ".0f")
+
+    if "." in percentile:
+        pass
+    elif percentile.endswith("1") and percentile != "11":
+        percentile = "{}st".format(percentile)
+    elif percentile.endswith("2") and percentile != "12":
+        percentile = "{}nd".format(percentile)
+    elif percentile.endswith("3") and percentile != "13":
+        percentile = "{}rd".format(percentile)
+    else:
+        percentile = "{}th".format(percentile)
+    return percentile

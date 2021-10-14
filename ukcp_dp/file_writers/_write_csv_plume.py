@@ -6,7 +6,7 @@ from the BaseCsvWriter base class.
 import logging
 
 import iris
-from ukcp_dp.constants import COLLECTION_MARINE, COLLECTION_PROB
+from ukcp_dp.constants import COLLECTION_MARINE, COLLECTION_OBS, COLLECTION_PROB
 from ukcp_dp.constants import InputType, RETURN_PERIODS
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
@@ -17,7 +17,7 @@ LOG = logging.getLogger(__name__)
 # pylint: disable=R0903
 class PlumeCsvWriter(BaseCsvWriter):
     """
-    The cdf CSV writer class.
+    The plume CSV writer class.
 
     This class extends BaseCsvWriter with a _write_csv(self).
 
@@ -46,7 +46,7 @@ class PlumeCsvWriter(BaseCsvWriter):
         ):
             self._write_csv_plume_percentiles(key_list)
         else:
-            self._write_csv_plume_ensemble(key_list)
+            self._write_csv_plume_data(key_list)
 
         # now write the data
         output_data_file_path = self._get_full_file_name()
@@ -70,22 +70,18 @@ class PlumeCsvWriter(BaseCsvWriter):
             else:
                 self._get_percentiles(cube, key_list)
 
-    def _write_csv_plume_ensemble(self, key_list):
+    def _write_csv_plume_data(self, key_list):
         """
         Write out the data, in CSV format, associated with a plume plot.
 
         """
         for cube in self.cube_list:
             # there should only be one cube
-            for ensemble_slice in cube.slices_over("ensemble_member"):
-                ensemble_name = ensemble_slice.coord("ensemble_member_id").points[0]
 
-                # the plume plot will be of the first variable
-                var = self.input_data.get_value_label(InputType.VARIABLE)[0]
-                self.header.append(
-                    "{var}({ensemble})".format(ensemble=ensemble_name, var=var)
-                )
-                self._read_x_cube(ensemble_slice, key_list)
+            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+                self._write_had_obs_data(cube, key_list)
+            else:
+                self._write_model_data(cube, key_list)
 
         # now add the data from the overlay
         if self.overlay_cube is not None:
@@ -93,6 +89,31 @@ class PlumeCsvWriter(BaseCsvWriter):
             self._get_percentiles(percentile_cube, key_list)
             percentile_cube = self.overlay_cube.extract(iris.Constraint(percentile=90))
             self._get_percentiles(percentile_cube, key_list)
+
+    def _write_model_data(self, cube, key_list):
+        """
+        Extract the model data.
+
+        """
+        for ensemble_slice in cube.slices_over("ensemble_member"):
+            ensemble_name = ensemble_slice.coord("ensemble_member_id").points[0]
+
+            # the plume plot will be of the first variable
+            var = self.input_data.get_value_label(InputType.VARIABLE)[0]
+            self.header.append(
+                "{var}({ensemble})".format(ensemble=ensemble_name, var=var)
+            )
+            self._read_x_cube(ensemble_slice, key_list)
+
+    def _write_had_obs_data(self, cube, key_list):
+        """
+        Extract the model data.
+
+        """
+        # the plume plot will be of the first variable
+        var = self.input_data.get_value_label(InputType.VARIABLE)[0]
+        self.header.append(var)
+        self._read_x_cube(cube, key_list)
 
     def _get_percentiles(self, cube, key_list):
         """

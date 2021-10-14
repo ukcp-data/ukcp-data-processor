@@ -1,3 +1,8 @@
+"""
+This module contains the PlumePlotter class, which implements the _generate_graph method
+from the BasePlotter base class.
+
+"""
 import calendar
 import logging
 
@@ -10,6 +15,7 @@ from labellines import labelLines
 import matplotlib.pyplot as plt
 import numpy as np
 from ukcp_dp.constants import (
+    COLLECTION_OBS,
     COLLECTION_PROB,
     COLLECTION_MARINE,
     ENSEMBLE_COLOURS,
@@ -28,6 +34,7 @@ from ukcp_dp.plotters._graph_plotter import GraphPlotter
 LOG = logging.getLogger(__name__)
 
 
+# pylint: disable=R0903
 class PlumePlotter(GraphPlotter):
     """
     The plume plotter class.
@@ -82,6 +89,9 @@ class PlumePlotter(GraphPlotter):
             # plot the percentiles
             self._plot_probability_levels(self.cube_list[0], ax, False)
 
+        elif self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+            self._plot_single_line(self.cube_list[0], ax)
+
         else:
             if self.overlay_cube is not None:
                 # plot the ensemble members
@@ -109,7 +119,7 @@ class PlumePlotter(GraphPlotter):
 
         else:
             # set the limits on the x axis, time axis
-            set_x_limits(self.cube_list[0], ax)
+            _set_x_limits(self.cube_list[0], ax)
             # add axis labels
             plt.xlabel("Date")
 
@@ -130,9 +140,9 @@ class PlumePlotter(GraphPlotter):
         ).startswith(
             RETURN_PERIODS
         ):
-            t_points = get_return_periods(cube, "percentile")
+            t_points = _get_return_periods(cube, "percentile")
         else:
-            t_points = get_time_series(cube, "percentile")
+            t_points = _get_time_series(cube, "percentile")
 
         if not is_overlay:
             self._plot_fiftieth_percentile_line(cube, ax, t_points)
@@ -303,7 +313,7 @@ class PlumePlotter(GraphPlotter):
             colours = ENSEMBLE_GREYSCALES
             linestyle = ["solid", "dashed", "dotted", "solid", "dashed"]
 
-        t_points = get_time_series(cube, "ensemble_member")
+        t_points = _get_time_series(cube, "ensemble_member")
 
         # Set plot line width
         if self.input_data.get_value(InputType.IMAGE_SIZE) == 900:
@@ -346,16 +356,59 @@ class PlumePlotter(GraphPlotter):
         if highlighted_counter == 0:
             self.show_legend = False
 
+    def _plot_single_line(self, cube, ax):
+        t_points = _get_time_series(cube, None)
 
-def get_return_periods(cube, slice_and_sel_coord):
+        # Set plot line width
+        if self.input_data.get_value(InputType.IMAGE_SIZE) == 900:
+            line_width = 0.7
+        if self.input_data.get_value(InputType.IMAGE_SIZE) == 1200:
+            line_width = 1
+        elif self.input_data.get_value(InputType.IMAGE_SIZE) == 2400:
+            line_width = 2
+
+        ax.plot(
+            t_points,
+            cube.data,
+            linestyle="solid",
+            color=PERCENTILE_LINE_COLOUR,
+            linewidth=line_width,
+        )
+
+        self.show_legend = False
+
+
+def _get_return_periods(cube, slice_and_sel_coord):
+    """
+    Get the return periods as a time series.
+
+    @param cube (Cube): an iris data cube
+    @param slice_and_sel_coord (str): the name of the coord to slice over
+
+    @return a list of time values
+
+    """
     tcoord = cube.slices_over(slice_and_sel_coord).next().coord("return_period")
     return tcoord.points
 
 
-def get_time_series(cube, slice_and_sel_coord):
-    # Convert the time coord into fractions of years,
-    # so we can easily use it for plotting:
-    tcoord = cube.slices_over(slice_and_sel_coord).next().coord("time")
+def _get_time_series(cube, slice_and_sel_coord):
+    """
+    Get the time series from the cube.
+
+    Convert the time coord into fractions of years so we can easily use it for plotting.
+
+    @param cube (Cube): an iris data cube
+    @param slice_and_sel_coord (str): the name of the coord to slice over
+
+    @return a list of time values
+
+    """
+    if slice_and_sel_coord is not None:
+        tcoord = cube.slices_over(slice_and_sel_coord).next().coord("time")
+    else:
+        tcoord = cube.coord("time")
+
     if tcoord.units.calendar is not None:
         tsteps = list(tcoord.units.num2date(tcoord.points))
 
@@ -400,7 +453,14 @@ def get_time_series(cube, slice_and_sel_coord):
     return tpoints
 
 
-def set_x_limits(cube, ax):
+def _set_x_limits(cube, ax):
+    """
+    Set the x limits for the plot.
+
+    @param cube (Cube): an iris data cube
+    @param ax (AxesSubplot): the sub-plot
+
+    """
     # Get x-axis limits from the Cube's time coord.
     tcoord = cube.coord("time")
     # Do this differently for datetime-like coords vs integer coords:

@@ -1,3 +1,7 @@
+"""
+This module provides the method get_file_lists.
+
+"""
 import logging
 import os
 

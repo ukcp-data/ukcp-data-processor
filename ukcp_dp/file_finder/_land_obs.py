@@ -1,3 +1,7 @@
+"""
+This module provides the method get_obs_file_list.
+
+"""
 import logging
 import os
 
@@ -13,6 +17,14 @@ VERSION = "latest"
 
 
 def get_obs_file_list(input_data):
+    """
+    Generate a list of files based on the input selection.
+
+    @param input_data (InputData) an object containing user defined values
+
+    @return a list of strings containing the file names
+
+    """
     LOG.info("get_obs_file_list")
 
     variables = input_data.get_value(InputType.VARIABLE)
