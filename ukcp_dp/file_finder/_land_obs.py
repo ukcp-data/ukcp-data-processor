@@ -49,8 +49,8 @@ def get_obs_file_list(input_data):
 
             # we need lots of files
             for year in range(
-                input_data.get_value(InputType.YEAR_MINIMUM) - 1,
-                input_data.get_value(InputType.YEAR_MAXIMUM),
+                input_data.get_value(InputType.YEAR_MINIMUM),
+                input_data.get_value(InputType.YEAR_MAXIMUM) + 1,
             ):
                 date_range = f"{year}01-{year}12"
                 file_name = _get_file_name(

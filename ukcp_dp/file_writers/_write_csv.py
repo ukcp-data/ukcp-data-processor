@@ -11,6 +11,7 @@ from ukcp_dp.file_writers._write_csv_pdf import PdfCsvWriter
 from ukcp_dp.file_writers._write_csv_plume import PlumeCsvWriter
 from ukcp_dp.file_writers._write_csv_postage_stamp_map import PostageStampMapCsvWriter
 from ukcp_dp.file_writers._write_csv_sample import SampleCsvWriter
+from ukcp_dp.file_writers._write_csv_single_map import SingleMapCsvWriter
 from ukcp_dp.file_writers._write_csv_subset import SubsetCsvWriter
 from ukcp_dp.file_writers._write_csv_three_map import ThreeMapCsvWriter
 
@@ -48,6 +49,9 @@ def write_csv_file(
 
         elif plot_type == PlotType.JP_PLOT:
             csv_writer = JpCsvWriter()
+
+        elif plot_type == PlotType.SINGLE_MAP:
+            csv_writer = SingleMapCsvWriter()
 
         elif plot_type == PlotType.THREE_MAPS:
             csv_writer = ThreeMapCsvWriter()

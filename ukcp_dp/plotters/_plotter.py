@@ -1,3 +1,7 @@
+"""
+This module provides the public entry point write_plot to the plotters package.
+
+"""
 import os
 from time import gmtime, strftime
 
@@ -7,6 +11,7 @@ from ukcp_dp.plotters._jp_plotter import JpPlotter
 from ukcp_dp.plotters._pdf_plotter import PdfPlotter
 from ukcp_dp.plotters._plume_plotter import PlumePlotter
 from ukcp_dp.plotters._postage_stamp_map_plotter import PostageStampMapPlotter
+from ukcp_dp.plotters._single_map_plotter import SingleMapPlotter
 from ukcp_dp.plotters._three_map_plotter import ThreeMapPlotter
 
 
@@ -34,6 +39,7 @@ def write_plot(
     @param title (str): a title for the plot
     @param vocab (Vocab): an instance of the ukcp_dp Vocab class
     @param plot_settings (StandardMap): an object containing plot settings
+
     """
 
     image_file = _get_image_file(output_path, image_format, plot_type)
@@ -48,6 +54,8 @@ def write_plot(
         plotter = PlumePlotter()
     elif plot_type == PlotType.POSTAGE_STAMP_MAPS:
         plotter = PostageStampMapPlotter()
+    elif plot_type == PlotType.SINGLE_MAP:
+        plotter = SingleMapPlotter()
     elif plot_type == PlotType.THREE_MAPS:
         plotter = ThreeMapPlotter()
     else:
