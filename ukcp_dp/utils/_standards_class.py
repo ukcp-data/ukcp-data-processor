@@ -899,7 +899,7 @@ UKCP_5DAY_PRECIP_ANOM.vstep = 15
 # Amount of rainfall in 5 days
 UKCP_RAINFALL = UKCPNEAT.copy()
 UKCP_RAINFALL.tag = "UKCP_rainfall"
-UKCP_RAINFALL.default_barlabel = "Total rainfall (mm)"
+UKCP_RAINFALL.default_barlabel = "Total rainfall, mm"
 UKCP_RAINFALL.preferred_unit = cf_units.Unit("mm")
 UKCP_RAINFALL.extendcolbar = "both"
 UKCP_RAINFALL.cpal = "Blues"
