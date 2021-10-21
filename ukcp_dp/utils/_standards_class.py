@@ -895,3 +895,16 @@ UKCP_5DAY_PRECIP_ANOM.overcol = "#240938"
 UKCP_5DAY_PRECIP_ANOM.vrange = [50, 200]
 UKCP_5DAY_PRECIP_ANOM.vmid = None
 UKCP_5DAY_PRECIP_ANOM.vstep = 15
+
+# Amount of rainfall in 5 days
+UKCP_5DAY_RAINFALL = UKCPNEAT.copy()
+UKCP_5DAY_RAINFALL.tag = "UKCP_1day_precip"
+UKCP_5DAY_RAINFALL.default_barlabel = "Maximum 5-day accumulative rainfall (mm)"
+UKCP_5DAY_RAINFALL.preferred_unit = cf_units.Unit("mm")
+UKCP_5DAY_RAINFALL.extendcolbar = "both"
+UKCP_5DAY_RAINFALL.cpal = "Blues"
+UKCP_5DAY_RAINFALL.undercol = "#ffffff"
+UKCP_5DAY_RAINFALL.overcol = "#240938"
+UKCP_5DAY_RAINFALL.vrange = [0, 200]
+UKCP_5DAY_RAINFALL.vmid = None
+UKCP_5DAY_RAINFALL.vstep = 10

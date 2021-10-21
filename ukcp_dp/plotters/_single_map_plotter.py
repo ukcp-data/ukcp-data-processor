@@ -38,24 +38,15 @@ class SingleMapPlotter(MapPlotter):
         LOG.debug("_generate_subplots")
 
         gs_top = 0.79
+        gs_bottom = 0.14
         gs_left = 0.02
         gs_right = 0.98
 
-        if self._is_landscape(cube, 1.25) is True:
-            grid_spec = gridspec.GridSpec(1, 1)
-            grid_spec.update(top=gs_top, bottom=0.02, left=gs_left, right=gs_right)
-            # grid = [grid_spec[0, 0], grid_spec[0, 1], grid_spec[1, 0], grid_spec[1, 1]]
-            bar_gs = gridspec.GridSpec(1, 1)
-            # bar_grid = bar_gs[0, 1]
-            bar_gs.update(top=0.35, bottom=0.15, left=gs_left, right=gs_right)
-
-        else:  # portrait
-            grid_spec = gridspec.GridSpec(1, 1)
-            # grid = [grid_spec[0, 0], grid_spec[0, 1], grid_spec[0, 2], grid_spec[0, 2]]
-            grid_spec.update(top=gs_top, bottom=0.14, left=gs_left, right=gs_right)
-            bar_gs = gridspec.GridSpec(1, 4)
-            bar_grid = bar_gs[0, 1:-1]
-            bar_gs.update(top=0.28, bottom=0.08, left=gs_left, right=gs_right)
+        grid_spec = gridspec.GridSpec(1, 1)
+        grid_spec.update(top=gs_top, bottom=gs_bottom, left=gs_left, right=gs_right)
+        bar_gs = gridspec.GridSpec(1, 4)
+        bar_grid = bar_gs[0, 1:-1]
+        bar_gs.update(top=0.28, bottom=0.08, left=gs_left, right=gs_right)
 
         result = self._add_sub_plot(fig, grid_spec[0, 0], plot_settings, cube)
 

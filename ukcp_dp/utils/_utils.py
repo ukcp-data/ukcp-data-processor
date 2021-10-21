@@ -7,6 +7,7 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
     Get the plot settings based on the variable being plotted.
 
     @return a StandardMap object containing plot settings
+
     """
     # tas, tasmax, tasmin
     if "tas" in var_id:
@@ -106,6 +107,10 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
             # TODO do we need a non-ANOM version?
             plot_settings = stds.UKCP_PMSL_ANOM.copy()
 
+    elif "rainfall" in var_id:
+        # Maximum 5-day accumulative rainfall (mm)
+        plot_settings = stds.UKCP_PMSL_ANOM.copy()
+
     elif "rls" in var_id:
         # Net Surface long wave flux (W m-2)
         if "Anom" in var_id:
@@ -165,6 +170,14 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
 
 
 def get_baseline_range(baseline):
+    """
+    Get the start and end year for a baseline.
+
+    @param baseline (str): the name of a baseline
+
+    @return a tuple containing two ints representing the start and end years
+
+    """
     if baseline == "b6190":
         return 1961, 1990
     if baseline == "b8100":
