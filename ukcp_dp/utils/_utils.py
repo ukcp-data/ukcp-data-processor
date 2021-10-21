@@ -107,9 +107,9 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
             # TODO do we need a non-ANOM version?
             plot_settings = stds.UKCP_PMSL_ANOM.copy()
 
-    elif "rain5DayAccumMax" in var_id:
+    elif "rainfall" in var_id:
         # Maximum 5-day accumulative rainfall (mm)
-        plot_settings = stds.UKCP_5DAY_RAINFALL.copy()
+        plot_settings = stds.UKCP_RAINFALL.copy()
 
     elif "rls" in var_id:
         # Net Surface long wave flux (W m-2)
