@@ -125,7 +125,7 @@ def _get_date_ranges(input_data, variable):
         return ["196101-199012", "198101-201012"]
 
     # assume this must be a region selection
-    if variable == "rainfall":
+    if variable == "rain5DayAccumMax":
         return ["186201-202012"]
 
     return ["188401-202012"]
