@@ -1,0 +1,34 @@
+header length,11
+Area,All river basins
+Data Source,Land observations
+Image Format,png
+Software Version,0.0.0TEST
+Spatial Representation,River Basin
+Temporal Average Type,Monthly
+Time Period,August
+Variable,Maximum air temperature at 1.5m (°C)
+Year,2018
+River Basin,Maximum air temperature at 1.5m (°C)
+Western Wales,18.709719094335842
+West Highland,15.14435639432599
+Tweed,17.831383418500913
+Thames,22.791912800802784
+Tay,16.590043556387002
+South West England,20.82725056313877
+South East England,22.32174452983064
+Solway,17.36512821387566
+Severn,20.842329928220316
+Orkney and Shetlands,15.603700704571295
+Northumbria,18.75959744846517
+North Western Ireland,17.58167005909019
+North West England,19.005218984767595
+North Highland,16.146696258359153
+North Eastern Ireland,18.018173970891983
+North East Scotland,16.820179288214092
+Neagh Bann,18.168746528614243
+Humber,21.091476341855888
+Forth,17.375246105549692
+Dee,19.181782758257754
+Clyde,16.8036474060782
+Argyll,15.487914980076477
+Anglian,22.930666447207827

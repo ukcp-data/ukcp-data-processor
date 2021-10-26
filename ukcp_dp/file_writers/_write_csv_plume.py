@@ -107,7 +107,7 @@ class PlumeCsvWriter(BaseCsvWriter):
 
     def _write_had_obs_data(self, cube, key_list):
         """
-        Extract the model data.
+        Extract the observation data.
 
         """
         # the plume plot will be of the first variable

@@ -176,6 +176,58 @@ def get_ms4_test_coast_point_data():
     return data, input_files, reference_files, output_file_index
 
 
+def get_ls6_test_bbox_data():
+    data = {}
+    data[InputType.AREA] = ["bbox", -84667.14, -114260.0, 676489.68, 1230247.3]
+    data[InputType.SPATIAL_REPRESENTATION] = "12km"
+    data[InputType.COLLECTION] = "land-obs"
+    data[InputType.VARIABLE] = "tasmin"
+
+    # temporal options
+    data[InputType.TIME_PERIOD] = "mam"
+    data[InputType.TEMPORAL_AVERAGE_TYPE] = "seas"
+    data[InputType.YEAR_MINIMUM] = 1918
+    data[InputType.YEAR_MAXIMUM] = 1928
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS6_Subset_01_bbox_seasonal.nc"
+    )
+
+    reference_files = [
+        path.join(
+            base_path, "data", "expected_outputs", "LS6_Subset_01_bbox_seasonal.csv"
+        )
+    ]
+
+    output_file_index = [0]
+    return data, input_files, reference_files, output_file_index
+
+
+def get_ls6_test_region_data():
+    data, _, _, _ = get_ls6_test_bbox_data()
+    data[InputType.AREA] = "admin_region|West Midlands"
+    data[InputType.SPATIAL_REPRESENTATION] = "admin_region"
+
+    # temporal options
+    data[InputType.TIME_PERIOD] = "may"
+    data[InputType.TEMPORAL_AVERAGE_TYPE] = "mon"
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS6_Subset_01_admin_monthly.nc"
+    )
+
+    reference_files = [
+        path.join(
+            base_path, "data", "expected_outputs", "LS6_Subset_01_admin_monthly.csv"
+        )
+    ]
+
+    output_file_index = [0]
+    return data, input_files, reference_files, output_file_index
+
+
 class SubsetCsvTestCase(unittest.TestCase):
     def test_subset_csv(self):
         """
@@ -187,6 +239,8 @@ class SubsetCsvTestCase(unittest.TestCase):
             (get_ls2_test_region_data()),
             (get_ls3a_test_point_data()),
             (get_ms4_test_coast_point_data()),
+            (get_ls6_test_bbox_data()),
+            (get_ls6_test_region_data()),
         ]
 
         for data, input_files, reference_files, output_file_index in inputs:

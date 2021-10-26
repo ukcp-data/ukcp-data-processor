@@ -96,10 +96,9 @@ def get_ls1_test_prob_extreame_point_data():
     data[InputType.TIME_SLICE_TYPE] = "1y"
 
     base_path = path.abspath(path.dirname(__file__))
-    input_files = [path.join(
-
-        base_path, "data", "input_files", "LS1_Subset_02_point_sesonal.nc"),
-        ]
+    input_files = [
+        path.join(base_path, "data", "input_files", "LS1_Subset_02_point_sesonal.nc")
+    ]
 
     reference_files = [
         path.join(
@@ -234,6 +233,62 @@ def get_ms4_test_gauge_point_data():
     return data, input_files, reference_files, output_file_index, None
 
 
+def get_ls6_test_obs_point_data():
+    data = {}
+    data[InputType.AREA] = ["point", 438000.0, 282000.0]
+    data[InputType.SPATIAL_REPRESENTATION] = "12km"
+    data[InputType.COLLECTION] = "land-obs"
+    data[InputType.VARIABLE] = "tasmax"
+
+    # temporal options
+    data[InputType.TIME_PERIOD] = "mam"
+    data[InputType.TEMPORAL_AVERAGE_TYPE] = "seas"
+    data[InputType.YEAR_MINIMUM] = 1980
+    data[InputType.YEAR_MAXIMUM] = 2000
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS6_Plume_01_point_seasonal.nc"
+    )
+
+    reference_files = [
+        path.join(
+            base_path, "data", "expected_outputs", "LS6_Plume_01_point_seasonal.csv"
+        )
+    ]
+
+    output_file_index = [0]
+    return data, input_files, reference_files, output_file_index, None
+
+
+def get_ls6_test_obs_region_data():
+    data = {}
+    data[InputType.AREA] = "country|England"
+    data[InputType.SPATIAL_REPRESENTATION] = "country"
+    data[InputType.COLLECTION] = "land-obs"
+    data[InputType.VARIABLE] = "tasmax"
+
+    # temporal options
+    data[InputType.TIME_PERIOD] = "aug"
+    data[InputType.TEMPORAL_AVERAGE_TYPE] = "mon"
+    data[InputType.YEAR_MINIMUM] = 1980
+    data[InputType.YEAR_MAXIMUM] = 2000
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS6_Plume_01_country_monthly.nc"
+    )
+
+    reference_files = [
+        path.join(
+            base_path, "data", "expected_outputs", "LS6_Plume_01_country_monthly.csv"
+        )
+    ]
+
+    output_file_index = [0]
+    return data, input_files, reference_files, output_file_index, None
+
+
 class PlumeCsvTestCase(unittest.TestCase):
     def test_plume_csv(self):
         """
@@ -246,6 +301,8 @@ class PlumeCsvTestCase(unittest.TestCase):
             (get_ls2_test_point_data()),
             (get_ls2_test_region_data()),
             (get_ms4_test_gauge_point_data()),
+            (get_ls6_test_obs_point_data()),
+            (get_ls6_test_obs_region_data()),
         ]
 
         for (
