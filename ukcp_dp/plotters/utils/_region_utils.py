@@ -1,6 +1,5 @@
 import logging
 
-import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
 from ukcp_dp.constants import UKCP_OSGB
 from ukcp_dp.spatial_files import (

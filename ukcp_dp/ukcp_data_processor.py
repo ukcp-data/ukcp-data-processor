@@ -7,10 +7,9 @@ the entry point for this package.
 
 """
 
-from iris.cube import CubeList
 from ukcp_dp._input_data import InputData
-from ukcp_dp.constants import COLLECTION_PROB, InputType, PlotType, VERSION
-from ukcp_dp.data_extractor import DataExtractor, get_probability_levels
+from ukcp_dp.constants import COLLECTION_PROB, InputType, VERSION
+from ukcp_dp.data_extractor import DataExtractor
 from ukcp_dp.file_finder import get_absolute_paths, get_file_lists
 from ukcp_dp.file_writers import write_file
 from ukcp_dp.plotters import write_plot as plotter_write_plot
