@@ -1,3 +1,11 @@
+# Release 2.6.0
+
+This release addresses:
+
+* Performance improvements for writing CSV files
+* Work around for files with lat, ong of 0, 0
+
+
 # Release 2.5.0
 
 This release addresses:
