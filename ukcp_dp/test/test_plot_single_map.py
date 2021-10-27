@@ -122,7 +122,7 @@ def get_ls6_test_bbox_river_overlay():
     return data, input_files, reference_file
 
 
-def get_ls6_test_region():
+def get_ls6_test_admin():
     data = {}
     data[InputType.AREA] = "admin_region|All administrative regions"
     data[InputType.SPATIAL_REPRESENTATION] = "admin_region"
@@ -150,6 +150,50 @@ def get_ls6_test_region():
     return data, input_files, reference_file
 
 
+def get_ls6_test_country():
+    data, _, _ = get_ls6_test_admin()
+    data[InputType.AREA] = "country|All countries"
+    data[InputType.SPATIAL_REPRESENTATION] = "country"
+    data[InputType.VARIABLE] = "rainfall"
+
+    # temporal options
+    data[InputType.TIME_PERIOD] = "aug"
+    data[InputType.TEMPORAL_AVERAGE_TYPE] = "mon"
+    data[InputType.YEAR] = 2018
+
+    # image options
+    data[InputType.FONT_SIZE] = "m"
+    data[InputType.IMAGE_SIZE] = 1200
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS6_Maps_01_country_monthly.nc"
+    )
+
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS6_Maps_01_country_monthly.png"
+    )
+
+    return data, input_files, reference_file
+
+
+def get_ls6_test_river():
+    data, _, _ = get_ls6_test_admin()
+    data[InputType.AREA] = "river_basin|All river basins"
+    data[InputType.SPATIAL_REPRESENTATION] = "river_basin"
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS6_Maps_01_river_monthly.nc"
+    )
+
+    reference_file = path.join(
+        base_path, "data", "expected_outputs", "LS6_Maps_01_river_monthly.png"
+    )
+
+    return data, input_files, reference_file
+
+
 class SingleMapPlotTestCase(unittest.TestCase):
     def test_single_map_plot(self):
         """
@@ -163,7 +207,9 @@ class SingleMapPlotTestCase(unittest.TestCase):
             (get_ls6_test_bbox_admin_overlay()),
             (get_ls6_test_bbox_country_overlay()),
             (get_ls6_test_bbox_river_overlay()),
-            (get_ls6_test_region()),
+            (get_ls6_test_admin()),
+            (get_ls6_test_country()),
+            (get_ls6_test_river()),
         ]
 
         for data, input_files, reference_file in inputs:
