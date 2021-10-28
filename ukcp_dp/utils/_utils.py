@@ -1,3 +1,7 @@
+"""
+This module provides common functions.
+
+"""
 from ukcp_dp.constants import InputType
 from ukcp_dp.utils import _standards_class as stds
 
@@ -185,3 +189,27 @@ def get_baseline_range(baseline):
     if baseline == "b8110":
         return 1981, 2010
     return None
+
+
+def get_spatial_resolution_m(cube):
+    """
+    Get the spatial resolution of the cube data in metres.
+
+    For the model data we can get this from an attribute.
+    For the land-obs we need to calculate it from the bounds.
+
+    @param cube (Cube): an iris cube
+
+    @return the spatial resolution of the cube data in metres
+
+    """
+    try:
+        resolution = cube.attributes["resolution"]
+        resolution = int(resolution.split("km")[0]) * 1000
+    except KeyError:
+        # work out the resolution from the bounds
+        resolution = int(
+            cube.coords("projection_y_coordinate")[0].bounds[1][0]
+            - cube.coords("projection_y_coordinate")[0].bounds[0][0]
+        )
+    return resolution

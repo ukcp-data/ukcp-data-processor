@@ -7,7 +7,8 @@ import logging
 
 import shapefile as shp
 from ukcp_dp.constants import AreaType, InputType
-from ukcp_dp.file_writers._base_shp_writer import BaseShpWriter, _get_resolution_m
+from ukcp_dp.file_writers._base_shp_writer import BaseShpWriter
+from ukcp_dp.utils import get_spatial_resolution_m
 
 
 LOG = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ class SingleMapShpWriter(BaseShpWriter):
         """
         cube = self.cube_list[0]
         output_file_list = []
-        resolution = _get_resolution_m(cube)
+        resolution = get_spatial_resolution_m(cube)
         half_grid_size = resolution / 2
         var_label = self.input_data.get_value_label(InputType.VARIABLE)[0]
 

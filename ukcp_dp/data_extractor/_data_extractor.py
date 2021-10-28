@@ -6,11 +6,12 @@ import glob
 import logging
 from os import path
 
-import cf_units
 import iris
 from iris.cube import CubeList
 import iris.experimental.equalise_cubes
 from iris.util import unify_time_units
+
+import cf_units
 from ukcp_dp.constants import (
     COLLECTION_PROB,
     InputType,
@@ -30,7 +31,7 @@ from ukcp_dp.exception import (
     UKCPDPDataNotFoundException,
     UKCPDPInvalidParameterException,
 )
-from ukcp_dp.utils import get_baseline_range
+from ukcp_dp.utils import get_baseline_range, get_spatial_resolution_m
 from ukcp_dp.vocab_manager import get_months
 
 
@@ -386,7 +387,7 @@ class DataExtractor:
 
         elif self.input_data.get_area_type() == AreaType.BBOX:
             # coordinates are coming in as OSGB, w, s, e, n
-            resolution = self._get_resolution_m(cube)
+            resolution = get_spatial_resolution_m(cube)
             half_grid_size = resolution / 2
             bng_w = self.input_data.get_area()[0]
             bng_s = self.input_data.get_area()[1]
@@ -737,19 +738,6 @@ class DataExtractor:
             pass
 
         return title
-
-    def _get_resolution_m(self, cube):
-        LOG.debug("_get_resolution_m")
-        try:
-            resolution = cube.attributes["resolution"]
-            resolution = int(resolution.split("km")[0]) * 1000
-        except KeyError:
-            # work out the resolution from the bounds
-            resolution = int(
-                cube.coords("projection_y_coordinate")[0].bounds[1][0]
-                - cube.coords("projection_y_coordinate")[0].bounds[0][0]
-            )
-        return resolution
 
 
 def get_probability_levels(cube, extended_range):
