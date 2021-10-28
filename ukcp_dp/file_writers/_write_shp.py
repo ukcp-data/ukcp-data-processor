@@ -7,6 +7,7 @@ import logging
 from ukcp_dp.constants import PlotType
 from ukcp_dp.exception import UKCPDPInvalidParameterException
 from ukcp_dp.file_writers._write_shp_postage_stamp_map import PostageStampMapShpWriter
+from ukcp_dp.file_writers._write_shp_single_map import SingleMapShpWriter
 from ukcp_dp.file_writers._write_shp_three_map import ThreeMapShpWriter
 
 
@@ -33,6 +34,9 @@ def write_shp_file(cube_list, output_data_file_path, input_data, plot_type):
 
         if plot_type == PlotType.THREE_MAPS:
             shp_writer = ThreeMapShpWriter()
+
+        elif plot_type == PlotType.SINGLE_MAP:
+            shp_writer = SingleMapShpWriter()
 
         elif plot_type == PlotType.POSTAGE_STAMP_MAPS:
             shp_writer = PostageStampMapShpWriter()
