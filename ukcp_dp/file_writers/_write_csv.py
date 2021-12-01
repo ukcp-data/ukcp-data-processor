@@ -44,7 +44,7 @@ def write_csv_file(
         elif plot_type == PlotType.PDF_PLOT:
             csv_writer = PdfCsvWriter()
 
-        elif plot_type == PlotType.PLUME_PLOT:
+        elif plot_type == PlotType.PLUME_PLOT or plot_type == PlotType.TIME_SERIES:
             csv_writer = PlumeCsvWriter()
 
         elif plot_type == PlotType.JP_PLOT:

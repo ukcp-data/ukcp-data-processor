@@ -43,6 +43,7 @@ class Vocab:
             # no grid in UKCP18_resolution
             # labels are plural in UKCP18_resolution
             # admin_region is just region in UKCP18_resolution
+            "1km": "1km grid",
             "12km": "12km grid",
             "2km": "2.2km grid",
             "5km": "5km grid",

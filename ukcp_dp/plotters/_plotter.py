@@ -50,7 +50,7 @@ def write_plot(
         plotter = JpPlotter()
     elif plot_type == PlotType.PDF_PLOT:
         plotter = PdfPlotter()
-    elif plot_type == PlotType.PLUME_PLOT:
+    elif plot_type == PlotType.PLUME_PLOT or plot_type == PlotType.TIME_SERIES:
         plotter = PlumePlotter()
     elif plot_type == PlotType.POSTAGE_STAMP_MAPS:
         plotter = PostageStampMapPlotter()
