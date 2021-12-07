@@ -115,6 +115,75 @@ def get_ls2_test_region_data():
     return data, input_files, reference_files, output_file_index
 
 
+def get_ls2_test_bbox_anom_data():
+    data = {}
+    data[InputType.AREA] = ["bbox", 195200.0, 349920.0, 659200.0, 604320.0]
+    data[InputType.SPATIAL_REPRESENTATION] = "60km"
+    data[InputType.COLLECTION] = "land-gcm"
+    data[InputType.VARIABLE] = "tasAnom"
+    data[InputType.SCENARIO] = "rcp85"
+    data[InputType.BASELINE] = "b8110"
+
+    # temporal options
+    data[InputType.TIME_PERIOD] = "all"
+    data[InputType.TEMPORAL_AVERAGE_TYPE] = "mon"
+    data[InputType.YEAR_MINIMUM] = 2090
+    data[InputType.YEAR_MAXIMUM] = 2100
+
+    # ensemble members input
+    data[InputType.ENSEMBLE] = [
+        "01",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "09",
+        "10",
+        "11",
+        "12",
+        "13",
+        "15",
+    ]
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS2_Subset_01_bbox_monthly_anom.nc"
+    )
+
+    reference_files = [
+        path.join(
+            base_path, "data", "expected_outputs", "LS2_Subset_01_bbox_monthly_anom_1.csv"
+        ),
+        path.join(
+            base_path, "data", "expected_outputs", "LS2_Subset_01_bbox_monthly_anom_2.csv"
+        ),
+    ]
+
+    output_file_index = [0, -1]
+    return data, input_files, reference_files, output_file_index
+
+
+def get_ls2_test_region_anom_data():
+    data, _, _, _ = get_ls2_test_bbox_anom_data()
+    data[InputType.AREA] = "river_basin|Severn"
+    data[InputType.SPATIAL_REPRESENTATION] = "river_basin"
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS2_Subset_01_river_monthly_anom.nc"
+    )
+
+    reference_files = [
+        path.join(
+            base_path, "data", "expected_outputs", "LS2_Subset_01_river_monthly_anom.csv"
+        )
+    ]
+
+    output_file_index = [0]
+    return data, input_files, reference_files, output_file_index
+
+
 def get_ls3a_test_point_data():
     data = {}
     data[InputType.AREA] = ["point", 452500.0, 262500.0]
@@ -185,6 +254,8 @@ class SubsetCsvTestCase(unittest.TestCase):
             (get_ls1_test_prob_point_data()),
             (get_ls2_test_bbox_data()),
             (get_ls2_test_region_data()),
+            (get_ls2_test_bbox_anom_data()),
+            (get_ls2_test_region_anom_data()),
             (get_ls3a_test_point_data()),
             (get_ms4_test_coast_point_data()),
         ]
