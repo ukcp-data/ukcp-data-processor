@@ -564,10 +564,16 @@ class DataExtractor:
 
         if year_max is not None:
             # we have some form of time slice
-            time_slice_constraint = iris.Constraint(
-                time=lambda t: year_min <= t.point.year < year_max
-            )
-            LOG.debug("Constraint(%s <= t.point.year < %s)", year_min, year_max)
+            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+                time_slice_constraint = iris.Constraint(
+                    time=lambda t: year_min <= t.point.year <= year_max
+                )
+                LOG.debug("Constraint(%s <= t.point.year <= %s)", year_min, year_max)
+            else:
+                time_slice_constraint = iris.Constraint(
+                    time=lambda t: year_min <= t.point.year < year_max
+                )
+                LOG.debug("Constraint(%s <= t.point.year < %s)", year_min, year_max)
 
         return time_slice_constraint
 
@@ -677,8 +683,10 @@ class DataExtractor:
         else:
             start_year = self.input_data.get_value(InputType.YEAR_MINIMUM)
             end_year = self.input_data.get_value(InputType.YEAR_MAXIMUM)
+            if self.input_data.get_value(InputType.COLLECTION) != COLLECTION_OBS:
+                end_year = end_year - 1
             title = "{t} years {start_year} up to and including {end_year},".format(
-                t=title, start_year=start_year, end_year=end_year - 1
+                t=title, start_year=start_year, end_year=end_year
             )
 
         if self.input_data.get_value(InputType.RETURN_PERIOD) is not None:
