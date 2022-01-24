@@ -6,7 +6,6 @@ from the BaseCsvWriter base class.
 from datetime import datetime
 import logging
 
-import numpy as np
 from ukcp_dp.constants import AreaType, InputType, COLLECTION_OBS, COLLECTION_PROB
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 
@@ -167,7 +166,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         output_data_file_path = self._get_full_file_name()
         self._write_headers(output_data_file_path)
 
-        self._write_data(self.cube_list[0], output_data_file_path)
+        self._write_data(cube, output_data_file_path)
 
         return output_data_file_path
 
@@ -176,7 +175,8 @@ class SubsetCsvWriter(BaseCsvWriter):
         Write out time series data to a file.
 
         The data should be for a single region or grid square. There may be one or
-        more ensembles.
+        more ensembles. If the collection is HadGrid UK then there can be multiple
+        regions but no ensembles
 
         """
         LOG.debug("_write_region_or_point_csv")
@@ -186,13 +186,21 @@ class SubsetCsvWriter(BaseCsvWriter):
 
         var = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
+        # update the header
         if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
-            self.header.append(f"{var}")
+            if self.input_data.get_area() == "all":
+                if self.input_data.get_area_type() == AreaType.ADMIN_REGION:
+                    region_coord_name = "Administrative Region"
+                elif self.input_data.get_area_type() == AreaType.RIVER_BASIN:
+                    region_coord_name = "River Basin"
+                for region_coord in self.cube_list[0].coord(region_coord_name)[:]:
+                    self.header.append(f"{var}({str(region_coord.points[0])})")
+            else:
+                self.header.append(f"{var}")
         else:
             # There should only be one cube so we only make reference to
             # self.cube_list[0]
             for ensemble_coord in self.cube_list[0].coord("ensemble_member_id")[:]:
-                # update the header
                 self.header.append(f"{var}({str(ensemble_coord.points[0])})")
 
         output_data_file_path = self._get_full_file_name()
@@ -213,32 +221,83 @@ class SubsetCsvWriter(BaseCsvWriter):
         else:
             date_format = "%Y-%m-%d"
 
+        dim_coords = []
+        for coord in cube.coords(dim_coords=True):
+            dim_coords.append(coord.name())
+
+        if "time" not in dim_coords:
+            self.region_or_point_csv_for_single_time(
+                cube, date_format, output_data_file_path
+            )
+        else:
+            self.region_or_point_csv_for_time_series(
+                cube, date_format, output_data_file_path
+            )
+
+        LOG.debug("data written to file")
+
+    def region_or_point_csv_for_single_time(
+        self, cube, date_format, output_data_file_path
+    ):
+        """
+        Get the region or point data where there is only one time value.
+
+        """
+        time_coord = cube.coord("time")
+
+        try:
+            data = ",".join("%s" % num for num in self._get_data(cube))
+        except IndexError:
+            data = cube.data
+
+        with open(output_data_file_path, "a") as output_data_file:
+            output_data_file.write(
+                f"{time_coord.cell(0).point.strftime(date_format)},{data}\n"
+            )
+
+    def region_or_point_csv_for_time_series(
+        self, cube, date_format, output_data_file_path
+    ):
+        """
+        Get the region or point data where there are multiple time values.
+
+        """
+        data = self._get_data(cube)
+        time_coords = cube.coord("time")[:]
+
+        secondary_index = None
+        for i, coord in enumerate(cube.coords(dim_coords=True)):
+            LOG.error(coord.name())
+            if coord.name() == "time":
+                time_index = i
+            elif coord.name() in ["region", "ensemble_member_id", "percentile"]:
+                secondary_index = i
+
+        with open(output_data_file_path, "a") as output_data_file:
+
+            for time_ in range(0, data.shape[time_index]):
+                time_formated = time_coords[time_].cell(0).point.strftime(date_format)
+
+                if time_index == 0:
+                    if secondary_index is None:
+                        data_formated = data[time_]
+                    if secondary_index == 1:
+                        data_formated = ','.join('%s' % num for num in data[time_])
+                else:
+                    data_formated = ','.join('%s' % num for num in data[:, time_])
+
+                output_data_file.write(f"{time_formated},{data_formated}\n")
+
+    def _get_data(self, cube):
+        """
+        Extract the data from the cube.
+
+        """
         start_time = datetime.now()
         data = cube.data[:]
         end_time = datetime.now()
         LOG.debug("data extracted from cube in %s", end_time - start_time)
-
-        time_coords = cube.coord("time")[:]
-        if self.input_data.get_value(InputType.COLLECTION) != COLLECTION_PROB:
-            data = np.transpose(data)
-
-        with open(output_data_file_path, "a") as output_data_file:
-
-            for time_ in range(0, data.shape[0]):
-                if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
-                    output_data_file.write(
-                        f"{time_coords[time_].cell(0).point.strftime(date_format)},"
-                        f"{data[:][time_]}"
-                        "\n"
-                    )
-                else:
-                    output_data_file.write(
-                        f"{time_coords[time_].cell(0).point.strftime(date_format)},"
-                        f"{','.join(['%s' % num for num in data[:][time_]])}"
-                        "\n"
-                    )
-
-        LOG.debug("data written to file")
+        return data
 
 
 def _fromat_percentile(percentile):

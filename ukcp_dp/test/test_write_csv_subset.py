@@ -228,6 +228,71 @@ def get_ls6_test_region_data():
     return data, input_files, reference_files, output_file_index
 
 
+def get_ls6_test_all_regions_data():
+    data, _, _, _ = get_ls6_test_region_data()
+    data[InputType.AREA] = "admin_region|all"
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS6_Subset_01_all_admin_monthly.nc"
+    )
+
+    reference_files = [
+        path.join(
+            base_path, "data", "expected_outputs", "LS6_Subset_01_all_admin_monthly.csv"
+        )
+    ]
+
+    output_file_index = [0]
+    return data, input_files, reference_files, output_file_index
+
+
+def get_ls6_test_all_river_monthly():
+    data, _, _, _ = get_ls6_test_region_data()
+    data[InputType.AREA] = "river_basin|all"
+    data[InputType.SPATIAL_REPRESENTATION] = "river_basin"
+
+    data[InputType.YEAR_MINIMUM] = 1928
+    data[InputType.YEAR_MAXIMUM] = 1928
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS6_Subset_01_all_river_monthly.nc"
+    )
+
+    reference_files = [
+        path.join(
+            base_path, "data", "expected_outputs", "LS6_Subset_01_all_river_monthly.csv"
+        )
+    ]
+
+    output_file_index = [0]
+    return data, input_files, reference_files, output_file_index
+
+
+def get_ls6_test_country_monthly():
+    data, _, _, _ = get_ls6_test_region_data()
+    data[InputType.AREA] = "country|wales"
+    data[InputType.SPATIAL_REPRESENTATION] = "country"
+
+    data[InputType.YEAR_MINIMUM] = 1928
+    data[InputType.YEAR_MAXIMUM] = 1928
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS6_Subset_01_country_monthly.nc"
+    )
+
+    reference_files = [
+        path.join(
+            base_path, "data", "expected_outputs", "LS6_Subset_01_country_monthly.csv"
+        )
+    ]
+
+    output_file_index = [0]
+    return data, input_files, reference_files, output_file_index
+
+
 class SubsetCsvTestCase(unittest.TestCase):
     def test_subset_csv(self):
         """
@@ -241,6 +306,9 @@ class SubsetCsvTestCase(unittest.TestCase):
             (get_ms4_test_coast_point_data()),
             (get_ls6_test_bbox_data()),
             (get_ls6_test_region_data()),
+            (get_ls6_test_all_regions_data()),
+            (get_ls6_test_all_river_monthly()),
+            (get_ls6_test_country_monthly()),
         ]
 
         for data, input_files, reference_files, output_file_index in inputs:

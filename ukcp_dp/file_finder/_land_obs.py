@@ -102,7 +102,6 @@ def _get_file_name(input_data, spatial_representation, variable, date_range):
 
 
 def _temporal_average_type(input_data):
-    LOG.debug("_temporal_average_type")
     if input_data.get_value(InputType.TIME_SLICE_TYPE) is None:
         temporal_average_type = input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
 
