@@ -116,7 +116,15 @@ class SubsetCsvWriter(BaseCsvWriter):
         time_coords = cube.coord("time")[:]
         y_coords = cube.coord("projection_y_coordinate")[:]
 
-        for time_ in range(0, data.shape[0]):
+        dim_coords = []
+        for i, coord in enumerate(cube.coords(dim_coords=True)):
+            dim_coords.append(coord.name())
+            if coord.name() == "time":
+                time_index = i
+            elif coord.name() == "projection_y_coordinate":
+                y_index = i
+
+        for time_ in range(0, data.shape[time_index]):
             output_data_file.write(
                 f"{time_coords[time_].cell(0).point.strftime('%Y-%m-%d')}\n"
             )
@@ -124,12 +132,36 @@ class SubsetCsvWriter(BaseCsvWriter):
             output_data_file.write(f"{','.join(column_headers)}\n")
 
             # rows of data
-            for y_coord in range(data.shape[1] - 1, -1, -1):
-                output_data_file.write(
-                    f"{y_coords[y_coord].cell(0).point},"
-                    f"{','.join(['%s' % num for num in data[:][time_][y_coord]])}"
-                    "\n"
-                )
+            for y_coord in range(data.shape[y_index] - 1, -1, -1):
+                if time_index == 0:
+                    if y_index == 1:
+                        line = (
+                            f"{y_coords[y_coord].cell(0).point},"
+                            f"{','.join(['%s' % num for num in data[time_, y_coord]])}"
+                            "\n"
+                        )
+                    else:
+                        line = (
+                            f"{y_coords[y_coord].cell(0).point},"
+                            f"{','.join(['%s' % num for num in data[time_, : ,y_coord]])}"
+                            "\n"
+                        )
+
+                elif time_index == 2:
+                    if y_index == 0:
+                        line = (
+                            f"{y_coords[y_coord].cell(0).point},"
+                            f"{','.join(['%s' % num for num in data[y_coord, : ,time_]])}"
+                            "\n"
+                        )
+                    else:
+                        line = (
+                            f"{y_coords[y_coord].cell(0).point},"
+                            f"{','.join(['%s' % num for num in data[: ,y_coord, time_]])}"
+                            "\n"
+                        )
+
+                output_data_file.write(line)
 
         LOG.debug("data written to file")
 
