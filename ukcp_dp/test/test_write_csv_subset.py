@@ -153,10 +153,16 @@ def get_ls2_test_bbox_anom_data():
 
     reference_files = [
         path.join(
-            base_path, "data", "expected_outputs", "LS2_Subset_01_bbox_monthly_anom_1.csv"
+            base_path,
+            "data",
+            "expected_outputs",
+            "LS2_Subset_01_bbox_monthly_anom_1.csv",
         ),
         path.join(
-            base_path, "data", "expected_outputs", "LS2_Subset_01_bbox_monthly_anom_2.csv"
+            base_path,
+            "data",
+            "expected_outputs",
+            "LS2_Subset_01_bbox_monthly_anom_2.csv",
         ),
     ]
 
@@ -176,7 +182,10 @@ def get_ls2_test_region_anom_data():
 
     reference_files = [
         path.join(
-            base_path, "data", "expected_outputs", "LS2_Subset_01_river_monthly_anom.csv"
+            base_path,
+            "data",
+            "expected_outputs",
+            "LS2_Subset_01_river_monthly_anom.csv",
         )
     ]
 
@@ -266,6 +275,28 @@ def get_ls6_test_bbox_data():
     reference_files = [
         path.join(
             base_path, "data", "expected_outputs", "LS6_Subset_01_bbox_seasonal.csv"
+        )
+    ]
+
+    output_file_index = [0]
+    return data, input_files, reference_files, output_file_index
+
+
+def get_ls6_test_bbox_data_one_year():
+    data, _, _, _ = get_ls6_test_bbox_data()
+    data[InputType.YEAR_MINIMUM] = 1928
+
+    base_path = path.abspath(path.dirname(__file__))
+    input_files = path.join(
+        base_path, "data", "input_files", "LS6_Subset_01_bbox_seasonal_one_year.nc"
+    )
+
+    reference_files = [
+        path.join(
+            base_path,
+            "data",
+            "expected_outputs",
+            "LS6_Subset_01_bbox_seasonal_one_year.csv",
         )
     ]
 
@@ -376,6 +407,7 @@ class SubsetCsvTestCase(unittest.TestCase):
             (get_ls3a_test_point_data()),
             (get_ms4_test_coast_point_data()),
             (get_ls6_test_bbox_data()),
+            (get_ls6_test_bbox_data_one_year()),
             (get_ls6_test_region_data()),
             (get_ls6_test_all_regions_data()),
             (get_ls6_test_all_river_monthly()),

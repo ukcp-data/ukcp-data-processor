@@ -107,22 +107,63 @@ class SubsetCsvWriter(BaseCsvWriter):
         Write out the column headers and data.
 
         """
-        start_time = datetime.now()
-        # get the numpy representation of the sub-cube
-        data = cube.data[:]
-        end_time = datetime.now()
-        LOG.debug("data extracted from cube in %s", end_time - start_time)
-
-        time_coords = cube.coord("time")[:]
         y_coords = cube.coord("projection_y_coordinate")[:]
 
-        dim_coords = []
+        time_index = None
         for i, coord in enumerate(cube.coords(dim_coords=True)):
-            dim_coords.append(coord.name())
             if coord.name() == "time":
                 time_index = i
             elif coord.name() == "projection_y_coordinate":
                 y_index = i
+
+        if time_index is None:
+            self._write_data_block_single_time(
+                column_headers, cube, output_data_file, y_coords, y_index
+            )
+        else:
+            self._write_data_block_time_series(
+                column_headers, cube, output_data_file, time_index, y_coords, y_index
+            )
+
+        LOG.debug("data written to file")
+
+    def _write_data_block_single_time(
+        self, column_headers, cube, output_data_file, y_coords, y_index
+    ):
+        """
+        Write out the column headers and data where there is only one time value.
+
+        """
+        data = self._get_data(cube)
+        output_data_file.write(f"{','.join(column_headers)}\n")
+
+        # rows of data
+        for y_coord in range(data.shape[y_index] - 1, -1, -1):
+            if y_index == 0:
+                line = (
+                    f"{y_coords[y_coord].cell(0).point},"
+                    f"{','.join(['%s' % num for num in data[y_coord, :]])}"
+                    "\n"
+                )
+            else:
+                line = (
+                    f"{y_coords[y_coord].cell(0).point},"
+                    f"{','.join(['%s' % num for num in data[: ,y_coord]])}"
+                    "\n"
+                )
+
+            output_data_file.write(line)
+
+    def _write_data_block_time_series(
+        self, column_headers, cube, output_data_file, time_index, y_coords, y_index
+    ):
+        """
+        Write out the column headers and data where there are multiple time values.
+
+
+        """
+        data = self._get_data(cube)
+        time_coords = cube.coord("time")[:]
 
         for time_ in range(0, data.shape[time_index]):
             output_data_file.write(
@@ -162,8 +203,6 @@ class SubsetCsvWriter(BaseCsvWriter):
                         )
 
                 output_data_file.write(line)
-
-        LOG.debug("data written to file")
 
     def _write_csv_percentiles(self):
         """
@@ -258,17 +297,17 @@ class SubsetCsvWriter(BaseCsvWriter):
             dim_coords.append(coord.name())
 
         if "time" not in dim_coords:
-            self.region_or_point_csv_for_single_time(
+            self._region_or_point_csv_for_single_time(
                 cube, date_format, output_data_file_path
             )
         else:
-            self.region_or_point_csv_for_time_series(
+            self._region_or_point_csv_for_time_series(
                 cube, date_format, output_data_file_path
             )
 
         LOG.debug("data written to file")
 
-    def region_or_point_csv_for_single_time(
+    def _region_or_point_csv_for_single_time(
         self, cube, date_format, output_data_file_path
     ):
         """
@@ -287,7 +326,7 @@ class SubsetCsvWriter(BaseCsvWriter):
                 f"{time_coord.cell(0).point.strftime(date_format)},{data}\n"
             )
 
-    def region_or_point_csv_for_time_series(
+    def _region_or_point_csv_for_time_series(
         self, cube, date_format, output_data_file_path
     ):
         """
@@ -299,7 +338,6 @@ class SubsetCsvWriter(BaseCsvWriter):
 
         secondary_index = None
         for i, coord in enumerate(cube.coords(dim_coords=True)):
-            LOG.error(coord.name())
             if coord.name() == "time":
                 time_index = i
             elif coord.name() in ["region", "ensemble_member_id", "percentile"]:
@@ -314,9 +352,9 @@ class SubsetCsvWriter(BaseCsvWriter):
                     if secondary_index is None:
                         data_formated = data[time_]
                     if secondary_index == 1:
-                        data_formated = ','.join('%s' % num for num in data[time_])
+                        data_formated = ",".join("%s" % num for num in data[time_])
                 else:
-                    data_formated = ','.join('%s' % num for num in data[:, time_])
+                    data_formated = ",".join("%s" % num for num in data[:, time_])
 
                 output_data_file.write(f"{time_formated},{data_formated}\n")
 
