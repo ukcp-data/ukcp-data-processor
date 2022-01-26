@@ -395,12 +395,12 @@ class DataExtractor:
             bng_n = self.input_data.get_area()[3]
             x_constraint = iris.Constraint(
                 projection_x_coordinate=lambda cell: (bng_w - half_grid_size)
-                <= cell.point
+                < cell.point
                 < (bng_e + half_grid_size)
             )
             y_constraint = iris.Constraint(
                 projection_y_coordinate=lambda cell: (bng_s - half_grid_size)
-                <= cell.point
+                < cell.point
                 < (bng_n + half_grid_size)
             )
             area_constraint = x_constraint & y_constraint
