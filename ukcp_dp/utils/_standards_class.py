@@ -532,7 +532,7 @@ UKCP_TEMP_EXTREME.vstep = 5.0
 # Air temperatures for use with the observation data.
 UKCP_TEMP_OBS = UKCP_TEMP.copy()
 UKCP_TEMP_OBS.tag = "UKCP_temp_obs"
-UKCP_TEMP_OBS.vrange = [-2.0, 20.0]
+UKCP_TEMP_OBS.vrange = [-4.0, 30.0]
 UKCP_TEMP_OBS.vmid = 0.0
 UKCP_TEMP_OBS.vstep = 2.0
 
