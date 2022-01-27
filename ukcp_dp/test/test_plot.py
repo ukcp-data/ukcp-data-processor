@@ -48,6 +48,7 @@ def run_plot_test(
         input_data.get_font_size(),
         input_data.get_value(InputType.VARIABLE)[0],
         extreme,
+        input_data.get_value(InputType.COLLECTION),
     )
 
     output_file = write_plot(

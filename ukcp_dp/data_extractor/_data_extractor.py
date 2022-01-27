@@ -556,7 +556,10 @@ class DataExtractor:
             if self.input_data.get_value(InputType.YEAR) is not None:
                 # year
                 year_min = self.input_data.get_value(InputType.YEAR)
-                year_max = self.input_data.get_value(InputType.YEAR) + 1
+                if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+                    year_max = self.input_data.get_value(InputType.YEAR)
+                else:
+                    year_max = self.input_data.get_value(InputType.YEAR) + 1
             else:
                 # year_minimum, year_maximum
                 year_min = self.input_data.get_value(InputType.YEAR_MINIMUM)

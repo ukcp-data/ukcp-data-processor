@@ -2,11 +2,11 @@
 This module provides common functions.
 
 """
-from ukcp_dp.constants import InputType
+from ukcp_dp.constants import InputType, COLLECTION_OBS
 from ukcp_dp.utils import _standards_class as stds
 
 
-def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
+def get_plot_settings(vocab, cmsize, fsize, var_id, extreme, collection):
     """
     Get the plot settings based on the variable being plotted.
 
@@ -20,6 +20,8 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
         # Minimum air temperature at 1.5m (C)
         if extreme is True:
             plot_settings = stds.UKCP_TEMP_EXTREME.copy()
+        elif collection == COLLECTION_OBS:
+            plot_settings = stds.UKCP_TEMP_OBS.copy()
         elif "Anom" in var_id:
             plot_settings = stds.UKCP_TEMP_ANOM.copy()
         else:

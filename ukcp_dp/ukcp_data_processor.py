@@ -102,6 +102,7 @@ class UKCPDataProcessor:
             self.input_data.get_font_size(),
             self.input_data.get_value(InputType.VARIABLE)[0],
             extreme,
+            self.input_data.get_value(InputType.COLLECTION),
         )
 
         data_extractor = DataExtractor(file_lists, self.input_data, self.plot_settings)
