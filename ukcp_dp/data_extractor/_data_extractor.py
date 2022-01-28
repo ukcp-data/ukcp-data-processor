@@ -726,9 +726,9 @@ class DataExtractor:
             )
 
         else:
-            title = "{t} in {area}".format(
-                t=title, area=self.input_data.get_area_label()
-            )
+            area = self.input_data.get_area_label()
+            area = area.replace("All ", "all ")
+            title = "{t} in {area}".format(t=title, area=area)
 
         # add baseline
         if self.input_data.get_value(InputType.BASELINE) is not None:

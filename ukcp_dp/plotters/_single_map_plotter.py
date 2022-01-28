@@ -86,8 +86,12 @@ class SingleMapPlotter(MapPlotter):
             cube_min = cube.collapsed(["region"], iris.analysis.MIN).data.item()
             cube_max = cube.collapsed(["region"], iris.analysis.MAX).data.item()
 
-        cube_min = math.floor(cube_min / 2) * 2
-        cube_max = math.ceil(cube_max / 2) * 2
+        if cube_max - cube_min > 11:
+            cube_min = math.floor(cube_min / 2) * 2
+            cube_max = math.ceil(cube_max / 2) * 2
+        else:
+            cube_min = math.floor(cube_min)
+            cube_max = math.ceil(cube_max)
 
         step = self._get_data_step(cube_min, cube_max)
         if step > 1 and cube_min + (step * 10) > cube_max:
@@ -97,9 +101,11 @@ class SingleMapPlotter(MapPlotter):
 
     def _get_data_step(self, min_value, max_value):
         data_range = max_value - min_value
-        if data_range < 7:
+        if data_range < 4:
+            return 0.25
+        if data_range < 8:
             return 0.5
-        if data_range < 13:
+        if data_range < 12:
             return 1
         return round(data_range / 20) * 2
 
