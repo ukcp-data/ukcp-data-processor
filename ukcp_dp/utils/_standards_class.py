@@ -532,9 +532,8 @@ UKCP_TEMP_EXTREME.vstep = 5.0
 # Air temperatures for use with the observation data.
 UKCP_TEMP_OBS = UKCP_TEMP.copy()
 UKCP_TEMP_OBS.tag = "UKCP_temp_obs"
-UKCP_TEMP_OBS.vrange = [-4.0, 30.0]
-UKCP_TEMP_OBS.vmid = 0.0
-UKCP_TEMP_OBS.vstep = 2.0
+UKCP_TEMP_OBS.extendcolbar = "neither"
+UKCP_TEMP_OBS.vmid = None
 
 # Precipitation rate.
 UKCP_PRECIP = UKCPNEAT.copy()
@@ -907,10 +906,6 @@ UKCP_RAINFALL = UKCPNEAT.copy()
 UKCP_RAINFALL.tag = "UKCP_rainfall"
 UKCP_RAINFALL.default_barlabel = "Total rainfall, mm"
 UKCP_RAINFALL.preferred_unit = cf_units.Unit("mm")
-UKCP_RAINFALL.extendcolbar = "both"
+UKCP_RAINFALL.extendcolbar = "neither"
 UKCP_RAINFALL.cpal = "Blues"
-UKCP_RAINFALL.undercol = "#ffffff"
-UKCP_RAINFALL.overcol = "#240938"
-UKCP_RAINFALL.vrange = [30, 180]
 UKCP_RAINFALL.vmid = None
-UKCP_RAINFALL.vstep = 10

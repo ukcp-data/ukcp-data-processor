@@ -4,6 +4,9 @@ method from the MapPlotter base class.
 
 """
 import logging
+import math
+
+import iris
 
 import matplotlib.gridspec as gridspec
 from ukcp_dp.constants import AreaType, InputType
@@ -48,6 +51,8 @@ class SingleMapPlotter(MapPlotter):
         bar_grid = bar_gs[0, 1:-1]
         bar_gs.update(top=0.28, bottom=0.08, left=gs_left, right=gs_right)
 
+        plot_settings.vrange, plot_settings.vstep = self._get_data_range(cube)
+
         result = self._add_sub_plot(fig, grid_spec[0, 0], plot_settings, cube)
 
         # add the sub plot to contain the bar
@@ -55,6 +60,48 @@ class SingleMapPlotter(MapPlotter):
         ax.axis("off")
 
         return result
+
+    def _get_data_range(self, cube):
+
+        if self.input_data.get_area_type() == AreaType.BBOX:
+            cube_min = cube.collapsed(
+                [
+                    "projection_x_coordinate",
+                    "projection_y_coordinate",
+                    "latitude",
+                    "longitude",
+                ],
+                iris.analysis.MIN,
+            ).data.item()
+            cube_max = cube.collapsed(
+                [
+                    "projection_x_coordinate",
+                    "projection_y_coordinate",
+                    "latitude",
+                    "longitude",
+                ],
+                iris.analysis.MAX,
+            ).data.item()
+        else:
+            cube_min = cube.collapsed(["region"], iris.analysis.MIN).data.item()
+            cube_max = cube.collapsed(["region"], iris.analysis.MAX).data.item()
+
+        cube_min = math.floor(cube_min / 2) * 2
+        cube_max = math.ceil(cube_max / 2) * 2
+
+        step = self._get_data_step(cube_min, cube_max)
+        if step > 1 and cube_min + (step * 10) > cube_max:
+            cube_max = cube_min + (step * 10)
+
+        return [cube_min, cube_max], step
+
+    def _get_data_step(self, min_value, max_value):
+        data_range = max_value - min_value
+        if data_range < 7:
+            return 0.5
+        if data_range < 13:
+            return 1
+        return round(data_range / 20) * 2
 
     def _add_sub_plot(self, fig, grid, plot_settings, data):
         ax = fig.add_subplot(grid, projection=plot_settings.proj)
