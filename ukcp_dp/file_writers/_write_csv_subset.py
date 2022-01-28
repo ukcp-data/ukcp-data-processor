@@ -262,6 +262,8 @@ class SubsetCsvWriter(BaseCsvWriter):
             if self.input_data.get_area() == "all":
                 if self.input_data.get_area_type() == AreaType.ADMIN_REGION:
                     region_coord_name = "Administrative Region"
+                elif self.input_data.get_area_type() == AreaType.COUNTRY:
+                    region_coord_name = "Country"
                 elif self.input_data.get_area_type() == AreaType.RIVER_BASIN:
                     region_coord_name = "River Basin"
                 for region_coord in self.cube_list[0].coord(region_coord_name)[:]:
