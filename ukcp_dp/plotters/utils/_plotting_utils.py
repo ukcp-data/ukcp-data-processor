@@ -1,7 +1,11 @@
+import calendar
 import logging
 
 import matplotlib
+from matplotlib.ticker import MaxNLocator
 
+import cf_units
+import datetime as dt
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -69,7 +73,7 @@ def start_standard_figure(settings):
     which is probably a StandardMap object, or similar.
 
     Again, the original font family and size are returned,
-    in a tuple alongsize the Figure object itself.
+    in a tuple alongside the Figure object itself.
     """
     fig, oldfont_family, oldfont_size = start_figure(
         settings.cmsize,
@@ -83,7 +87,7 @@ def start_standard_figure(settings):
 
 def end_figure(outfnames, dpi=None, oldfont_family=None, oldfont_size=None):
     """
-    Do all the complicted logic related to
+    Do all the complicated logic related to
     finishing off a figure - plotting to screen/file, and closing.
 
     Because the "print" dpi doesn't have to be the same as the "display" dpi,
@@ -133,6 +137,67 @@ def end_figure(outfnames, dpi=None, oldfont_family=None, oldfont_size=None):
     if oldfont_size is not None:
         LOG.debug("Resetting font size")
         matplotlib.rcParams["font.size"] = oldfont_size
+
+
+def get_time_series(cube, slice_and_sel_coord):
+    """
+    Get the time series from the cube.
+
+    Convert the time coord into fractions of years so we can easily use it for plotting.
+
+    @param cube (Cube): an iris data cube
+    @param slice_and_sel_coord (str): the name of the coord to slice over
+
+    @return a list of time values
+
+    """
+    if slice_and_sel_coord is not None:
+        tcoord = cube.slices_over(slice_and_sel_coord).next().coord("time")
+    else:
+        tcoord = cube.coord("time")
+
+    if tcoord.units.calendar is not None:
+        tsteps = list(tcoord.units.num2date(tcoord.points))
+
+        if isinstance(tsteps[0], (dt.date, dt.datetime)):
+            tpoints = [
+                t.year
+                + t.timetuple().tm_yday / (366.0 if calendar.isleap(t.year) else 365.0)
+                for t in tsteps
+            ]
+
+        elif isinstance(
+            tsteps[0],
+            (cf_units.cftime.datetime, cf_units.cftime._cftime.Datetime360Day),
+        ):
+            if tcoord.units.calendar == "360_day":
+                tpoints = [t.year + t.dayofyr / 360.0 for t in tsteps]
+            else:
+                raise Exception(
+                    "Got time points as cftime objects, "
+                    "but NOT on a 360-day calendar."
+                )
+
+        else:
+            LOG.warning(
+                "Using num2date on the time coord points didn't give "
+                "standard or netcdf date/datetime objects. The time "
+                "coord units were:%s, num2date gave objects of type "
+                "%s",
+                units=tcoord.units,
+                type=type(tsteps[0]),
+            )
+            raise Exception("Unrecognised time coord data type, cannot plot")
+
+    else:
+        # Non-date time coord, like a year! Simples!
+        LOG.info(
+            "Time coord points are not date-like objects, ASSUMEING they "
+            "are in year-fractions."
+        )
+        tpoints = tcoord.points
+
+    return tpoints
 
 
 def make_colourbar(
@@ -240,6 +305,83 @@ def make_standard_bar(settings, fig, barlabel=None, colmappable=None, bar_pos=No
         bar_pos=bar_pos,
     )
     return colour_bar
+
+
+def set_x_limits(cube, ax):
+    """
+    Set the x limits for the plot.
+
+    @param cube (Cube): an iris data cube
+    @param ax (AxesSubplot): the sub-plot
+
+    """
+    # Get x-axis limits from the Cube's time coord.
+    tcoord = cube.coord("time")
+    # Do this differently for datetime-like coords vs integer coords:
+    if tcoord.units.calendar is not None:
+        if tcoord.units.name.startswith("hour"):
+            # Can't easily use dt.timedelta objects with netcdfdatetimes,
+            # which is likely to be what these are.
+            xlims = [
+                tcoord.units.num2date(tcoord.points[0]),
+                tcoord.units.num2date(tcoord.points[-1]),
+            ]
+        elif tcoord.units.name.startswith("day"):
+            # Can't easily use dt.timedelta objects with netcdfdatetimes,
+            # which is likely to be what these are.
+            xlims = [
+                tcoord.units.num2date(tcoord.points[0]),
+                tcoord.units.num2date(tcoord.points[-1]),
+            ]
+        else:
+            raise Exception(
+                "Time coord units are "
+                + str(tcoord.units)
+                + " but I can only handle days and hours!"
+            )
+    else:
+        # x-axis will be in units of integer years.
+        LOG.info(
+            "Time coord points are not date-like objects, ASSUMEING they "
+            "are in year-fractions."
+        )
+        tsteps = tcoord.points
+        xlims = [tsteps[0], tsteps[-1]]
+
+    # Now we've got proposed x-axis limits (as some data type),
+    # we convert those x-axis limits into fractions of years.
+    if isinstance(xlims[0], (dt.date, dt.datetime)):
+        xlims_touse = [
+            t.year
+            + t.timetuple().tm_yday / (366.0 if calendar.isleap(t.year) else 365.0)
+            for t in xlims
+        ]
+
+    elif isinstance(
+        xlims[0], (cf_units.cftime.datetime, cf_units.cftime._cftime.Datetime360Day)
+    ):
+        # Strictly-speaking, this might not be on a 360-day calendar,
+        # but in practice we're unlikely to get this kind of object
+        # unless a 360-day calendar is involved.
+        LOG.info(
+            "Time axis limits specified with cftime.datetime "
+            "objects, ASSUMEING they're on a 360-day calendar."
+        )
+        xlims_touse = [t.year + t.dayofyr / 360.0 for t in xlims]
+
+    elif isinstance(xlims[0], (float, int)):
+        xlims_touse = xlims
+
+    else:
+        raise Exception(
+            "Unacceptable format for x-limits! Please use "
+            "standard or netcdf date/datetime objects, or ints or "
+            "floats."
+        )
+
+    # Finally, apply the limits:
+    ax.set_xlim(xlims_touse)
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
 
 def wrap_string(text, width):

@@ -13,6 +13,7 @@ from ukcp_dp.plotters._plume_plotter import PlumePlotter
 from ukcp_dp.plotters._postage_stamp_map_plotter import PostageStampMapPlotter
 from ukcp_dp.plotters._single_map_plotter import SingleMapPlotter
 from ukcp_dp.plotters._three_map_plotter import ThreeMapPlotter
+from ukcp_dp.plotters._time_series_plotter import TimeSeriesPlotter
 
 
 def write_plot(
@@ -50,7 +51,7 @@ def write_plot(
         plotter = JpPlotter()
     elif plot_type == PlotType.PDF_PLOT:
         plotter = PdfPlotter()
-    elif plot_type == PlotType.PLUME_PLOT or plot_type == PlotType.TIME_SERIES:
+    elif plot_type == PlotType.PLUME_PLOT:
         plotter = PlumePlotter()
     elif plot_type == PlotType.POSTAGE_STAMP_MAPS:
         plotter = PostageStampMapPlotter()
@@ -58,6 +59,8 @@ def write_plot(
         plotter = SingleMapPlotter()
     elif plot_type == PlotType.THREE_MAPS:
         plotter = ThreeMapPlotter()
+    elif plot_type == PlotType.TIME_SERIES:
+        plotter = TimeSeriesPlotter()
     else:
         raise Exception("Invalid plot type: {}".format(plot_type))
 
