@@ -115,7 +115,7 @@ class SingleMapPlotter(MapPlotter):
             return 0.5
         if data_range < 12:
             return 1
-        return round(data_range / 20) * 2
+        return math.ceil(data_range / 20) * 2
 
     def _add_sub_plot(self, fig, grid, plot_settings, data):
         ax = fig.add_subplot(grid, projection=plot_settings.proj)
