@@ -248,12 +248,15 @@ def get_ls6_test_obs_point_data():
 
     base_path = path.abspath(path.dirname(__file__))
     input_files = path.join(
-        base_path, "data", "input_files", "LS6_Plume_01_point_seasonal.nc"
+        base_path, "data", "input_files", "LS6_Time_Series_01_point_seasonal.nc"
     )
 
     reference_files = [
         path.join(
-            base_path, "data", "expected_outputs", "LS6_Plume_01_point_seasonal.csv"
+            base_path,
+            "data",
+            "expected_outputs",
+            "LS6_Time_Series_01_point_seasonal.csv",
         )
     ]
 
@@ -276,12 +279,15 @@ def get_ls6_test_obs_region_data():
 
     base_path = path.abspath(path.dirname(__file__))
     input_files = path.join(
-        base_path, "data", "input_files", "LS6_Plume_01_country_monthly.nc"
+        base_path, "data", "input_files", "LS6_Time_Series_01_country_monthly.nc"
     )
 
     reference_files = [
         path.join(
-            base_path, "data", "expected_outputs", "LS6_Plume_01_country_monthly.csv"
+            base_path,
+            "data",
+            "expected_outputs",
+            "LS6_Time_Series_01_country_monthly.csv",
         )
     ]
 
