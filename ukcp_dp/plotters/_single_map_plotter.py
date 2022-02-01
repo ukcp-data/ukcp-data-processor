@@ -40,24 +40,32 @@ class SingleMapPlotter(MapPlotter):
         """
         LOG.debug("_generate_subplots")
 
-        gs_top = 0.79
-        gs_bottom = 0.14
-        gs_left = 0.02
-        gs_right = 0.98
+        if self._is_landscape(cube, 1.25) is True:
+            gs_top = 0.79
+            gs_bottom = 0.14
+            gs_left = 0.02
+            gs_right = 0.98
+
+            # Position of the colour-bar Axes: [left,bottom, width,height]
+            plot_settings.bar_position = [0.25, 0.08, 0.5, 0.025]
+            plot_settings.bar_orientation = "horizontal"
+
+        else:  # portrait
+            gs_top = 0.79
+            gs_bottom = 0.05
+            gs_left = 0.15
+            gs_right = 0.8
+
+            # Position of the colour-bar Axes: [left,bottom, width,height]
+            plot_settings.bar_position = [0.82, 0.25, 0.025, 0.5]
+            plot_settings.bar_orientation = "vertical"
 
         grid_spec = gridspec.GridSpec(1, 1)
         grid_spec.update(top=gs_top, bottom=gs_bottom, left=gs_left, right=gs_right)
-        bar_gs = gridspec.GridSpec(1, 4)
-        bar_grid = bar_gs[0, 1:-1]
-        bar_gs.update(top=0.28, bottom=0.08, left=gs_left, right=gs_right)
 
         plot_settings.vrange, plot_settings.vstep = self._get_data_range(cube)
 
         result = self._add_sub_plot(fig, grid_spec[0, 0], plot_settings, cube)
-
-        # add the sub plot to contain the bar
-        ax = fig.add_subplot(bar_grid)
-        ax.axis("off")
 
         return result
 
