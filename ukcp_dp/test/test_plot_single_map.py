@@ -7,7 +7,7 @@ from ukcp_dp.test.test_plot import run_plot_test
 
 def get_ls6_test_bbox():
     data = {}
-    data[InputType.AREA] = [AreaType.BBOX, -84667.14, -114260.0, 676489.68, 1230247.3]
+    data[InputType.AREA] = [AreaType.BBOX, -84667.14, 0.0, 676489.68, 1230247.3]
     data[InputType.SPATIAL_REPRESENTATION] = "12km"
     data[InputType.COLLECTION] = "land-obs"
     data[InputType.VARIABLE] = "tasmax"
