@@ -127,10 +127,10 @@ def get_ls6_test_admin():
     data[InputType.AREA] = "admin_region|All administrative regions"
     data[InputType.SPATIAL_REPRESENTATION] = "admin_region"
     data[InputType.COLLECTION] = "land-obs"
-    data[InputType.VARIABLE] = "tasmax"
+    data[InputType.VARIABLE] = "tasmin"
 
     # temporal options
-    data[InputType.TIME_PERIOD] = "aug"
+    data[InputType.TIME_PERIOD] = "jan"
     data[InputType.TEMPORAL_AVERAGE_TYPE] = "mon"
     data[InputType.YEAR] = 2018
 
@@ -154,12 +154,12 @@ def get_ls6_test_country():
     data, _, _ = get_ls6_test_admin()
     data[InputType.AREA] = "country|All countries"
     data[InputType.SPATIAL_REPRESENTATION] = "country"
-    data[InputType.VARIABLE] = "rainfall"
+    data[InputType.VARIABLE] = "tasmin"
 
     # temporal options
-    data[InputType.TIME_PERIOD] = "aug"
+    data[InputType.TIME_PERIOD] = "feb"
     data[InputType.TEMPORAL_AVERAGE_TYPE] = "mon"
-    data[InputType.YEAR] = 2018
+    data[InputType.YEAR] = 2047
 
     # image options
     data[InputType.FONT_SIZE] = "m"
