@@ -103,7 +103,7 @@ class SingleMapPlotter(MapPlotter):
             cube_max = math.ceil(cube_max)
 
         step = _get_data_step(cube_min, cube_max)
-        if step > 1 and cube_min + (step * 10) > cube_max:
+        if step > 2 and cube_min + (step * 10) > cube_max:
             cube_max = cube_min + (step * 10)
 
         return [cube_min, cube_max], step
@@ -149,7 +149,7 @@ def _get_data_step(min_value, max_value):
         return 0.25
     if data_range < 8:
         return 0.5
-    if data_range < 12:
+    if data_range < 13:
         return 1
     return math.ceil(data_range / 20) * 2
 
