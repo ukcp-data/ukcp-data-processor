@@ -72,6 +72,3 @@ class TimeSeriesPlotter(GraphPlotter):
         )
 
         self.show_legend = False
-
-
-

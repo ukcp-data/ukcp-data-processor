@@ -64,6 +64,7 @@ class SingleMapPlotter(MapPlotter):
         grid_spec.update(top=gs_top, bottom=gs_bottom, left=gs_left, right=gs_right)
 
         plot_settings.vrange, plot_settings.vstep = self._get_data_range(cube)
+        plot_settings.vmid = _get_mid_point(plot_settings.vrange)
 
         result = self._add_sub_plot(fig, grid_spec[0, 0], plot_settings, cube)
 
@@ -101,21 +102,11 @@ class SingleMapPlotter(MapPlotter):
             cube_min = math.floor(cube_min)
             cube_max = math.ceil(cube_max)
 
-        step = self._get_data_step(cube_min, cube_max)
+        step = _get_data_step(cube_min, cube_max)
         if step > 1 and cube_min + (step * 10) > cube_max:
             cube_max = cube_min + (step * 10)
 
         return [cube_min, cube_max], step
-
-    def _get_data_step(self, min_value, max_value):
-        data_range = max_value - min_value
-        if data_range < 4:
-            return 0.25
-        if data_range < 8:
-            return 0.5
-        if data_range < 12:
-            return 1
-        return math.ceil(data_range / 20) * 2
 
     def _add_sub_plot(self, fig, grid, plot_settings, data):
         ax = fig.add_subplot(grid, projection=plot_settings.proj)
@@ -150,3 +141,22 @@ class SingleMapPlotter(MapPlotter):
             # geometry contains them.
 
         return result
+
+
+def _get_data_step(min_value, max_value):
+    data_range = max_value - min_value
+    if data_range < 4:
+        return 0.25
+    if data_range < 8:
+        return 0.5
+    if data_range < 12:
+        return 1
+    return math.ceil(data_range / 20) * 2
+
+
+def _get_mid_point(vrange):
+    if vrange[0] > 0:
+        return vrange[0]
+    if vrange[1] < 0:
+        return vrange[1]
+    return 0
