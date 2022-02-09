@@ -14,6 +14,7 @@ from ukcp_dp.constants import (
     COLLECTION_OBS,
     COLLECTION_OBS_MIN_YEAR,
     COLLECTION_RCM,
+    COLLECTION_RCM_CORDEX,
     COLLECTION_RCM_MIN_YEAR,
     COLLECTION_RCM_GWL,
     EXTENDED_PROJECTIONS,
@@ -231,6 +232,8 @@ class Validator:
         allowed_ensembles = get_ensemble_member_set(
             self.input_data.get_value(InputType.COLLECTION)
         )
+        if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_RCM:
+            allowed_ensembles.extend(get_ensemble_member_set(COLLECTION_RCM_CORDEX))
         if allowed_ensembles is None:
             raise Exception(
                 "Unable to get list of valid ensembles for {}".format(

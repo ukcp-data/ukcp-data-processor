@@ -12,6 +12,7 @@ import iris.experimental.equalise_cubes
 from iris.util import unify_time_units
 
 import cf_units
+import numpy as
 from ukcp_dp.constants import (
     COLLECTION_PROB,
     InputType,
@@ -265,6 +266,25 @@ class DataExtractor:
 
         iris.experimental.equalise_cubes.equalise_attributes(cubes)
         unify_time_units(cubes)
+
+        if collection == COLLECTION_RCM:
+            # we need to update the type of ensemble_member_id in order to be able to
+            # process Met Office and CORDEX data together
+            for cube in cubes:
+                for ind, aux_coord in enumerate(cube.aux_coords):
+                    if aux_coord.var_name == "ensemble_member_id":
+                        if aux_coord.dtype == np.dtype("<U27"):
+                            # replace string23 with string46 to match CORDEX
+                            cube.remove_coord(aux_coord)
+                            value = aux_coord.points.astype(np.dtype("<U46"))
+                            ensemble_coord = iris.coords.AuxCoord(
+                                value,
+                                units=aux_coord.units,
+                                long_name=aux_coord.long_name,
+                                var_name="ensemble_member_id",
+                            )
+                            cube.add_aux_coord(ensemble_coord, ind)
+                        break
 
         try:
             cube = cubes.concatenate_cube()
