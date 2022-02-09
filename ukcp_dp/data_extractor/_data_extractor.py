@@ -12,7 +12,7 @@ import iris.experimental.equalise_cubes
 from iris.util import unify_time_units
 
 import cf_units
-import numpy as
+import numpy as np
 from ukcp_dp.constants import (
     COLLECTION_PROB,
     InputType,
