@@ -273,11 +273,6 @@ def _get_region_record_from_shapefile(region_shape_file, region):
     return None
 
 
-def _get_resolution_m(cube):
-    resolution = cube.attributes["resolution"]
-    return int(resolution.split("km")[0]) * 1000
-
-
 def _write_polygon(shape_writer, x_coord, y_coord, half_grid_size):
     # Given the central x, y, and half_grid_size construct a polygon
     polygon = [

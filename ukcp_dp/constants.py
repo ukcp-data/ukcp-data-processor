@@ -172,6 +172,8 @@ LOGO_LARGE = path.join(
 
 TEMP_ANOMS = ["tasAnom", "tasmaxAnom", "tasminAnom"]
 
+COLLECTION_OBS = "land-obs"
+COLLECTION_OBS_MIN_YEAR = 1862
 COLLECTION_PROB = "land-prob"
 COLLECTION_PROB_MIN_YEAR = 1961
 COLLECTION_CPM = "land-cpm"
@@ -200,6 +202,8 @@ PDF_LABEL = "Relative probability"
 DATA_DIR = "/badc/ukcp18/data"
 DATA_SERVICE_URL = "http://data.ceda.ac.uk"
 
+HADUK_DIR = "/badc/ukmo-hadobs/data/insitu/MOHC/HadOBS/HadUK-Grid/v1.0.3.0"
+
 # Area types
 AreaType = enum(
     ADMIN_REGION="admin_region",
@@ -218,7 +222,9 @@ PlotType = enum(
     PDF_PLOT="PDF_PLOT",
     PLUME_PLOT="PLUME_PLOT",
     POSTAGE_STAMP_MAPS="POSTAGE_STAMP_MAPS",
+    SINGLE_MAP="SINGLE_MAP",
     THREE_MAPS="THREE_MAPS",
+    TIME_SERIES="TIME_SERIES",
 )
 
 # Data formats

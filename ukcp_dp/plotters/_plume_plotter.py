@@ -1,12 +1,13 @@
-import calendar
+"""
+This module contains the PlumePlotter class, which implements the _generate_graph method
+from the BasePlotter base class.
+
+"""
 import logging
 
-from matplotlib.ticker import MaxNLocator
-
-import cf_units
-import datetime as dt
 import iris
 from labellines import labelLines
+
 import matplotlib.pyplot as plt
 import numpy as np
 from ukcp_dp.constants import (
@@ -23,16 +24,19 @@ from ukcp_dp.constants import (
     SCENARIO_GREYSCALES,
 )
 from ukcp_dp.plotters._graph_plotter import GraphPlotter
+from ukcp_dp.plotters.utils._plotting_utils import get_time_series, set_x_limits
 
 
 LOG = logging.getLogger(__name__)
 
 
+# pylint: disable=R0903
 class PlumePlotter(GraphPlotter):
     """
     The plume plotter class.
 
     This class extends BasePlotter with a _generate_graph(self).
+
     """
 
     PROB_LABELS = {
@@ -130,7 +134,7 @@ class PlumePlotter(GraphPlotter):
         ).startswith(
             RETURN_PERIODS
         ):
-            t_points = get_return_periods(cube, "percentile")
+            t_points = _get_return_periods(cube, "percentile")
         else:
             t_points = get_time_series(cube, "percentile")
 
@@ -255,6 +259,7 @@ class PlumePlotter(GraphPlotter):
         @param t_points ([float]): time points
         @param percentile_data ([numpy.ndarray]): a list of arrays, with each
             array representing a percentiles data
+
         """
         # Generate the lines so we can add labels
         for i, data in enumerate(percentile_data):
@@ -347,124 +352,15 @@ class PlumePlotter(GraphPlotter):
             self.show_legend = False
 
 
-def get_return_periods(cube, slice_and_sel_coord):
+def _get_return_periods(cube, slice_and_sel_coord):
+    """
+    Get the return periods as a time series.
+
+    @param cube (Cube): an iris data cube
+    @param slice_and_sel_coord (str): the name of the coord to slice over
+
+    @return a list of time values
+
+    """
     tcoord = cube.slices_over(slice_and_sel_coord).next().coord("return_period")
     return tcoord.points
-
-
-def get_time_series(cube, slice_and_sel_coord):
-    # Convert the time coord into fractions of years,
-    # so we can easily use it for plotting:
-    tcoord = cube.slices_over(slice_and_sel_coord).next().coord("time")
-    if tcoord.units.calendar is not None:
-        tsteps = list(tcoord.units.num2date(tcoord.points))
-
-        if isinstance(tsteps[0], (dt.date, dt.datetime)):
-            tpoints = [
-                t.year
-                + t.timetuple().tm_yday / (366.0 if calendar.isleap(t.year) else 365.0)
-                for t in tsteps
-            ]
-
-        elif isinstance(
-            tsteps[0],
-            (cf_units.cftime.datetime, cf_units.cftime._cftime.Datetime360Day),
-        ):
-            if tcoord.units.calendar == "360_day":
-                tpoints = [t.year + t.dayofyr / 360.0 for t in tsteps]
-            else:
-                raise Exception(
-                    "Got time points as cftime objects, "
-                    "but NOT on a 360-day calendar."
-                )
-
-        else:
-            LOG.warning(
-                "Using num2date on the time coord points didn't give "
-                "standard or netcdf date/datetime objects. The time "
-                "coord units were:%s, num2date gave objects of type "
-                "%s",
-                units=tcoord.units,
-                type=type(tsteps[0]),
-            )
-            raise Exception("Unrecognised time coord data type, cannot plot")
-
-    else:
-        # Non-date time coord, like a year! Simples!
-        LOG.info(
-            "Time coord points are not date-like objects, ASSUMEING they "
-            "are in year-fractions."
-        )
-        tpoints = tcoord.points
-
-    return tpoints
-
-
-def set_x_limits(cube, ax):
-    # Get x-axis limits from the Cube's time coord.
-    tcoord = cube.coord("time")
-    # Do this differently for datetime-like coords vs integer coords:
-    if tcoord.units.calendar is not None:
-        if tcoord.units.name.startswith("hour"):
-            # Can't easily use dt.timedelta objects with netcdfdatetimes,
-            # which is likely to be what these are.
-            xlims = [
-                tcoord.units.num2date(tcoord.points[0]),
-                tcoord.units.num2date(tcoord.points[-1]),
-            ]
-        elif tcoord.units.name.startswith("day"):
-            # Can't easily use dt.timedelta objects with netcdfdatetimes,
-            # which is likely to be what these are.
-            xlims = [
-                tcoord.units.num2date(tcoord.points[0]),
-                tcoord.units.num2date(tcoord.points[-1]),
-            ]
-        else:
-            raise Exception(
-                "Time coord units are "
-                + str(tcoord.units)
-                + " but I can only handle days and hours!"
-            )
-    else:
-        # x-axis will be in units of integer years.
-        LOG.info(
-            "Time coord points are not date-like objects, ASSUMEING they "
-            "are in year-fractions."
-        )
-        tsteps = tcoord.points
-        xlims = [tsteps[0], tsteps[-1]]
-
-    # Now we've got proposed x-axis limits (as some data type),
-    # we convert those x-axis limits into fractions of years.
-    if isinstance(xlims[0], (dt.date, dt.datetime)):
-        xlims_touse = [
-            t.year
-            + t.timetuple().tm_yday / (366.0 if calendar.isleap(t.year) else 365.0)
-            for t in xlims
-        ]
-
-    elif isinstance(
-        xlims[0], (cf_units.cftime.datetime, cf_units.cftime._cftime.Datetime360Day)
-    ):
-        # Strictly-speaking, this might not be on a 360-day calendar,
-        # but in practice we're unlikely to get this kind of object
-        # unless a 360-day calendar is involved.
-        LOG.info(
-            "Time axis limits specified with cftime.datetime "
-            "objects, ASSUMEING they're on a 360-day calendar."
-        )
-        xlims_touse = [t.year + t.dayofyr / 360.0 for t in xlims]
-
-    elif isinstance(xlims[0], (float, int)):
-        xlims_touse = xlims
-
-    else:
-        raise Exception(
-            "Unacceptable format for x-limits! Please use "
-            "standard or netcdf date/datetime objects, or ints or "
-            "floats."
-        )
-
-    # Finally, apply the limits:
-    ax.set_xlim(xlims_touse)
-    ax.xaxis.set_major_locator(MaxNLocator(integer=True))

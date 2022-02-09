@@ -1,9 +1,14 @@
+"""
+This module provides the method get_file_lists.
+
+"""
 import logging
 import os
 
 from ukcp_dp.constants import (
     DATA_DIR,
     DATA_SERVICE_URL,
+    COLLECTION_OBS,
     COLLECTION_PROB,
     COLLECTION_PROB_MIN_YEAR,
     COLLECTION_CPM,
@@ -17,6 +22,8 @@ from ukcp_dp.constants import (
     AreaType,
     TemporalAverageType,
 )
+
+from ._land_obs import get_obs_file_list
 
 
 LOG = logging.getLogger(__name__)
@@ -66,6 +73,9 @@ def get_file_lists(input_data):
         COLLECTION_RCM_GWL,
     ]:
         file_list["main"] = _get_cm_file_list(input_data)
+
+    elif input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+        file_list["main"] = get_obs_file_list(input_data)
 
         if input_data.get_value(InputType.BASELINE) is not None:
             file_list["baseline"] = _get_file_list_for_baseline(input_data)

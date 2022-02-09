@@ -6,11 +6,12 @@ import glob
 import logging
 from os import path
 
-import cf_units
 import iris
 from iris.cube import CubeList
 import iris.experimental.equalise_cubes
 from iris.util import unify_time_units
+
+import cf_units
 from ukcp_dp.constants import (
     COLLECTION_PROB,
     InputType,
@@ -21,6 +22,7 @@ from ukcp_dp.constants import (
     COLLECTION_CPM,
     COLLECTION_DERIVED,
     COLLECTION_GCM,
+    COLLECTION_OBS,
     COLLECTION_RCM,
     COLLECTION_RCM_GWL,
 )
@@ -29,7 +31,7 @@ from ukcp_dp.exception import (
     UKCPDPDataNotFoundException,
     UKCPDPInvalidParameterException,
 )
-from ukcp_dp.utils import get_baseline_range
+from ukcp_dp.utils import get_baseline_range, get_spatial_resolution_m
 from ukcp_dp.vocab_manager import get_months
 
 
@@ -385,7 +387,7 @@ class DataExtractor:
 
         elif self.input_data.get_area_type() == AreaType.BBOX:
             # coordinates are coming in as OSGB, w, s, e, n
-            resolution = self._get_resolution_m(cube)
+            resolution = get_spatial_resolution_m(cube)
             half_grid_size = resolution / 2
             bng_w = self.input_data.get_area()[0]
             bng_s = self.input_data.get_area()[1]
@@ -393,12 +395,12 @@ class DataExtractor:
             bng_n = self.input_data.get_area()[3]
             x_constraint = iris.Constraint(
                 projection_x_coordinate=lambda cell: (bng_w - half_grid_size)
-                <= cell.point
+                < cell.point
                 < (bng_e + half_grid_size)
             )
             y_constraint = iris.Constraint(
                 projection_y_coordinate=lambda cell: (bng_s - half_grid_size)
-                <= cell.point
+                < cell.point
                 < (bng_n + half_grid_size)
             )
             area_constraint = x_constraint & y_constraint
@@ -507,13 +509,22 @@ class DataExtractor:
                     break
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
-            temporal_constraint = iris.Constraint(
-                season=self.input_data.get_value(InputType.TIME_PERIOD)
-            )
-            LOG.debug(
-                "Constraint(season=%s)",
-                self.input_data.get_value(InputType.TIME_PERIOD),
-            )
+            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+                temporal_constraint = iris.Constraint(
+                    clim_season=self.input_data.get_value(InputType.TIME_PERIOD)
+                )
+                LOG.debug(
+                    "Constraint(clim_season=%s)",
+                    self.input_data.get_value(InputType.TIME_PERIOD),
+                )
+            else:
+                temporal_constraint = iris.Constraint(
+                    season=self.input_data.get_value(InputType.TIME_PERIOD)
+                )
+                LOG.debug(
+                    "Constraint(season=%s)",
+                    self.input_data.get_value(InputType.TIME_PERIOD),
+                )
 
         else:
             raise UKCPDPInvalidParameterException(
@@ -545,7 +556,10 @@ class DataExtractor:
             if self.input_data.get_value(InputType.YEAR) is not None:
                 # year
                 year_min = self.input_data.get_value(InputType.YEAR)
-                year_max = self.input_data.get_value(InputType.YEAR) + 1
+                if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+                    year_max = self.input_data.get_value(InputType.YEAR)
+                else:
+                    year_max = self.input_data.get_value(InputType.YEAR) + 1
             else:
                 # year_minimum, year_maximum
                 year_min = self.input_data.get_value(InputType.YEAR_MINIMUM)
@@ -553,10 +567,16 @@ class DataExtractor:
 
         if year_max is not None:
             # we have some form of time slice
-            time_slice_constraint = iris.Constraint(
-                time=lambda t: year_min <= t.point.year < year_max
-            )
-            LOG.debug("Constraint(%s <= t.point.year < %s)", year_min, year_max)
+            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+                time_slice_constraint = iris.Constraint(
+                    time=lambda t: year_min <= t.point.year <= year_max
+                )
+                LOG.debug("Constraint(%s <= t.point.year <= %s)", year_min, year_max)
+            else:
+                time_slice_constraint = iris.Constraint(
+                    time=lambda t: year_min <= t.point.year < year_max
+                )
+                LOG.debug("Constraint(%s <= t.point.year < %s)", year_min, year_max)
 
         return time_slice_constraint
 
@@ -666,8 +686,10 @@ class DataExtractor:
         else:
             start_year = self.input_data.get_value(InputType.YEAR_MINIMUM)
             end_year = self.input_data.get_value(InputType.YEAR_MAXIMUM)
+            if self.input_data.get_value(InputType.COLLECTION) != COLLECTION_OBS:
+                end_year = end_year - 1
             title = "{t} years {start_year} up to and including {end_year},".format(
-                t=title, start_year=start_year, end_year=end_year - 1
+                t=title, start_year=start_year, end_year=end_year
             )
 
         if self.input_data.get_value(InputType.RETURN_PERIOD) is not None:
@@ -704,9 +726,9 @@ class DataExtractor:
             )
 
         else:
-            title = "{t} in {area}".format(
-                t=title, area=self.input_data.get_area_label()
-            )
+            area = self.input_data.get_area_label()
+            area = area.replace("All ", "all ")
+            title = "{t} in {area}".format(t=title, area=area)
 
         # add baseline
         if self.input_data.get_value(InputType.BASELINE) is not None:
@@ -714,18 +736,19 @@ class DataExtractor:
                 t=title, baseline=self.input_data.get_value_label(InputType.BASELINE)
             )
 
-        # add scenario, if only one of them. If len > 1 then the scenarios will
-        # be on the plot legend
-        scenario = self.input_data.get_value_label(InputType.SCENARIO)
-        if len(scenario) == 1:
-            title = "{t}, and scenario {scenario}".format(t=title, scenario=scenario[0])
+        try:
+            # add scenario, if only one of them. If len > 1 then the scenarios will
+            # be on the plot legend
+            scenario = self.input_data.get_value_label(InputType.SCENARIO)
+            if len(scenario) == 1:
+                title = "{t}, and scenario {scenario}".format(
+                    t=title, scenario=scenario[0]
+                )
+        except KeyError:
+            # there is no scenario for the Had Grid Obs data
+            pass
 
         return title
-
-    def _get_resolution_m(self, cube):
-        LOG.debug("_get_resolution_m")
-        resolution = cube.attributes["resolution"]
-        return int(resolution.split("km")[0]) * 1000
 
 
 def get_probability_levels(cube, extended_range):

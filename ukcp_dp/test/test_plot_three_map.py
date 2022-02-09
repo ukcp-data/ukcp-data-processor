@@ -22,7 +22,6 @@ def get_ls1_test_prob_bbox_data():
     # image options
     data[InputType.FONT_SIZE] = "m"
     data[InputType.IMAGE_SIZE] = 1200
-    data[InputType.LEGEND_POSITION] = 2
 
     # process constants
     data[InputType.BASELINE] = "b8100"
@@ -107,7 +106,6 @@ def get_ls1_test_prob_region_data():
     # image options
     data[InputType.FONT_SIZE] = "m"
     data[InputType.IMAGE_SIZE] = 1200
-    data[InputType.LEGEND_POSITION] = 2
 
     # process constants
     data[InputType.BASELINE] = "b8100"

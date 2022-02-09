@@ -1,12 +1,17 @@
-from ukcp_dp.constants import InputType
+"""
+This module provides common functions.
+
+"""
+from ukcp_dp.constants import InputType, COLLECTION_OBS
 from ukcp_dp.utils import _standards_class as stds
 
 
-def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
+def get_plot_settings(vocab, cmsize, fsize, var_id, extreme, collection):
     """
     Get the plot settings based on the variable being plotted.
 
     @return a StandardMap object containing plot settings
+
     """
     # tas, tasmax, tasmin
     if "tas" in var_id:
@@ -15,6 +20,8 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
         # Minimum air temperature at 1.5m (C)
         if extreme is True:
             plot_settings = stds.UKCP_TEMP_EXTREME.copy()
+        elif collection == COLLECTION_OBS:
+            plot_settings = stds.UKCP_TEMP_OBS.copy()
         elif "Anom" in var_id:
             plot_settings = stds.UKCP_TEMP_ANOM.copy()
         else:
@@ -106,6 +113,10 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
             # TODO do we need a non-ANOM version?
             plot_settings = stds.UKCP_PMSL_ANOM.copy()
 
+    elif "rainfall" in var_id:
+        # Maximum 5-day accumulative rainfall (mm)
+        plot_settings = stds.UKCP_RAINFALL.copy()
+
     elif "rls" in var_id:
         # Net Surface long wave flux (W m-2)
         if "Anom" in var_id:
@@ -165,6 +176,14 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme):
 
 
 def get_baseline_range(baseline):
+    """
+    Get the start and end year for a baseline.
+
+    @param baseline (str): the name of a baseline
+
+    @return a tuple containing two ints representing the start and end years
+
+    """
     if baseline == "b6190":
         return 1961, 1990
     if baseline == "b8100":
@@ -172,3 +191,27 @@ def get_baseline_range(baseline):
     if baseline == "b8110":
         return 1981, 2010
     return None
+
+
+def get_spatial_resolution_m(cube):
+    """
+    Get the spatial resolution of the cube data in metres.
+
+    For the model data we can get this from an attribute.
+    For the land-obs we need to calculate it from the bounds.
+
+    @param cube (Cube): an iris cube
+
+    @return the spatial resolution of the cube data in metres
+
+    """
+    try:
+        resolution = cube.attributes["resolution"]
+        resolution = int(resolution.split("km")[0]) * 1000
+    except KeyError:
+        # work out the resolution from the bounds
+        resolution = int(
+            cube.coords("projection_y_coordinate")[0].bounds[1][0]
+            - cube.coords("projection_y_coordinate")[0].bounds[0][0]
+        )
+    return resolution

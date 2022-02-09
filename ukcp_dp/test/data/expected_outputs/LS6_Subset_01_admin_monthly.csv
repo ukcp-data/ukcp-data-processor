@@ -1,0 +1,21 @@
+header length,11
+Area,West Midlands
+Data Source,Land observations
+Software Version,0.0.0TEST
+Spatial Representation,Administrative Region
+Temporal Average Type,Monthly
+Time Period,May
+Variable,Minimum air temperature at 1.5m (°C)
+Year Maximum,1928
+Year Minimum,1918
+Date,Minimum air temperature at 1.5m (°C)
+1918-05-16,6.656273164973062
+1919-05-16,7.04654208215901
+1920-05-16,6.588529474947833
+1921-05-16,5.059722359938228
+1922-05-16,6.536284334412242
+1923-05-16,4.6824072080816
+1924-05-16,6.742809548747292
+1925-05-16,6.787572720481489
+1926-05-16,5.106986345857096
+1927-05-16,5.2983659832831735

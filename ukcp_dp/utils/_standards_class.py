@@ -529,6 +529,11 @@ UKCP_TEMP_EXTREME.vrange = [10.0, 40.0]
 UKCP_TEMP_EXTREME.vmid = 0.0
 UKCP_TEMP_EXTREME.vstep = 5.0
 
+# Air temperatures for use with the observation data.
+UKCP_TEMP_OBS = UKCP_TEMP.copy()
+UKCP_TEMP_OBS.tag = "UKCP_temp_obs"
+UKCP_TEMP_OBS.extendcolbar = "neither"
+UKCP_TEMP_OBS.vmid = None
 
 # Precipitation rate.
 UKCP_PRECIP = UKCPNEAT.copy()
@@ -895,3 +900,12 @@ UKCP_5DAY_PRECIP_ANOM.overcol = "#240938"
 UKCP_5DAY_PRECIP_ANOM.vrange = [50, 200]
 UKCP_5DAY_PRECIP_ANOM.vmid = None
 UKCP_5DAY_PRECIP_ANOM.vstep = 15
+
+# Amount of rainfall in 5 days
+UKCP_RAINFALL = UKCPNEAT.copy()
+UKCP_RAINFALL.tag = "UKCP_rainfall"
+UKCP_RAINFALL.default_barlabel = "Total rainfall, mm"
+UKCP_RAINFALL.preferred_unit = cf_units.Unit("mm")
+UKCP_RAINFALL.extendcolbar = "neither"
+UKCP_RAINFALL.cpal = "Blues"
+UKCP_RAINFALL.vmid = None

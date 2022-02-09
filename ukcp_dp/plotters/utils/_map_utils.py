@@ -147,7 +147,19 @@ def plot_standard_choropleth_map(
     in a StandardMap object called 'settings'
 
     """
-    resolution = thecube.attributes["resolution"]
+    try:
+        resolution = thecube.attributes["resolution"]
+    except KeyError:
+        # the Had UK Grid Obs do not have resolution
+        for aux_coord in thecube.aux_coords:
+            if aux_coord.var_name == "geo_region":
+                if aux_coord.long_name == "Country":
+                    resolution = "country"
+                elif aux_coord.long_name == "Administrative Region":
+                    resolution = "region"
+                elif aux_coord.long_name == "River Basin":
+                    resolution = "river"
+
     shapefile_regions = get_ukcp_shapefile_regions(resolution, hi_res=hi_res)
     if barlab is None:
         barlab = settings.default_barlabel
@@ -698,7 +710,19 @@ def plot_choropleth_map(
     # -- the details of what we're doing here are likely to change later!
 
     # This is used to look up metadata for the shapefiles:
-    region_set = regionaldata[0].attributes["resolution"]
+    try:
+        region_set = regionaldata[0].attributes["resolution"]
+    except KeyError:
+        # the Had UK Grid Obs do not have resolution
+        for aux_coord in regionaldata[0].aux_coords:
+            if aux_coord.var_name == "geo_region":
+                if aux_coord.long_name == "Country":
+                    region_set = "country"
+                elif aux_coord.long_name == "Administrative Region":
+                    region_set = "region"
+                elif aux_coord.long_name == "River Basin":
+                    region_set = "river"
+
     reg_key = UKSHAPES[region_set]["attr_key"]
     regdata_dict = dict()
     for regcube in regionaldata:

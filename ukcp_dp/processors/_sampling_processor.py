@@ -151,7 +151,14 @@ class SamplingProcessor:
             extreme = True
         else:
             extreme = False
-        plot_settings = get_plot_settings(self.vocab, None, None, variable, extreme)
+        plot_settings = get_plot_settings(
+            self.vocab,
+            None,
+            None,
+            variable,
+            extreme,
+            self.input_data.get_value(InputType.COLLECTION),
+        )
         data_extractor = DataExtractor(file_lists, input_data, plot_settings)
         cubes = data_extractor.get_cubes()
         if len(cubes) > 1:

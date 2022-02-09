@@ -1,0 +1,12 @@
+header length,11
+Area,All river basins
+Data Source,Land observations
+Software Version,0.0.0TEST
+Spatial Representation,River Basin
+Temporal Average Type,Monthly
+Time Period,May
+Variable,Minimum air temperature at 1.5m (°C)
+Year Maximum,1928
+Year Minimum,1928
+Date,Minimum air temperature at 1.5m (°C)(Anglian),Minimum air temperature at 1.5m (°C)(Argyll),Minimum air temperature at 1.5m (°C)(Clyde),Minimum air temperature at 1.5m (°C)(Dee),Minimum air temperature at 1.5m (°C)(Forth),Minimum air temperature at 1.5m (°C)(Humber),Minimum air temperature at 1.5m (°C)(Neagh Bann),Minimum air temperature at 1.5m (°C)(North East Scotland),Minimum air temperature at 1.5m (°C)(North Eastern Ireland),Minimum air temperature at 1.5m (°C)(North Highland),Minimum air temperature at 1.5m (°C)(North West England),Minimum air temperature at 1.5m (°C)(North Western Ireland),Minimum air temperature at 1.5m (°C)(Northumbria),Minimum air temperature at 1.5m (°C)(Orkney and Shetlands),Minimum air temperature at 1.5m (°C)(Severn),Minimum air temperature at 1.5m (°C)(Solway),Minimum air temperature at 1.5m (°C)(South East England),Minimum air temperature at 1.5m (°C)(South West England),Minimum air temperature at 1.5m (°C)(Tay),Minimum air temperature at 1.5m (°C)(Thames),Minimum air temperature at 1.5m (°C)(Tweed),Minimum air temperature at 1.5m (°C)(West Highland),Minimum air temperature at 1.5m (°C)(Western Wales)
+1928-05-16,5.562794094815673,5.379474383068496,4.350260167205464,5.084771284953526,4.314055312341437,4.948275439802081,5.574139558006362,3.3683706921425354,5.931333856438872,4.389419557105947,5.526891562663884,5.302549933814887,4.0906730561134585,5.652369353233544,5.496025864020703,4.373681681423493,6.1979867920316725,6.836539572902842,3.5298270464347907,5.611840338474008,3.6354994754844046,5.752089211317908,6.404935569021319
