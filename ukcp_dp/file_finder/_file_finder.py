@@ -74,11 +74,11 @@ def get_file_lists(input_data):
     ]:
         file_list["main"] = _get_cm_file_list(input_data)
 
-    elif input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
-        file_list["main"] = get_obs_file_list(input_data)
-
         if input_data.get_value(InputType.BASELINE) is not None:
             file_list["baseline"] = _get_file_list_for_baseline(input_data)
+
+    elif input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+        file_list["main"] = get_obs_file_list(input_data)
 
     # the file list for an overlay of probability levels
     if (
