@@ -1,9 +1,16 @@
+# Release 2.7.0
+
+This release addresses:
+
+* Add support for HadUK Grid processes
+
+
 # Release 2.6.0
 
 This release addresses:
 
 * Performance improvements for writing CSV files
-* Work around for files with lat, ong of 0, 0
+* Work around for files with lat, long of 0, 0
 
 
 # Release 2.5.0
@@ -17,7 +24,7 @@ This release addresses:
 
 This release addresses:
 
-* Add option for users to get data as shapesiles for map products
+* Add option for users to get data as shape files for map products
 * Add option for users to set y-axis scale for plume plots
 
 
