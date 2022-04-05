@@ -64,7 +64,9 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme, collection):
 
     elif "sfcWind" in var_id or "wsgmax10m" in var_id:
         # Wind speed at 10m (m s-1)
-        if "Anom" in var_id:
+        if collection == COLLECTION_OBS:
+            plot_settings = stds.UKCP_WIND_OBS.copy()
+        elif "Anom" in var_id:
             plot_settings = stds.UKCP_WIND_ANOM.copy()
         else:
             plot_settings = stds.UKCP_WIND.copy()
@@ -93,7 +95,9 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme, collection):
 
     elif "hurs" in var_id:
         # Relative humidity at 1.5m (%)
-        if "Anom" in var_id:
+        if collection == COLLECTION_OBS:
+            plot_settings = stds.UKCP_RELATIVE_HUMIDITY_OBS.copy()
+        elif "Anom" in var_id:
             plot_settings = stds.UKCP_RELATIVE_HUMIDITY_ANOM.copy()
         else:
             plot_settings = stds.UKCP_RELATIVE_HUMIDITY.copy()
@@ -107,7 +111,9 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme, collection):
 
     elif "psl" in var_id:
         # Sea level pressure (hPa)
-        if "Anom" in var_id:
+        if collection == COLLECTION_OBS:
+            plot_settings = stds.UKCP_PMSL_OBS.copy()
+        elif "Anom" in var_id:
             plot_settings = stds.UKCP_PMSL_ANOM.copy()
         else:
             # TODO do we need a non-ANOM version?
@@ -140,6 +146,22 @@ def get_plot_settings(vocab, cmsize, fsize, var_id, extreme, collection):
             plot_settings = stds.UKCP_SWRAD_NET_MONTHLY_BIAS.copy()
         else:
             plot_settings = stds.UKCP_SWRAD_NET_MONTHLY.copy()
+
+    elif var_id == "groundfrost":
+        # Days of ground frost (days)
+        plot_settings = stds.UKCP_GROUND_FROST.copy()
+
+    elif var_id == "pv":
+        # Vapour pressure (hPa)
+        plot_settings = stds.UKCP_VAPOUR_PRESSURE.copy()
+
+    elif var_id == "snowLying":
+        # Days of snow lying (days)
+        plot_settings = stds.UKCP_SNOW_LYING.copy()
+
+    elif var_id == "sun":
+        # Sunshine hours (h)
+        plot_settings = stds.UKCP_SUN.copy()
 
     else:
         plot_settings = stds.UKCPNEAT.copy()

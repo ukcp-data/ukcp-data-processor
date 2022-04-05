@@ -632,6 +632,10 @@ UKCP_WIND.vrange = [0.0, 15.0]
 UKCP_WIND.vmid = None
 UKCP_WIND.vstep = 2.0
 
+UKCP_WIND_OBS = UKCP_WIND.copy()
+UKCP_WIND_OBS.tag = "UKCP_wind_obs"
+UKCP_WIND_OBS.extendcolbar = "neither"
+UKCP_WIND_OBS.vmid = None
 
 # Wind speed anomalies.
 UKCP_WIND_ANOM = UKCP_WIND.copy()
@@ -827,6 +831,10 @@ UKCP_RELATIVE_HUMIDITY.vrange = [0.0, 100.0]
 UKCP_RELATIVE_HUMIDITY.vmid = 50.0
 UKCP_RELATIVE_HUMIDITY.vstep = 10.0
 
+UKCP_RELATIVE_HUMIDITY_OBS = UKCP_RELATIVE_HUMIDITY.copy()
+UKCP_RELATIVE_HUMIDITY_OBS.tag = "UKCP_rh_obs"
+UKCP_RELATIVE_HUMIDITY_OBS.extendcolbar = "neither"
+UKCP_RELATIVE_HUMIDITY_OBS.vmid = None
 
 UKCP_RELATIVE_HUMIDITY_ANOM = UKCP_RELATIVE_HUMIDITY.copy()
 UKCP_RELATIVE_HUMIDITY_ANOM.tag = "UKCP_rh_anom"
@@ -848,6 +856,11 @@ UKCP_PMSL_ANOM.overcol = "#240938"
 UKCP_PMSL_ANOM.vrange = [-25.0, 25.0]
 UKCP_PMSL_ANOM.vmid = 0.0
 UKCP_PMSL_ANOM.vstep = 5.0
+
+UKCP_PMSL_OBS = UKCP_PMSL_ANOM.copy()
+UKCP_PMSL_OBS.tag = "UKCP_pmsl_obs"
+UKCP_PMSL_OBS.extendcolbar = "neither"
+UKCP_PMSL_OBS.vmid = None
 
 # Amount of precipitation in 1 day
 UKCP_1DAY_PRECIP = UKCPNEAT.copy()
@@ -909,3 +922,39 @@ UKCP_RAINFALL.preferred_unit = cf_units.Unit("mm")
 UKCP_RAINFALL.extendcolbar = "neither"
 UKCP_RAINFALL.cpal = "Blues"
 UKCP_RAINFALL.vmid = None
+
+# Days of ground frost
+UKCP_GROUND_FROST = UKCPNEAT.copy()
+UKCP_GROUND_FROST.tag = "UKCP_groundfrost"
+UKCP_GROUND_FROST.default_barlabel = "Days of ground frost, days"
+UKCP_GROUND_FROST.preferred_unit = cf_units.Unit("day")
+UKCP_GROUND_FROST.extendcolbar = "neither"
+UKCP_GROUND_FROST.cpal = "Blues"
+UKCP_GROUND_FROST.vmid = None
+
+# Days of snow lying
+UKCP_SNOW_LYING = UKCPNEAT.copy()
+UKCP_SNOW_LYING.tag = "UKCP_snowLying"
+UKCP_SNOW_LYING.default_barlabel = "Days of snow lying, days"
+UKCP_SNOW_LYING.preferred_unit = cf_units.Unit("day")
+UKCP_SNOW_LYING.extendcolbar = "neither"
+UKCP_SNOW_LYING.cpal = "Blues"
+UKCP_SNOW_LYING.vmid = None
+
+# Sunshine hours
+UKCP_SUN = UKCPNEAT.copy()
+UKCP_SUN.tag = "UKCP_sun"
+UKCP_SUN.default_barlabel = "Sunshine, hours"
+UKCP_SUN.preferred_unit = cf_units.Unit("hr")
+UKCP_SUN.extendcolbar = "neither"
+UKCP_SUN.cpal = "Blues"
+UKCP_SUN.vmid = None
+
+# Vapour pressure (hPa)
+UKCP_VAPOUR_PRESSURE = UKCPNEAT.copy()
+UKCP_VAPOUR_PRESSURE.tag = "UKCP_sun"
+UKCP_VAPOUR_PRESSURE.default_barlabel = "Vapour pressure, hPa"
+UKCP_VAPOUR_PRESSURE.preferred_unit = cf_units.Unit("hPa")
+UKCP_VAPOUR_PRESSURE.extendcolbar = "neither"
+UKCP_VAPOUR_PRESSURE.cpal = "Blues"
+UKCP_VAPOUR_PRESSURE.vmid = None
