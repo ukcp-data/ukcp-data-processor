@@ -40,14 +40,26 @@ class SingleMapPlotter(MapPlotter):
         """
         LOG.debug("_generate_subplots")
 
+        plot_settings.vrange, plot_settings.vstep = self._get_data_range(cube)
+        plot_settings.vmid = _get_mid_point(plot_settings.vrange)
+
         if self._is_landscape(cube, 1.25) is True:
             gs_top = 0.79
             gs_bottom = 0.14
             gs_left = 0.02
             gs_right = 0.98
 
-            # Position of the colour-bar Axes: [left,bottom, width,height]
-            plot_settings.bar_position = [0.25, 0.08, 0.5, 0.025]
+            if (
+                plot_settings.vstep == 1
+                and plot_settings.vrange[1] - plot_settings.vrange[0] == 2
+            ):
+                # special case
+                # Position of the colour-bar Axes: [left,bottom, width,height]
+                plot_settings.bar_position = [0.25, 0.08, 0.2, 0.025]
+            else:
+                # Position of the colour-bar Axes: [left,bottom, width,height]
+                plot_settings.bar_position = [0.25, 0.08, 0.5, 0.025]
+
             plot_settings.bar_orientation = "horizontal"
 
         else:  # portrait
@@ -56,15 +68,22 @@ class SingleMapPlotter(MapPlotter):
             gs_left = 0.15
             gs_right = 0.8
 
-            # Position of the colour-bar Axes: [left,bottom, width,height]
-            plot_settings.bar_position = [0.82, 0.25, 0.025, 0.5]
+            if (
+                plot_settings.vstep == 1
+                and plot_settings.vrange[1] - plot_settings.vrange[0] == 2
+            ):
+                # special case
+                # Position of the colour-bar Axes: [left,bottom, width,height]
+                plot_settings.bar_position = [0.82, 0.25, 0.025, 0.2]
+            else:
+                # special case
+                # Position of the colour-bar Axes: [left,bottom, width,height]
+                plot_settings.bar_position = [0.82, 0.25, 0.025, 0.5]
+
             plot_settings.bar_orientation = "vertical"
 
         grid_spec = gridspec.GridSpec(1, 1)
         grid_spec.update(top=gs_top, bottom=gs_bottom, left=gs_left, right=gs_right)
-
-        plot_settings.vrange, plot_settings.vstep = self._get_data_range(cube)
-        plot_settings.vmid = _get_mid_point(plot_settings.vrange)
 
         result = self._add_sub_plot(fig, grid_spec[0, 0], plot_settings, cube)
 
@@ -105,6 +124,10 @@ class SingleMapPlotter(MapPlotter):
         step = _get_data_step(cube_min, cube_max)
         if step > 2 and cube_min + (step * 10) > cube_max:
             cube_max = cube_min + (step * 10)
+
+        if cube_min == cube_max:
+            cube_max = cube_max + 2
+            step = 1
 
         return [cube_min, cube_max], step
 
