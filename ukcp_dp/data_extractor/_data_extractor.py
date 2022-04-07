@@ -156,6 +156,7 @@ class DataExtractor:
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
             self.input_data.get_value(InputType.TIME_PERIOD),
             self.input_data.get_value(InputType.COLLECTION),
+            self.input_data.get_value(InputType.VARIABLE),
         )
 
         return anomaly
