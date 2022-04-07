@@ -24,6 +24,7 @@ def get_anomaly(
     temporal_average_type,
     time_period,
     collection,
+    variable,
 ):
     """
     Generate a cube containing the anomaly values.
@@ -39,6 +40,7 @@ def get_anomaly(
         type
     @param time_period(str): the name of a month or season or 'all'
     @param collection(str): the collection
+    @param variable(str): the variable
     """
     if temporal_average_type == TemporalAverageType.MONTHLY:
         periods = _get_selected_month_numbers(time_period)
@@ -75,10 +77,11 @@ def get_anomaly(
             except iris.exceptions.CoordinateNotFoundError:
                 pass
             if collection == COLLECTION_CPM:
-                try:
-                    cube_absoute_period.remove_coord("yyyymm")
-                except iris.exceptions.CoordinateNotFoundError:
-                    pass
+                if variable == "wsgmax10m":
+                    try:
+                        cube_absoute_period.remove_coord("yyyymm")
+                    except iris.exceptions.CoordinateNotFoundError:
+                        pass
                 try:
                     cube_climatology_period.remove_coord("year")
                 except iris.exceptions.CoordinateNotFoundError:
