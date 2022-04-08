@@ -222,10 +222,12 @@ class PostageStampMapPlotter(MapPlotter):
         if self.input_data.get_area_type() == AreaType.BBOX:
 
             if self.input_data.get_value(InputType.COLLECTION) in [
-                COLLECTION_CPM,
                 COLLECTION_RCM,
                 COLLECTION_RCM_GWL,
-            ]:
+            ] or (
+                self.input_data.get_value(InputType.COLLECTION) == COLLECTION_CPM
+                and self.input_data.get_value(InputType.VARIABLE) == "wsgmax10m"
+            ):
                 # RCM is on a rotated grid
                 ensemble_mean_cube = cube.collapsed(
                     [
