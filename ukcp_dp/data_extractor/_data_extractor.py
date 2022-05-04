@@ -286,6 +286,17 @@ class DataExtractor:
                             cube.add_aux_coord(ensemble_coord, ind)
                         break
 
+                # the UKCP regional seasonal data has month_number, lets remove it to
+                # match CORDEX
+                if (
+                    self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
+                    == TemporalAverageType.SEASONAL
+                ):
+                    try:
+                        cube.remove_coord("month_number")
+                    except iris.exceptions.CoordinateNotFoundError:
+                        pass
+
         try:
             cube = cubes.concatenate_cube()
         except iris.exceptions.ConcatenateError as ex:
