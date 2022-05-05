@@ -272,7 +272,7 @@ class DataExtractor:
             # we need to update the type of ensemble_member_id in order to be able to
             # process Met Office and CORDEX data together
             for cube in cubes:
-                for ind, aux_coord in enumerate(cube.aux_coords):
+                for aux_coord in cube.aux_coords:
                     if aux_coord.var_name == "ensemble_member_id":
                         if aux_coord.dtype == np.dtype("<U27"):
                             # replace string23 with string46 to match CORDEX
@@ -284,7 +284,7 @@ class DataExtractor:
                                 long_name=aux_coord.long_name,
                                 var_name="ensemble_member_id",
                             )
-                            cube.add_aux_coord(ensemble_coord, ind)
+                            cube.add_aux_coord(ensemble_coord, 0)
                         break
 
                 # the UKCP regional seasonal data has month_number, lets remove it to
