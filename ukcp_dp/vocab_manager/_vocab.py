@@ -6,38 +6,6 @@ from ukcp_cv import CV_Type, get_cv
 class Vocab:
 
     VOCAB = {
-        "ensemble": {
-            # equivalent to UKCP18_ensemble_member
-            # UKCP18 values are full values
-            "01": "00000",
-            "02": "00605",
-            "03": "00834",
-            "04": "01113",
-            "05": "01554",
-            "06": "01649",
-            "07": "01843",
-            "08": "01935",
-            "09": "02123",
-            "10": "02242",
-            "11": "02305",
-            "12": "02335",
-            "13": "02491",
-            "14": "02832",
-            "15": "02868",
-            "16": "bcc-csm1-1",
-            "17": "CCSM4",
-            "18": "CESM1-BGC",
-            "19": "CanESM2",
-            "20": "CMCC-CM",
-            "21": "CNRM-CM5",
-            "22": "EC-EARTH",
-            "23": "ACCESS1-3",
-            "24": "HadGEM2-ES",
-            "25": "IPSL-CM5A-MR",
-            "26": "MPI-ESM-MR",
-            "27": "MRI-CGCM3",
-            "28": "GFDL-ESM2G",
-        },
         "spatial_representation": {
             # equivalent to UKCP18_resolution
             # no grid in UKCP18_resolution
@@ -243,6 +211,8 @@ class Vocab:
         self._load_cv(CV_Type.SCENARIO)
         self._load_cv(CV_Type.TIME_SLICE_TYPE)
 
+        self._load_cv(CV_Type.ENSEMBLE_SHORT_NAME)
+        self.vocab["ensemble"] = self.vocab[CV_Type.ENSEMBLE_SHORT_NAME]
         self._load_cv(CV_Type.ADMIN_REGION)
         self.vocab[CV_Type.ADMIN_REGION]["all"] = "All administrative regions"
         self._load_cv(CV_Type.COUNTRY)
@@ -497,7 +467,7 @@ ENSEMBLE_MEMBER_SET = {
     "26": ["26"],
     "27": ["27"],
     "28": ["28"],
-    "cordex": list(_get_range(100, 177).values()),
+    "land-euro-cordex": list(_get_range(100, 166).values()),
 }
 
 
