@@ -188,7 +188,6 @@ class Vocab:
         self.vocab["year_maximum"].update(_get_range(3001, 3052))
         self.vocab["sampling_id"] = _get_range(1, 4001)
         self.vocab["random_sampling_count"] = _get_range(100, 4001)
-        self.vocab["highlighted_ensemble_members"] = self.vocab["ensemble"]
         self.vocab["sampling_percentile_2"] = self.vocab["sampling_percentile_1"]
         time_period = {"all": "all"}
         time_period.update(self.vocab["ann"])
@@ -213,6 +212,7 @@ class Vocab:
 
         self._load_cv(CV_Type.ENSEMBLE_SHORT_NAME)
         self.vocab["ensemble"] = self.vocab[CV_Type.ENSEMBLE_SHORT_NAME]
+        self.vocab["highlighted_ensemble_members"] = self.vocab["ensemble"]
         self._load_cv(CV_Type.ADMIN_REGION)
         self.vocab[CV_Type.ADMIN_REGION]["all"] = "All administrative regions"
         self._load_cv(CV_Type.COUNTRY)
@@ -467,7 +467,8 @@ ENSEMBLE_MEMBER_SET = {
     "26": ["26"],
     "27": ["27"],
     "28": ["28"],
-    "land-euro-cordex": list(_get_range(100, 166).values()),
+    "land-euro-cordex": list(_get_range(29, 34).values())
+    + list(_get_range(100, 165).values()),
 }
 
 
