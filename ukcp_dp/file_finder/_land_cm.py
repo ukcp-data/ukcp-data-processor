@@ -7,12 +7,15 @@ import os
 
 from ukcp_dp.constants import (
     DATA_DIR,
+    COLLECTION_RCM_CORDEX,
     COLLECTION_CPM,
     COLLECTION_DERIVED,
     COLLECTION_GCM,
+    COLLECTION_RCM,
     InputType,
     AreaType,
 )
+from ukcp_dp.vocab_manager._vocab import get_ensemble_member_set
 
 
 LOG = logging.getLogger(__name__)
@@ -159,7 +162,7 @@ def _get_cm_file_path(
     else:
         temporal_average_type = input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
 
-    collection = input_data.get_value(InputType.COLLECTION)
+    collection = _get_collection(input_data, ensemble)
 
     if baseline is not None and scenario in ["gwl2", "gwl4"]:
         # we need to use the GCM RCP8.5 baseline for GWL2 and GWL4
@@ -246,7 +249,7 @@ def _get_cm_file_name(
         )
         date_range = "198012-201011"
 
-    collection = input_data.get_value(InputType.COLLECTION)
+    collection = _get_collection(input_data, ensemble)
 
     if baseline is not None and scenario in ["gwl2", "gwl4"]:
         # we need to use the GCM RCP8.5 baseline for GWL2 and GWL4
@@ -268,3 +271,13 @@ def _get_cm_file_name(
     )
 
     return file_name
+
+
+def _get_collection(input_data, ensemble):
+    collection = input_data.get_value(InputType.COLLECTION)
+    if collection == COLLECTION_RCM and ensemble in get_ensemble_member_set(
+        COLLECTION_RCM_CORDEX
+    ):
+        collection = COLLECTION_RCM_CORDEX
+
+    return collection
