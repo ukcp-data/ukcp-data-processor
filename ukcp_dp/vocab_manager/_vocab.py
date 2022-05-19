@@ -468,8 +468,7 @@ ENSEMBLE_MEMBER_SET = {
     "26": ["26"],
     "27": ["27"],
     "28": ["28"],
-    "land-euro-cordex": list(_get_range(29, 34).values())
-    + list(_get_range(100, 165).values()),
+    "land-euro-cordex": list(_get_range(100, 165).values()),
 }
 
 
