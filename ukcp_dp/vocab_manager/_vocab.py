@@ -212,7 +212,8 @@ class Vocab:
 
         self._load_cv(CV_Type.ENSEMBLE_SHORT_NAME)
         self.vocab["ensemble"] = self.vocab[CV_Type.ENSEMBLE_SHORT_NAME]
-        self.vocab["highlighted_ensemble_members"] = self.vocab["ensemble"]
+        self._load_cv(CV_Type.ENSEMBLE_MEMBER)
+        self.vocab["highlighted_ensemble_members"] = self.vocab[CV_Type.ENSEMBLE_MEMBER]
         self._load_cv(CV_Type.ADMIN_REGION)
         self.vocab[CV_Type.ADMIN_REGION]["all"] = "All administrative regions"
         self._load_cv(CV_Type.COUNTRY)
