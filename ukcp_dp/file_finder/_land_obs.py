@@ -2,10 +2,11 @@
 This module provides the method get_obs_file_list.
 
 """
+from calendar import monthrange
 import logging
 import os
 
-from ukcp_dp.constants import HADUK_DIR, InputType, AreaType
+from ukcp_dp.constants import HADUK_DIR, InputType, AreaType, TemporalAverageType
 
 
 LOG = logging.getLogger(__name__)
@@ -52,11 +53,36 @@ def get_obs_file_list(input_data):
                 input_data.get_value(InputType.YEAR_MINIMUM),
                 input_data.get_value(InputType.YEAR_MAXIMUM) + 1,
             ):
-                date_range = f"{year}01-{year}12"
-                file_name = _get_file_name(
-                    input_data, spatial_representation, variable, date_range
-                )
-                ensemble_file_list.append(os.path.join(file_path, file_name))
+                if (
+                    input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
+                    == TemporalAverageType.DAILY
+                ):
+                    for month in [
+                        "01",
+                        "02",
+                        "03",
+                        "04",
+                        "05",
+                        "06",
+                        "07",
+                        "08",
+                        "09",
+                        "10",
+                        "11",
+                        "12",
+                    ]:
+                        last_day = monthrange(year, int(month))[1]
+                        date_range = f"{year}{month}01-{year}{month}{last_day}"
+                        file_name = _get_file_name(
+                            input_data, spatial_representation, variable, date_range
+                        )
+                        ensemble_file_list.append(os.path.join(file_path, file_name))
+                else:
+                    date_range = f"{year}01-{year}12"
+                    file_name = _get_file_name(
+                        input_data, spatial_representation, variable, date_range
+                    )
+                    ensemble_file_list.append(os.path.join(file_path, file_name))
         else:
             date_ranges = _get_date_ranges(input_data, variable)
             for date_range in date_ranges:
@@ -137,4 +163,3 @@ def _get_date_ranges(input_data, variable):
         start_year = "1971"
 
     return [f"{start_year}01-{end_year}12"]
-
