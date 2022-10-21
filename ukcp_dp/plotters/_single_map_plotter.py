@@ -9,7 +9,7 @@ import math
 import iris
 
 import matplotlib.gridspec as gridspec
-from ukcp_dp.constants import AreaType, InputType
+from ukcp_dp.constants import AreaType, InputType, COLOUR_RANGE_STARTS_AT_ZERO
 from ukcp_dp.plotters._map_plotter import MapPlotter
 from ukcp_dp.plotters.utils._map_utils import (
     plot_standard_map,
@@ -41,7 +41,9 @@ class SingleMapPlotter(MapPlotter):
         LOG.debug("_generate_subplots")
 
         plot_settings.vrange, plot_settings.vstep = self._get_data_range(cube)
-        plot_settings.vmid = _get_mid_point(plot_settings.vrange)
+        plot_settings.vmid = _get_mid_point(
+            plot_settings.vrange, self.input_data.get_value(InputType.VARIABLE)
+        )
 
         if self._is_landscape(cube, 1.25) is True:
             gs_top = 0.79
@@ -177,7 +179,9 @@ def _get_data_step(min_value, max_value):
     return math.ceil(data_range / 20) * 2
 
 
-def _get_mid_point(vrange):
+def _get_mid_point(vrange, variable):
+    if variable[0] in COLOUR_RANGE_STARTS_AT_ZERO:
+        return (vrange[0] + vrange[1]) / 2
     if vrange[0] > 0:
         return vrange[0]
     if vrange[1] < 0:
