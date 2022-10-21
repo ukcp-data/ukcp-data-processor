@@ -242,6 +242,7 @@ class Vocab:
         self._load_cv(CV_Type.COLLECTION)
         self._load_cv(CV_Type.SCENARIO)
         self._load_cv(CV_Type.TIME_SLICE_TYPE)
+        self._load_cv(CV_Type.ENSEMBLE_SHORT_NAME)
 
         self._load_cv(CV_Type.ADMIN_REGION)
         self.vocab[CV_Type.ADMIN_REGION]["all"] = "All administrative regions"
