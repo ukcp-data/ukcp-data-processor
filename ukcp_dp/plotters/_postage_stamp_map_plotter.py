@@ -1,6 +1,8 @@
 import logging
 
 import iris
+from ukcp_cv import CV_Type
+
 import matplotlib.gridspec as gridspec
 from ukcp_dp.constants import (
     AreaType,
@@ -291,9 +293,13 @@ class PostageStampMapPlotter(MapPlotter):
         return result
 
     def _plot_map(self, fig, grid, plot_settings, ensemble_cube, i, title_font_size):
-        ensemble_name = ensemble_cube.coord("ensemble_member_id").points[0]
+        ensemble_no = ensemble_cube.coord("ensemble_member").points[0]
+        if ensemble_no < 10:
+            ensemble_no = f"0{ensemble_no}"
+        else:
+            ensemble_no = str(ensemble_no)
 
-        LOG.debug("generating postage stamp map for ensemble %s", ensemble_name)
+        LOG.debug("generating postage stamp map for ensemble %s", ensemble_no)
 
         ax = fig.add_subplot(grid[i], projection=plot_settings.proj)
 
@@ -326,14 +332,9 @@ class PostageStampMapPlotter(MapPlotter):
             # geometry contains them.
 
         # add a title
-        if ensemble_name.startswith("HadGEM3-GC3.05-r001i1p"):
-            ensemble_name = ensemble_name.split("HadGEM3-GC3.05-r001i1p")[1]
-        elif ensemble_name.startswith("HadREM3-GA705-r001i1p"):
-            ensemble_name = ensemble_name.split("HadREM3-GA705-r001i1p")[1]
-        elif ensemble_name.startswith("HadREM3-RA11M-r001i1p"):
-            ensemble_name = ensemble_name.split("HadREM3-RA11M-r001i1p")[1]
-        elif ensemble_name.endswith("-r1i1p1"):
-            ensemble_name = ensemble_name.split("-r1i1p1")[0]
+        ensemble_name = self.vocab.get_collection_term_label(
+            CV_Type.ENSEMBLE_SHORT_NAME, ensemble_no
+        )
         ax.set_title(ensemble_name, fontdict={"fontsize": title_font_size})
 
         return result

@@ -3,7 +3,7 @@ from os import path
 import cartopy.crs as ccrs
 
 
-VERSION = "2.7.0"
+VERSION = "2.8.0"
 
 
 def enum(**named_values):
@@ -158,6 +158,8 @@ CONTOUR_FILL = ["#D3D3D3", "#9E9E9E", "#6C6C6C"]
 OVERLAY_COLOUR = "black"
 OVERLAY_LINE_WIDTH = 0.3
 
+COLOUR_RANGE_STARTS_AT_ZERO = ["groundfrost", "snowLying", "sun"]
+
 ROOT_DIR = path.dirname(path.dirname(path.abspath(__file__)))
 
 LOGO_SMALL = path.join(
@@ -202,7 +204,7 @@ PDF_LABEL = "Relative probability"
 DATA_DIR = "/badc/ukcp18/data"
 DATA_SERVICE_URL = "http://data.ceda.ac.uk"
 
-HADUK_DIR = "/badc/ukmo-hadobs/data/insitu/MOHC/HadOBS/HadUK-Grid/v1.0.3.0"
+HADUK_DIR = "/badc/ukmo-hadobs/data/insitu/MOHC/HadOBS/HadUK-Grid/v1.1.0.0"
 
 # Area types
 AreaType = enum(

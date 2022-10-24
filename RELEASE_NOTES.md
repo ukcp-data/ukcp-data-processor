@@ -1,3 +1,10 @@
+# Release 2.8.0
+
+This release addresses:
+
+* Add support for HadUK Grid daily processes
+
+
 # Release 2.7.0
 
 This release addresses:

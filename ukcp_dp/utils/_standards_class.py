@@ -929,7 +929,7 @@ UKCP_GROUND_FROST.tag = "UKCP_groundfrost"
 UKCP_GROUND_FROST.default_barlabel = "Days of ground frost, days"
 UKCP_GROUND_FROST.preferred_unit = cf_units.Unit("1.0")
 UKCP_GROUND_FROST.extendcolbar = "neither"
-UKCP_GROUND_FROST.cpal = "Blues"
+UKCP_GROUND_FROST.cpal = "RdBu"
 UKCP_GROUND_FROST.vmid = None
 
 # Days of snow lying
@@ -938,7 +938,7 @@ UKCP_SNOW_LYING.tag = "UKCP_snowLying"
 UKCP_SNOW_LYING.default_barlabel = "Days of snow lying, days"
 UKCP_SNOW_LYING.preferred_unit = cf_units.Unit("1.0")
 UKCP_SNOW_LYING.extendcolbar = "neither"
-UKCP_SNOW_LYING.cpal = "Blues"
+UKCP_SNOW_LYING.cpal = "UKCP_WhBl"
 UKCP_SNOW_LYING.vmid = None
 
 # Sunshine hours
@@ -947,7 +947,7 @@ UKCP_SUN.tag = "UKCP_sun"
 UKCP_SUN.default_barlabel = "Sunshine, hours"
 UKCP_SUN.preferred_unit = cf_units.Unit("hr")
 UKCP_SUN.extendcolbar = "neither"
-UKCP_SUN.cpal = "Blues"
+UKCP_SUN.cpal = "UKCP_GyOr"
 UKCP_SUN.vmid = None
 
 # Vapour pressure (hPa)
@@ -956,5 +956,5 @@ UKCP_VAPOUR_PRESSURE.tag = "UKCP_pv"
 UKCP_VAPOUR_PRESSURE.default_barlabel = "Vapour pressure, hPa"
 UKCP_VAPOUR_PRESSURE.preferred_unit = cf_units.Unit("hPa")
 UKCP_VAPOUR_PRESSURE.extendcolbar = "neither"
-UKCP_VAPOUR_PRESSURE.cpal = "Blues"
+UKCP_VAPOUR_PRESSURE.cpal = "PuOr"
 UKCP_VAPOUR_PRESSURE.vmid = None
