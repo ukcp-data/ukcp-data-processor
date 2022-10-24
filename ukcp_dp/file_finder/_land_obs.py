@@ -147,7 +147,7 @@ def _get_date_ranges(input_data, variable):
     if input_data.get_value(InputType.TIME_SLICE_TYPE) == "30y":
         return ["196101-199012", "198101-201012"]
 
-    end_year = "2020"
+    end_year = "2021"
 
     if variable in ["tas", "tasmax", "tasmin"]:
         start_year = "1884"
