@@ -150,9 +150,15 @@ def _get_date_ranges(input_data, variable):
     end_year = "2021"
 
     if variable in ["tas", "tasmax", "tasmin"]:
-        start_year = "1884"
+        if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == "day":
+            start_year = "1960"
+        else:
+            start_year = "1884"
     if variable == "rainfall":
-        start_year = "1862"
+        if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == "day":
+            start_year = "1891"
+        else:
+            start_year = "1862"
     if variable == "sun":
         start_year = "1919"
     if variable == "sfcWind":
@@ -161,5 +167,8 @@ def _get_date_ranges(input_data, variable):
         start_year = "1961"
     if variable == "snowLying":
         start_year = "1971"
+
+    if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == "day":
+        return [f"{start_year}0101-{end_year}1231"]
 
     return [f"{start_year}01-{end_year}12"]
