@@ -39,7 +39,9 @@ def get_ls6_test_bbox():
 
 
 def get_ls6_test_bbox_ann():
-    data, _, variable = get_ls6_test_bbox()
+    data, _, _ = get_ls6_test_bbox()
+    variable = "sun"
+    data[InputType.VARIABLE] = variable
 
     # temporal options
     data[InputType.TIME_PERIOD] = "ann"
@@ -49,7 +51,7 @@ def get_ls6_test_bbox_ann():
         [
             path.join(
                 HADUK_DIR,
-                "12km/tasmax/ann/latest/tasmax_hadukgrid_uk_12km_ann_201801-201812.nc",
+                "12km/sun/ann/latest/sun_hadukgrid_uk_12km_ann_201801-201812.nc",
             )
         ]
     ]
@@ -140,7 +142,7 @@ def get_ls6_test_region():
         [
             path.join(
                 HADUK_DIR,
-                "region/tasmax/mon/latest/tasmax_hadukgrid_uk_region_mon_188401-202012.nc",
+                "region/tasmax/mon/latest/tasmax_hadukgrid_uk_region_mon_188401-202112.nc",
             )
         ]
     ]
@@ -164,8 +166,148 @@ def get_ls6_test_river():
         [
             path.join(
                 HADUK_DIR,
-                "river/rainfall/mon/latest/rainfall_hadukgrid_uk_river_mon_186201-202012.nc",
+                "river/rainfall/mon/latest/rainfall_hadukgrid_uk_river_mon_186201-202112.nc",
             )
+        ]
+    ]
+
+    return data, expected_file_lists, variable
+
+
+def get_ls6_test_country():
+    data, _, _ = get_ls6_test_region()
+    variable = "sun"
+    data[InputType.AREA] = "country|England"
+    data[InputType.SPATIAL_REPRESENTATION] = "country"
+    data[InputType.VARIABLE] = variable
+
+    # temporal options
+    del data[InputType.YEAR]
+    data[InputType.YEAR_MINIMUM] = 1980
+    data[InputType.YEAR_MAXIMUM] = 1981
+
+    expected_file_lists = [
+        [
+            path.join(
+                HADUK_DIR,
+                "country/sun/mon/latest/sun_hadukgrid_uk_country_mon_191901-202112.nc",
+            )
+        ]
+    ]
+
+    return data, expected_file_lists, variable
+
+
+def get_ls6_test_region_daily():
+    data, _, variable = get_ls6_test_region()
+    data[InputType.VARIABLE] = variable
+
+    # temporal options
+    data[InputType.TIME_PERIOD] = "day"
+    data[InputType.TEMPORAL_AVERAGE_TYPE] = "day"
+    data[InputType.YEAR] = 2018
+
+    # image options
+    data[InputType.FONT_SIZE] = "m"
+    data[InputType.IMAGE_SIZE] = 1200
+
+    expected_file_lists = [
+        [
+            path.join(
+                HADUK_DIR,
+                "region/tasmax/day/latest/tasmax_hadukgrid_uk_region_day_19600101-20211231.nc",
+            )
+        ]
+    ]
+
+    return data, expected_file_lists, variable
+
+
+def get_ls6_test_river_daily():
+    data, _, variable = get_ls6_test_river()
+    data[InputType.VARIABLE] = variable
+
+    # temporal options
+    data[InputType.TIME_PERIOD] = "day"
+    data[InputType.TEMPORAL_AVERAGE_TYPE] = "day"
+
+    expected_file_lists = [
+        [
+            path.join(
+                HADUK_DIR,
+                "river/rainfall/day/latest/rainfall_hadukgrid_uk_river_day_18910101-20211231.nc",
+            )
+        ]
+    ]
+
+    return data, expected_file_lists, variable
+
+
+def get_ls6_test_point():
+    data, _, variable = get_ls6_test_bbox()
+
+    data[InputType.AREA] = ["point", 437500.0, 337500.0]
+
+    # temporal options
+    data[InputType.TIME_PERIOD] = "day"
+    data[InputType.TEMPORAL_AVERAGE_TYPE] = "day"
+    del data[InputType.YEAR]
+    data[InputType.YEAR_MINIMUM] = 2018
+    data[InputType.YEAR_MAXIMUM] = 2018
+    # image options
+    data[InputType.FONT_SIZE] = "m"
+    data[InputType.IMAGE_SIZE] = 1200
+
+    expected_file_lists = [
+        [
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20180101-20180131.nc",
+            ),
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20180201-20180228.nc",
+            ),
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20180301-20180331.nc",
+            ),
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20180401-20180430.nc",
+            ),
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20180501-20180531.nc",
+            ),
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20180601-20180630.nc",
+            ),
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20180701-20180731.nc",
+            ),
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20180801-20180831.nc",
+            ),
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20180901-20180930.nc",
+            ),
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20181001-20181031.nc",
+            ),
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20181101-20181130.nc",
+            ),
+            path.join(
+                HADUK_DIR,
+                "12km/tasmax/day/latest/tasmax_hadukgrid_uk_12km_day_20181201-20181231.nc",
+            ),
         ]
     ]
 
@@ -188,6 +330,10 @@ class LandObsFileFinderTestCase(unittest.TestCase):
             (get_ls6_test_bbox_mon()),
             (get_ls6_test_region()),
             (get_ls6_test_river()),
+            (get_ls6_test_country()),
+            (get_ls6_test_region_daily()),
+            (get_ls6_test_river_daily()),
+            (get_ls6_test_point()),
         ]
 
         for data, expected_file_lists, variable in inputs:
