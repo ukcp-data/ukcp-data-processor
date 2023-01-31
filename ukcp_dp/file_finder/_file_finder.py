@@ -198,7 +198,7 @@ def _get_file_list_per_scenario(
             input_data.get_value(InputType.COLLECTION) == COLLECTION_MARINE
             and input_data.get_value(InputType.METHOD) in MARINE_SHAPE_FILES
         ):
-            file_name = _get_marine_file_name(input_data)
+            file_name = _get_marine_file_name(input_data, scenario, variable)
             file_list_per_data_type.append([os.path.join(file_path, file_name)])
 
         elif (
@@ -387,12 +387,12 @@ def _get_prob_file_name(
     return file_name
 
 
-def _get_marine_file_name(input_data):
+def _get_marine_file_name(input_data, scenario, variable):
     file_name = (
-        f"{input_data.get_value(InputType.VARIABLE)}_"
+        f"{variable}_"
         f"{input_data.get_value(InputType.COLLECTION)}_"
         f"{input_data.get_value(InputType.METHOD)}_"
-        f"{input_data.get_value(InputType.SCENARIO)}_"
+        f"{scenario}_"
         "future_"
         f"{input_data.get_value(InputType.YEAR)}.zip"
     )
