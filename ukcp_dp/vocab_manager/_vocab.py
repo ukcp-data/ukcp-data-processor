@@ -134,6 +134,8 @@ class Vocab:
             "msl-proj-expl": "Extended projections",
             "return-periods": "21st century projections",
             "return-periods-ext": "Extended projections",
+            "return-periods-shp": "21st century projections, data in shapefiles",
+            "return-periods-ext-shp": "Extended projections, data in shapefiles",
         },
         "order_by_mean": {True: "True", False: "False"},
         "overlay_probability_levels": {True: "True", False: "False"},
