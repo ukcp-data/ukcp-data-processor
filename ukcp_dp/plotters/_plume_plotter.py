@@ -101,7 +101,7 @@ class PlumePlotter(GraphPlotter):
         ) == COLLECTION_MARINE and self.input_data.get_value(
             InputType.METHOD
         ).startswith(
-            "return-periods"
+            RETURN_PERIODS
         ):
             # add axis labels
             plt.xlabel("Return period (years)")

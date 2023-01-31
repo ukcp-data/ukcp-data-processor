@@ -193,7 +193,8 @@ OTHER_MAX_YEAR = 2101
 
 # Marine data stuff
 RETURN_PERIODS = "return-periods"
-EXTENDED_PROJECTIONS = ["msl-proj-expl", "return-periods-ext"]
+EXTENDED_PROJECTIONS = ["msl-proj-expl", "return-periods-ext", "return-periods-ext-shp"]
+MARINE_SHAPE_FILES = ["return-periods-shp", "return-periods-ext-shp"]
 
 # Derived data stuff
 GWL = ["gwl2", "gwl4"]
