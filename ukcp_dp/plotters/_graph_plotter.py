@@ -108,4 +108,4 @@ class GraphPlotter(BasePlotter):
         Get the maximum value in a time series cube.
 
         """
-        cube.collapsed("time", iris.analysis.MAX).data.item()
+        return cube.collapsed(["time"], iris.analysis.MAX).data.item()
