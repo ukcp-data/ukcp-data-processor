@@ -166,7 +166,7 @@ def get_ls6_test_river():
         [
             path.join(
                 HADUK_DIR,
-                "river/rainfall/mon/latest/rainfall_hadukgrid_uk_river_mon_186201-202112.nc",
+                "river/rainfall/mon/latest/rainfall_hadukgrid_uk_river_mon_183601-202112.nc",
             )
         ]
     ]
