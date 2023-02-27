@@ -152,7 +152,9 @@ class PlumeCsvWriter(BaseCsvWriter):
         data = cube.data[:]
         coords = cube.coord("return_period")[:]
         for period in range(0, data.shape[0]):
-            value = value_to_string(data[period])
+            value = value_to_string(
+                data[period], self.input_data.get_value(InputType.VARIABLE)[0]
+            )
             time_str = int(round(coords[period].cell(0).point))
             try:
                 self.data_dict[time_str].append(value)
