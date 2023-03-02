@@ -192,9 +192,9 @@ COLLECTION_DERIVED_GWL_MAX_YEAR = 3051
 OTHER_MAX_YEAR = 2101
 
 # Marine data stuff
-RETURN_PERIODS = "return-periods"
-EXTENDED_PROJECTIONS = ["msl-proj-expl", "return-periods-ext", "return-periods-ext-shp"]
-MARINE_SHAPE_FILES = ["return-periods-shp", "return-periods-ext-shp"]
+EXTREME_SEA_LEVEL = "ext-sea-lev"
+EXTENDED_PROJECTIONS = ["msl-proj-expl", "ext-sea-lev-expl", "ext-sea-lev-expl-shp"]
+MARINE_SHAPE_FILES = ["ext-sea-lev-shp", "ext-sea-lev-expl-shp"]
 
 # Derived data stuff
 GWL = ["gwl2", "gwl4"]

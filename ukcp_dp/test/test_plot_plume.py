@@ -225,7 +225,7 @@ def get_ms4_test_gauge_point_data():
     data[InputType.LEGEND_POSITION] = 2
 
     # process constants
-    data[InputType.METHOD] = "return-periods"
+    data[InputType.METHOD] = "ext-sea-lev"
     data[InputType.DATA_TYPE] = "percentile"
 
     base_path = path.abspath(path.dirname(__file__))
