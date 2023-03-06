@@ -18,7 +18,7 @@ from ukcp_dp.constants import (
     ENSEMBLE_LOWLIGHT,
     PERCENTILE_LINE_COLOUR,
     PERCENTILE_FILL,
-    RETURN_PERIODS,
+    EXTREME_SEA_LEVEL,
     InputType,
     SCENARIO_COLOURS,
     SCENARIO_GREYSCALES,
@@ -101,7 +101,7 @@ class PlumePlotter(GraphPlotter):
         ) == COLLECTION_MARINE and self.input_data.get_value(
             InputType.METHOD
         ).startswith(
-            "return-periods"
+            EXTREME_SEA_LEVEL
         ):
             # add axis labels
             plt.xlabel("Return period (years)")
@@ -132,7 +132,7 @@ class PlumePlotter(GraphPlotter):
         ) == COLLECTION_MARINE and self.input_data.get_value(
             InputType.METHOD
         ).startswith(
-            RETURN_PERIODS
+            EXTREME_SEA_LEVEL
         ):
             t_points = _get_return_periods(cube, "percentile")
         else:
@@ -143,7 +143,7 @@ class PlumePlotter(GraphPlotter):
 
         if (
             self.input_data.get_value(InputType.COLLECTION) == COLLECTION_MARINE
-            and self.input_data.get_value(InputType.METHOD).startswith(RETURN_PERIODS)
+            and self.input_data.get_value(InputType.METHOD).startswith(EXTREME_SEA_LEVEL)
         ) or is_overlay:
             self._single_fill(cube, ax, t_points, is_overlay)
         else:
@@ -162,7 +162,7 @@ class PlumePlotter(GraphPlotter):
         ) == COLLECTION_MARINE and self.input_data.get_value(
             InputType.METHOD
         ).startswith(
-            RETURN_PERIODS
+            EXTREME_SEA_LEVEL
         ):
             ax.plot(
                 t_points,

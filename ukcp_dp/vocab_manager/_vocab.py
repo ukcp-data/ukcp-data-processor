@@ -132,8 +132,9 @@ class Vocab:
         "method": {
             "msl-proj": "21st century projections",
             "msl-proj-expl": "Extended projections",
-            "return-periods": "21st century projections",
-            "return-periods-ext": "Extended projections",
+            "ext-sea-lev-expl": "Extended projections",
+            "ext-sea-lev-shp": "21st century projections, data in shapefiles",
+            "ext-sea-lev-expl-shp": "Extended projections, data in shapefiles",
         },
         "order_by_mean": {True: "True", False: "False"},
         "overlay_probability_levels": {True: "True", False: "False"},
@@ -212,11 +213,11 @@ class Vocab:
     def __init__(self):
         self.vocab = self.VOCAB
         self.vocab["plot_title"] = None
-        self.vocab["year"] = _get_range(1862, 2301)
+        self.vocab["year"] = _get_range(1836, 2301)
         self.vocab["year"].update(_get_range(3001, 3051))
-        self.vocab["year_minimum"] = _get_range(1862, 2302)
+        self.vocab["year_minimum"] = _get_range(1836, 2302)
         self.vocab["year_minimum"].update(_get_range(3001, 3052))
-        self.vocab["year_maximum"] = _get_range(1862, 2302)
+        self.vocab["year_maximum"] = _get_range(1836, 2302)
         self.vocab["year_maximum"].update(_get_range(3001, 3052))
         self.vocab["sampling_id"] = _get_range(1, 4001)
         self.vocab["random_sampling_count"] = _get_range(100, 4001)

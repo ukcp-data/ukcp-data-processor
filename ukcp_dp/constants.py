@@ -175,7 +175,7 @@ LOGO_LARGE = path.join(
 TEMP_ANOMS = ["tasAnom", "tasmaxAnom", "tasminAnom"]
 
 COLLECTION_OBS = "land-obs"
-COLLECTION_OBS_MIN_YEAR = 1862
+COLLECTION_OBS_MIN_YEAR = 1836
 COLLECTION_PROB = "land-prob"
 COLLECTION_PROB_MIN_YEAR = 1961
 COLLECTION_CPM = "land-cpm"
@@ -192,8 +192,9 @@ COLLECTION_DERIVED_GWL_MAX_YEAR = 3051
 OTHER_MAX_YEAR = 2101
 
 # Marine data stuff
-RETURN_PERIODS = "return-periods"
-EXTENDED_PROJECTIONS = ["msl-proj-expl", "return-periods-ext"]
+EXTREME_SEA_LEVEL = "ext-sea-lev"
+EXTENDED_PROJECTIONS = ["msl-proj-expl", "ext-sea-lev-expl", "ext-sea-lev-expl-shp"]
+MARINE_SHAPE_FILES = ["ext-sea-lev-shp", "ext-sea-lev-expl-shp"]
 
 # Derived data stuff
 GWL = ["gwl2", "gwl4"]

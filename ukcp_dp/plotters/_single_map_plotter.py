@@ -58,6 +58,12 @@ class SingleMapPlotter(MapPlotter):
                 # special case
                 # Position of the colour-bar Axes: [left,bottom, width,height]
                 plot_settings.bar_position = [0.25, 0.08, 0.2, 0.025]
+
+            elif plot_settings.vrange[1] > 999 and plot_settings.vstep == 0.25:
+                # We have 6+ digits so we need a wider bar
+                # Position of the colour-bar Axes: [left,bottom, width,height]
+                plot_settings.bar_position = [0.15, 0.08, 0.7, 0.025]
+
             else:
                 # Position of the colour-bar Axes: [left,bottom, width,height]
                 plot_settings.bar_position = [0.25, 0.08, 0.5, 0.025]

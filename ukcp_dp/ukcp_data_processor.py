@@ -8,7 +8,8 @@ the entry point for this package.
 """
 
 from ukcp_dp._input_data import InputData
-from ukcp_dp.constants import COLLECTION_PROB, InputType, VERSION
+from ukcp_dp.constants import COLLECTION_PROB, InputType, VERSION,\
+    COLLECTION_MARINE
 from ukcp_dp.data_extractor import DataExtractor
 from ukcp_dp.file_finder import get_absolute_paths, get_file_lists
 from ukcp_dp.file_writers import write_file
@@ -75,6 +76,21 @@ class UKCPDataProcessor:
         self.validated = True
 
         return True
+
+    def select_files(self):
+        """
+        Use the data set by 'set_inputs' to generate a list of files.
+
+        In general this method should not be called, instead call select_data()
+
+        @return a list of file paths of the files containing the selected data
+        """
+        if self.validated is False:
+            self.validate_inputs()
+
+        file_lists = get_file_lists(self.input_data)
+
+        return get_absolute_paths(file_lists)
 
     def select_data(self):
         """

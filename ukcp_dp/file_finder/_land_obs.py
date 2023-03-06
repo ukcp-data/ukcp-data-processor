@@ -158,7 +158,7 @@ def _get_date_ranges(input_data, variable):
         if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == "day":
             start_year = "1891"
         else:
-            start_year = "1862"
+            start_year = "1836"
     if variable == "sun":
         start_year = "1919"
     if variable == "sfcWind":

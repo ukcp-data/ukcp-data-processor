@@ -2,7 +2,7 @@ header length,10
 Area,50.83 -1.08
 Data Source,Marine simulations
 Data Type,percentile
-Method,21st century projections
+Method,Extended projections
 Scenario,RCP 4.5
 Software Version,0.0.0TEST
 Variable,Still water return level (m)

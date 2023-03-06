@@ -18,6 +18,7 @@ from ukcp_dp.constants import (
     COLLECTION_RCM_GWL,
     COLLECTION_MARINE,
     InputType,
+    MARINE_SHAPE_FILES,
     OTHER_MAX_YEAR,
     AreaType,
     TemporalAverageType,
@@ -194,6 +195,13 @@ def _get_file_list_per_scenario(
         )
 
         if (
+            input_data.get_value(InputType.COLLECTION) == COLLECTION_MARINE
+            and input_data.get_value(InputType.METHOD) in MARINE_SHAPE_FILES
+        ):
+            file_name = _get_marine_file_name(input_data, scenario, variable)
+            file_list_per_data_type.append([os.path.join(file_path, file_name)])
+
+        elif (
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
             == TemporalAverageType.ANNUAL
             or spatial_representation != "25km"
@@ -376,6 +384,18 @@ def _get_prob_file_name(
             )
         )
 
+    return file_name
+
+
+def _get_marine_file_name(input_data, scenario, variable):
+    file_name = (
+        f"{variable}_"
+        f"{input_data.get_value(InputType.COLLECTION)}_"
+        f"{input_data.get_value(InputType.METHOD)}_"
+        f"{scenario}_"
+        "future_"
+        f"{input_data.get_value(InputType.YEAR)}.zip"
+    )
     return file_name
 
 

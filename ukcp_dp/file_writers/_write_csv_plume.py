@@ -7,7 +7,7 @@ import logging
 
 import iris
 from ukcp_dp.constants import COLLECTION_MARINE, COLLECTION_OBS, COLLECTION_PROB
-from ukcp_dp.constants import InputType, RETURN_PERIODS
+from ukcp_dp.constants import InputType, EXTREME_SEA_LEVEL
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
 
 
@@ -33,7 +33,7 @@ class PlumeCsvWriter(BaseCsvWriter):
         ) == COLLECTION_MARINE and self.input_data.get_value(
             InputType.METHOD
         ).startswith(
-            RETURN_PERIODS
+            EXTREME_SEA_LEVEL
         ):
             self.header.append("Return period(years)")
         else:
@@ -138,7 +138,7 @@ class PlumeCsvWriter(BaseCsvWriter):
         ) == COLLECTION_MARINE and self.input_data.get_value(
             InputType.METHOD
         ).startswith(
-            RETURN_PERIODS
+            EXTREME_SEA_LEVEL
         ):
             self._read_returnlevel_cube(cube, key_list)
         else:
@@ -152,7 +152,9 @@ class PlumeCsvWriter(BaseCsvWriter):
         data = cube.data[:]
         coords = cube.coord("return_period")[:]
         for period in range(0, data.shape[0]):
-            value = value_to_string(data[period])
+            value = value_to_string(
+                data[period], self.input_data.get_value(InputType.VARIABLE)[0]
+            )
             time_str = int(round(coords[period].cell(0).point))
             try:
                 self.data_dict[time_str].append(value)

@@ -163,12 +163,21 @@ class BaseCsvWriter:
         return os.path.join(self.output_data_file_path, file_name)
 
 
-def value_to_string(value):
+def value_to_string(value, variable=None):
     """
-    Change the type of the given value to a string.
+    Format the value dependent on the contents of variable.
 
-    In the future it may be that we want to do something special, i.e. set the precision
-    of floats, set the precision according to variable etc.
+    The default operation is to return a string.
+
+    @param value(): the value to format
+    @param variable(str): the name of the variable that the value represents.
 
     """
+    if variable is None:
+        return str(value)
+
+    if variable == "extremeSeaLevel":
+        # The value is in metres and we want to the nearest mm
+        return str(round(value, 3))
+
     return str(value)

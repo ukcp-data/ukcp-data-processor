@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 
+import iris
 from matplotlib.transforms import Bbox
 
 import matplotlib.pyplot as plt
-from ukcp_dp.constants import InputType
+from ukcp_dp.constants import InputType, COLLECTION_OBS
 from ukcp_dp.plotters._base_plotter import BasePlotter
 from ukcp_dp.plotters.utils._plotting_utils import (
     end_figure,
@@ -18,7 +19,7 @@ class GraphPlotter(BasePlotter):
 
     This class extends BasePlotter with _generate_plot(self, output_path). This
     class should be extended with a _generate_graph(self) method to plot the
-    map.
+    graph.
     """
 
     def __init__(self, *args, **kwargs):
@@ -51,8 +52,17 @@ class GraphPlotter(BasePlotter):
         self._add_logo(fig)
 
         # Set the area below the title and allow room for the labels
-        # [[left, bottom], [right, top]]
-        fig.add_axes(Bbox([[0.11, 0.12], [0.95, 0.81]]))
+        if (
+            self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS
+            and self._get_max_data_value(self.cube_list[0]) > 999
+        ):
+            # We have 6+ digits so we need a bit more space
+            # [[left, bottom], [right, top]]
+            fig.add_axes(Bbox([[0.13, 0.12], [0.95, 0.81]]))
+        else:
+            # [[left, bottom], [right, top]]
+            fig.add_axes(Bbox([[0.11, 0.12], [0.95, 0.81]]))
+
         self._generate_graph()
 
         # Set the title width and tick label padding
@@ -92,3 +102,10 @@ class GraphPlotter(BasePlotter):
         This method should be overridden to produce the plots.
 
         """
+
+    def _get_max_data_value(self, cube):
+        """
+        Get the maximum value in a time series cube.
+
+        """
+        return cube.collapsed(["time"], iris.analysis.MAX).data.item()
