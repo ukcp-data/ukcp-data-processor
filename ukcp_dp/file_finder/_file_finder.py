@@ -605,11 +605,15 @@ def _get_cm_file_name(
             COLLECTION_DERIVED,
         ]:
             date_range = "200912-209911"
-        elif input_data.get_value(InputType.COLLECTION) == COLLECTION_CPM:
-            if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
-                date_range = "{}".format(year)
-            else:
-                return "*"
+        elif input_data.get_value(
+            InputType.COLLECTION
+        ) == COLLECTION_CPM and input_data.get_value(
+            InputType.TEMPORAL_AVERAGE_TYPE
+        ) in [
+            "1hr",
+            "3hr",
+        ]:
+            date_range = "{}".format(year)
         else:
             date_range = "200912-207911"
 
