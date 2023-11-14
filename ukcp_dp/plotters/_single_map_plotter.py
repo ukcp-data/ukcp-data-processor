@@ -9,6 +9,7 @@ import math
 import iris
 
 import matplotlib.gridspec as gridspec
+import numpy.ma as ma
 from ukcp_dp.constants import AreaType, InputType, COLOUR_RANGE_STARTS_AT_ZERO
 from ukcp_dp.plotters._map_plotter import MapPlotter
 from ukcp_dp.plotters.utils._map_utils import (
@@ -119,6 +120,7 @@ class SingleMapPlotter(MapPlotter):
                 iris.analysis.MAX,
             ).data.item()
         else:
+            cube.data = ma.masked_invalid(cube.data)
             cube_min = cube.collapsed(["region"], iris.analysis.MIN).data.item()
             cube_max = cube.collapsed(["region"], iris.analysis.MAX).data.item()
 
