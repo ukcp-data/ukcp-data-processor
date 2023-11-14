@@ -206,6 +206,7 @@ DATA_DIR = "/badc/ukcp18/data"
 DATA_SERVICE_URL = "http://data.ceda.ac.uk"
 
 HADUK_DIR = "/badc/ukmo-hadobs/data/insitu/MOHC/HadOBS/HadUK-Grid/v1.2.0.ceda"
+HADUK_END_YEAR = "2022"
 
 # Area types
 AreaType = enum(

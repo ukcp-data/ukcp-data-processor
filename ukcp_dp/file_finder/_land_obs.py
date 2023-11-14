@@ -6,7 +6,13 @@ from calendar import monthrange
 import logging
 import os
 
-from ukcp_dp.constants import HADUK_DIR, InputType, AreaType, TemporalAverageType
+from ukcp_dp.constants import (
+    HADUK_DIR,
+    HADUK_END_YEAR,
+    InputType,
+    AreaType,
+    TemporalAverageType,
+)
 
 
 LOG = logging.getLogger(__name__)
@@ -147,8 +153,6 @@ def _get_date_ranges(input_data, variable):
     if input_data.get_value(InputType.TIME_SLICE_TYPE) == "30y":
         return ["196101-199012", "198101-201012"]
 
-    end_year = "2021"
-
     if variable in ["tas", "tasmax", "tasmin"]:
         if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == "day":
             start_year = "1960"
@@ -169,6 +173,6 @@ def _get_date_ranges(input_data, variable):
         start_year = "1971"
 
     if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == "day":
-        return [f"{start_year}0101-{end_year}1231"]
+        return [f"{start_year}0101-{HADUK_END_YEAR}1231"]
 
-    return [f"{start_year}01-{end_year}12"]
+    return [f"{start_year}01-{HADUK_END_YEAR}12"]
