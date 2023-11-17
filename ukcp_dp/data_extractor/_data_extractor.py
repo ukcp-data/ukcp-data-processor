@@ -2,9 +2,11 @@
 This module contains the DataExtractor class.
 
 """
+import functools
 import glob
 import logging
 from os import path
+import signal
 
 import iris
 from iris.cube import CubeList
@@ -25,6 +27,7 @@ from ukcp_dp.constants import (
     COLLECTION_OBS,
     COLLECTION_RCM,
     COLLECTION_RCM_GWL,
+    IRIS_LOAD_TIMEOUT_SECONDS,
 )
 from ukcp_dp.data_extractor._utils import get_anomaly
 from ukcp_dp.exception import (
@@ -221,8 +224,14 @@ class DataExtractor:
         cubes = CubeList()
         try:
             for file_path in file_list:
+                LOG.debug(" - FILE: %s", file_path)
                 f_list = glob.glob(file_path)
-                cube_list = [iris.load_cube(f) for f in f_list]
+
+                cube_list = []
+                for nc_file in f_list:
+                    LOG.debug(" - file: %s", nc_file)
+                    cube_list.append(_load_cube(nc_file))
+                    LOG.debug(" - cube appended")
                 cubes.extend(cube_list)
 
         except IOError as ex:
@@ -777,3 +786,29 @@ def get_probability_levels(cube, extended_range):
         percentile_cubes.append(cube.extract(iris.Constraint(percentile=95)))
 
     return percentile_cubes.merge_cube()
+
+
+def timeout(seconds=10):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            def handle_timeout(signum, frame):
+                raise TimeoutError()
+
+            signal.signal(signal.SIGALRM, handle_timeout)
+            signal.alarm(seconds)
+            result = func(*args, **kwargs)
+            signal.alarm(0)
+            return result
+        return wrapper
+    return decorator
+
+
+@timeout(seconds=IRIS_LOAD_TIMEOUT_SECONDS)
+def _load_cube(filename):
+    try:
+        cube = iris.load_cube(filename)
+    except TimeoutError:
+        LOG.error(f"Timeout accessing {filename}")
+        raise UKCPDPDataNotFoundException("Timeout error accessing file")
+    return cube
