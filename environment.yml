@@ -93,9 +93,9 @@ dependencies:
   - pyqt=5.12.3
   - pyshp=2.1.0
   - pysocks=1.7.0
-  - python=3.7.6
+  - python=3.9.18
   - python-dateutil=2.8.0
-  - python_abi=3.7
+  - python_abi=3.9
   - pytz=2019.1
   - pyyaml=5.1
   - qt=5.12.5
