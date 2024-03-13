@@ -5,7 +5,7 @@ channels:
 dependencies:
   - dask
   - dask-core
-  - python=3.9.18
+  - python=3.9
   - pip:
     - matplotlib-label-lines==0.3.8
     - git+https://github.com/ukcp-data/UKCP18_CVs.git
