@@ -3,8 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - dask
-  - dask-core
+  - dask=1.2.2
   - python=3.9
   - pip:
     - matplotlib-label-lines==0.3.8
