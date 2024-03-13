@@ -2,8 +2,7 @@ name: ukcp-dp
 channels:
   - conda-forge
   - defaults
-dependencies:
-  - _libgcc_mutex=0.1=conda_forge
+dependencies:  - _libgcc_mutex=0.1
   - _openmp_mutex=4.5=2_gnu
   - antlr-python-runtime=4.11.1=pyhd8ed1ab_0
   - archspec=0.2.1=pyhd3eb1b0_0
@@ -29,7 +28,7 @@ dependencies:
   - bzip2=1.0.8=h7b6447c_0
   - c-ares=1.19.1=h5eee18b_0
   - ca-certificates=2024.2.2=hbcca054_0
-  - cachetools=5.3.3=pypi_0
+  - cachetools=5.3.3
   - cartopy=0.22.0=py39hddac248_1
   - certifi=2024.2.2=pyhd8ed1ab_0
   - cf-units=3.2.0=py39h44dd56e_4
@@ -61,14 +60,14 @@ dependencies:
   - geos=3.12.1=h59595ed_0
   - gflags=2.2.2=he1b5a44_1004
   - glog=0.6.0=h6f12383_0
-  - google-api-core=2.17.1=pypi_0
-  - google-api-python-client=2.122.0=pypi_0
-  - google-auth=2.28.2=pypi_0
-  - google-auth-httplib2=0.2.0=pypi_0
-  - googleapis-common-protos=1.63.0=pypi_0
+  - google-api-core=2.17.1
+  - google-api-python-client=2.122.0
+  - google-auth=2.28.2
+  - google-auth-httplib2=0.2.0
+  - googleapis-common-protos=1.63.0
   - hdf4=4.2.15=h501b40f_6
   - hdf5=1.14.0=nompi_hb72d44e_103
-  - httplib2=0.22.0=pypi_0
+  - httplib2=0.22.0
   - icu=73.1=h6a678d5_0
   - idna=3.4=py39h06a4308_0
   - importlib-metadata=7.0.2=pyha770c72_0
@@ -139,7 +138,7 @@ dependencies:
   - lz4-c=1.9.4=h6a678d5_0
   - markupsafe=2.1.5=py39hd1e30aa_0
   - matplotlib-base=3.8.3=py39he9076e7_0
-  - matplotlib-label-lines=0.3.8=pypi_0
+  - matplotlib-label-lines=0.3.8
   - menuinst=2.0.2=py39h06a4308_0
   - msgpack-python=1.0.7=py39h7633fee_0
   - munkres=1.1.4=pyh9f0ad1d_0
@@ -158,13 +157,13 @@ dependencies:
   - platformdirs=3.10.0=py39h06a4308_0
   - pluggy=1.0.0=py39h06a4308_1
   - proj=9.3.1=h1d62c97_0
-  - protobuf=4.25.3=pypi_0
+  - protobuf=4.25.3
   - psutil=5.9.8=py39hd1e30aa_0
   - pthread-stubs=0.4=h36c2ea0_1001
   - pyarrow=13.0.0=py39h6925388_8_cpu
   - pyarrow-hotfix=0.6=pyhd8ed1ab_0
-  - pyasn1=0.5.1=pypi_0
-  - pyasn1-modules=0.3.0=pypi_0
+  - pyasn1=0.5.1
+  - pyasn1-modules=0.3.0
   - pybind11-abi=4=hd3eb1b0_1
   - pycosat=0.6.6=py39h5eee18b_0
   - pycparser=2.21=pyhd3eb1b0_0
@@ -185,14 +184,14 @@ dependencies:
   - reproc=14.2.4=h295c915_1
   - reproc-cpp=14.2.4=h295c915_1
   - requests=2.31.0=py39h06a4308_1
-  - rsa=4.9=pypi_0
+  - rsa=4.9
   - ruamel.yaml=0.17.21=py39h5eee18b_0
   - ruamel.yaml.clib=0.2.6=py39h5eee18b_1
   - s2n=1.3.54=h06160fa_0
   - scipy=1.12.0=py39h474f0d3_2
   - setuptools=68.2.2=py39h06a4308_0
   - shapely=2.0.3=py39h6404dd3_0
-  - simplejson=3.19.2=pypi_0
+  - simplejson=3.19.2
   - six=1.16.0=pyh6c4a22f_0
   - snappy=1.1.10=h9fff704_0
   - sortedcontainers=2.4.0=pyhd8ed1ab_0
@@ -205,10 +204,10 @@ dependencies:
   - tzdata=2023d=h04d1e81_0
   - ucx=1.15.0=h9929b8b_6
   - udunits2=2.2.28=h40f5838_3
-  - ukcp-controlled-vocabularies=1.0.10=pypi_0
-  - ukcp-spatial-files=1.0.0=pypi_0
+  - ukcp-controlled-vocabularies=1.0.10
+  - ukcp-spatial-files=1.0.0
   - unicodedata2=15.1.0=py39hd1e30aa_0
-  - uritemplate=4.1.1=pypi_0
+  - uritemplate=4.1.1
   - urllib3=2.1.0=py39h06a4308_1
   - wheel=0.41.2=py39h06a4308_0
   - xorg-libxau=1.0.11=hd590300_0
