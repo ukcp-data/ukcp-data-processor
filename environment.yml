@@ -5,6 +5,7 @@ channels:
 dependencies:
   - cartopy
   - dask=2024.3.0
+  - iris
   - python=3.9
   - pip:
     - matplotlib-label-lines==0.3.8
