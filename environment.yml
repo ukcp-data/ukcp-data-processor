@@ -3,6 +3,8 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - dask=1.2.2
+  - dask-core=1.2.2
   - pip:
     - matplotlib-label-lines==0.3.8
     - git+https://github.com/ukcp-data/UKCP18_CVs.git
