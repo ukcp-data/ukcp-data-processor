@@ -139,7 +139,6 @@ dependencies:
   - lz4-c=1.9.4=h6a678d5_0
   - markupsafe=2.1.5=py39hd1e30aa_0
   - matplotlib-base=3.8.3=py39he9076e7_0
-  - matplotlib-label-lines=0.3.8
   - menuinst=2.0.2=py39h06a4308_0
   - msgpack-python=1.0.7=py39h7633fee_0
   - munkres=1.1.4=pyh9f0ad1d_0
