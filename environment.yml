@@ -86,7 +86,6 @@ dependencies:
   - lerc=4.0.0=h27087fc_0
   - libaec=1.1.2=h59595ed_1
   - libarchive=3.6.2=h6ac8c49_2
-  - libarrow=13.0.0=h75f0d2f_8_cpu
   - libblas=3.9.0=21_linux64_openblas
   - libbrotlicommon=1.1.0=hd590300_1
   - libbrotlidec=1.1.0=hd590300_1
@@ -155,7 +154,6 @@ dependencies:
   - platformdirs=3.10.0=py39h06a4308_0
   - pluggy=1.0.0=py39h06a4308_1
   - proj=9.3.1=h1d62c97_0
-  - protobuf=4.25.3
   - psutil=5.9.8=py39hd1e30aa_0
   - pthread-stubs=0.4=h36c2ea0_1001
   - pyarrow=13.0.0=py39h6925388_8_cpu
