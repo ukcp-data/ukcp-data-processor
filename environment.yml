@@ -2,7 +2,8 @@ name: ukcp-dp
 channels:
   - conda-forge
   - defaults
-dependencies:  - _libgcc_mutex=0.1
+dependencies:
+  - _libgcc_mutex=0.1
   - _openmp_mutex=4.5=2_gnu
   - antlr-python-runtime=4.11.1=pyhd8ed1ab_0
   - archspec=0.2.1=pyhd3eb1b0_0
