@@ -84,7 +84,6 @@ dependencies:
   - lcms2=2.15=h7f713cb_2
   - ld_impl_linux-64=2.38=h1181459_1
   - lerc=4.0.0=h27087fc_0
-  - libabseil=20230802.1=cxx17_h59595ed_0
   - libaec=1.1.2=h59595ed_1
   - libarchive=3.6.2=h6ac8c49_2
   - libarrow=13.0.0=h75f0d2f_8_cpu
