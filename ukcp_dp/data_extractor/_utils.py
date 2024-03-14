@@ -74,28 +74,28 @@ def get_anomaly(
         if temporal_average_type == TemporalAverageType.MONTHLY:
             try:
                 cube_absoute_period.remove_coord("year")
-            except iris.exceptions.CoordinateNotFoundError:
+            except CoordinateNotFoundError:
                 pass
             if collection == COLLECTION_CPM:
                 if variable == "wsgmax10m":
                     try:
                         cube_absoute_period.remove_coord("yyyymm")
-                    except iris.exceptions.CoordinateNotFoundError:
+                    except CoordinateNotFoundError:
                         pass
                 try:
                     cube_climatology_period.remove_coord("year")
-                except iris.exceptions.CoordinateNotFoundError:
+                except CoordinateNotFoundError:
                     pass
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
             try:
                 cube_absoute_period.remove_coord("month_number")
-            except iris.exceptions.CoordinateNotFoundError:
+            except CoordinateNotFoundError:
                 pass
             if collection == COLLECTION_CPM:
                 try:
                     cube_absoute_period.remove_coord("season_year")
-                except iris.exceptions.CoordinateNotFoundError:
+                except CoordinateNotFoundError:
                     pass
 
         if scenario[0] in GWL:
@@ -105,11 +105,11 @@ def get_anomaly(
             for param in ["latitude", "longitude"]:
                 try:
                     cube_absoute_period.remove_coord(param)
-                except iris.exceptions.CoordinateNotFoundError:
+                except CoordinateNotFoundError:
                     pass
                 try:
                     cube_climatology_period.remove_coord(param)
-                except iris.exceptions.CoordinateNotFoundError:
+                except CoordinateNotFoundError:
                     pass
 
         # now generate the anomaly
@@ -122,14 +122,14 @@ def get_anomaly(
             for coord in ["yyyymm", "month_number"]:
                 try:
                     cube_anomaly_period.remove_coord(coord)
-                except iris.exceptions.CoordinateNotFoundError:
+                except CoordinateNotFoundError:
                     pass
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
             for coord in ["year", "season"]:
                 try:
                     cube_anomaly_period.remove_coord(coord)
-                except iris.exceptions.CoordinateNotFoundError:
+                except CoordinateNotFoundError:
                     pass
 
         if time_period == "all":
