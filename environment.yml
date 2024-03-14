@@ -117,7 +117,6 @@ dependencies:
   - libnuma=2.0.16=h0b41bf4_1
   - libopenblas=0.3.26=pthreads_h413a1c8_0
   - libpng=1.6.43=h2797004_0
-  - libprotobuf=4.24.3=hf27288f_1
   - libsolv=0.7.24=he621ea3_0
   - libsqlite=3.45.2=h2797004_0
   - libssh2=1.10.0=hdbd6064_2
