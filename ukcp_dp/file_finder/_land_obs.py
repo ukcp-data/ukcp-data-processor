@@ -164,7 +164,7 @@ def _get_date_ranges(input_data, variable):
         else:
             start_year = "1836"
     if variable == "sun":
-        start_year = "1919"
+        start_year = "1910"
     if variable == "sfcWind":
         start_year = "1969"
     if variable in ["psl", "hurs", "pv", "groundfrost"]:
