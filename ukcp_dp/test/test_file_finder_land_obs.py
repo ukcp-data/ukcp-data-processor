@@ -142,7 +142,7 @@ def get_ls6_test_region():
         [
             path.join(
                 HADUK_DIR,
-                "region/tasmax/mon/latest/tasmax_hadukgrid_uk_region_mon_188401-202112.nc",
+                "region/tasmax/mon/latest/tasmax_hadukgrid_uk_region_mon_188401-202212.nc",
             )
         ]
     ]
@@ -166,7 +166,7 @@ def get_ls6_test_river():
         [
             path.join(
                 HADUK_DIR,
-                "river/rainfall/mon/latest/rainfall_hadukgrid_uk_river_mon_183601-202112.nc",
+                "river/rainfall/mon/latest/rainfall_hadukgrid_uk_river_mon_183601-202212.nc",
             )
         ]
     ]
@@ -190,7 +190,7 @@ def get_ls6_test_country():
         [
             path.join(
                 HADUK_DIR,
-                "country/sun/mon/latest/sun_hadukgrid_uk_country_mon_191901-202112.nc",
+                "country/sun/mon/latest/sun_hadukgrid_uk_country_mon_191001-202212.nc",
             )
         ]
     ]
@@ -215,7 +215,7 @@ def get_ls6_test_region_daily():
         [
             path.join(
                 HADUK_DIR,
-                "region/tasmax/day/latest/tasmax_hadukgrid_uk_region_day_19600101-20211231.nc",
+                "region/tasmax/day/latest/tasmax_hadukgrid_uk_region_day_19600101-20221231.nc",
             )
         ]
     ]
@@ -235,7 +235,7 @@ def get_ls6_test_river_daily():
         [
             path.join(
                 HADUK_DIR,
-                "river/rainfall/day/latest/rainfall_hadukgrid_uk_river_day_18910101-20211231.nc",
+                "river/rainfall/day/latest/rainfall_hadukgrid_uk_river_day_18910101-20221231.nc",
             )
         ]
     ]
