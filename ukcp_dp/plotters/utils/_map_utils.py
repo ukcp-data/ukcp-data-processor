@@ -814,7 +814,7 @@ def plot_choropleth_map(
         # np.arange can give inconsistent results
         # https://docs.scipy.org/doc/numpy/reference/generated/numpy.arange.html
         # so this is better:
-        nsteps = (vrange[1] - vrange[0]) / vstep
+        nsteps = int((vrange[1] - vrange[0]) / vstep)
         levels = np.linspace(vrange[0], vrange[1], num=nsteps + 1, endpoint=True)
 
         # Set up the colourmap:

@@ -8,8 +8,7 @@ the entry point for this package.
 """
 
 from ukcp_dp._input_data import InputData
-from ukcp_dp.constants import COLLECTION_PROB, InputType, VERSION,\
-    COLLECTION_MARINE
+from ukcp_dp.constants import COLLECTION_PROB, InputType, VERSION
 from ukcp_dp.data_extractor import DataExtractor
 from ukcp_dp.file_finder import get_absolute_paths, get_file_lists
 from ukcp_dp.file_writers import write_file
