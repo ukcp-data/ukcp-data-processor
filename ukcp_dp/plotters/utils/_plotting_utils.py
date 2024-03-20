@@ -159,7 +159,10 @@ def get_time_series(cube, slice_and_sel_coord):
     if tcoord.units.calendar is not None:
         tsteps = list(tcoord.units.num2date(tcoord.points))
 
-        if isinstance(tsteps[0], (dt.date, dt.datetime)):
+        if (
+            isinstance(tsteps[0], (dt.date, dt.datetime))
+            or tcoord.units.calendar == "standard"
+        ):
             tpoints = [
                 t.year
                 + t.timetuple().tm_yday / (366.0 if calendar.isleap(t.year) else 365.0)
