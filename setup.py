@@ -24,7 +24,7 @@ setup(
     url=GIT_REPO,
     packages=find_packages(),
     install_requires=reqs,
-    tests_require=["pytest"],
+    tests_require=["pytest", "pytest-cov", "nccmp"],
     classifiers=[
         "Development Status :: 2 - ???",
         "Intended Audience :: Developers",
