@@ -72,6 +72,7 @@ dependencies:
   - lerc=4.0.0=h27087fc_0
   - libabseil=20240116.1=cxx17_h59595ed_2
   - libaec=1.1.2=h59595ed_1
+  - libarchive
   - libarrow=15.0.1=h6bfc85a_2_cpu
   - libarrow-acero=15.0.1=h59595ed_2_cpu
   - libarrow-dataset=15.0.1=h59595ed_2_cpu
