@@ -36,6 +36,7 @@ jobs:
       run: |
         conda install pytest
         conda install pytest-cov
+        conda install nccmp
         pytest --verbose --cov=./ --cov-report xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2

@@ -1,4 +1,6 @@
 import difflib
+from filecmp import cmp
+import subprocess
 
 import iris
 
@@ -6,7 +8,6 @@ from ukcp_dp._input_data import InputData
 from ukcp_dp.constants import DataFormat
 from ukcp_dp.file_writers import write_file
 from ukcp_dp.vocab_manager import Vocab
-from filecmp import cmp
 
 
 def run_write_test(
