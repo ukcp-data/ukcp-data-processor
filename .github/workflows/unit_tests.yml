@@ -25,6 +25,7 @@ jobs:
         conda env update --file environment.yml --name base
         pip freeze
         conda list -e
+        conda list
     - name: Lint with flake8
       run: |
         conda install flake8
