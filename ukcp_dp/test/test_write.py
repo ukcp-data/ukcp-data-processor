@@ -47,58 +47,50 @@ def run_write_test(
         vocab=vocab,
     )
 
-    if data_format == DataFormat.CSV:
-        read_param = "r"
-
-    else:
-        read_param = "rb"
-
     diff = ""
     for inx, reference_file_name in enumerate(reference_files):
         if data_format == DataFormat.CSV:
-            with open(
-                output_files[output_file_index[inx]], read_param
-            ) as generated_file:
-                with open(reference_file_name, read_param) as reference_file:
-
-                    if data_format == DataFormat.CSV:
-                        # Find and print the diff:
-                        for line in difflib.unified_diff(
-                            reference_file.readlines(),
-                            generated_file.readlines(),
-                            fromfile=reference_file_name,
-                            tofile=output_files[output_file_index[inx]],
-                            lineterm="",
-                        ):
-                            diff += line
-                    else:
-                        differ = difflib.Differ()
-                        try:
-                            for line in list(
-                                differ.compare(
-                                    reference_file.readlines(),
-                                    generated_file.readlines(),
-                                )
-                            ):
-                                if line.startswith("+ ") or line.startswith("- "):
-                                    diff += line
-                        except TypeError:
-                            diff += (
-                                f"ERROR comparing {reference_file_name} and "
-                                "{output_files[output_file_index[inx]]}"
-                            )
-        else:
-            result = cmp(
-                output_files[output_file_index[inx]], reference_file_name, shallow=False
+            diff = _cmp_csv_files(
+                diff, output_files[output_file_index[inx]], reference_file_name
             )
-            if result is False:
-                print(
-                    f"Files differ: {output_files[output_file_index[inx]]}, "
-                    f"{reference_file_name}\n"
-                )
-                diff += (
-                    f"Files differ: {output_files[output_file_index[inx]]}, "
-                    f"{reference_file_name}\n"
-                )
+        elif data_format == DataFormat.NET_CDF:
+            diff = _check_nc_files(
+                diff, output_files[output_file_index[inx]], reference_file_name
+            )
+        else:
+            diff = _check_shp_files(
+                diff, output_files[output_file_index[inx]], reference_file_name
+            )
+    return diff
 
+
+def _cmp_csv_files(diff, output_file, reference_file_name):
+    with open(output_file, "r") as generated_file:
+        with open(reference_file_name, "r") as reference_file:
+
+            # Find and print the diff:
+            for line in difflib.unified_diff(
+                reference_file.readlines(),
+                generated_file.readlines(),
+                fromfile=reference_file_name,
+                tofile=output_file,
+                lineterm="",
+            ):
+                diff += line
+    return diff
+
+
+def _check_nc_files(diff, output_file, reference_file_name):
+    result = subprocess.run(["nccmp", "-dmgf", output_file, reference_file_name])
+    if result.returncode > 0:
+        print(f"Files differ: {output_file}, " f"{reference_file_name}\n")
+        diff += f"Files differ: {output_file}, " f"{reference_file_name}\n"
+    return diff
+
+
+def _check_shp_files(diff, output_file, reference_file_name):
+    result = cmp(output_file, reference_file_name, shallow=False)
+    if result is False:
+        print(f"Files differ: {output_file}, " f"{reference_file_name}\n")
+        diff += f"Files differ: {output_file}, " f"{reference_file_name}\n"
     return diff
