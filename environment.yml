@@ -8,6 +8,7 @@ dependencies:
   - cftime
   - dask=2024.3.0
   - matplotlib-base
+  - pip
   - python=3.9.18
   - pip:
     - matplotlib-label-lines==0.7.0
