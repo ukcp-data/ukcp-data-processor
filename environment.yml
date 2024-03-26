@@ -1,7 +1,7 @@
 name: ukcp-dp
 channels:
   - conda-forge
-  - default
+  - defaults
 dependencies:
   - cartopy
   - cf-units
