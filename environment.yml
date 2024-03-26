@@ -7,6 +7,7 @@ dependencies:
   - cf-units
   - cftime
   - dask=2024.3.0
+  - iris=3.8.1
   - matplotlib-base
   - pip
   - python=3.9.18
