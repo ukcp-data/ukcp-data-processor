@@ -35,6 +35,7 @@ jobs:
         conda install pytest
         conda install pytest-cov
         conda install conda-forge::nccmp
+        pip install ImageHash
         pytest --verbose --cov=./ --cov-report xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v2
