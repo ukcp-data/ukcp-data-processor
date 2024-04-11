@@ -20,6 +20,7 @@ InputType = enum(
     DATA_TYPE="data_type",
     ENSEMBLE="ensemble",
     FONT_SIZE="font_size",
+    GWL="gwl",
     HIGHLIGHTED_ENSEMBLE_MEMBERS="highlighted_ensemble_members",
     IMAGE_FORMAT="image_format",
     IMAGE_SIZE="image_size",
@@ -65,6 +66,7 @@ INPUT_TYPES_SINGLE_VALUE = [
     InputType.DATA_FORMAT,
     InputType.COLLECTION,
     InputType.FONT_SIZE,
+    InputType.GWL,
     InputType.IMAGE_FORMAT,
     InputType.IMAGE_SIZE,
     InputType.LEGEND_POSITION,
@@ -106,24 +108,6 @@ INPUT_TYPES.append(InputType.AREA)
 INPUT_TYPES.append(InputType.PLOT_TITLE)
 INPUT_TYPES.append(InputType.Y_AXIS_MAX)
 INPUT_TYPES.append(InputType.Y_AXIS_MIN)
-
-DATA_SELECTION_TYPES = [
-    InputType.BASELINE,
-    InputType.COLLECTION,
-    InputType.DATA_TYPE,
-    InputType.ENSEMBLE,
-    InputType.METHOD,
-    InputType.OVERLAY_PROBABILITY_LEVELS,
-    InputType.RETURN_PERIOD,
-    InputType.SCENARIO,
-    InputType.SPATIAL_REPRESENTATION,
-    InputType.TEMPORAL_AVERAGE_TYPE,
-    InputType.TIME_PERIOD,
-    InputType.VARIABLE,
-    InputType.YEAR,
-    InputType.YEAR_MINIMUM,
-    InputType.YEAR_MAXIMUM,
-]
 
 IRIS_LOAD_TIMEOUT_SECONDS = 300
 
