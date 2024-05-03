@@ -11,6 +11,7 @@ import signal
 import iris
 from iris.cube import CubeList
 import iris.experimental.equalise_cubes
+from iris.time import PartialDateTime
 from iris.util import unify_time_units
 
 import cf_units
@@ -577,7 +578,17 @@ class DataExtractor:
 
         if year_max is not None:
             # we have some form of time slice
-            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+            if self.input_data.get_value(InputType.GWL) is not None:
+                # We start from December in the previous year
+                year_min = year_min - 1
+                pdt1 = PartialDateTime(year=year_min, month=12)
+                pdt2 = PartialDateTime(year=year_max, month=12)
+                time_slice_constraint = iris.Constraint(
+                    time=lambda cell: pdt1 <= cell.point < pdt2
+                )
+                LOG.debug("Constraint(%s <= t.point.year < %s)", pdt1, pdt2)
+
+            elif self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
                 time_slice_constraint = iris.Constraint(
                     time=lambda t: year_min <= t.point.year <= year_max
                 )
