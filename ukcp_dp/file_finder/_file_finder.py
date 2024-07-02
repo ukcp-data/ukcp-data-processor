@@ -64,7 +64,10 @@ def get_file_lists(input_data):
         COLLECTION_PROB,
         COLLECTION_MARINE,
     ]:
-        file_list["main"] = _get_prob_file_list(input_data)
+        if input_data.get_value(InputType.GWL) is not None:
+            file_list["main"] = _get_prob_gwl_file_list(input_data)
+        else:
+            file_list["main"] = _get_prob_file_list(input_data)
 
     elif input_data.get_value(InputType.COLLECTION) in [
         COLLECTION_CPM,
@@ -124,6 +127,34 @@ def _get_absolute_path(file_path):
     path = DATA_SERVICE_URL + path
     path = path.rstrip("*")
     return path
+
+
+def _get_prob_gwl_file_list(input_data):
+    """
+    Get a list of files based on the data provided in the input data.
+
+    @param input_data (InputData): an InputData object
+
+    @return a dict where
+        key: (str) variable name
+        value: list of lists where:
+            each list is a list of files per scenario, per variable, including
+            their full paths
+    """
+    variables = input_data.get_value(InputType.VARIABLE)
+
+    spatial_representation = _get_prob_spatial_representation(input_data)
+
+    file_lists_per_variable = {}
+
+    for variable in variables:
+        # generate a list of files for each variable
+        file_path = _get_prob_gwl_file_path(input_data, spatial_representation, variable)
+        # current thinking is that there will only be one file
+        file_name = "*"
+        file_lists_per_variable[variable] = [os.path.join(file_path, file_name)]
+
+    return file_lists_per_variable
 
 
 def _get_prob_file_list(input_data):
@@ -291,6 +322,23 @@ def _get_prob_file_path(
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
             VERSION,
         )
+
+    return file_path
+
+
+def _get_prob_gwl_file_path(input_data, spatial_representation, variable):
+
+    file_path = os.path.join(
+        DATA_DIR,
+        COLLECTION_PROB,
+        "uk",
+        spatial_representation,
+        "gwl",
+        input_data.get_value(InputType.BASELINE),
+        variable,
+        input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+        VERSION,
+    )
 
     return file_path
 
