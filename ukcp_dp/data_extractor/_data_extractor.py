@@ -218,7 +218,6 @@ class DataExtractor:
         cube = self._load_cubes(
             file_list, climatology, overlay_probability_levels, collection
         )
-
         LOG.debug("Concatenated cube:\n%s", cube)
 
         if climatology is True:
@@ -277,6 +276,187 @@ class DataExtractor:
             raise UKCPDPDataNotFoundException(
                 "Selection constraints resulted in no data being" " selected"
             )
+
+        return cube
+
+    def _load_cubes(
+        self, file_list, climatology, overlay_probability_levels, collection
+    ):
+        """
+        Get an iris cube based on the given files.
+
+        @param file_list (list[str]): a list of file name to retrieve data from
+        @param climatology (boolean): if True extract the climatology data
+        @param overlay_probability_levels (boolean): if True only include the
+            10th, 50th and 90th percentile data
+        @param collection(str): the name of the collection being processed
+
+        @return an iris cube, maybe 'None' if overlay_probability_levels=True
+        """
+        if climatology is True:
+            LOG.info("_load_cubes for climatology")
+        elif overlay_probability_levels is True:
+            LOG.info("_load_cubes, overlay probability levels")
+        else:
+            LOG.info("_load_cubes")
+
+        if LOG.getEffectiveLevel() == logging.DEBUG:
+            LOG.debug("_load_cubes from %s files", len(file_list))
+            for fpath in file_list:
+                LOG.debug(" - FILE: %s", fpath)
+
+        if (
+            collection == COLLECTION_PROB
+            and self.input_data.get_value(InputType.GWL) is not None
+        ):
+            return self._load_cubes_prob_gwl(file_list)
+        else:
+            return self._load_cubes_standard(
+                file_list, overlay_probability_levels, collection
+            )
+
+    def _load_cubes_prob_gwl(self, file_list):
+        """
+        Get an iris cube based on the given files.
+
+        @param file_list (list[str]): a list of file name to retrieve data from
+
+        @return an iris cube
+        """
+        LOG.info("_load_cubes_prob_gwl")
+
+        # Load the cubes
+        cubes = CubeList()
+        try:
+            for file_path in file_list:
+                LOG.debug(" - FILE: %s", file_path)
+                f_list = glob.glob(file_path)
+
+                cube_list = []
+                for nc_file in f_list:
+                    LOG.debug(" - file: %s", nc_file)
+                    cube_list.append(iris.load(nc_file, CUBE_NAME_MAPPING))
+                    LOG.debug(" - cube appended")
+                cubes.extend(cube_list)
+        except IOError as ex:
+            for file_name in file_list:
+                file_name = file_name.split("*")[0]
+                if not path.exists(file_name):
+                    LOG.error("File not found: %s", file_name)
+            raise UKCPDPDataNotFoundException from ex
+
+        try:
+            cube = cubes.concatenate_cube()
+        except iris.exceptions.ConcatenateError as ex:
+            LOG.error("Failed to concatenate cubes:\n%s\n%s", ex, cubes)
+
+            # pylint: disable=W0707
+            raise UKCPDPDataNotFoundException(
+                "No data found for given selection options"
+            )
+
+        return cube
+
+    def _load_cubes_standard(self, file_list, overlay_probability_levels, collection):
+        """
+        Get an iris cube based on the given files.
+
+        @param file_list (list[str]): a list of file name to retrieve data from
+        @param overlay_probability_levels (boolean): if True only include the
+            10th, 50th and 90th percentile data
+        @param collection(str): the name of the collection being processed
+
+        @return an iris cube, maybe 'None' if overlay_probability_levels=True
+        """
+        LOG.info("_load_cubes_prob_gwl")
+
+        # Load the cubes
+        cubes = CubeList()
+        try:
+            for file_path in file_list:
+                LOG.debug(" - FILE: %s", file_path)
+                f_list = glob.glob(file_path)
+
+                cube_list = []
+                for nc_file in f_list:
+                    LOG.debug(" - file: %s", nc_file)
+                    cube_list.append(_load_cube(nc_file))
+                    LOG.debug(" - cube appended")
+                cubes.extend(cube_list)
+
+        except IOError as ex:
+            if overlay_probability_levels is True:
+                # not all variables have corresponding probabilistic data
+                return None
+            for file_name in file_list:
+                file_name = file_name.split("*")[0]
+                if not path.exists(file_name):
+                    LOG.error("File not found: %s", file_name)
+            raise UKCPDPDataNotFoundException from ex
+
+        # Remove time_bnds cubes
+        if collection == COLLECTION_PROB:
+            unfiltered_cubes = cubes
+            cubes = CubeList()
+            for cube in unfiltered_cubes:
+                if cube.name() != "time_bnds":
+                    cubes.append(cube)
+
+        # Different creation dates will stop cubes concatenating, so lets
+        # remove them
+        for cube in cubes:
+            coords = cube.coords(var_name="creation_date")
+            for coord in coords:
+                cube.remove_coord(coord)
+
+        if len(cubes) == 0:
+            LOG.warning("No data was retrieved from the following files:%s", file_list)
+            raise UKCPDPDataNotFoundException(
+                "No data found for given selection options"
+            )
+
+        LOG.debug("First cube:\n%s", cubes[0])
+        LOG.debug("Concatenate cubes:\n%s", cubes)
+
+        iris.experimental.equalise_cubes.equalise_attributes(cubes)
+        unify_time_units(cubes)
+
+        try:
+            cube = cubes.concatenate_cube()
+        except iris.exceptions.ConcatenateError as ex:
+            LOG.error("Failed to concatenate cubes:\n%s\n%s", ex, cubes)
+            error_cubes = CubeList()
+            for error_cube in cubes:
+                error_cubes.append(error_cube)
+                try:
+                    LOG.info(
+                        "Appending %s", error_cube.coord("ensemble_member_id").points[0]
+                    )
+                except iris.exceptions.CoordinateNotFoundError:
+                    pass
+                try:
+                    error_cubes.concatenate_cube()
+                except iris.exceptions.ConcatenateError as ex:
+                    message = ""
+                    try:
+                        message = " {}".format(
+                            error_cube.coord("ensemble_member_id").points[0]
+                        )
+                    except iris.exceptions.CoordinateNotFoundError:
+                        pass
+                    LOG.error(
+                        "Error when concatenating cube%s:\n%s\n%s",
+                        message,
+                        ex,
+                        error_cube,
+                    )
+                    break
+
+            # pylint: disable=W0707
+            raise UKCPDPDataNotFoundException(
+                "No data found for given selection options"
+            )
+>>>>>>> 669f6aa (updata the data extractor to cope with the GWL prop files)
 
         return cube
 
