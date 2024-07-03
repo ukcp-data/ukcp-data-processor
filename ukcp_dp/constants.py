@@ -236,6 +236,15 @@ TemporalAverageType = enum(
     ANNUAL="ann",
 )
 
+CUBE_NAME_MAPPING = {
+    "hussAnom": "specific_humidity",
+    "prAnom": "lwe_precipitation_rate",
+    "rssAnom": "surface_net_downward_shortwave_flux",
+    "tasAnom": "air_temperature",
+    "tasmaxAnom": "air_temperature",
+    "tasminAnom": "air_temperature",
+}
+
 DPI_DISPLAY = 94
 DPI_SAVING = 100
 
