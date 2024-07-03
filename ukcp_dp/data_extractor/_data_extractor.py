@@ -332,6 +332,7 @@ class DataExtractor:
                 LOG.debug(" - FILE: %s", file_path)
                 f_list = glob.glob(file_path)
 
+<<<<<<< HEAD
                 for nc_file in f_list:
                     LOG.debug(" - file: %s", nc_file)
                     cubes.extend(
@@ -343,6 +344,14 @@ class DataExtractor:
                         )
                     )
                     LOG.debug(" - cube appended")
+=======
+                cube_list = []
+                for nc_file in f_list:
+                    LOG.debug(" - file: %s", nc_file)
+                    cube_list.append(iris.load(nc_file, CUBE_NAME_MAPPING))
+                    LOG.debug(" - cube appended")
+                cubes.extend(cube_list)
+>>>>>>> fe92e8c (updata the data extractor to cope with the GWL prop files)
         except IOError as ex:
             for file_name in file_list:
                 file_name = file_name.split("*")[0]
@@ -360,6 +369,7 @@ class DataExtractor:
                 "No data found for given selection options"
             )
 
+<<<<<<< HEAD
         # generate a gwl constraint
         gwl_constraint = self._get_gwl_selector()
         if gwl_constraint is not None:
@@ -375,6 +385,8 @@ class DataExtractor:
                 "Selection constraints resulted in no data being" " selected"
             )
 
+=======
+>>>>>>> fe92e8c (updata the data extractor to cope with the GWL prop files)
         return cube
 
     def _load_cubes_standard(self, file_list, overlay_probability_levels, collection):
@@ -388,7 +400,11 @@ class DataExtractor:
 
         @return an iris cube, maybe 'None' if overlay_probability_levels=True
         """
+<<<<<<< HEAD
         LOG.info("_load_cubes_standard")
+=======
+        LOG.info("_load_cubes_prob_gwl")
+>>>>>>> fe92e8c (updata the data extractor to cope with the GWL prop files)
 
         # Load the cubes
         cubes = CubeList()
@@ -478,6 +494,7 @@ class DataExtractor:
             )
 >>>>>>> 669f6aa (updata the data extractor to cope with the GWL prop files)
 
+<<<<<<< HEAD
         return cube
 
     def _load_cubes(
@@ -691,6 +708,8 @@ class DataExtractor:
                 "No data found for given selection options"
             )
 
+=======
+>>>>>>> fe92e8c (updata the data extractor to cope with the GWL prop files)
         return cube
 
     def _convert_to_percentiles_from_ensembles(self, cube):
