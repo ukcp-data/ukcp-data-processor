@@ -608,12 +608,8 @@ def _get_cm_file_name(
         elif input_data.get_value(InputType.COLLECTION) == COLLECTION_CPM:
             if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
                 date_range = "{}".format(year)
-            elif input_data.get_value(InputType.YEAR_MINIMUM) == 1981:
-                date_range = "198012-200011"
-            elif input_data.get_value(InputType.YEAR_MINIMUM) == 2021:
-                date_range = "202012-204011"
-            elif input_data.get_value(InputType.YEAR_MINIMUM) == 2061:
-                date_range = "206012-208011"
+            else:
+                date_range = "200912-207911"
         else:
             date_range = "200912-207911"
 
