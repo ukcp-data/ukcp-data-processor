@@ -160,7 +160,6 @@ def _get_prob_gwl_file_list(input_data):
         None,
         None,
     )
-
         file_lists_per_variable[variable] = [[os.path.join(file_path, file_name)]]
 
     return file_lists_per_variable
