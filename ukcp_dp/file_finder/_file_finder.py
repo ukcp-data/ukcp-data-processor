@@ -152,7 +152,7 @@ def _get_prob_gwl_file_list(input_data):
         file_path = _get_prob_gwl_file_path(input_data, spatial_representation, variable)
         # current thinking is that there will only be one file
         file_name = "*"
-        file_lists_per_variable[variable] = [os.path.join(file_path, file_name)]
+        file_lists_per_variable[variable] = [[os.path.join(file_path, file_name)]]
 
     return file_lists_per_variable
 
