@@ -332,12 +332,17 @@ class DataExtractor:
                 LOG.debug(" - FILE: %s", file_path)
                 f_list = glob.glob(file_path)
 
-                cube_list = []
                 for nc_file in f_list:
                     LOG.debug(" - file: %s", nc_file)
-                    cube_list.append(iris.load(nc_file, CUBE_NAME_MAPPING))
+                    cubes.extend(
+                        iris.load(
+                            nc_file,
+                            CUBE_NAME_MAPPING[
+                                self.input_data.get_value(InputType.VARIABLE)
+                            ][0],
+                        )
+                    )
                     LOG.debug(" - cube appended")
-                cubes.extend(cube_list)
         except IOError as ex:
             for file_name in file_list:
                 file_name = file_name.split("*")[0]
@@ -368,7 +373,7 @@ class DataExtractor:
 
         @return an iris cube, maybe 'None' if overlay_probability_levels=True
         """
-        LOG.info("_load_cubes_prob_gwl")
+        LOG.info("_load_cubes_standard")
 
         # Load the cubes
         cubes = CubeList()
