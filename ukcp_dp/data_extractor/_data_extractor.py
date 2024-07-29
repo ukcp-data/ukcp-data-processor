@@ -339,7 +339,7 @@ class DataExtractor:
                             nc_file,
                             CUBE_NAME_MAPPING[
                                 self.input_data.get_value(InputType.VARIABLE)
-                            ][0],
+                            [0]],
                         )
                     )
                     LOG.debug(" - cube appended")
@@ -358,6 +358,21 @@ class DataExtractor:
             # pylint: disable=W0707
             raise UKCPDPDataNotFoundException(
                 "No data found for given selection options"
+            )
+
+        # generate a gwl constraint
+        gwl_constraint = self._get_gwl_selector()
+        if gwl_constraint is not None:
+            cube = cube.extract(gwl_constraint)
+
+        if cube is None:
+            if gwl_constraint is not None:
+                LOG.warning(
+                    "GWL constraint resulted in no cubes being " "returned: %s",
+                    gwl_constraint,
+                )
+            raise UKCPDPDataNotFoundException(
+                "Selection constraints resulted in no data being" " selected"
             )
 
         return cube
