@@ -340,7 +340,7 @@ class DataExtractor:
                             nc_file,
                             CUBE_NAME_MAPPING[
                                 self.input_data.get_value(InputType.VARIABLE)
-                            ][0],
+                            [0]],
                         )
                     )
                     LOG.debug(" - cube appended")
@@ -359,6 +359,21 @@ class DataExtractor:
             # pylint: disable=W0707
             raise UKCPDPDataNotFoundException(
                 "No data found for given selection options"
+            )
+
+        # generate a gwl constraint
+        gwl_constraint = self._get_gwl_selector()
+        if gwl_constraint is not None:
+            cube = cube.extract(gwl_constraint)
+
+        if cube is None:
+            if gwl_constraint is not None:
+                LOG.warning(
+                    "GWL constraint resulted in no cubes being " "returned: %s",
+                    gwl_constraint,
+                )
+            raise UKCPDPDataNotFoundException(
+                "Selection constraints resulted in no data being" " selected"
             )
 
         return cube
@@ -474,6 +489,17 @@ class DataExtractor:
         result.coord("percentile_over_ensemble_member").long_name = "percentile"
         return result
 
+    def _get_gwl_selector(self):
+        gwl_constraint = iris.Constraint(
+            GWL=float(self.input_data.get_value(InputType.GWL))
+        )
+        LOG.debug(
+            "Constraint(GWL=%s)",
+            self.input_data.get_value(InputType.GWL),
+        )
+
+        return gwl_constraint
+    
     def _get_spatial_selector(self, cube, collection):
         LOG.debug("_get_spatial_selector")
         # generate an area constraint
@@ -602,15 +628,25 @@ class DataExtractor:
 
         elif temporal_average_type == TemporalAverageType.MONTHLY:
             for i, term in enumerate(get_months()):
+                    
                 if term == self.input_data.get_value(InputType.TIME_PERIOD):
                     # i is the index not the month number
-                    temporal_constraint = iris.Constraint(
-                        time=lambda t: i < t.point.month <= i + 1
-                    )
-                    LOG.debug("Constraint(%s <= t.point.month <= %s)", i, i + 1)
+
+                    if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB and self.input_data.get_value(InputType.GWL) is not None:
+                        temporal_constraint = iris.Constraint(
+                            month=lambda m: i < m.point <= i + 1
+                        )
+                        LOG.debug("Constraint(%s <= m.point <= %s)", i, i + 1)
+                    else:
+                        temporal_constraint = iris.Constraint(
+                            time=lambda t: i < t.point.month <= i + 1
+                        )
+                        LOG.debug("Constraint(%s <= t.point.month <= %s)", i, i + 1)
                     break
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
+            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB and self.input_data.get_value(InputType.GWL) is not None:
+                return
             if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
                 temporal_constraint = iris.Constraint(
                     clim_season=self.input_data.get_value(InputType.TIME_PERIOD)
@@ -818,10 +854,16 @@ class DataExtractor:
         elif self.input_data.get_area_type() == AreaType.BBOX:
             x_bounds = self.cubes[0].coord("projection_x_coordinate").bounds
             y_bounds = self.cubes[0].coord("projection_y_coordinate").bounds
-            grid_x1 = int(x_bounds[0][0])
-            grid_y1 = int(y_bounds[0][0])
-            grid_x2 = int(x_bounds[-1][1])
-            grid_y2 = int(y_bounds[-1][1])
+            if y_bounds is None:
+                grid_x1 = min(self.cubes[0].coord("projection_x_coordinate").points)
+                grid_x2 = max(self.cubes[0].coord("projection_x_coordinate").points)
+                grid_y1 = min(self.cubes[0].coord("projection_y_coordinate").points)
+                grid_y2 = max(self.cubes[0].coord("projection_y_coordinate").points)
+            else:
+                grid_x1 = int(x_bounds[0][0])
+                grid_y1 = int(y_bounds[0][0])
+                grid_x2 = int(x_bounds[-1][1])
+                grid_y2 = int(y_bounds[-1][1])
             title = "{t} in area {x1}, {y1} to {x2}, {y2}".format(
                 t=title, x1=grid_x1, y1=grid_y1, x2=grid_x2, y2=grid_y2
             )
