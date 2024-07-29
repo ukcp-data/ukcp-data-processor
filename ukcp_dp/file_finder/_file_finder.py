@@ -151,7 +151,16 @@ def _get_prob_gwl_file_list(input_data):
         # generate a list of files for each variable
         file_path = _get_prob_gwl_file_path(input_data, spatial_representation, variable)
         # current thinking is that there will only be one file
-        file_name = "*"
+        file_name = _get_prob_file_name(
+        None,
+        input_data,
+        "gwl",
+        spatial_representation,
+        variable,
+        None,
+        None,
+    )
+
         file_lists_per_variable[variable] = [[os.path.join(file_path, file_name)]]
 
     return file_lists_per_variable
@@ -393,7 +402,27 @@ def _get_prob_file_name(
 
     return_period = input_data.get_value(InputType.RETURN_PERIOD)
 
-    if return_period is None:
+    if scenario is "gwl":
+
+        if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == TemporalAverageType.MONTHLY:
+            time_period = input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
+        else:
+            time_period = input_data.get_value(InputType.TIME_PERIOD)
+
+        file_name = (
+            "{variable}_{scenario}_{collection}_uk_"
+            "{spatial_representation}_{baseline}_"
+            "{time_period}_percentiles.nc".format(
+                variable=variable,
+                scenario=scenario,
+                collection=COLLECTION_PROB,
+                spatial_representation=spatial_representation,
+                baseline=input_data.get_value(InputType.BASELINE),
+                time_period=time_period,
+            )
+        )
+
+    elif return_period is None:
         file_name = (
             "{variable}_{scenario}_{collection}_uk_"
             "{spatial_representation}_{data_type}_{baseline}_"
