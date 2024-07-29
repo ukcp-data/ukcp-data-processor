@@ -109,12 +109,12 @@ class Vocab:
             "shp": "Shapefile",
         },
         "gwl": {
-            "gwl1": "1°C above pre-industrial",
-            "gwl1.5": "1.5°C above pre-industrial",
-            "gwl2": "2°C above pre-industrial",
-            "gwl2.5": "2.5°C above pre-industrial",
-            "gwl3": "3°C above pre-industrial",
-            "gwl4": "4°C above pre-industrial",
+            "1": "1°C above pre-industrial",
+            "1.5": "1.5°C above pre-industrial",
+            "2": "2°C above pre-industrial",
+            "2.5": "2.5°C above pre-industrial",
+            "3": "3°C above pre-industrial",
+            "4": "4°C above pre-industrial",
         },
         "show_boundaries": {
             "none": "None",
