@@ -3,7 +3,7 @@ from os import path
 import cartopy.crs as ccrs
 
 
-VERSION = "2.9.0"
+VERSION = "2.10.0"
 
 
 def enum(**named_values):
@@ -207,8 +207,8 @@ PDF_LABEL = "Relative probability"
 DATA_DIR = "/badc/ukcp18/data"
 DATA_SERVICE_URL = "http://data.ceda.ac.uk"
 
-HADUK_DIR = "/badc/ukmo-hadobs/data/insitu/MOHC/HadOBS/HadUK-Grid/v1.2.0.ceda"
-HADUK_END_YEAR = "2022"
+HADUK_DIR = "/badc/ukmo-hadobs/data/insitu/MOHC/HadOBS/HadUK-Grid/v1.3.0.ceda"
+HADUK_END_YEAR = "2023"
 
 # Area types
 AreaType = enum(
