@@ -109,6 +109,14 @@ class Vocab:
             "netcdf": "CF-netCDF",
             "shp": "Shapefile",
         },
+        "gwl": {
+            "1": "1°C above pre-industrial",
+            "1.5": "1.5°C above pre-industrial",
+            "2": "2°C above pre-industrial",
+            "2.5": "2.5°C above pre-industrial",
+            "3": "3°C above pre-industrial",
+            "4": "4°C above pre-industrial",
+        },
         "show_boundaries": {
             "none": "None",
             "country": "Country",
@@ -179,6 +187,7 @@ class Vocab:
         "data_type": "Data Type",
         "ensemble": "Members",
         "font_size": "Font Size",
+        "gwl": "Global Warming Level",
         "highlighted_ensemble_members": "Highlighted Members",
         "image_format": "Image Format",
         "image_size": "Image Size",
