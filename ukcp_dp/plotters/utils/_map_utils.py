@@ -940,9 +940,6 @@ def plot_choropleth_map(
 
     # Add gridlines (and label them on the axes, IF we're in PlateCarree)
     gridlabels = proj == ccrs.PlateCarree()
-    gl = ax.gridlines(
-        crs=ccrs.PlateCarree(), draw_labels=gridlabels, linewidth=0.5, color="grey"
-    )
     if gridlabels:
         gl = ax.gridlines(
             crs=ccrs.PlateCarree(), draw_labels=gridlabels, linewidth=0.5, color="grey"
