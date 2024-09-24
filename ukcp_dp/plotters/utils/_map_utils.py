@@ -940,15 +940,17 @@ def plot_choropleth_map(
 
     # Add gridlines (and label them on the axes, IF we're in PlateCarree)
     gridlabels = proj == ccrs.PlateCarree()
-    gl = ax.gridlines(
-        crs=ccrs.PlateCarree(), draw_labels=gridlabels, linewidth=0.5, color="grey"
-    )
     if gridlabels:
+        gl = ax.gridlines(
+            crs=ccrs.PlateCarree(), draw_labels=gridlabels, linewidth=0.5, color="grey"
+            )
         # Options to switch on/off individual axes labels:
         gl.xlabels_bottom = xgridax[0]
         gl.xlabels_top = xgridax[1]
         gl.ylabels_left = ygridax[0]
         gl.ylabels_right = ygridax[1]
+    else:
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=0)
 
     # Set limits for the grid separate to the plot's xlims/ylims:
     if showglobal:
