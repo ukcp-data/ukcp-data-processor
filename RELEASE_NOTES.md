@@ -1,3 +1,9 @@
+# Release 2.11.0
+
+This release addresses:
+
+* Provide the complete time range of CPM data from 1981 to 2080
+
 # Release 2.10.0
 
 This release addresses:
