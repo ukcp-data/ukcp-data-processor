@@ -247,4 +247,4 @@ body:
       label: Additional information
       placeholder: Any additional information that may be useful
     validations:
-      required: true
+      required: false
