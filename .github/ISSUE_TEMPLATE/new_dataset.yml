@@ -38,7 +38,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        If this dataset is related to a previous UKCP dataset, please provide:
+        ## If this dataset is related to a previous UKCP dataset, please provide:
   - type: input
     id: ceda_archive_path
     attributes:
@@ -60,7 +60,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        If this is a completely new UKCP dataset, please provide:
+        ## If this is a completely new UKCP dataset, please provide:
   - type: input
     id: archieve_path
     attributes:
