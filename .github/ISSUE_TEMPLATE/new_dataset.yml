@@ -1,0 +1,92 @@
+name: New Dataset
+description: Request a new dataset to be added to the achive.
+title: 'New Dataset: '
+labels:
+  - dataset
+assignees:
+  - knappett
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide as much detail as possible!
+  - type: input
+    id: title
+    attributes:
+      label: Dataset title
+      placeholder: local projections (2.2km) regridded to 5km
+    validations:
+      required: false
+  - type: input
+    id: data_source
+    attributes:
+      label: Data source
+    validations:
+      required: false
+  - type: input
+    id: data_source_other
+    attributes:
+      label: 'Data source, other'
+    validations:
+      required: false
+  - type: input
+    id: dataset_size
+    attributes:
+      label: Dataset size (volume and no. of files)
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        If this dataset is related to a previous UKCP dataset, please provide:
+  - type: input
+    id: ceda_archive_path
+    attributes:
+      label: The CEDA archive path of the most recent version
+    validations:
+      required: false
+  - type: input
+    id: dataset_relationship
+    attributes:
+      label: The relationship between the datasets
+    validations:
+      required: false
+  - type: textarea
+    id: catalogue_page_update
+    attributes:
+      label: Any updates to the existing CEDA catalogue page required for this update
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        If this is a completely new UKCP dataset, please provide:
+  - type: input
+    id: archieve_path
+    attributes:
+      label: Suggest a suitable CEDA archive path for the dataset
+      description: >-
+        UKCP18 archive directories can be browsed here:
+        https://data.ceda.ac.uk/badc/ukcp18/data
+    validations:
+      required: false
+  - type: checkboxes
+    id: catalogue_template_sent
+    attributes:
+      label: CEDA catalogue template sent?
+      description: >-
+        Complete the following CEDA catalogue template and email the dataset
+        title to the CEDA team to inform them of the new record (the team is not
+        automatically notified when new catalogue records are generated):
+        https://catalogue.ceda.ac.uk/metadata_records/add/new/
+      options:
+        - label: done
+  - type: checkboxes
+    id: file_listing_sent
+    attributes:
+      label: File listing and checksums sent?
+      description: >-
+        For each dataset uploaded, please provide a complete file listing and
+        the corresponding md5sum checksums
+      options:
+        - label: done
