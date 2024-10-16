@@ -344,7 +344,6 @@ class DataExtractor:
                         )
                     )
                     LOG.debug(" - cube appended")
-
         except IOError as ex:
             for file_name in file_list:
                 file_name = file_name.split("*")[0]
