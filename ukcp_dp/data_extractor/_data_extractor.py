@@ -11,6 +11,7 @@ import signal
 import iris
 from iris.cube import CubeList
 import iris.experimental.equalise_cubes
+from iris.time import PartialDateTime
 from iris.util import unify_time_units
 
 import cf_units
@@ -28,6 +29,7 @@ from ukcp_dp.constants import (
     COLLECTION_RCM,
     COLLECTION_RCM_GWL,
     IRIS_LOAD_TIMEOUT_SECONDS,
+    CUBE_NAME_MAPPING,
 )
 from ukcp_dp.data_extractor._utils import get_anomaly
 from ukcp_dp.exception import (
@@ -208,17 +210,186 @@ class DataExtractor:
 
         @return an iris cube, maybe 'None' if overlay_probability_levels=True
         """
-        if climatology is True:
-            LOG.info("_get_cube for climatology")
-        elif overlay_probability_levels is True:
-            LOG.info("_get_cube, overlay probability levels")
+        if overlay_probability_levels is True:
+            collection = COLLECTION_PROB
         else:
-            LOG.info("_get_cube")
+            collection = self.input_data.get_value(InputType.COLLECTION)
+
+        cube = self._load_cubes(
+            file_list, climatology, overlay_probability_levels, collection
+        )
+
+        LOG.debug("Concatenated cube:\n%s", cube)
+
+        if climatology is True:
+            # generate a time slice constraint based on the baseline
+            time_slice_constraint = self._time_slice_selector(True)
+        else:
+            # generate a time slice constraint
+            time_slice_constraint = self._time_slice_selector(False)
+        if time_slice_constraint is not None:
+            cube = cube.extract(time_slice_constraint)
+
+        if cube is None:
+            if time_slice_constraint is not None:
+                LOG.warning(
+                    "Time slice constraint resulted in no cubes being " "returned: %s",
+                    time_slice_constraint,
+                )
+            raise UKCPDPDataNotFoundException(
+                "Selection constraints resulted in no data being" " selected"
+            )
+
+        # generate a temporal constraint
+        temporal_constraint = self._get_temporal_selector()
+        if temporal_constraint is not None:
+            cube = cube.extract(temporal_constraint)
+
+        if cube is None:
+            if temporal_constraint is not None:
+                LOG.warning(
+                    "Temporal constraint resulted in no cubes being " "returned: %s",
+                    temporal_constraint,
+                )
+            raise UKCPDPDataNotFoundException(
+                "Selection constraints resulted in no data being" " selected"
+            )
+
+        # extract 10, 50 and 90 percentiles
+        if overlay_probability_levels is True:
+            cube = get_probability_levels(cube, False)
+
+        # generate an area constraint
+        area_constraint = self._get_spatial_selector(cube, collection)
+        if area_constraint is not None:
+            cube = cube.extract(area_constraint)
+            if self.input_data.get_area_type() == AreaType.BBOX:
+                # Make sure we still have x, y dimension coordinated for
+                # bboxes
+                cube = self._promote_x_y_coords(cube)
+
+        if cube is None:
+            if area_constraint is not None:
+                LOG.warning(
+                    "Area constraint resulted in no cubes being " "returned: %s",
+                    area_constraint,
+                )
+            raise UKCPDPDataNotFoundException(
+                "Selection constraints resulted in no data being" " selected"
+            )
+
+        return cube
+
+    def _load_cubes(
+        self, file_list, climatology, overlay_probability_levels, collection
+    ):
+        """
+        Get an iris cube based on the given files.
+
+        @param file_list (list[str]): a list of file name to retrieve data from
+        @param climatology (boolean): if True extract the climatology data
+        @param overlay_probability_levels (boolean): if True only include the
+            10th, 50th and 90th percentile data
+        @param collection(str): the name of the collection being processed
+
+        @return an iris cube, maybe 'None' if overlay_probability_levels=True
+        """
+        if climatology is True:
+            LOG.info("_load_cubes for climatology")
+        elif overlay_probability_levels is True:
+            LOG.info("_load_cubes, overlay probability levels")
+        else:
+            LOG.info("_load_cubes")
 
         if LOG.getEffectiveLevel() == logging.DEBUG:
-            LOG.debug("_get_cube from %s files", len(file_list))
+            LOG.debug("_load_cubes from %s files", len(file_list))
             for fpath in file_list:
                 LOG.debug(" - FILE: %s", fpath)
+
+        if (
+            collection == COLLECTION_PROB
+            and self.input_data.get_value(InputType.GWL) is not None
+        ):
+            return self._load_cubes_prob_gwl(file_list)
+        else:
+            return self._load_cubes_standard(
+                file_list, overlay_probability_levels, collection
+            )
+
+    def _load_cubes_prob_gwl(self, file_list):
+        """
+        Get an iris cube based on the given files.
+
+        @param file_list (list[str]): a list of file name to retrieve data from
+
+        @return an iris cube
+        """
+        LOG.info("_load_cubes_prob_gwl")
+
+        # Load the cubes
+        cubes = CubeList()
+        try:
+            for file_path in file_list:
+                LOG.debug(" - FILE: %s", file_path)
+                f_list = glob.glob(file_path)
+
+                for nc_file in f_list:
+                    LOG.debug(" - file: %s", nc_file)
+                    cubes.extend(
+                        iris.load(
+                            nc_file,
+                            CUBE_NAME_MAPPING[
+                                self.input_data.get_value(InputType.VARIABLE)
+                            [0]],
+                        )
+                    )
+                    LOG.debug(" - cube appended")
+        except IOError as ex:
+            for file_name in file_list:
+                file_name = file_name.split("*")[0]
+                if not path.exists(file_name):
+                    LOG.error("File not found: %s", file_name)
+            raise UKCPDPDataNotFoundException from ex
+
+        try:
+            cube = cubes.concatenate_cube()
+        except iris.exceptions.ConcatenateError as ex:
+            LOG.error("Failed to concatenate cubes:\n%s\n%s", ex, cubes)
+
+            # pylint: disable=W0707
+            raise UKCPDPDataNotFoundException(
+                "No data found for given selection options"
+            )
+
+        # generate a gwl constraint
+        gwl_constraint = self._get_gwl_selector()
+        if gwl_constraint is not None:
+            cube = cube.extract(gwl_constraint)
+
+        if cube is None:
+            if gwl_constraint is not None:
+                LOG.warning(
+                    "GWL constraint resulted in no cubes being " "returned: %s",
+                    gwl_constraint,
+                )
+            raise UKCPDPDataNotFoundException(
+                "Selection constraints resulted in no data being" " selected"
+            )
+
+        return cube
+
+    def _load_cubes_standard(self, file_list, overlay_probability_levels, collection):
+        """
+        Get an iris cube based on the given files.
+
+        @param file_list (list[str]): a list of file name to retrieve data from
+        @param overlay_probability_levels (boolean): if True only include the
+            10th, 50th and 90th percentile data
+        @param collection(str): the name of the collection being processed
+
+        @return an iris cube, maybe 'None' if overlay_probability_levels=True
+        """
+        LOG.info("_load_cubes_standard")
 
         # Load the cubes
         cubes = CubeList()
@@ -243,11 +414,6 @@ class DataExtractor:
                 if not path.exists(file_name):
                     LOG.error("File not found: %s", file_name)
             raise UKCPDPDataNotFoundException from ex
-
-        if overlay_probability_levels is True:
-            collection = COLLECTION_PROB
-        else:
-            collection = self.input_data.get_value(InputType.COLLECTION)
 
         # Remove time_bnds cubes
         if collection == COLLECTION_PROB:
@@ -312,65 +478,6 @@ class DataExtractor:
                 "No data found for given selection options"
             )
 
-        LOG.debug("Concatenated cube:\n%s", cube)
-
-        if climatology is True:
-            # generate a time slice constraint based on the baseline
-            time_slice_constraint = self._time_slice_selector(True)
-        else:
-            # generate a time slice constraint
-            time_slice_constraint = self._time_slice_selector(False)
-        if time_slice_constraint is not None:
-            cube = cube.extract(time_slice_constraint)
-
-        if cube is None:
-            if time_slice_constraint is not None:
-                LOG.warning(
-                    "Time slice constraint resulted in no cubes being " "returned: %s",
-                    time_slice_constraint,
-                )
-            raise UKCPDPDataNotFoundException(
-                "Selection constraints resulted in no data being" " selected"
-            )
-
-        # generate a temporal constraint
-        temporal_constraint = self._get_temporal_selector()
-        if temporal_constraint is not None:
-            cube = cube.extract(temporal_constraint)
-
-        if cube is None:
-            if temporal_constraint is not None:
-                LOG.warning(
-                    "Temporal constraint resulted in no cubes being " "returned: %s",
-                    temporal_constraint,
-                )
-            raise UKCPDPDataNotFoundException(
-                "Selection constraints resulted in no data being" " selected"
-            )
-
-        # extract 10, 50 and 90 percentiles
-        if overlay_probability_levels is True:
-            cube = get_probability_levels(cube, False)
-
-        # generate an area constraint
-        area_constraint = self._get_spatial_selector(cube, collection)
-        if area_constraint is not None:
-            cube = cube.extract(area_constraint)
-            if self.input_data.get_area_type() == AreaType.BBOX:
-                # Make sure we still have x, y dimension coordinated for
-                # bboxes
-                cube = self._promote_x_y_coords(cube)
-
-        if cube is None:
-            if area_constraint is not None:
-                LOG.warning(
-                    "Area constraint resulted in no cubes being " "returned: %s",
-                    area_constraint,
-                )
-            raise UKCPDPDataNotFoundException(
-                "Selection constraints resulted in no data being" " selected"
-            )
-
         return cube
 
     def _convert_to_percentiles_from_ensembles(self, cube):
@@ -382,6 +489,17 @@ class DataExtractor:
         result.coord("percentile_over_ensemble_member").long_name = "percentile"
         return result
 
+    def _get_gwl_selector(self):
+        gwl_constraint = iris.Constraint(
+            GWL=float(self.input_data.get_value(InputType.GWL))
+        )
+        LOG.debug(
+            "Constraint(GWL=%s)",
+            self.input_data.get_value(InputType.GWL),
+        )
+
+        return gwl_constraint
+    
     def _get_spatial_selector(self, cube, collection):
         LOG.debug("_get_spatial_selector")
         # generate an area constraint
@@ -510,15 +628,25 @@ class DataExtractor:
 
         elif temporal_average_type == TemporalAverageType.MONTHLY:
             for i, term in enumerate(get_months()):
+                    
                 if term == self.input_data.get_value(InputType.TIME_PERIOD):
                     # i is the index not the month number
-                    temporal_constraint = iris.Constraint(
-                        time=lambda t: i < t.point.month <= i + 1
-                    )
-                    LOG.debug("Constraint(%s <= t.point.month <= %s)", i, i + 1)
+
+                    if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB and self.input_data.get_value(InputType.GWL) is not None:
+                        temporal_constraint = iris.Constraint(
+                            month=lambda m: i < m.point <= i + 1
+                        )
+                        LOG.debug("Constraint(%s <= m.point <= %s)", i, i + 1)
+                    else:
+                        temporal_constraint = iris.Constraint(
+                            time=lambda t: i < t.point.month <= i + 1
+                        )
+                        LOG.debug("Constraint(%s <= t.point.month <= %s)", i, i + 1)
                     break
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
+            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB and self.input_data.get_value(InputType.GWL) is not None:
+                return
             if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
                 temporal_constraint = iris.Constraint(
                     clim_season=self.input_data.get_value(InputType.TIME_PERIOD)
@@ -577,7 +705,17 @@ class DataExtractor:
 
         if year_max is not None:
             # we have some form of time slice
-            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+            if self.input_data.get_value(InputType.GWL) is not None:
+                # We start from December in the previous year
+                year_min = year_min - 1
+                pdt1 = PartialDateTime(year=year_min, month=12)
+                pdt2 = PartialDateTime(year=year_max, month=12)
+                time_slice_constraint = iris.Constraint(
+                    time=lambda cell: pdt1 <= cell.point < pdt2
+                )
+                LOG.debug("Constraint(%s <= t.point.year < %s)", pdt1, pdt2)
+
+            elif self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
                 time_slice_constraint = iris.Constraint(
                     time=lambda t: year_min <= t.point.year <= year_max
                 )
@@ -716,10 +854,16 @@ class DataExtractor:
         elif self.input_data.get_area_type() == AreaType.BBOX:
             x_bounds = self.cubes[0].coord("projection_x_coordinate").bounds
             y_bounds = self.cubes[0].coord("projection_y_coordinate").bounds
-            grid_x1 = int(x_bounds[0][0])
-            grid_y1 = int(y_bounds[0][0])
-            grid_x2 = int(x_bounds[-1][1])
-            grid_y2 = int(y_bounds[-1][1])
+            if y_bounds is None:
+                grid_x1 = min(self.cubes[0].coord("projection_x_coordinate").points)
+                grid_x2 = max(self.cubes[0].coord("projection_x_coordinate").points)
+                grid_y1 = min(self.cubes[0].coord("projection_y_coordinate").points)
+                grid_y2 = max(self.cubes[0].coord("projection_y_coordinate").points)
+            else:
+                grid_x1 = int(x_bounds[0][0])
+                grid_y1 = int(y_bounds[0][0])
+                grid_x2 = int(x_bounds[-1][1])
+                grid_y2 = int(y_bounds[-1][1])
             title = "{t} in area {x1}, {y1} to {x2}, {y2}".format(
                 t=title, x1=grid_x1, y1=grid_y1, x2=grid_x2, y2=grid_y2
             )
@@ -800,7 +944,9 @@ def timeout(seconds=10):
             result = func(*args, **kwargs)
             signal.alarm(0)
             return result
+
         return wrapper
+
     return decorator
 
 
