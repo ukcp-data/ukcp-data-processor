@@ -231,6 +231,8 @@ class Validator:
         allowed_ensembles = get_ensemble_member_set(
             self.input_data.get_value(InputType.COLLECTION)
         )
+        if self.input_data.get_value(InputType.C) == "cmip5_4":
+            allowed_ensembles.extend(get_ensemble_member_set("cmip5_4"))
         if allowed_ensembles is None:
             raise Exception(
                 "Unable to get list of valid ensembles for {}".format(
