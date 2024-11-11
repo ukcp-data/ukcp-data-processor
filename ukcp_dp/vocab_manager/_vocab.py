@@ -37,6 +37,7 @@ class Vocab:
             "26": "MPI-ESM-MR",
             "27": "MRI-CGCM3",
             "28": "GFDL-ESM2G",
+            "29": "EC-EARTH",
         },
         "spatial_representation": {
             # equivalent to UKCP18_resolution
