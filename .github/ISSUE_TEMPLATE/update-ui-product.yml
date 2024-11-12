@@ -190,9 +190,9 @@ body:
       required: false
   - type: input
     id: time_slice_upper_limit
-    description: ONLY PROVIDE IF CHANGED
     attributes:
       label: Time slice upper limit
+      description: ONLY PROVIDE IF CHANGED
       placeholder: '2100'
     validations:
       required: false
