@@ -22,7 +22,7 @@ body:
     attributes:
       label: Product name
       description: >-
-        By convention this should start with one of "Data", "Maps", "Plot" or
+        ONLY PROVIDE IF CHANGED - By convention this should start with one of "Data", "Maps", "Plot" or
         "Time series" and mention the dataset
       placeholder: 'Maps: Anomalies for regional projections (12km) over UK'
     validations:
@@ -32,7 +32,7 @@ body:
     attributes:
       label: Product description
       description: >-
-        The description will appear on the page that lists the products as well
+        ONLY PROVIDE IF CHANGED - The description will appear on the page that lists the products as well
         as in the top section of the product form
       placeholder: >-
         Generates a panel of small maps (also known as "small multiples", or a
@@ -47,7 +47,7 @@ body:
     id: product_guidance
     attributes:
       label: Product Guidance
-      description: The guidance will appear in the top section of the product form
+      description: ONLY PROVIDE IF CHANGED - The guidance will appear in the top section of the product form
       placeholder: >-
         For guidance on the Representative Concentration Pathways (RCP) and how
         to interpret the plots, please see the guidance pages.
@@ -57,6 +57,7 @@ body:
     id: data_source
     attributes:
       label: Data source
+      description: ONLY PROVIDE IF CHANGED
       multiple: false
       options:
         - Probabilistic (25km)
@@ -82,6 +83,7 @@ body:
     id: variable
     attributes:
       label: Variables
+      description: ONLY PROVIDE IF CHANGED
       multiple: true
       options:
         - tas
@@ -89,6 +91,7 @@ body:
         - tasmax
         - tasmin
         - sfcWind
+        - wsgmax10m
         - hurs
         - huss
         - uas
@@ -107,7 +110,7 @@ body:
     id: baseline
     attributes:
       label: Baseline period
-      description: Use this field if you wish anomaly values to be calculated
+      description: ONLY PROVIDE IF CHANGED - Use this field if you wish anomaly values to be calculated
       multiple: true
       options:
         - 1961-1990
@@ -120,6 +123,7 @@ body:
     id: scenario
     attributes:
       label: Scenario
+      description: ONLY PROVIDE IF CHANGED
       multiple: true
       options:
         - RCP 2.6
@@ -134,6 +138,7 @@ body:
     id: area
     attributes:
       label: Area
+      description: ONLY PROVIDE IF CHANGED
       multiple: true
       options:
         - grid square
@@ -150,6 +155,7 @@ body:
     id: temporal_average
     attributes:
       label: Temporal average
+      description: ONLY PROVIDE IF CHANGED
       multiple: true
       options:
         - hourly
@@ -165,6 +171,7 @@ body:
     id: time_slice_duration
     attributes:
       label: Time slice duration
+      description: ONLY PROVIDE IF CHANGED
       multiple: true
       options:
         - 1 year
@@ -177,11 +184,13 @@ body:
     id: time_slice_lower_limit
     attributes:
       label: Time slice lower limit
+      description: ONLY PROVIDE IF CHANGED
       placeholder: '1960'
     validations:
       required: false
   - type: input
     id: time_slice_upper_limit
+    description: ONLY PROVIDE IF CHANGED
     attributes:
       label: Time slice upper limit
       placeholder: '2100'
@@ -191,6 +200,7 @@ body:
     id: time_slice_minimum_range
     attributes:
       label: Time slice minimum range (years)
+      description: ONLY PROVIDE IF CHANGED
       placeholder: '20'
     validations:
       required: false
@@ -198,6 +208,7 @@ body:
     id: set
     attributes:
       label: Set
+      description: ONLY PROVIDE IF CHANGED
       multiple: true
       options:
         - Full global set (28 members)
@@ -206,6 +217,8 @@ body:
         - >-
           Subset: PPE-15, Hadley Centre Model (15 members) and selected CMIP 5
           members
+        - 'CMIP5-4, downscaled CMIP5'
+        - 'PPE-12 and CMIP5-4 (16 members)'
       default: 0
     validations:
       required: false
@@ -213,6 +226,7 @@ body:
     id: main_output
     attributes:
       label: Main output
+      description: ONLY PROVIDE IF CHANGED
       multiple: true
       options:
         - data
@@ -225,6 +239,7 @@ body:
     id: data_format
     attributes:
       label: Data format
+      description: ONLY PROVIDE IF CHANGED
       multiple: true
       options:
         - CSV
