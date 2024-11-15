@@ -2,6 +2,7 @@
 This module provides the method get_file_lists.
 
 """
+
 import logging
 import os
 
@@ -149,18 +150,21 @@ def _get_prob_gwl_file_list(input_data):
 
     for variable in variables:
         # generate a list of files for each variable
-        file_path = _get_prob_gwl_file_path(input_data, spatial_representation, variable)
-        # current thinking is that there will only be one file
-        file_name = _get_prob_file_name(
-        None,
-        input_data,
-        "gwl",
-        spatial_representation,
-        variable,
-        None,
-        None,
-    )
-        file_lists_per_variable[variable] = [[os.path.join(file_path, file_name)]]
+
+        file_list_per_scenario = []
+        for scenario in input_data.get_value(InputType.SCENARIO):
+            file_list_per_scenario.extend(
+                _get_file_list_per_scenario(
+                    input_data,
+                    scenario,
+                    spatial_representation,
+                    variable,
+                    None,
+                    None,
+                )
+            )
+
+        file_lists_per_variable[variable] = file_list_per_scenario
 
     return file_lists_per_variable
 
@@ -240,6 +244,17 @@ def _get_file_list_per_scenario(
             file_name = _get_marine_file_name(input_data, scenario, variable)
             file_list_per_data_type.append([os.path.join(file_path, file_name)])
 
+        elif input_data.get_value(InputType.GWL) is not None:
+            file_name = _get_prob_file_name_for_year(
+                data_type,
+                input_data,
+                scenario,
+                spatial_representation,
+                variable,
+                None,
+            )
+            file_list_per_data_type.append([os.path.join(file_path, file_name)])
+
         elif (
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
             == TemporalAverageType.ANNUAL
@@ -315,8 +330,23 @@ def _get_prob_file_path(
             variable,
             VERSION,
         )
-    else:
 
+    elif input_data.get_value(InputType.GWL) is not None:
+        file_path = os.path.join(
+            DATA_DIR,
+            COLLECTION_PROB,
+            "uk",
+            spatial_representation,
+            scenario,
+            data_type,
+            input_data.get_value(InputType.BASELINE),
+            input_data.get_value(InputType.GWL),
+            variable,
+            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+            VERSION,
+        )
+
+    else:
         file_path = os.path.join(
             DATA_DIR,
             COLLECTION_PROB,
@@ -330,23 +360,6 @@ def _get_prob_file_path(
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
             VERSION,
         )
-
-    return file_path
-
-
-def _get_prob_gwl_file_path(input_data, spatial_representation, variable):
-
-    file_path = os.path.join(
-        DATA_DIR,
-        COLLECTION_PROB,
-        "uk",
-        spatial_representation,
-        "gwl",
-        input_data.get_value(InputType.BASELINE),
-        variable,
-        input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
-        VERSION,
-    )
 
     return file_path
 
@@ -401,23 +414,18 @@ def _get_prob_file_name(
 
     return_period = input_data.get_value(InputType.RETURN_PERIOD)
 
-    if scenario is "gwl":
-
-        if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == TemporalAverageType.MONTHLY:
-            time_period = input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
-        else:
-            time_period = input_data.get_value(InputType.TIME_PERIOD)
-
+    if input_data.get_value(InputType.GWL) is not None:
         file_name = (
             "{variable}_{scenario}_{collection}_uk_"
             "{spatial_representation}_{baseline}_"
-            "{time_period}_percentiles.nc".format(
+            "{gwl}_{}".format(
                 variable=variable,
                 scenario=scenario,
                 collection=COLLECTION_PROB,
                 spatial_representation=spatial_representation,
                 baseline=input_data.get_value(InputType.BASELINE),
-                time_period=time_period,
+                gwl=input_data.get_value(InputType.GWL),
+                temporal_type=input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
             )
         )
 
