@@ -490,11 +490,14 @@ class DataExtractor:
         return result
 
     def _get_gwl_selector(self):
+        gwl = self.input_data.get_value(InputType.GWL)
+        if "gwl" in gwl:
+            gwl = gwl.split("gwl")[1]
         gwl_constraint = iris.Constraint(
-            GWL=float(self.input_data.get_value(InputType.GWL))
+            global_warming_level=float(gwl)
         )
         LOG.debug(
-            "Constraint(GWL=%s)",
+            "Constraint(global_warming_level=%s)",
             self.input_data.get_value(InputType.GWL),
         )
 
@@ -628,25 +631,15 @@ class DataExtractor:
 
         elif temporal_average_type == TemporalAverageType.MONTHLY:
             for i, term in enumerate(get_months()):
-                    
                 if term == self.input_data.get_value(InputType.TIME_PERIOD):
                     # i is the index not the month number
-
-                    if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB and self.input_data.get_value(InputType.GWL) is not None:
-                        temporal_constraint = iris.Constraint(
-                            month=lambda m: i < m.point <= i + 1
-                        )
-                        LOG.debug("Constraint(%s <= m.point <= %s)", i, i + 1)
-                    else:
-                        temporal_constraint = iris.Constraint(
-                            time=lambda t: i < t.point.month <= i + 1
-                        )
-                        LOG.debug("Constraint(%s <= t.point.month <= %s)", i, i + 1)
+                    temporal_constraint = iris.Constraint(
+                        time=lambda t: i < t.point.month <= i + 1
+                    )
+                    LOG.debug("Constraint(%s <= t.point.month <= %s)", i, i + 1)
                     break
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
-            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB and self.input_data.get_value(InputType.GWL) is not None:
-                return
             if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
                 temporal_constraint = iris.Constraint(
                     clim_season=self.input_data.get_value(InputType.TIME_PERIOD)
@@ -854,16 +847,10 @@ class DataExtractor:
         elif self.input_data.get_area_type() == AreaType.BBOX:
             x_bounds = self.cubes[0].coord("projection_x_coordinate").bounds
             y_bounds = self.cubes[0].coord("projection_y_coordinate").bounds
-            if y_bounds is None:
-                grid_x1 = min(self.cubes[0].coord("projection_x_coordinate").points)
-                grid_x2 = max(self.cubes[0].coord("projection_x_coordinate").points)
-                grid_y1 = min(self.cubes[0].coord("projection_y_coordinate").points)
-                grid_y2 = max(self.cubes[0].coord("projection_y_coordinate").points)
-            else:
-                grid_x1 = int(x_bounds[0][0])
-                grid_y1 = int(y_bounds[0][0])
-                grid_x2 = int(x_bounds[-1][1])
-                grid_y2 = int(y_bounds[-1][1])
+            grid_x1 = int(x_bounds[0][0])
+            grid_y1 = int(y_bounds[0][0])
+            grid_x2 = int(x_bounds[-1][1])
+            grid_y2 = int(y_bounds[-1][1])
             title = "{t} in area {x1}, {y1} to {x2}, {y2}".format(
                 t=title, x1=grid_x1, y1=grid_y1, x2=grid_x2, y2=grid_y2
             )
@@ -944,9 +931,7 @@ def timeout(seconds=10):
             result = func(*args, **kwargs)
             signal.alarm(0)
             return result
-
         return wrapper
-
     return decorator
 
 

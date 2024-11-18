@@ -245,12 +245,13 @@ def _get_file_list_per_scenario(
             file_list_per_data_type.append([os.path.join(file_path, file_name)])
 
         elif input_data.get_value(InputType.GWL) is not None:
-            file_name = _get_prob_file_name_for_year(
+            file_name = _get_prob_file_name(
                 data_type,
                 input_data,
                 scenario,
                 spatial_representation,
                 variable,
+                None,
                 None,
             )
             file_list_per_data_type.append([os.path.join(file_path, file_name)])
@@ -340,7 +341,7 @@ def _get_prob_file_path(
             scenario,
             data_type,
             input_data.get_value(InputType.BASELINE),
-            input_data.get_value(InputType.GWL),
+            "gwl",
             variable,
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
             VERSION,
@@ -417,12 +418,13 @@ def _get_prob_file_name(
     if input_data.get_value(InputType.GWL) is not None:
         file_name = (
             "{variable}_{scenario}_{collection}_uk_"
-            "{spatial_representation}_{baseline}_"
-            "{gwl}_{}".format(
+            "{spatial_representation}_{data_type}_{baseline}_"
+            "{gwl}_{temporal_type}.nc".format(
                 variable=variable,
                 scenario=scenario,
                 collection=COLLECTION_PROB,
                 spatial_representation=spatial_representation,
+                data_type=data_type,
                 baseline=input_data.get_value(InputType.BASELINE),
                 gwl=input_data.get_value(InputType.GWL),
                 temporal_type=input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
