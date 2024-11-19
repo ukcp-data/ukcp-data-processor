@@ -2,6 +2,7 @@
 This module contains the DataExtractor class.
 
 """
+
 import functools
 import glob
 import logging
@@ -29,7 +30,6 @@ from ukcp_dp.constants import (
     COLLECTION_RCM,
     COLLECTION_RCM_GWL,
     IRIS_LOAD_TIMEOUT_SECONDS,
-    CUBE_NAME_MAPPING,
 )
 from ukcp_dp.data_extractor._utils import get_anomaly
 from ukcp_dp.exception import (
@@ -334,14 +334,7 @@ class DataExtractor:
 
                 for nc_file in f_list:
                     LOG.debug(" - file: %s", nc_file)
-                    cubes.extend(
-                        iris.load(
-                            nc_file,
-                            CUBE_NAME_MAPPING[
-                                self.input_data.get_value(InputType.VARIABLE)
-                            [0]],
-                        )
-                    )
+                    cubes.extend(iris.load(nc_file))
                     LOG.debug(" - cube appended")
                 for nc_file in f_list:
                     LOG.debug(" - file: %s", nc_file)
@@ -718,16 +711,14 @@ class DataExtractor:
         gwl = self.input_data.get_value(InputType.GWL)
         if "gwl" in gwl:
             gwl = gwl.split("gwl")[1]
-        gwl_constraint = iris.Constraint(
-            global_warming_level=float(gwl)
-        )
+        gwl_constraint = iris.Constraint(global_warming_level=float(gwl))
         LOG.debug(
             "Constraint(global_warming_level=%s)",
             self.input_data.get_value(InputType.GWL),
         )
 
         return gwl_constraint
-    
+
     def _get_spatial_selector(self, cube, collection):
         LOG.debug("_get_spatial_selector")
         # generate an area constraint
@@ -1156,7 +1147,9 @@ def timeout(seconds=10):
             result = func(*args, **kwargs)
             signal.alarm(0)
             return result
+
         return wrapper
+
     return decorator
 
 
