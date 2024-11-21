@@ -324,14 +324,17 @@ class PlumePlotter(GraphPlotter):
         highlighted_counter = 0
         for ensemble_slice in cube.slices_over("ensemble_member"):
             ensemble = ensemble_slice.coord("ensemble_member").points[0]
-            ensemble_name = ensemble_slice.coord("ensemble_member_id").points[0]
 
             # highlighted ensembles should be included in the legend
             if ensemble in highlighted_ensemble_members:
+                if ensemble < 10:
+                    label = f"Member 0{ensemble}"
+                else:
+                    label = f"Member {ensemble}"
                 ax.plot(
                     t_points,
                     ensemble_slice.data,
-                    label=ensemble_name,
+                    label=label,
                     linestyle=linestyle[highlighted_counter],
                     color=colours[highlighted_counter],
                     zorder=2,

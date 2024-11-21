@@ -71,11 +71,16 @@ class SubsetCsvWriter(BaseCsvWriter):
 
         # loop over ensembles
         for ensemble_slice in cube.slices_over("ensemble_member"):
-            ensemble_name = ensemble_slice.coord("ensemble_member_id").points[0]
+            ensemble_name = ensemble_slice.coord("ensemble_member").points[0]
 
             LOG.debug("processing ensemble %s", ensemble_name)
 
-            output_data_file_path = self._get_full_file_name(f"_{ensemble_name}")
+            if ensemble_name < 10:
+                ensemble_no = f"0{ensemble_name}"
+            else:
+                ensemble_no = str(ensemble_name)
+
+            output_data_file_path = self._get_full_file_name(f"_{ensemble_no}")
             self._write_headers(output_data_file_path)
 
             with open(output_data_file_path, "a") as output_data_file:
