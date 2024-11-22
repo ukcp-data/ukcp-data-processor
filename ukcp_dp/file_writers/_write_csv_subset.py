@@ -3,11 +3,13 @@ This module contains the SubsetCsvWriter class, which implements the _write_csv 
 from the BaseCsvWriter base class.
 
 """
+
 from datetime import datetime
 import logging
 
 from ukcp_dp.constants import AreaType, InputType, COLLECTION_OBS, COLLECTION_PROB
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
+from ukcp_dp.file_writers._utils import ensemble_to_string
 
 
 LOG = logging.getLogger(__name__)
@@ -71,19 +73,16 @@ class SubsetCsvWriter(BaseCsvWriter):
 
         # loop over ensembles
         for ensemble_slice in cube.slices_over("ensemble_member"):
-            ensemble_name = ensemble_slice.coord("ensemble_member").points[0]
+            ensemble_no = ensemble_to_string(
+                ensemble_slice.coord("ensemble_member").points[0]
+            )
 
-            LOG.debug("processing ensemble %s", ensemble_name)
-
-            if ensemble_name < 10:
-                ensemble_no = f"0{ensemble_name}"
-            else:
-                ensemble_no = str(ensemble_name)
+            LOG.debug("processing ensemble %s", ensemble_no)
 
             output_data_file_path = self._get_full_file_name(f"_{ensemble_no}")
             self._write_headers(output_data_file_path)
 
-            with open(output_data_file_path, "a") as output_data_file:
+            with open(output_data_file_path, "a", encoding="utf-8") as output_data_file:
                 self._write_data_block(ensemble_slice, output_data_file, column_headers)
 
             output_file_list.append(output_data_file_path)
@@ -100,7 +99,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         output_data_file_path = self._get_full_file_name()
         self._write_headers(output_data_file_path)
 
-        with open(output_data_file_path, "a") as output_data_file:
+        with open(output_data_file_path, "a", encoding="utf-8") as output_data_file:
             self._write_data_block(cube, output_data_file, column_headers)
 
         output_file_list.append(output_data_file_path)
@@ -235,9 +234,7 @@ class SubsetCsvWriter(BaseCsvWriter):
             percentile = _fromat_percentile(percentile)
 
             # update the header
-            self.header.append(
-                "{var}({percentile} Percentile)".format(percentile=percentile, var=var)
-            )
+            self.header.append(f"{var}({percentile} Percentile)")
 
         output_data_file_path = self._get_full_file_name()
         self._write_headers(output_data_file_path)
@@ -278,8 +275,10 @@ class SubsetCsvWriter(BaseCsvWriter):
         else:
             # There should only be one cube so we only make reference to
             # self.cube_list[0]
-            for ensemble_coord in self.cube_list[0].coord("ensemble_member_id")[:]:
-                self.header.append(f"{var}({str(ensemble_coord.points[0])})")
+            for ensemble_coord in self.cube_list[0].coord("ensemble_member")[:]:
+                self.header.append(
+                    f"{var}({ensemble_to_string(ensemble_coord.points[0])})"
+                )
 
         output_data_file_path = self._get_full_file_name()
         self._write_headers(output_data_file_path)
@@ -328,7 +327,7 @@ class SubsetCsvWriter(BaseCsvWriter):
         except IndexError:
             data = cube.data
 
-        with open(output_data_file_path, "a") as output_data_file:
+        with open(output_data_file_path, "a", encoding="utf-8") as output_data_file:
             output_data_file.write(
                 f"{time_coord.cell(0).point.strftime(date_format)},{data}\n"
             )
@@ -350,7 +349,7 @@ class SubsetCsvWriter(BaseCsvWriter):
             elif coord.name() in ["region", "ensemble_member_id", "percentile"]:
                 secondary_index = i
 
-        with open(output_data_file_path, "a") as output_data_file:
+        with open(output_data_file_path, "a", encoding="utf-8") as output_data_file:
 
             for time_ in range(0, data.shape[time_index]):
                 time_formated = time_coords[time_].cell(0).point.strftime(date_format)
@@ -403,11 +402,11 @@ def _fromat_percentile(percentile):
     if "." in percentile:
         pass
     elif percentile.endswith("1") and percentile != "11":
-        percentile = "{}st".format(percentile)
+        percentile = "{percentile}st"
     elif percentile.endswith("2") and percentile != "12":
-        percentile = "{}nd".format(percentile)
+        percentile = "{percentile}nd"
     elif percentile.endswith("3") and percentile != "13":
-        percentile = "{}rd".format(percentile)
+        percentile = "{percentile}rd"
     else:
-        percentile = "{}th".format(percentile)
+        percentile = "{percentile}th"
     return percentile

@@ -3,11 +3,13 @@ This module contains the ThreeMapShpWriter class, which implements the _write_sh
 from the BaseShpWriter base class.
 
 """
+
 import logging
 
 import shapefile as shp
 from ukcp_dp.constants import AreaType, InputType
 from ukcp_dp.file_writers._base_shp_writer import BaseShpWriter
+from ukcp_dp.file_writers._utils import ensemble_to_string
 from ukcp_dp.utils import get_spatial_resolution_m
 
 
@@ -48,9 +50,10 @@ class PostageStampMapShpWriter(BaseShpWriter):
         var_label = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
         for ensemble_slice in cube.slices_over("ensemble_member"):
-            ensemble_name = ensemble_slice.coord("ensemble_member_id").points[0]
-            ensemble_name = ensemble_name.replace(".", "_")
-            output_data_file = self._get_file_name(f"_{ensemble_name}")
+            ensemble_no = ensemble_to_string(
+                ensemble_slice.coord("ensemble_member").points[0]
+            )
+            output_data_file = self._get_file_name(f"_{ensemble_no}")
 
             self._write_bbox_data(
                 ensemble_slice,

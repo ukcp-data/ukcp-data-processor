@@ -3,10 +3,15 @@ This module contains the PostageStampMapCsvWriter class, which implements the _w
 method from the BaseCsvWriter base class.
 
 """
+
 import logging
 
 from ukcp_dp.constants import AreaType, InputType
-from ukcp_dp.file_writers._base_csv_map_writer import BaseCsvMapWriter, _write_xy_data
+from ukcp_dp.file_writers._base_csv_map_writer import (
+    BaseCsvMapWriter,
+    _write_xy_data,
+)
+from ukcp_dp.file_writers._utils import ensemble_to_string
 
 
 LOG = logging.getLogger(__name__)
@@ -47,11 +52,13 @@ class PostageStampMapCsvWriter(BaseCsvMapWriter):
 
         # loop over ensembles
         for ensemble_slice in cube.slices_over("ensemble_member"):
-            ensemble_name = ensemble_slice.coord("ensemble_member_id").points[0]
+            ensemble_no = ensemble_to_string(
+                ensemble_slice.coord("ensemble_member").points[0]
+            )
 
-            LOG.debug("processing ensemble %s", ensemble_name)
+            LOG.debug("processing ensemble %s", ensemble_no)
 
-            output_data_file_path = self._get_full_file_name(f"_{ensemble_name}")
+            output_data_file_path = self._get_full_file_name(f"_{ensemble_no}")
             self._write_headers(output_data_file_path)
 
             _write_xy_data(ensemble_slice, output_data_file_path)
@@ -77,9 +84,9 @@ class PostageStampMapCsvWriter(BaseCsvMapWriter):
 
         var = self.input_data.get_value_label(InputType.VARIABLE)[0]
 
-        for ensemble_coord in cube.coord("ensemble_member_id")[:]:
+        for ensemble_coord in cube.coord("ensemble_member")[:]:
             # update the header
-            self.header.append(f"{var}({str(ensemble_coord.points[0])})")
+            self.header.append(f"{var}({ensemble_to_string(ensemble_coord.points[0])})")
 
         output_data_file_path = self._get_full_file_name()
         self._write_headers(output_data_file_path)
