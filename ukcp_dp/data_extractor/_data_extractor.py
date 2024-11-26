@@ -1002,63 +1002,55 @@ class DataExtractor:
 
         variable = " and ".join(self.input_data.get_value_label(InputType.VARIABLE))
         if self.input_data.get_value(InputType.VARIABLE)[0] in ["hursAnom", "hussAnom"]:
-            variable = "percentage {variable}".format(variable=variable)
+            variable = f"percentage {variable}"
 
         if self.input_data.get_value(InputType.RETURN_PERIOD) is not None:
-            title = "{variable} for {time_period} in".format(
-                time_period=self.input_data.get_value_label(InputType.TIME_PERIOD),
-                variable=variable,
-            )
+            title = f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} in"
+
+        elif self.input_data.get_value(InputType.GWL) is not None:
+            title = (f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
+                     f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} at "
+                     f"{self.input_data.get_value_label(InputType.GWL)} level")
 
         elif (
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
             == TemporalAverageType.ANNUAL
             or self.input_data.get_value(InputType.TIME_PERIOD) == "all"
         ):
-            title = "{temporal_type} average {variable} for".format(
-                temporal_type=self.input_data.get_value_label(
-                    InputType.TEMPORAL_AVERAGE_TYPE
-                ),
-                variable=variable,
-            )
+            title = (f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
+                     f"{variable} for")
 
         elif self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) is None:
-            title = "{variable} for".format(variable=variable)
+            title = f"{variable} for"
 
         else:
-            title = "{temporal_type} average {variable} for {time_period} in".format(
-                temporal_type=self.input_data.get_value_label(
-                    InputType.TEMPORAL_AVERAGE_TYPE
-                ),
-                time_period=self.input_data.get_value_label(InputType.TIME_PERIOD),
-                variable=variable,
-            )
+            title = (f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
+                     f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} in")
 
-        if self.input_data.get_value(
+
+        if self.input_data.get_value(InputType.GWL) is not None:
+            pass
+
+        elif self.input_data.get_value(
             InputType.YEAR_MINIMUM
         ) == self.input_data.get_value(InputType.YEAR_MAXIMUM):
-            title = "{t} {year}".format(
-                t=title, year=self.input_data.get_value(InputType.YEAR)
-            )
+            title = f"{title} {self.input_data.get_value(InputType.YEAR)}"
+
         else:
             start_year = self.input_data.get_value(InputType.YEAR_MINIMUM)
             end_year = self.input_data.get_value(InputType.YEAR_MAXIMUM)
             if self.input_data.get_value(InputType.COLLECTION) != COLLECTION_OBS:
                 end_year = end_year - 1
-            title = "{t} years {start_year} up to and including {end_year},".format(
-                t=title, start_year=start_year, end_year=end_year
-            )
+            title = f"{title} years {start_year} up to and including {end_year},"
 
         if self.input_data.get_value(InputType.RETURN_PERIOD) is not None:
-            title = "{t} for a return period of {return_period},".format(
-                t=title,
-                return_period=self.input_data.get_value(InputType.RETURN_PERIOD),
-            )
+            title = (f"{title} for a return period of "
+                     f"{self.input_data.get_value(InputType.RETURN_PERIOD)},")
 
         if self.input_data.get_area_type() == AreaType.POINT:
             grid_x = int(self.cubes[0].coord("projection_x_coordinate").points[0])
             grid_y = int(self.cubes[0].coord("projection_y_coordinate").points[0])
-            title = "{t} for grid square {x}, {y}".format(t=title, x=grid_x, y=grid_y)
+            title = f"{title} for grid square {grid_x}, {grid_y}"
 
         elif self.input_data.get_area_type() == AreaType.BBOX:
             x_bounds = self.cubes[0].coord("projection_x_coordinate").bounds
@@ -1067,9 +1059,7 @@ class DataExtractor:
             grid_y1 = int(y_bounds[0][0])
             grid_x2 = int(x_bounds[-1][1])
             grid_y2 = int(y_bounds[-1][1])
-            title = "{t} in area {x1}, {y1} to {x2}, {y2}".format(
-                t=title, x1=grid_x1, y1=grid_y1, x2=grid_x2, y2=grid_y2
-            )
+            title = f"{title} in area {grid_x1}, {grid_y1} to {grid_x2}, {grid_y2}"
 
         elif self.input_data.get_area_type() in [
             AreaType.COAST_POINT,
@@ -1078,29 +1068,24 @@ class DataExtractor:
             # coordinates are coming in as lat, long
             latitude = str(round(self.cubes[0].coord("latitude").points[0], 2))
             longitude = str(round(self.cubes[0].coord("longitude").points[0], 2))
-            title = "{t} for grid square {latitude}°, {longitude}°".format(
-                t=title, latitude=latitude, longitude=longitude
-            )
+            title = f"{title} for grid square {latitude}°, {longitude}°"
 
         else:
             area = self.input_data.get_area_label()
             area = area.replace("All ", "all ")
-            title = "{t} in {area}".format(t=title, area=area)
+            title = f"{title} in {area}"
 
         # add baseline
         if self.input_data.get_value(InputType.BASELINE) is not None:
-            title = "{t}, using baseline {baseline}".format(
-                t=title, baseline=self.input_data.get_value_label(InputType.BASELINE)
-            )
+            title = f"{title}, using baseline {self.input_data.get_value_label(InputType.BASELINE)}"
 
         try:
             # add scenario, if only one of them. If len > 1 then the scenarios will
             # be on the plot legend
-            scenario = self.input_data.get_value_label(InputType.SCENARIO)
+            scenario = self.input_data.get_value_label(InputType.SCENARIO)[0]
             if len(scenario) == 1:
-                title = "{t}, and scenario {scenario}".format(
-                    t=title, scenario=scenario[0]
-                )
+                title = f"{title}, and scenario {scenario}"
+
         except KeyError:
             # there is no scenario for the Had Grid Obs data
             pass
@@ -1136,6 +1121,14 @@ def get_probability_levels(cube, extended_range):
 
 
 def timeout(seconds=10):
+    """
+    A decorator method that raises a TimeoutError after a give number of seconds.
+
+    @param seconds(int): the timeout in seconds (default 10 seconds)
+
+    @raises TimeoutError
+
+    """
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -1158,6 +1151,6 @@ def _load_cube(filename):
     try:
         cube = iris.load_cube(filename)
     except TimeoutError:
-        LOG.error(f"Timeout accessing {filename}")
+        LOG.error("Timeout accessing %s", filename)
         raise UKCPDPDataNotFoundException("Timeout error accessing file")
     return cube
