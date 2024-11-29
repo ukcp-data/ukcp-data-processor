@@ -1,3 +1,9 @@
+# Release 2.12.0
+
+This release addresses:
+
+* Provide the CMIP members 23, 25, 27 and 29 for the 'Local' and 'Regional' collections
+
 # Release 2.11.0
 
 This release addresses:
