@@ -264,6 +264,18 @@ class DataExtractor:
             for coord in coords:
                 cube.remove_coord(coord)
 
+            temporal_average_type = self.input_data.get_value(
+                InputType.TEMPORAL_AVERAGE_TYPE
+            )
+            if (
+                collection == COLLECTION_CPM
+                and temporal_average_type == TemporalAverageType.SEASONAL
+            ):
+                # some of the seasonal cubes contain month_number
+                coords = cube.coords(var_name="month_number")
+                for coord in coords:
+                    cube.remove_coord(coord)
+
         if len(cubes) == 0:
             LOG.warning("No data was retrieved from the following files:%s", file_list)
             raise UKCPDPDataNotFoundException(

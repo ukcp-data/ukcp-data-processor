@@ -2,6 +2,7 @@
 This module contains the BaseCsvWriter, a base class for CSV writers.
 
 """
+
 import collections
 import logging
 import os
@@ -116,11 +117,9 @@ class BaseCsvWriter:
         """
         self._write_headers(output_data_file_path)
 
-        with open(output_data_file_path, "a") as output_data_file:
+        with open(output_data_file_path, "a", encoding="utf-8") as output_data_file:
             for key in key_list:
-                line_out = "{key},{values}\n".format(
-                    key=key, values=",".join(self.data_dict[key])
-                )
+                line_out = f"{key},{','.join(self.data_dict[key])}\n"
                 output_data_file.write(line_out)
 
         # reset the data dict
@@ -142,11 +141,9 @@ class BaseCsvWriter:
         header_string = header_string.replace("\n,", "\n")
         header_length = len(header_string.split("\n")) + len(user_inputs.keys()) + 1
         with open(output_data_file_path, "w", encoding="utf8") as output_data_file:
-            output_data_file.write("header length,{}\n".format(header_length))
+            output_data_file.write(f"header length,{header_length}\n")
             for key in sorted(user_inputs.keys()):
-                output_data_file.write(
-                    "{key},{value}\n".format(key=key, value=user_inputs[key])
-                )
+                output_data_file.write(f"{key},{user_inputs[key]}\n")
             output_data_file.write(header_string)
             output_data_file.write("\n")
 
@@ -157,9 +154,7 @@ class BaseCsvWriter:
             plot_type = self.plot_type.lower()
         except AttributeError:
             plot_type = "subset"
-        file_name = "{plot_type}_{timestamp}{suffix}.csv".format(
-            plot_type=plot_type, timestamp=self.timestamp, suffix=file_name_suffix
-        )
+        file_name = f"{plot_type}_{self.timestamp}{file_name_suffix}.csv"
         return os.path.join(self.output_data_file_path, file_name)
 
 
