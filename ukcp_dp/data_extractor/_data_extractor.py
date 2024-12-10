@@ -2,7 +2,6 @@
 This module contains the DataExtractor class.
 
 """
-
 import functools
 import glob
 import logging
@@ -30,6 +29,7 @@ from ukcp_dp.constants import (
     COLLECTION_RCM,
     COLLECTION_RCM_GWL,
     IRIS_LOAD_TIMEOUT_SECONDS,
+    CUBE_NAME_MAPPING,
 )
 from ukcp_dp.data_extractor._utils import get_anomaly
 from ukcp_dp.exception import (
@@ -334,7 +334,14 @@ class DataExtractor:
 
                 for nc_file in f_list:
                     LOG.debug(" - file: %s", nc_file)
-                    cubes.extend(iris.load(nc_file))
+                    cubes.extend(
+                        iris.load(
+                            nc_file,
+                            CUBE_NAME_MAPPING[
+                                self.input_data.get_value(InputType.VARIABLE)
+                            [0]],
+                        )
+                    )
                     LOG.debug(" - cube appended")
                 for nc_file in f_list:
                     LOG.debug(" - file: %s", nc_file)
@@ -481,7 +488,6 @@ class DataExtractor:
             raise UKCPDPDataNotFoundException(
                 "No data found for given selection options"
             )
->>>>>>> 669f6aa (updata the data extractor to cope with the GWL prop files)
 
         return cube
 
@@ -708,17 +714,16 @@ class DataExtractor:
         return result
 
     def _get_gwl_selector(self):
-        gwl = self.input_data.get_value(InputType.GWL)
-        if "gwl" in gwl:
-            gwl = gwl.split("gwl")[1]
-        gwl_constraint = iris.Constraint(global_warming_level=float(gwl))
+        gwl_constraint = iris.Constraint(
+            GWL=float(self.input_data.get_value(InputType.GWL))
+        )
         LOG.debug(
-            "Constraint(global_warming_level=%s)",
+            "Constraint(GWL=%s)",
             self.input_data.get_value(InputType.GWL),
         )
 
         return gwl_constraint
-
+    
     def _get_spatial_selector(self, cube, collection):
         LOG.debug("_get_spatial_selector")
         # generate an area constraint
@@ -847,15 +852,25 @@ class DataExtractor:
 
         elif temporal_average_type == TemporalAverageType.MONTHLY:
             for i, term in enumerate(get_months()):
+                    
                 if term == self.input_data.get_value(InputType.TIME_PERIOD):
                     # i is the index not the month number
-                    temporal_constraint = iris.Constraint(
-                        time=lambda t: i < t.point.month <= i + 1
-                    )
-                    LOG.debug("Constraint(%s <= t.point.month <= %s)", i, i + 1)
+
+                    if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB and self.input_data.get_value(InputType.GWL) is not None:
+                        temporal_constraint = iris.Constraint(
+                            month=lambda m: i < m.point <= i + 1
+                        )
+                        LOG.debug("Constraint(%s <= m.point <= %s)", i, i + 1)
+                    else:
+                        temporal_constraint = iris.Constraint(
+                            time=lambda t: i < t.point.month <= i + 1
+                        )
+                        LOG.debug("Constraint(%s <= t.point.month <= %s)", i, i + 1)
                     break
 
         elif temporal_average_type == TemporalAverageType.SEASONAL:
+            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB and self.input_data.get_value(InputType.GWL) is not None:
+                return
             if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
                 temporal_constraint = iris.Constraint(
                     clim_season=self.input_data.get_value(InputType.TIME_PERIOD)
@@ -1002,64 +1017,80 @@ class DataExtractor:
 
         variable = " and ".join(self.input_data.get_value_label(InputType.VARIABLE))
         if self.input_data.get_value(InputType.VARIABLE)[0] in ["hursAnom", "hussAnom"]:
-            variable = f"percentage {variable}"
+            variable = "percentage {variable}".format(variable=variable)
 
         if self.input_data.get_value(InputType.RETURN_PERIOD) is not None:
-            title = f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} in"
-
-        elif self.input_data.get_value(InputType.GWL) is not None:
-            title = (f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
-                     f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} at "
-                     f"{self.input_data.get_value_label(InputType.GWL)} level")
+            title = "{variable} for {time_period} in".format(
+                time_period=self.input_data.get_value_label(InputType.TIME_PERIOD),
+                variable=variable,
+            )
 
         elif (
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
             == TemporalAverageType.ANNUAL
             or self.input_data.get_value(InputType.TIME_PERIOD) == "all"
         ):
-            title = (f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
-                     f"{variable} for")
+            title = "{temporal_type} average {variable} for".format(
+                temporal_type=self.input_data.get_value_label(
+                    InputType.TEMPORAL_AVERAGE_TYPE
+                ),
+                variable=variable,
+            )
 
         elif self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) is None:
-            title = f"{variable} for"
+            title = "{variable} for".format(variable=variable)
 
         else:
-            title = (f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
-                     f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} in")
+            title = "{temporal_type} average {variable} for {time_period} in".format(
+                temporal_type=self.input_data.get_value_label(
+                    InputType.TEMPORAL_AVERAGE_TYPE
+                ),
+                time_period=self.input_data.get_value_label(InputType.TIME_PERIOD),
+                variable=variable,
+            )
 
-
-        if self.input_data.get_value(InputType.GWL) is not None:
-            pass
-
-        elif self.input_data.get_value(
+        if self.input_data.get_value(
             InputType.YEAR_MINIMUM
         ) == self.input_data.get_value(InputType.YEAR_MAXIMUM):
-            title = f"{title} {self.input_data.get_value(InputType.YEAR)}"
-
+            title = "{t} {year}".format(
+                t=title, year=self.input_data.get_value(InputType.YEAR)
+            )
         else:
             start_year = self.input_data.get_value(InputType.YEAR_MINIMUM)
             end_year = self.input_data.get_value(InputType.YEAR_MAXIMUM)
             if self.input_data.get_value(InputType.COLLECTION) != COLLECTION_OBS:
                 end_year = end_year - 1
-            title = f"{title} years {start_year} up to and including {end_year},"
+            title = "{t} years {start_year} up to and including {end_year},".format(
+                t=title, start_year=start_year, end_year=end_year
+            )
 
         if self.input_data.get_value(InputType.RETURN_PERIOD) is not None:
-            title = (f"{title} for a return period of "
-                     f"{self.input_data.get_value(InputType.RETURN_PERIOD)},")
+            title = "{t} for a return period of {return_period},".format(
+                t=title,
+                return_period=self.input_data.get_value(InputType.RETURN_PERIOD),
+            )
 
         if self.input_data.get_area_type() == AreaType.POINT:
             grid_x = int(self.cubes[0].coord("projection_x_coordinate").points[0])
             grid_y = int(self.cubes[0].coord("projection_y_coordinate").points[0])
-            title = f"{title} for grid square {grid_x}, {grid_y}"
+            title = "{t} for grid square {x}, {y}".format(t=title, x=grid_x, y=grid_y)
 
         elif self.input_data.get_area_type() == AreaType.BBOX:
             x_bounds = self.cubes[0].coord("projection_x_coordinate").bounds
             y_bounds = self.cubes[0].coord("projection_y_coordinate").bounds
-            grid_x1 = int(x_bounds[0][0])
-            grid_y1 = int(y_bounds[0][0])
-            grid_x2 = int(x_bounds[-1][1])
-            grid_y2 = int(y_bounds[-1][1])
-            title = f"{title} in area {grid_x1}, {grid_y1} to {grid_x2}, {grid_y2}"
+            if y_bounds is None:
+                grid_x1 = min(self.cubes[0].coord("projection_x_coordinate").points)
+                grid_x2 = max(self.cubes[0].coord("projection_x_coordinate").points)
+                grid_y1 = min(self.cubes[0].coord("projection_y_coordinate").points)
+                grid_y2 = max(self.cubes[0].coord("projection_y_coordinate").points)
+            else:
+                grid_x1 = int(x_bounds[0][0])
+                grid_y1 = int(y_bounds[0][0])
+                grid_x2 = int(x_bounds[-1][1])
+                grid_y2 = int(y_bounds[-1][1])
+            title = "{t} in area {x1}, {y1} to {x2}, {y2}".format(
+                t=title, x1=grid_x1, y1=grid_y1, x2=grid_x2, y2=grid_y2
+            )
 
         elif self.input_data.get_area_type() in [
             AreaType.COAST_POINT,
@@ -1068,24 +1099,29 @@ class DataExtractor:
             # coordinates are coming in as lat, long
             latitude = str(round(self.cubes[0].coord("latitude").points[0], 2))
             longitude = str(round(self.cubes[0].coord("longitude").points[0], 2))
-            title = f"{title} for grid square {latitude}°, {longitude}°"
+            title = "{t} for grid square {latitude}°, {longitude}°".format(
+                t=title, latitude=latitude, longitude=longitude
+            )
 
         else:
             area = self.input_data.get_area_label()
             area = area.replace("All ", "all ")
-            title = f"{title} in {area}"
+            title = "{t} in {area}".format(t=title, area=area)
 
         # add baseline
         if self.input_data.get_value(InputType.BASELINE) is not None:
-            title = f"{title}, using baseline {self.input_data.get_value_label(InputType.BASELINE)}"
+            title = "{t}, using baseline {baseline}".format(
+                t=title, baseline=self.input_data.get_value_label(InputType.BASELINE)
+            )
 
         try:
             # add scenario, if only one of them. If len > 1 then the scenarios will
             # be on the plot legend
-            scenario = self.input_data.get_value_label(InputType.SCENARIO)[0]
+            scenario = self.input_data.get_value_label(InputType.SCENARIO)
             if len(scenario) == 1:
-                title = f"{title}, and scenario {scenario}"
-
+                title = "{t}, and scenario {scenario}".format(
+                    t=title, scenario=scenario[0]
+                )
         except KeyError:
             # there is no scenario for the Had Grid Obs data
             pass
@@ -1121,14 +1157,6 @@ def get_probability_levels(cube, extended_range):
 
 
 def timeout(seconds=10):
-    """
-    A decorator method that raises a TimeoutError after a give number of seconds.
-
-    @param seconds(int): the timeout in seconds (default 10 seconds)
-
-    @raises TimeoutError
-
-    """
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -1151,6 +1179,6 @@ def _load_cube(filename):
     try:
         cube = iris.load_cube(filename)
     except TimeoutError:
-        LOG.error("Timeout accessing %s", filename)
+        LOG.error(f"Timeout accessing {filename}")
         raise UKCPDPDataNotFoundException("Timeout error accessing file")
     return cube
