@@ -121,6 +121,9 @@ class DataExtractor:
                 else:
                     # we can use the values directly from the file
                     cube = self._get_cube(file_list)
+                    if cube is None:
+                        # this can be the case for some of the Prob GWL data
+                        continue
 
                 # do we need to convert percentiles?
                 if (
@@ -219,6 +222,10 @@ class DataExtractor:
             file_list, climatology, overlay_probability_levels, collection
         )
 
+        if cube is None:
+            # this can be the case for some of the Prob GWL data
+            return None
+
         LOG.debug("Concatenated cube:\n%s", cube)
 
         if climatology is True:
@@ -233,11 +240,11 @@ class DataExtractor:
         if cube is None:
             if time_slice_constraint is not None:
                 LOG.warning(
-                    "Time slice constraint resulted in no cubes being " "returned: %s",
+                    "Time slice constraint resulted in no cubes being returned: %s",
                     time_slice_constraint,
                 )
             raise UKCPDPDataNotFoundException(
-                "Selection constraints resulted in no data being" " selected"
+                "Selection constraints resulted in no data being selected"
             )
 
         # generate a temporal constraint
@@ -248,11 +255,11 @@ class DataExtractor:
         if cube is None:
             if temporal_constraint is not None:
                 LOG.warning(
-                    "Temporal constraint resulted in no cubes being " "returned: %s",
+                    "Temporal constraint resulted in no cubes being returned: %s",
                     temporal_constraint,
                 )
             raise UKCPDPDataNotFoundException(
-                "Selection constraints resulted in no data being" " selected"
+                "Selection constraints resulted in no data being selected"
             )
 
         # extract 10, 50 and 90 percentiles
@@ -271,11 +278,11 @@ class DataExtractor:
         if cube is None:
             if area_constraint is not None:
                 LOG.warning(
-                    "Area constraint resulted in no cubes being " "returned: %s",
+                    "Area constraint resulted in no cubes being returned: %s",
                     area_constraint,
                 )
             raise UKCPDPDataNotFoundException(
-                "Selection constraints resulted in no data being" " selected"
+                "Selection constraints resulted in no data being selected"
             )
 
         return cube
@@ -311,10 +318,10 @@ class DataExtractor:
             and self.input_data.get_value(InputType.GWL) is not None
         ):
             return self._load_cubes_prob_gwl(file_list)
-        else:
-            return self._load_cubes_standard(
-                file_list, overlay_probability_levels, collection
-            )
+
+        return self._load_cubes_standard(
+            file_list, overlay_probability_levels, collection
+        )
 
     def _load_cubes_prob_gwl(self, file_list):
         """
@@ -344,6 +351,10 @@ class DataExtractor:
                     LOG.error("File not found: %s", file_name)
             raise UKCPDPDataNotFoundException from ex
 
+        if len(cubes) == 0:
+            LOG.info("GWL files not found: %s", file_list)
+            return None
+
         try:
             cube = cubes.concatenate_cube()
         except iris.exceptions.ConcatenateError as ex:
@@ -362,11 +373,11 @@ class DataExtractor:
         if cube is None:
             if gwl_constraint is not None:
                 LOG.warning(
-                    "GWL constraint resulted in no cubes being " "returned: %s",
+                    "GWL constraint resulted in no cubes being returned: %s",
                     gwl_constraint,
                 )
             raise UKCPDPDataNotFoundException(
-                "Selection constraints resulted in no data being" " selected"
+                "Selection constraints resulted in no data being selected"
             )
 
         return cube
@@ -462,18 +473,16 @@ class DataExtractor:
                     pass
                 try:
                     error_cubes.concatenate_cube()
-                except iris.exceptions.ConcatenateError as ex:
+                except iris.exceptions.ConcatenateError as ex_2:
                     message = ""
                     try:
-                        message = " {}".format(
-                            error_cube.coord("ensemble_member_id").points[0]
-                        )
+                        message = f" {error_cube.coord('ensemble_member_id').points[0]}"
                     except iris.exceptions.CoordinateNotFoundError:
                         pass
                     LOG.error(
                         "Error when concatenating cube%s:\n%s\n%s",
                         message,
-                        ex,
+                        ex_2,
                         error_cube,
                     )
                     break
@@ -607,7 +616,7 @@ class DataExtractor:
                     )
         else:
             raise UKCPDPInvalidParameterException(
-                "Unknown area type: {}.".format(self.input_data.get_area_type())
+                f"Unknown area type: {self.input_data.get_area_type()}."
             )
 
         return area_constraint
@@ -662,9 +671,8 @@ class DataExtractor:
 
         else:
             raise UKCPDPInvalidParameterException(
-                "Unknown temporal average type: {}.".format(
-                    self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
-                )
+                "Unknown temporal average type: "
+                f"{self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)}."
             )
 
         return temporal_constraint
@@ -795,25 +803,30 @@ class DataExtractor:
             title = f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} in"
 
         elif self.input_data.get_value(InputType.GWL) is not None:
-            title = (f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
-                     f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} at "
-                     f"{self.input_data.get_value_label(InputType.GWL)} level")
+            title = (
+                f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
+                f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} at "
+                f"{self.input_data.get_value_label(InputType.GWL)} level"
+            )
 
         elif (
             self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
             == TemporalAverageType.ANNUAL
             or self.input_data.get_value(InputType.TIME_PERIOD) == "all"
         ):
-            title = (f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
-                     f"{variable} for")
+            title = (
+                f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
+                f"{variable} for"
+            )
 
         elif self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) is None:
             title = f"{variable} for"
 
         else:
-            title = (f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
-                     f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} in")
-
+            title = (
+                f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
+                f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} in"
+            )
 
         if self.input_data.get_value(InputType.GWL) is not None:
             pass
@@ -831,8 +844,10 @@ class DataExtractor:
             title = f"{title} years {start_year} up to and including {end_year},"
 
         if self.input_data.get_value(InputType.RETURN_PERIOD) is not None:
-            title = (f"{title} for a return period of "
-                     f"{self.input_data.get_value(InputType.RETURN_PERIOD)},")
+            title = (
+                f"{title} for a return period of "
+                f"{self.input_data.get_value(InputType.RETURN_PERIOD)},"
+            )
 
         if self.input_data.get_area_type() == AreaType.POINT:
             grid_x = int(self.cubes[0].coord("projection_x_coordinate").points[0])
@@ -916,6 +931,7 @@ def timeout(seconds=10):
     @raises TimeoutError
 
     """
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
