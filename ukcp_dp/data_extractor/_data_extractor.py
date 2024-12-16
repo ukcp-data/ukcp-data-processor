@@ -121,9 +121,6 @@ class DataExtractor:
                 else:
                     # we can use the values directly from the file
                     cube = self._get_cube(file_list)
-                    if cube is None:
-                        # this can be the case for some of the Prob GWL data
-                        continue
 
                 # do we need to convert percentiles?
                 if (
@@ -221,10 +218,6 @@ class DataExtractor:
         cube = self._load_cubes(
             file_list, climatology, overlay_probability_levels, collection
         )
-
-        if cube is None:
-            # this can be the case for some of the Prob GWL data
-            return None
 
         LOG.debug("Concatenated cube:\n%s", cube)
 
@@ -350,10 +343,6 @@ class DataExtractor:
                 if not path.exists(file_name):
                     LOG.error("File not found: %s", file_name)
             raise UKCPDPDataNotFoundException from ex
-
-        if len(cubes) == 0:
-            LOG.info("GWL files not found: %s", file_list)
-            return None
 
         try:
             cube = cubes.concatenate_cube()
