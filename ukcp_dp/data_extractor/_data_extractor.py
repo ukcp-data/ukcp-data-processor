@@ -301,10 +301,7 @@ class DataExtractor:
         else:
             LOG.info("_load_cubes")
 
-        if LOG.getEffectiveLevel() == logging.DEBUG:
-            LOG.debug("_load_cubes from %s files", len(file_list))
-            for fpath in file_list:
-                LOG.debug(" - FILE: %s", fpath)
+        LOG.debug("_load_cubes from %s file paths", len(file_list))
 
         if (
             collection == COLLECTION_PROB
@@ -388,15 +385,16 @@ class DataExtractor:
         cubes = CubeList()
         try:
             for file_path in file_list:
-                LOG.debug(" - FILE: %s", file_path)
+                LOG.debug(" - file path: %s", file_path)
                 f_list = glob.glob(file_path)
 
                 cube_list = []
                 for nc_file in f_list:
-                    LOG.debug(" - file: %s", nc_file)
+                    LOG.debug(" - file name: %s", nc_file)
                     cube_list.append(_load_cube(nc_file))
                     LOG.debug(" - cube appended")
                 cubes.extend(cube_list)
+                LOG.debug(" - finished: %s", file_path)
 
         except IOError as ex:
             if overlay_probability_levels is True:
@@ -456,7 +454,9 @@ class DataExtractor:
                 error_cubes.append(error_cube)
                 try:
                     LOG.info(
-                        "Appending %s", error_cube.coord("ensemble_member_id").points[0]
+                        "Appending Member %s, year %s",
+                        error_cube.coord("ensemble_member").points[0],
+                        error_cube.coord("year").points[0],
                     )
                 except iris.exceptions.CoordinateNotFoundError:
                     pass
@@ -465,7 +465,10 @@ class DataExtractor:
                 except iris.exceptions.ConcatenateError as ex_2:
                     message = ""
                     try:
-                        message = f" {error_cube.coord('ensemble_member_id').points[0]}"
+                        message = " Member {}, year {}".format(
+                            error_cube.coord("ensemble_member").points[0],
+                            error_cube.coord("year").points[0],
+                        )
                     except iris.exceptions.CoordinateNotFoundError:
                         pass
                     LOG.error(
