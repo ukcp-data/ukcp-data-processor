@@ -449,6 +449,8 @@ class DataExtractor:
             cube = cubes.concatenate_cube()
         except iris.exceptions.ConcatenateError as ex:
             LOG.error("Failed to concatenate cubes:\n%s\n%s", ex, cubes)
+            # Sometimes this gets a better error message from merge
+            LOG.error(cubes.merge_cube())
             error_cubes = CubeList()
             for error_cube in cubes:
                 error_cubes.append(error_cube)

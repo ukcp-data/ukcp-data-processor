@@ -1,3 +1,9 @@
+# Release 2.13.0
+
+This release addresses:
+
+* Provide GWL data for RCM and probabilistic data
+
 # Release 2.12.0
 
 This release addresses:
