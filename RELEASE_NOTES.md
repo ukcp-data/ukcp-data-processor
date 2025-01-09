@@ -2,7 +2,7 @@
 
 This release addresses:
 
-* Provide GWL data for RCM and probabilistic data
+* Provide global warming level data for the 'Regional' and 'Probabilistic' collections
 
 # Release 2.12.0
 
