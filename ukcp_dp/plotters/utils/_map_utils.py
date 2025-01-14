@@ -236,7 +236,7 @@ def plot_map(
     dpi=DPI_SAVING,
     dpi_display=DPI_DISPLAY,
     fsize=12,
-    fontfam="Arial",
+    fontfam="DejaVu Sans",
     proj=ccrs.PlateCarree(),
     marlft=0.03,
     marrgt=0.97,
@@ -604,7 +604,7 @@ def plot_choropleth_map(
     dpi=DPI_SAVING,
     dpi_display=DPI_DISPLAY,
     fsize=12,
-    fontfam="Arial",
+    fontfam="DejaVu Sans",
     proj=ccrs.PlateCarree(),
     marlft=0.03,
     marrgt=0.97,
@@ -814,7 +814,7 @@ def plot_choropleth_map(
         # np.arange can give inconsistent results
         # https://docs.scipy.org/doc/numpy/reference/generated/numpy.arange.html
         # so this is better:
-        nsteps = (vrange[1] - vrange[0]) / vstep
+        nsteps = int((vrange[1] - vrange[0]) / vstep)
         levels = np.linspace(vrange[0], vrange[1], num=nsteps + 1, endpoint=True)
 
         # Set up the colourmap:
@@ -940,15 +940,17 @@ def plot_choropleth_map(
 
     # Add gridlines (and label them on the axes, IF we're in PlateCarree)
     gridlabels = proj == ccrs.PlateCarree()
-    gl = ax.gridlines(
-        crs=ccrs.PlateCarree(), draw_labels=gridlabels, linewidth=0.5, color="grey"
-    )
     if gridlabels:
+        gl = ax.gridlines(
+            crs=ccrs.PlateCarree(), draw_labels=gridlabels, linewidth=0.5, color="grey"
+            )
         # Options to switch on/off individual axes labels:
         gl.xlabels_bottom = xgridax[0]
         gl.xlabels_top = xgridax[1]
         gl.ylabels_left = ygridax[0]
         gl.ylabels_right = ygridax[1]
+    else:
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), linewidth=0)
 
     # Set limits for the grid separate to the plot's xlims/ylims:
     if showglobal:

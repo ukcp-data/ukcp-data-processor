@@ -11,9 +11,8 @@ import signal
 
 import iris
 from iris.cube import CubeList
-import iris.experimental.equalise_cubes
 from iris.time import PartialDateTime
-from iris.util import unify_time_units
+from iris.util import equalise_attributes, unify_time_units
 
 import cf_units
 from ukcp_dp.constants import (
@@ -442,7 +441,7 @@ class DataExtractor:
         LOG.debug("First cube:\n%s", cubes[0])
         LOG.debug("Concatenate cubes:\n%s", cubes)
 
-        iris.experimental.equalise_cubes.equalise_attributes(cubes)
+        equalise_attributes(cubes)
         unify_time_units(cubes)
 
         try:
@@ -948,6 +947,6 @@ def _load_cube(filename):
     try:
         cube = iris.load_cube(filename)
     except TimeoutError:
-        LOG.error("Timeout accessing %s", filename)
+        LOG.error(f"Timeout accessing {filename}")
         raise UKCPDPDataNotFoundException("Timeout error accessing file")
     return cube
