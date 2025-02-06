@@ -2,7 +2,6 @@
 This module contains the DataExtractor class.
 
 """
-
 import functools
 import glob
 import logging
@@ -12,7 +11,6 @@ import signal
 import iris
 from iris.cube import CubeList
 from iris.util import equalise_attributes, unify_time_units
-from iris.time import PartialDateTime
 
 import cf_units
 from ukcp_dp.constants import (
@@ -209,14 +207,111 @@ class DataExtractor:
 
         @return an iris cube, maybe 'None' if overlay_probability_levels=True
         """
+        if climatology is True:
+            LOG.info("_get_cube for climatology")
+        elif overlay_probability_levels is True:
+            LOG.info("_get_cube, overlay probability levels")
+        else:
+            LOG.info("_get_cube")
+
+        if LOG.getEffectiveLevel() == logging.DEBUG:
+            LOG.debug("_get_cube from %s file paths", len(file_list))
+
+        # Load the cubes
+        cubes = CubeList()
+        try:
+            for file_path in file_list:
+                LOG.debug(" - FILE: %s", file_path)
+                f_list = glob.glob(file_path)
+
+                cube_list = []
+                for nc_file in f_list:
+                    LOG.debug(" - file: %s", nc_file)
+                    cube_list.append(_load_cube(nc_file))
+                    LOG.debug(" - cube appended")
+                cubes.extend(cube_list)
+                LOG.debug(" - finished: %s", file_path)
+
+        except IOError as ex:
+            if overlay_probability_levels is True:
+                # not all variables have corresponding probabilistic data
+                return None
+            for file_name in file_list:
+                file_name = file_name.split("*")[0]
+                if not path.exists(file_name):
+                    LOG.error("File not found: %s", file_name)
+            raise UKCPDPDataNotFoundException from ex
+
         if overlay_probability_levels is True:
             collection = COLLECTION_PROB
         else:
             collection = self.input_data.get_value(InputType.COLLECTION)
 
-        cube = self._load_cubes(
-            file_list, climatology, overlay_probability_levels, collection
-        )
+        # Remove time_bnds cubes
+        if collection == COLLECTION_PROB:
+            unfiltered_cubes = cubes
+            cubes = CubeList()
+            for cube in unfiltered_cubes:
+                if cube.name() != "time_bnds":
+                    cubes.append(cube)
+
+        # Different creation dates will stop cubes concatenating, so lets
+        # remove them
+        for cube in cubes:
+            coords = cube.coords(var_name="creation_date")
+            for coord in coords:
+                cube.remove_coord(coord)
+
+        if len(cubes) == 0:
+            LOG.warning("No data was retrieved from the following files:%s", file_list)
+            raise UKCPDPDataNotFoundException(
+                "No data found for given selection options"
+            )
+
+        LOG.debug("First cube:\n%s", cubes[0])
+        LOG.debug("Concatenate cubes:\n%s", cubes)
+
+        equalise_attributes(cubes)
+        unify_time_units(cubes)
+
+        try:
+            cube = cubes.concatenate_cube()
+        except iris.exceptions.ConcatenateError as ex:
+            LOG.error("Failed to concatenate cubes:\n%s\n%s", ex, cubes)
+            error_cubes = CubeList()
+            for error_cube in cubes:
+                error_cubes.append(error_cube)
+                try:
+                    LOG.info(
+                        "Appending Member %s, year %s",
+                        error_cube.coord("ensemble_member").points[0],
+                        error_cube.coord("year").points[0],
+                    )
+                except iris.exceptions.CoordinateNotFoundError:
+                    pass
+                try:
+                    error_cubes.concatenate_cube()
+                except iris.exceptions.ConcatenateError as ex:
+                    message = ""
+                    try:
+                        message = " Member {}, year {}".format(
+                            error_cube.coord("ensemble_member").points[0],
+                            error_cube.coord("year").points[0]
+                        )
+                    except iris.exceptions.CoordinateNotFoundError:
+                        pass
+                    LOG.error(
+                        "Error when concatenating cube%s:\n%s\n%s",
+                        message,
+                        ex,
+                        error_cube,
+                    )
+                    break
+
+            # pylint: disable=W0707
+            raise UKCPDPDataNotFoundException(
+                "No data found for given selection options"
+            )
 
         LOG.debug("Concatenated cube:\n%s", cube)
 
@@ -232,11 +327,11 @@ class DataExtractor:
         if cube is None:
             if time_slice_constraint is not None:
                 LOG.warning(
-                    "Time slice constraint resulted in no cubes being returned: %s",
+                    "Time slice constraint resulted in no cubes being " "returned: %s",
                     time_slice_constraint,
                 )
             raise UKCPDPDataNotFoundException(
-                "Selection constraints resulted in no data being selected"
+                "Selection constraints resulted in no data being" " selected"
             )
 
         # generate a temporal constraint
@@ -247,11 +342,11 @@ class DataExtractor:
         if cube is None:
             if temporal_constraint is not None:
                 LOG.warning(
-                    "Temporal constraint resulted in no cubes being returned: %s",
+                    "Temporal constraint resulted in no cubes being " "returned: %s",
                     temporal_constraint,
                 )
             raise UKCPDPDataNotFoundException(
-                "Selection constraints resulted in no data being selected"
+                "Selection constraints resulted in no data being" " selected"
             )
 
         # extract 10, 50 and 90 percentiles
@@ -270,219 +365,11 @@ class DataExtractor:
         if cube is None:
             if area_constraint is not None:
                 LOG.warning(
-                    "Area constraint resulted in no cubes being returned: %s",
+                    "Area constraint resulted in no cubes being " "returned: %s",
                     area_constraint,
                 )
             raise UKCPDPDataNotFoundException(
-                "Selection constraints resulted in no data being selected"
-            )
-
-        return cube
-
-    def _load_cubes(
-        self, file_list, climatology, overlay_probability_levels, collection
-    ):
-        """
-        Get an iris cube based on the given files.
-
-        @param file_list (list[str]): a list of file name to retrieve data from
-        @param climatology (boolean): if True extract the climatology data
-        @param overlay_probability_levels (boolean): if True only include the
-            10th, 50th and 90th percentile data
-        @param collection(str): the name of the collection being processed
-
-        @return an iris cube, maybe 'None' if overlay_probability_levels=True
-        """
-        if climatology is True:
-            LOG.info("_load_cubes for climatology")
-        elif overlay_probability_levels is True:
-            LOG.info("_load_cubes, overlay probability levels")
-        else:
-            LOG.info("_load_cubes")
-
-        LOG.debug("_load_cubes from %s file paths", len(file_list))
-
-        if (
-            collection == COLLECTION_PROB
-            and self.input_data.get_value(InputType.GWL) is not None
-        ):
-            return self._load_cubes_prob_gwl(file_list)
-
-        return self._load_cubes_standard(
-            file_list, overlay_probability_levels, collection
-        )
-
-    def _load_cubes_prob_gwl(self, file_list):
-        """
-        Get an iris cube based on the given files.
-
-        @param file_list (list[str]): a list of file name to retrieve data from
-
-        @return an iris cube
-        """
-        LOG.info("_load_cubes_prob_gwl")
-
-        # Load the cubes
-        cubes = CubeList()
-        try:
-            for file_path in file_list:
-                LOG.debug(" - FILE: %s", file_path)
-                f_list = glob.glob(file_path)
-
-                for nc_file in f_list:
-                    LOG.debug(" - file: %s", nc_file)
-                    cubes.extend(iris.load(nc_file))
-                    LOG.debug(" - cube appended")
-        except IOError as ex:
-            for file_name in file_list:
-                file_name = file_name.split("*")[0]
-                if not path.exists(file_name):
-                    LOG.error("File not found: %s", file_name)
-            raise UKCPDPDataNotFoundException from ex
-
-        try:
-            cube = cubes.concatenate_cube()
-        except iris.exceptions.ConcatenateError as ex:
-            LOG.error("Failed to concatenate cubes:\n%s\n%s", ex, cubes)
-
-            # pylint: disable=W0707
-            raise UKCPDPDataNotFoundException(
-                "No data found for given selection options"
-            )
-
-        # generate a gwl constraint
-        gwl_constraint = self._get_gwl_selector()
-        if gwl_constraint is not None:
-            cube = cube.extract(gwl_constraint)
-
-        if cube is None:
-            if gwl_constraint is not None:
-                LOG.warning(
-                    "GWL constraint resulted in no cubes being returned: %s",
-                    gwl_constraint,
-                )
-            raise UKCPDPDataNotFoundException(
-                "Selection constraints resulted in no data being selected"
-            )
-
-        return cube
-
-    def _load_cubes_standard(self, file_list, overlay_probability_levels, collection):
-        """
-        Get an iris cube based on the given files.
-
-        @param file_list (list[str]): a list of file name to retrieve data from
-        @param overlay_probability_levels (boolean): if True only include the
-            10th, 50th and 90th percentile data
-        @param collection(str): the name of the collection being processed
-
-        @return an iris cube, maybe 'None' if overlay_probability_levels=True
-        """
-        LOG.info("_load_cubes_standard")
-
-        # Load the cubes
-        cubes = CubeList()
-        try:
-            for file_path in file_list:
-                LOG.debug(" - file path: %s", file_path)
-                f_list = glob.glob(file_path)
-
-                cube_list = []
-                for nc_file in f_list:
-                    LOG.debug(" - file name: %s", nc_file)
-                    cube_list.append(_load_cube(nc_file))
-                    LOG.debug(" - cube appended")
-                cubes.extend(cube_list)
-                LOG.debug(" - finished: %s", file_path)
-
-        except IOError as ex:
-            if overlay_probability_levels is True:
-                # not all variables have corresponding probabilistic data
-                return None
-            for file_name in file_list:
-                file_name = file_name.split("*")[0]
-                if not path.exists(file_name):
-                    LOG.error("File not found: %s", file_name)
-            raise UKCPDPDataNotFoundException from ex
-
-        # Remove time_bnds cubes
-        if collection == COLLECTION_PROB:
-            unfiltered_cubes = cubes
-            cubes = CubeList()
-            for cube in unfiltered_cubes:
-                if cube.name() != "time_bnds":
-                    cubes.append(cube)
-
-        # Different creation dates will stop cubes concatenating, so lets
-        # remove them
-        for cube in cubes:
-            coords = cube.coords(var_name="creation_date")
-            for coord in coords:
-                cube.remove_coord(coord)
-
-            temporal_average_type = self.input_data.get_value(
-                InputType.TEMPORAL_AVERAGE_TYPE
-            )
-            if (
-                collection == COLLECTION_CPM
-                and temporal_average_type == TemporalAverageType.SEASONAL
-            ):
-                # some of the seasonal cubes contain month_number
-                coords = cube.coords(var_name="month_number")
-                for coord in coords:
-                    cube.remove_coord(coord)
-
-        if len(cubes) == 0:
-            LOG.warning("No data was retrieved from the following files:%s", file_list)
-            raise UKCPDPDataNotFoundException(
-                "No data found for given selection options"
-            )
-
-        LOG.debug("First cube:\n%s", cubes[0])
-        LOG.debug("Concatenate cubes:\n%s", cubes)
-
-        equalise_attributes(cubes)
-        unify_time_units(cubes)
-
-        try:
-            cube = cubes.concatenate_cube()
-        except iris.exceptions.ConcatenateError as ex:
-            LOG.error("Failed to concatenate cubes:\n%s\n%s", ex, cubes)
-            # Sometimes this gets a better error message from merge
-            LOG.error(cubes.merge_cube())
-            error_cubes = CubeList()
-            for error_cube in cubes:
-                error_cubes.append(error_cube)
-                try:
-                    LOG.info(
-                        "Appending Member %s, year %s",
-                        error_cube.coord("ensemble_member").points[0],
-                        error_cube.coord("year").points[0],
-                    )
-                except iris.exceptions.CoordinateNotFoundError:
-                    pass
-                try:
-                    error_cubes.concatenate_cube()
-                except iris.exceptions.ConcatenateError as ex_2:
-                    message = ""
-                    try:
-                        message = " Member {}, year {}".format(
-                            error_cube.coord("ensemble_member").points[0],
-                            error_cube.coord("year").points[0],
-                        )
-                    except iris.exceptions.CoordinateNotFoundError:
-                        pass
-                    LOG.error(
-                        "Error when concatenating cube%s:\n%s\n%s",
-                        message,
-                        ex_2,
-                        error_cube,
-                    )
-                    break
-
-            # pylint: disable=W0707
-            raise UKCPDPDataNotFoundException(
-                "No data found for given selection options"
+                "Selection constraints resulted in no data being" " selected"
             )
 
         return cube
@@ -495,18 +382,6 @@ class DataExtractor:
         )
         result.coord("percentile_over_ensemble_member").long_name = "percentile"
         return result
-
-    def _get_gwl_selector(self):
-        gwl = self.input_data.get_value(InputType.GWL)
-        if "gwl" in gwl:
-            gwl = gwl.split("gwl")[1]
-        gwl_constraint = iris.Constraint(global_warming_level=float(gwl))
-        LOG.debug(
-            "Constraint(global_warming_level=%s)",
-            self.input_data.get_value(InputType.GWL),
-        )
-
-        return gwl_constraint
 
     def _get_spatial_selector(self, cube, collection):
         LOG.debug("_get_spatial_selector")
@@ -609,7 +484,7 @@ class DataExtractor:
                     )
         else:
             raise UKCPDPInvalidParameterException(
-                f"Unknown area type: {self.input_data.get_area_type()}."
+                "Unknown area type: {}.".format(self.input_data.get_area_type())
             )
 
         return area_constraint
@@ -664,8 +539,9 @@ class DataExtractor:
 
         else:
             raise UKCPDPInvalidParameterException(
-                "Unknown temporal average type: "
-                f"{self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)}."
+                "Unknown temporal average type: {}.".format(
+                    self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
+                )
             )
 
         return temporal_constraint
@@ -702,17 +578,7 @@ class DataExtractor:
 
         if year_max is not None:
             # we have some form of time slice
-            if self.input_data.get_value(InputType.GWL) is not None:
-                # We start from December in the previous year
-                year_min = year_min - 1
-                pdt1 = PartialDateTime(year=year_min, month=12)
-                pdt2 = PartialDateTime(year=year_max, month=12)
-                time_slice_constraint = iris.Constraint(
-                    time=lambda cell: pdt1 <= cell.point < pdt2
-                )
-                LOG.debug("Constraint(%s <= t.point.year < %s)", pdt1, pdt2)
-
-            elif self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
+            if self.input_data.get_value(InputType.COLLECTION) == COLLECTION_OBS:
                 time_slice_constraint = iris.Constraint(
                     time=lambda t: year_min <= t.point.year <= year_max
                 )
@@ -790,16 +656,12 @@ class DataExtractor:
 
         variable = " and ".join(self.input_data.get_value_label(InputType.VARIABLE))
         if self.input_data.get_value(InputType.VARIABLE)[0] in ["hursAnom", "hussAnom"]:
-            variable = f"percentage {variable}"
+            variable = "percentage {variable}".format(variable=variable)
 
         if self.input_data.get_value(InputType.RETURN_PERIOD) is not None:
-            title = f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} in"
-
-        elif self.input_data.get_value(InputType.GWL) is not None:
-            title = (
-                f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
-                f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} at "
-                f"{self.input_data.get_value_label(InputType.GWL)} level"
+            title = "{variable} for {time_period} in".format(
+                time_period=self.input_data.get_value_label(InputType.TIME_PERIOD),
+                variable=variable,
             )
 
         elif (
@@ -807,45 +669,50 @@ class DataExtractor:
             == TemporalAverageType.ANNUAL
             or self.input_data.get_value(InputType.TIME_PERIOD) == "all"
         ):
-            title = (
-                f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
-                f"{variable} for"
+            title = "{temporal_type} average {variable} for".format(
+                temporal_type=self.input_data.get_value_label(
+                    InputType.TEMPORAL_AVERAGE_TYPE
+                ),
+                variable=variable,
             )
 
         elif self.input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) is None:
-            title = f"{variable} for"
+            title = "{variable} for".format(variable=variable)
 
         else:
-            title = (
-                f"{self.input_data.get_value_label(InputType.TEMPORAL_AVERAGE_TYPE)} average "
-                f"{variable} for {self.input_data.get_value_label(InputType.TIME_PERIOD)} in"
+            title = "{temporal_type} average {variable} for {time_period} in".format(
+                temporal_type=self.input_data.get_value_label(
+                    InputType.TEMPORAL_AVERAGE_TYPE
+                ),
+                time_period=self.input_data.get_value_label(InputType.TIME_PERIOD),
+                variable=variable,
             )
 
-        if self.input_data.get_value(InputType.GWL) is not None:
-            pass
-
-        elif self.input_data.get_value(
+        if self.input_data.get_value(
             InputType.YEAR_MINIMUM
         ) == self.input_data.get_value(InputType.YEAR_MAXIMUM):
-            title = f"{title} {self.input_data.get_value(InputType.YEAR)}"
-
+            title = "{t} {year}".format(
+                t=title, year=self.input_data.get_value(InputType.YEAR)
+            )
         else:
             start_year = self.input_data.get_value(InputType.YEAR_MINIMUM)
             end_year = self.input_data.get_value(InputType.YEAR_MAXIMUM)
             if self.input_data.get_value(InputType.COLLECTION) != COLLECTION_OBS:
                 end_year = end_year - 1
-            title = f"{title} years {start_year} up to and including {end_year},"
+            title = "{t} years {start_year} up to and including {end_year},".format(
+                t=title, start_year=start_year, end_year=end_year
+            )
 
         if self.input_data.get_value(InputType.RETURN_PERIOD) is not None:
-            title = (
-                f"{title} for a return period of "
-                f"{self.input_data.get_value(InputType.RETURN_PERIOD)},"
+            title = "{t} for a return period of {return_period},".format(
+                t=title,
+                return_period=self.input_data.get_value(InputType.RETURN_PERIOD),
             )
 
         if self.input_data.get_area_type() == AreaType.POINT:
             grid_x = int(self.cubes[0].coord("projection_x_coordinate").points[0])
             grid_y = int(self.cubes[0].coord("projection_y_coordinate").points[0])
-            title = f"{title} for grid square {grid_x}, {grid_y}"
+            title = "{t} for grid square {x}, {y}".format(t=title, x=grid_x, y=grid_y)
 
         elif self.input_data.get_area_type() == AreaType.BBOX:
             x_bounds = self.cubes[0].coord("projection_x_coordinate").bounds
@@ -854,7 +721,9 @@ class DataExtractor:
             grid_y1 = int(y_bounds[0][0])
             grid_x2 = int(x_bounds[-1][1])
             grid_y2 = int(y_bounds[-1][1])
-            title = f"{title} in area {grid_x1}, {grid_y1} to {grid_x2}, {grid_y2}"
+            title = "{t} in area {x1}, {y1} to {x2}, {y2}".format(
+                t=title, x1=grid_x1, y1=grid_y1, x2=grid_x2, y2=grid_y2
+            )
 
         elif self.input_data.get_area_type() in [
             AreaType.COAST_POINT,
@@ -863,24 +732,29 @@ class DataExtractor:
             # coordinates are coming in as lat, long
             latitude = str(round(self.cubes[0].coord("latitude").points[0], 2))
             longitude = str(round(self.cubes[0].coord("longitude").points[0], 2))
-            title = f"{title} for grid square {latitude}°, {longitude}°"
+            title = "{t} for grid square {latitude}°, {longitude}°".format(
+                t=title, latitude=latitude, longitude=longitude
+            )
 
         else:
             area = self.input_data.get_area_label()
             area = area.replace("All ", "all ")
-            title = f"{title} in {area}"
+            title = "{t} in {area}".format(t=title, area=area)
 
         # add baseline
         if self.input_data.get_value(InputType.BASELINE) is not None:
-            title = f"{title}, using baseline {self.input_data.get_value_label(InputType.BASELINE)}"
+            title = "{t}, using baseline {baseline}".format(
+                t=title, baseline=self.input_data.get_value_label(InputType.BASELINE)
+            )
 
         try:
             # add scenario, if only one of them. If len > 1 then the scenarios will
             # be on the plot legend
-            scenario = self.input_data.get_value_label(InputType.SCENARIO)[0]
+            scenario = self.input_data.get_value_label(InputType.SCENARIO)
             if len(scenario) == 1:
-                title = f"{title}, and scenario {scenario}"
-
+                title = "{t}, and scenario {scenario}".format(
+                    t=title, scenario=scenario[0]
+                )
         except KeyError:
             # there is no scenario for the Had Grid Obs data
             pass
@@ -916,15 +790,6 @@ def get_probability_levels(cube, extended_range):
 
 
 def timeout(seconds=10):
-    """
-    A decorator method that raises a TimeoutError after a give number of seconds.
-
-    @param seconds(int): the timeout in seconds (default 10 seconds)
-
-    @raises TimeoutError
-
-    """
-
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -936,9 +801,7 @@ def timeout(seconds=10):
             result = func(*args, **kwargs)
             signal.alarm(0)
             return result
-
         return wrapper
-
     return decorator
 
 
@@ -947,6 +810,6 @@ def _load_cube(filename):
     try:
         cube = iris.load_cube(filename)
     except TimeoutError:
-        LOG.error("Timeout accessing %s", filename)
+        LOG.error(f"Timeout accessing {filename}")
         raise UKCPDPDataNotFoundException("Timeout error accessing file")
     return cube

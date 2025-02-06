@@ -127,6 +127,13 @@ class Validator:
             )
 
     def _validate_time_slice(self):
+        if (
+            self.input_data.get_value(InputType.COLLECTION) == COLLECTION_PROB
+            and self.input_data.get_value(InputType.GWL) is not None
+        ):
+            # there are no dates for the probabilistic GWLs
+            return
+
         year = self.input_data.get_value(InputType.YEAR)
         year_min = self.input_data.get_value(InputType.YEAR_MINIMUM)
         year_max = self.input_data.get_value(InputType.YEAR_MAXIMUM)
@@ -231,6 +238,11 @@ class Validator:
         allowed_ensembles = get_ensemble_member_set(
             self.input_data.get_value(InputType.COLLECTION)
         )
+        if self.input_data.get_value(InputType.COLLECTION) in [
+            COLLECTION_CPM,
+            COLLECTION_RCM,
+        ]:
+            allowed_ensembles.extend(get_ensemble_member_set("land-cmip5_4"))
         if allowed_ensembles is None:
             raise Exception(
                 "Unable to get list of valid ensembles for {}".format(

@@ -98,7 +98,7 @@ def get_anomaly(
                 except CoordinateNotFoundError:
                     pass
 
-        if scenario[0] in GWL:
+        if scenario[0] in GWL or collection == COLLECTION_CPM:
             # We are calculating the anomalies for the GWL data from the GCM baseline
             # data. Unfortunately the lat and log are ever so slightly different, a
             # floating point issue.

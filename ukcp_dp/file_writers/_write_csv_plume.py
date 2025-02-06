@@ -3,12 +3,17 @@ This module contains the PlumeCsvWriter class, which implements the _write_csv m
 from the BaseCsvWriter base class.
 
 """
+
 import logging
 
 import iris
 from ukcp_dp.constants import COLLECTION_MARINE, COLLECTION_OBS, COLLECTION_PROB
 from ukcp_dp.constants import InputType, EXTREME_SEA_LEVEL
-from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter, value_to_string
+from ukcp_dp.file_writers._base_csv_writer import (
+    BaseCsvWriter,
+    value_to_string,
+)
+from ukcp_dp.file_writers._utils import ensemble_to_string
 
 
 LOG = logging.getLogger(__name__)
@@ -96,13 +101,13 @@ class PlumeCsvWriter(BaseCsvWriter):
 
         """
         for ensemble_slice in cube.slices_over("ensemble_member"):
-            ensemble_name = ensemble_slice.coord("ensemble_member_id").points[0]
+            ensemble_no = ensemble_to_string(
+                ensemble_slice.coord("ensemble_member").points[0]
+            )
 
             # the plume plot will be of the first variable
             var = self.input_data.get_value_label(InputType.VARIABLE)[0]
-            self.header.append(
-                "{var}({ensemble})".format(ensemble=ensemble_name, var=var)
-            )
+            self.header.append(f"{var}({ensemble_no})")
             self._read_x_cube(ensemble_slice, key_list)
 
     def _write_had_obs_data(self, cube, key_list):
@@ -125,11 +130,7 @@ class PlumeCsvWriter(BaseCsvWriter):
             percentile = str(_slice.coord("percentile").points[0])
             # the plume plot will be of the first variable
             var = self.input_data.get_value_label(InputType.VARIABLE)[0]
-            self.header.append(
-                "{var}({percentile}th Percentile)".format(
-                    percentile=int(float(percentile)), var=var
-                )
-            )
+            self.header.append(f"{var}({int(float(percentile))}th Percentile)")
             self._read_x_cube(_slice, key_list)
 
     def _read_x_cube(self, cube, key_list):

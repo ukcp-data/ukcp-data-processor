@@ -2,6 +2,7 @@
 This module provides the method get_file_lists.
 
 """
+
 import logging
 import os
 
@@ -64,7 +65,10 @@ def get_file_lists(input_data):
         COLLECTION_PROB,
         COLLECTION_MARINE,
     ]:
-        file_list["main"] = _get_prob_file_list(input_data)
+        if input_data.get_value(InputType.GWL) is not None:
+            file_list["main"] = _get_prob_gwl_file_list(input_data)
+        else:
+            file_list["main"] = _get_prob_file_list(input_data)
 
     elif input_data.get_value(InputType.COLLECTION) in [
         COLLECTION_CPM,
@@ -124,6 +128,45 @@ def _get_absolute_path(file_path):
     path = DATA_SERVICE_URL + path
     path = path.rstrip("*")
     return path
+
+
+def _get_prob_gwl_file_list(input_data):
+    """
+    Get a list of files based on the data provided in the input data.
+
+    @param input_data (InputData): an InputData object
+
+    @return a dict where
+        key: (str) variable name
+        value: list of lists where:
+            each list is a list of files per scenario, per variable, including
+            their full paths
+    """
+    variables = input_data.get_value(InputType.VARIABLE)
+
+    spatial_representation = _get_prob_spatial_representation(input_data)
+
+    file_lists_per_variable = {}
+
+    for variable in variables:
+        # generate a list of files for each variable
+
+        file_list_per_scenario = []
+        for scenario in input_data.get_value(InputType.SCENARIO):
+            file_list_per_scenario.extend(
+                _get_file_list_per_scenario(
+                    input_data,
+                    scenario,
+                    spatial_representation,
+                    variable,
+                    None,
+                    None,
+                )
+            )
+
+        file_lists_per_variable[variable] = file_list_per_scenario
+
+    return file_lists_per_variable
 
 
 def _get_prob_file_list(input_data):
@@ -201,6 +244,18 @@ def _get_file_list_per_scenario(
             file_name = _get_marine_file_name(input_data, scenario, variable)
             file_list_per_data_type.append([os.path.join(file_path, file_name)])
 
+        elif input_data.get_value(InputType.GWL) is not None:
+            file_name = _get_prob_file_name(
+                data_type,
+                input_data,
+                scenario,
+                spatial_representation,
+                variable,
+                None,
+                None,
+            )
+            file_list_per_data_type.append([os.path.join(file_path, file_name)])
+
         elif (
             input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE)
             == TemporalAverageType.ANNUAL
@@ -276,8 +331,23 @@ def _get_prob_file_path(
             variable,
             VERSION,
         )
-    else:
 
+    elif input_data.get_value(InputType.GWL) is not None:
+        file_path = os.path.join(
+            DATA_DIR,
+            COLLECTION_PROB,
+            "uk",
+            spatial_representation,
+            scenario,
+            data_type,
+            input_data.get_value(InputType.BASELINE),
+            "gwl",
+            variable,
+            input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+            VERSION,
+        )
+
+    else:
         file_path = os.path.join(
             DATA_DIR,
             COLLECTION_PROB,
@@ -345,7 +415,23 @@ def _get_prob_file_name(
 
     return_period = input_data.get_value(InputType.RETURN_PERIOD)
 
-    if return_period is None:
+    if input_data.get_value(InputType.GWL) is not None:
+        file_name = (
+            "{variable}_{scenario}_{collection}_uk_"
+            "{spatial_representation}_{data_type}_{baseline}_"
+            "{gwl}_{temporal_type}.nc".format(
+                variable=variable,
+                scenario=scenario,
+                collection=COLLECTION_PROB,
+                spatial_representation=spatial_representation,
+                data_type=data_type,
+                baseline=input_data.get_value(InputType.BASELINE),
+                gwl=input_data.get_value(InputType.GWL),
+                temporal_type=input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE),
+            )
+        )
+
+    elif return_period is None:
         file_name = (
             "{variable}_{scenario}_{collection}_uk_"
             "{spatial_representation}_{data_type}_{baseline}_"
@@ -608,12 +694,8 @@ def _get_cm_file_name(
         elif input_data.get_value(InputType.COLLECTION) == COLLECTION_CPM:
             if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) in ["1hr", "3hr"]:
                 date_range = "{}".format(year)
-            elif input_data.get_value(InputType.YEAR_MINIMUM) == 1981:
-                date_range = "198012-200011"
-            elif input_data.get_value(InputType.YEAR_MINIMUM) == 2021:
-                date_range = "202012-204011"
-            elif input_data.get_value(InputType.YEAR_MINIMUM) == 2061:
-                date_range = "206012-208011"
+            else:
+                date_range = "200912-207911"
         else:
             date_range = "200912-207911"
 

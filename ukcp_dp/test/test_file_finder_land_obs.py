@@ -1,7 +1,7 @@
 from os import path
 import unittest
 
-from ukcp_dp import AreaType, InputType
+from ukcp_dp import AreaType, InputType, HADUK_END_YEAR
 from ukcp_dp._input_data import InputData
 from ukcp_dp.constants import HADUK_DIR
 from ukcp_dp.file_finder import get_file_lists
@@ -142,7 +142,7 @@ def get_ls6_test_region():
         [
             path.join(
                 HADUK_DIR,
-                "region/tasmax/mon/latest/tasmax_hadukgrid_uk_region_mon_188401-202212.nc",
+                f"region/tasmax/mon/latest/tasmax_hadukgrid_uk_region_mon_188401-{HADUK_END_YEAR}12.nc",
             )
         ]
     ]
@@ -166,7 +166,7 @@ def get_ls6_test_river():
         [
             path.join(
                 HADUK_DIR,
-                "river/rainfall/mon/latest/rainfall_hadukgrid_uk_river_mon_183601-202212.nc",
+                f"river/rainfall/mon/latest/rainfall_hadukgrid_uk_river_mon_183601-{HADUK_END_YEAR}12.nc",
             )
         ]
     ]
@@ -190,7 +190,7 @@ def get_ls6_test_country():
         [
             path.join(
                 HADUK_DIR,
-                "country/sun/mon/latest/sun_hadukgrid_uk_country_mon_191001-202212.nc",
+                f"country/sun/mon/latest/sun_hadukgrid_uk_country_mon_191901-{HADUK_END_YEAR}12.nc",
             )
         ]
     ]
@@ -215,7 +215,7 @@ def get_ls6_test_region_daily():
         [
             path.join(
                 HADUK_DIR,
-                "region/tasmax/day/latest/tasmax_hadukgrid_uk_region_day_19600101-20221231.nc",
+                f"region/tasmax/day/latest/tasmax_hadukgrid_uk_region_day_19600101-{HADUK_END_YEAR}1231.nc",
             )
         ]
     ]
@@ -235,7 +235,7 @@ def get_ls6_test_river_daily():
         [
             path.join(
                 HADUK_DIR,
-                "river/rainfall/day/latest/rainfall_hadukgrid_uk_river_day_18910101-20221231.nc",
+                f"river/rainfall/day/latest/rainfall_hadukgrid_uk_river_day_18910101-{HADUK_END_YEAR}1231.nc",
             )
         ]
     ]

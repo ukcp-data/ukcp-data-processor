@@ -240,7 +240,8 @@ class PostageStampMapPlotter(MapPlotter):
                     ],
                     iris.analysis.MEAN,
                 )
-            elif self.input_data.get_value(InputType.SCENARIO)[0] in GWL:
+            elif (self.input_data.get_value(InputType.SCENARIO)[0] in GWL or 
+                  self.input_data.get_value(InputType.COLLECTION) == COLLECTION_CPM):
                 ensemble_mean_cube = cube.collapsed(
                     ["projection_x_coordinate", "projection_y_coordinate"],
                     iris.analysis.MEAN,
@@ -332,9 +333,7 @@ class PostageStampMapPlotter(MapPlotter):
             # geometry contains them.
 
         # add a title
-        ensemble_name = self.vocab.get_collection_term_label(
-            CV_Type.ENSEMBLE_SHORT_NAME, ensemble_no
-        )
+        ensemble_name = f"Member {ensemble_no}"
         ax.set_title(ensemble_name, fontdict={"fontsize": title_font_size})
 
         return result

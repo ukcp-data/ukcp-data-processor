@@ -1,0 +1,271 @@
+name: Update UI Product
+description: Request a changes to an existing product in the UI.
+title: 'Update Product: '
+labels:
+  - product form
+  - UI Update
+assignees:
+  - antony-wilson
+body:
+  - type: textarea
+    id: current_product_name
+    attributes:
+      label: Current product name
+      placeholder: 'Maps: Anomalies for regional projections (12km) over UK'
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: Please only provide details of where the product form needs to change.
+  - type: textarea
+    id: product_name
+    attributes:
+      label: Product name
+      description: >-
+        ONLY PROVIDE IF CHANGED - By convention this should start with one of "Data", "Maps", "Plot" or
+        "Time series" and mention the dataset
+      placeholder: 'Maps: Anomalies for regional projections (12km) over UK'
+    validations:
+      required: false
+  - type: textarea
+    id: product_description
+    attributes:
+      label: Product description
+      description: >-
+        ONLY PROVIDE IF CHANGED - The description will appear on the page that lists the products as well
+        as in the top section of the product form
+      placeholder: >-
+        Generates a panel of small maps (also known as "small multiples", or a
+        "postage stamp plot") from the regional projections for RCP8.5 for
+        1980-2080. Shows anomalies of chosen future periods (1 or 20 years) from
+        a choice of baseline (representing current climate). Results are
+        available for a given temporal average and areas. Each member of the set
+        of regional projections is represented as a single small map.
+    validations:
+      required: false
+  - type: textarea
+    id: product_guidance
+    attributes:
+      label: Product Guidance
+      description: ONLY PROVIDE IF CHANGED - The guidance will appear in the top section of the product form
+      placeholder: >-
+        For guidance on the Representative Concentration Pathways (RCP) and how
+        to interpret the plots, please see the guidance pages.
+    validations:
+      required: false
+  - type: dropdown
+    id: data_source
+    attributes:
+      label: Data source
+      description: ONLY PROVIDE IF CHANGED
+      multiple: false
+      options:
+        - Probabilistic (25km)
+        - Global (60km)
+        - Regional (12km)
+        - Regional global warming levels (12km)
+        - Local (2.2km)
+        - Marine projections
+        - 'Other, please specify below'
+    validations:
+      required: false
+  - type: input
+    id: data_source_other
+    attributes:
+      label: 'Data source, other'
+      description: >-
+        Use this field to provide the name of a data source that is not listed
+        above
+      placeholder: Local (2.2km)
+    validations:
+      required: false
+  - type: dropdown
+    id: variable
+    attributes:
+      label: Variables
+      description: ONLY PROVIDE IF CHANGED
+      multiple: true
+      options:
+        - tas
+        - pr
+        - tasmax
+        - tasmin
+        - sfcWind
+        - wsgmax10m
+        - hurs
+        - huss
+        - uas
+        - vas
+        - prsn
+        - snw
+        - psl
+        - rls
+        - rss
+        - clt
+        - seaLevel
+        - extremeSeaLevel
+    validations:
+      required: false
+  - type: dropdown
+    id: baseline
+    attributes:
+      label: Baseline period
+      description: ONLY PROVIDE IF CHANGED - Use this field if you wish anomaly values to be calculated
+      multiple: true
+      options:
+        - 1961-1990
+        - 1981-2000
+        - 1981-2010
+      default: 0
+    validations:
+      required: false
+  - type: dropdown
+    id: scenario
+    attributes:
+      label: Scenario
+      description: ONLY PROVIDE IF CHANGED
+      multiple: true
+      options:
+        - RCP 2.6
+        - RCP 4.5
+        - RCP 6.0
+        - RCP 8.5
+        - SRES A1B
+      default: 0
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: ONLY PROVIDE IF CHANGED
+      multiple: true
+      options:
+        - grid square
+        - bounding box
+        - admin regions
+        - river basins
+        - countries
+        - tide gauge location
+        - costal location
+      default: 0
+    validations:
+      required: false
+  - type: dropdown
+    id: temporal_average
+    attributes:
+      label: Temporal average
+      description: ONLY PROVIDE IF CHANGED
+      multiple: true
+      options:
+        - hourly
+        - 3 hourly
+        - daily
+        - monthly
+        - seasonal
+        - annual
+      default: 0
+    validations:
+      required: false
+  - type: dropdown
+    id: time_slice_duration
+    attributes:
+      label: Time slice duration
+      description: ONLY PROVIDE IF CHANGED
+      multiple: true
+      options:
+        - 1 year
+        - 20 years
+        - 30 years
+      default: 0
+    validations:
+      required: false
+  - type: input
+    id: time_slice_lower_limit
+    attributes:
+      label: Time slice lower limit
+      description: ONLY PROVIDE IF CHANGED
+      placeholder: '1960'
+    validations:
+      required: false
+  - type: input
+    id: time_slice_upper_limit
+    attributes:
+      label: Time slice upper limit
+      description: ONLY PROVIDE IF CHANGED
+      placeholder: '2100'
+    validations:
+      required: false
+  - type: input
+    id: time_slice_minimum_range
+    attributes:
+      label: Time slice minimum range (years)
+      description: ONLY PROVIDE IF CHANGED
+      placeholder: '20'
+    validations:
+      required: false
+  - type: dropdown
+    id: set
+    attributes:
+      label: Set
+      description: ONLY PROVIDE IF CHANGED
+      multiple: true
+      options:
+        - Full global set (28 members)
+        - 'Subset: regional 12km set only (12 members)'
+        - 'Subset: PPE-15, Hadley Centre Model only (15 members)'
+        - >-
+          Subset: PPE-15, Hadley Centre Model (15 members) and selected CMIP 5
+          members
+        - 'CMIP5-4, downscaled CMIP5'
+        - 'PPE-12 and CMIP5-4 (16 members)'
+      default: 0
+    validations:
+      required: false
+  - type: dropdown
+    id: main_output
+    attributes:
+      label: Main output
+      description: ONLY PROVIDE IF CHANGED
+      multiple: true
+      options:
+        - data
+        - graph
+        - map
+      default: 0
+    validations:
+      required: false
+  - type: dropdown
+    id: data_format
+    attributes:
+      label: Data format
+      description: ONLY PROVIDE IF CHANGED
+      multiple: true
+      options:
+        - CSV
+        - CF-netCDF
+        - Shapefile
+      default: 0
+    validations:
+      required: false
+  - type: textarea
+    id: directory_structure
+    attributes:
+      label: Directory structure
+      description: Please provide examples of the directory structure to be used
+    validations:
+      required: false
+  - type: textarea
+    id: file_names
+    attributes:
+      label: File names
+      description: Please provide examples of the file names to be used
+    validations:
+      required: false
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Additional information
+      placeholder: Any additional information that may be useful
+    validations:
+      required: false
