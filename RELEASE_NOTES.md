@@ -1,8 +1,16 @@
+# Release 2.14.0
+
+This release addresses:
+
+* Update multiple dependencies
+
+
 # Release 2.13.0
 
 This release addresses:
 
 * Provide global warming level data for the 'Regional' and 'Probabilistic' collections
+
 
 # Release 2.12.0
 
@@ -10,11 +18,13 @@ This release addresses:
 
 * Provide the CMIP members 23, 25, 27 and 29 for the 'Local' and 'Regional' collections
 
+
 # Release 2.11.0
 
 This release addresses:
 
 * Provide the complete time range of CPM data from 1981 to 2080
+
 
 # Release 2.10.0
 
