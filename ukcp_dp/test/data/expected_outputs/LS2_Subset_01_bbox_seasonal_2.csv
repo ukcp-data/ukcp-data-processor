@@ -1,7 +1,7 @@
 header length,15
 Area,-84667.14 -114260.0 676489.68 1230247.3
 Data Source,Global simulations
-Members,00000,00605,00834,01113,01554,01649,01843,01935,02123,02242,02305,02335,02491,02832,02868
+Members,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15
 Scenario,RCP 2.6
 Software Version,0.0.0TEST
 Spatial Representation,60km grid
