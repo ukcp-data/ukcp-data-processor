@@ -190,7 +190,7 @@ def get_ls6_test_country():
         [
             path.join(
                 HADUK_DIR,
-                f"country/sun/mon/latest/sun_hadukgrid_uk_country_mon_191901-{HADUK_END_YEAR}12.nc",
+                f"country/sun/mon/latest/sun_hadukgrid_uk_country_mon_191001-{HADUK_END_YEAR}12.nc",
             )
         ]
     ]
