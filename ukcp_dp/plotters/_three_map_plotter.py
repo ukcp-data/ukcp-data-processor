@@ -40,16 +40,18 @@ class ThreeMapPlotter(MapPlotter):
             gs.update(top=gs_top, bottom=0.02, left=gs_left, right=gs_right)
             grid = [gs[0, 0], gs[0, 1], gs[1, 0], gs[1, 1]]
             bar_gs = gridspec.GridSpec(1, 2)
-            bar_grid = bar_gs[0, 1]
             bar_gs.update(top=0.35, bottom=0.15, left=gs_left, right=gs_right)
+            # Position of the colour-bar Axes: [left,bottom, width,height]
+            plot_settings.bar_position = [0.54, 0.15, 0.44, 0.03]
 
         else:  # portrait
             gs = gridspec.GridSpec(1, 3)
             grid = [gs[0, 0], gs[0, 1], gs[0, 2], gs[0, 2]]
             gs.update(top=gs_top, bottom=0.14, left=gs_left, right=gs_right)
             bar_gs = gridspec.GridSpec(1, 4)
-            bar_grid = bar_gs[0, 1:-1]
             bar_gs.update(top=0.28, bottom=0.08, left=gs_left, right=gs_right)
+            # Position of the colour-bar Axes: [left,bottom, width,height]
+            plot_settings.bar_position = [0.28, 0.08, 0.44, 0.03]
 
         # extract 10th, 50th and 90th percentiles
         percentiles = [10, 50, 90]
@@ -65,10 +67,6 @@ class ThreeMapPlotter(MapPlotter):
             result = self._add_sub_plot(
                 fig, grid[i], plot_settings, title, percentile_cube
             )
-
-        # add the sub plot to contain the bar
-        ax = fig.add_subplot(bar_grid)
-        ax.axis("off")
 
         return result
 
