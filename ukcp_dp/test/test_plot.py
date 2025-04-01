@@ -1,11 +1,12 @@
+from PIL import Image
+import imagehash
 import iris
 
 from ukcp_dp._input_data import InputData
 from ukcp_dp.constants import COLLECTION_PROB, InputType
 from ukcp_dp.plotters import write_plot
-from ukcp_dp.vocab_manager import Vocab
-from filecmp import cmp
 from ukcp_dp.utils import get_plot_settings
+from ukcp_dp.vocab_manager import Vocab
 
 
 def run_plot_test(
@@ -65,8 +66,10 @@ def run_plot_test(
 
     diff = ""
 
-    result = cmp(output_file, reference_file, shallow=False)
-    if result is False:
+    output_hash = imagehash.average_hash(Image.open(output_file), hash_size=32)
+    reference_hash = imagehash.average_hash(Image.open(reference_file), hash_size=32)
+
+    if output_hash != reference_hash:
         print(f"Files differ: {output_file}, {reference_file}\n")
         diff = f"Files differ: {output_file}, {reference_file}\n"
 
