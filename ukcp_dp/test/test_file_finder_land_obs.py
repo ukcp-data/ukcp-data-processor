@@ -1,9 +1,9 @@
 from os import path
 import unittest
 
-from ukcp_dp import AreaType, InputType, HADUK_END_YEAR
+from ukcp_dp import AreaType, InputType
 from ukcp_dp._input_data import InputData
-from ukcp_dp.constants import HADUK_DIR
+from ukcp_dp.constants import HADUK_DIR, HADUK_END_YEAR
 from ukcp_dp.file_finder import get_file_lists
 from ukcp_dp.validator import Validator
 from ukcp_dp.vocab_manager import Vocab
