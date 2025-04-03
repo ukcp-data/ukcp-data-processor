@@ -11,9 +11,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.9
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v3
       with:
-        python-version: 3.9
+        python-version: '3.9'
     - name: Add conda to system path
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
@@ -21,6 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         conda env update --file environment-test.yml --name base
+        conda export --no-builds --from-history
     - name: Lint with flake8
       run: |
         conda install flake8
