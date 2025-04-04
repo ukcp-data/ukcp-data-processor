@@ -1,7 +1,7 @@
 header length,13
 Area,452500.0 262500.0
 Data Source,Local simulations
-Members,00000
+Members,01
 Scenario,RCP 8.5
 Software Version,0.0.0TEST
 Spatial Representation,5km grid
@@ -10,7 +10,7 @@ Time Period,Hourly
 Variable,Mean air temperature at 1.5m (°C)
 Year Maximum,1982
 Year Minimum,1981
-Date,Mean air temperature at 1.5m (°C)(HadREM3-RA11M-r001i1p00000)
+Date,Mean air temperature at 1.5m (°C)(01)
 1981-01-01T00:30,4.0806212
 1981-01-01T01:30,2.8680968
 1981-01-01T02:30,2.3808227

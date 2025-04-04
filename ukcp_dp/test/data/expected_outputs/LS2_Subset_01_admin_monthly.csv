@@ -1,7 +1,7 @@
 header length,13
 Area,West Midlands
 Data Source,Global simulations
-Members,00000,00605,00834,01113,01554,01649,01843,01935,02123,02242,02305,02335,02491,02832,02868
+Members,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15
 Scenario,RCP 2.6
 Software Version,0.0.0TEST
 Spatial Representation,Administrative Region
@@ -10,7 +10,7 @@ Time Period,May
 Variable,Mean air temperature at 1.5m (°C)
 Year Maximum,2028
 Year Minimum,2018
-Date,Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p00000),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p00605),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p00834),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p01113),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p01554),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p01649),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p01843),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p01935),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p02123),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p02242),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p02305),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p02335),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p02491),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p02832),Mean air temperature at 1.5m (°C)(HadGEM3-GC3.05-r001i1p02868)
+Date,Mean air temperature at 1.5m (°C)(01),Mean air temperature at 1.5m (°C)(02),Mean air temperature at 1.5m (°C)(03),Mean air temperature at 1.5m (°C)(04),Mean air temperature at 1.5m (°C)(05),Mean air temperature at 1.5m (°C)(06),Mean air temperature at 1.5m (°C)(07),Mean air temperature at 1.5m (°C)(08),Mean air temperature at 1.5m (°C)(09),Mean air temperature at 1.5m (°C)(10),Mean air temperature at 1.5m (°C)(11),Mean air temperature at 1.5m (°C)(12),Mean air temperature at 1.5m (°C)(13),Mean air temperature at 1.5m (°C)(14),Mean air temperature at 1.5m (°C)(15)
 2018-05-16,9.743291,11.673585,12.1059675,11.96807,10.300023,11.9447155,9.796789,10.575308,11.816172,10.762975,10.010489,9.621728,9.819723,13.902543,11.275931
 2019-05-16,12.688702,12.122221,9.474142,11.779942,11.208219,13.028025,11.71809,10.405915,12.107032,10.992315,9.077563,8.742676,10.559339,11.1001005,10.424485
 2020-05-16,11.605418,9.365307,12.049505,11.058684,10.293073,10.513612,10.491609,10.86493,13.554023,10.755084,10.216996,10.695602,11.770627,12.823773,10.097472

@@ -152,7 +152,7 @@ class SubsetCsvWriter(BaseCsvWriter):
             else:
                 line = (
                     f"{y_coords[y_coord].cell(0).point},"
-                    f"{','.join(['%s' % num for num in data[: ,y_coord]])}"
+                    f"{','.join(['%s' % num for num in data[:, y_coord]])}"
                     "\n"
                 )
 
@@ -402,11 +402,11 @@ def _fromat_percentile(percentile):
     if "." in percentile:
         pass
     elif percentile.endswith("1") and percentile != "11":
-        percentile = "{percentile}st"
+        percentile = f"{percentile}st"
     elif percentile.endswith("2") and percentile != "12":
-        percentile = "{percentile}nd"
+        percentile = f"{percentile}nd"
     elif percentile.endswith("3") and percentile != "13":
-        percentile = "{percentile}rd"
+        percentile = f"{percentile}rd"
     else:
-        percentile = "{percentile}th"
+        percentile = f"{percentile}th"
     return percentile

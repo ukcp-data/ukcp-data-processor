@@ -1,7 +1,6 @@
 import logging
 
 import iris
-from ukcp_cv import CV_Type
 
 import matplotlib.gridspec as gridspec
 from ukcp_dp.constants import (

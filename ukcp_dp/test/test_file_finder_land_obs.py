@@ -1,9 +1,9 @@
 from os import path
 import unittest
 
-from ukcp_dp import AreaType, InputType, HADUK_END_YEAR
+from ukcp_dp import AreaType, InputType
 from ukcp_dp._input_data import InputData
-from ukcp_dp.constants import HADUK_DIR
+from ukcp_dp.constants import HADUK_DIR, HADUK_END_YEAR
 from ukcp_dp.file_finder import get_file_lists
 from ukcp_dp.validator import Validator
 from ukcp_dp.vocab_manager import Vocab
@@ -190,7 +190,7 @@ def get_ls6_test_country():
         [
             path.join(
                 HADUK_DIR,
-                f"country/sun/mon/latest/sun_hadukgrid_uk_country_mon_191901-{HADUK_END_YEAR}12.nc",
+                f"country/sun/mon/latest/sun_hadukgrid_uk_country_mon_191001-{HADUK_END_YEAR}12.nc",
             )
         ]
     ]

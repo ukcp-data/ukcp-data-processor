@@ -6,8 +6,7 @@ from ukcp_dp.constants import DPI_DISPLAY, DPI_SAVING, REG_BI_FULL, UKCP_OSGB
 
 
 class StandardMap:
-    """
-    """
+    """ """
 
     def __init__(
         self,
@@ -29,7 +28,7 @@ class StandardMap:
         dpi=DPI_SAVING,
         dpi_display=DPI_DISPLAY,
         fsize=12,
-        fontfam="Arial",
+        fontfam="DejaVu Sans",
         proj=ccrs.PlateCarree(),
         marlft=0.03,
         marrgt=0.97,
@@ -459,7 +458,7 @@ UKCPNEAT = StandardMap(
     cmsize=[15.5, 17],
     dpi=DPI_SAVING,
     fsize=12,
-    fontfam="Arial",
+    fontfam="DejaVu Sans",
     proj=UKCP_OSGB,
     marlft=0.01,
     marrgt=1.00,

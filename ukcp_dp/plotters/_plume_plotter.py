@@ -3,10 +3,12 @@ This module contains the PlumePlotter class, which implements the _generate_grap
 from the BasePlotter base class.
 
 """
+
 import logging
 
 import iris
 from labellines import labelLines
+from matplotlib import patheffects
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -108,7 +110,7 @@ class PlumePlotter(GraphPlotter):
             # use a log scale for the x axis
             ax.set_xscale("log")
             labs3 = np.array(["1", "10", "100", "1000"])
-            locs3 = [np.int(lab) for lab in labs3]
+            locs3 = [int(lab) for lab in labs3]
             plt.xticks(locs3, labs3)
 
         else:
@@ -143,7 +145,9 @@ class PlumePlotter(GraphPlotter):
 
         if (
             self.input_data.get_value(InputType.COLLECTION) == COLLECTION_MARINE
-            and self.input_data.get_value(InputType.METHOD).startswith(EXTREME_SEA_LEVEL)
+            and self.input_data.get_value(InputType.METHOD).startswith(
+                EXTREME_SEA_LEVEL
+            )
         ) or is_overlay:
             self._single_fill(cube, ax, t_points, is_overlay)
         else:
@@ -270,6 +274,7 @@ class PlumePlotter(GraphPlotter):
                     i
                 ],
                 alpha=0,
+                path_effects=[patheffects.withStroke(linewidth=0)],
             )
 
         # work out where to put the line labels along the x axis
@@ -278,11 +283,7 @@ class PlumePlotter(GraphPlotter):
         xvals = (x_max - (x_range / 100 * 45), x_max - (x_range / 100 * 5))
 
         labelLines(
-            plt.gca().get_lines(),
-            align=False,
-            color="k",
-            xvals=xvals,
-            backgroundcolor=None,
+            plt.gca().get_lines(), align=False, color="k", xvals=xvals, outline_width=0
         )
 
         # The line labels have been added as text boxes. Now set the
