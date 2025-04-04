@@ -14,7 +14,6 @@ from ukcp_dp.plotters.utils._plotting_utils import (
 from ukcp_dp.plotters.utils._region_utils import reg_from_cube
 from ukcp_dp.spatial_files import (
     OVERLAY_ADMIN,
-    OVERLAY_COASTLINE,
     OVERLAY_COUNTRY,
     OVERLAY_RIVER,
     OVERLAY_COASTLINE_SMALL,

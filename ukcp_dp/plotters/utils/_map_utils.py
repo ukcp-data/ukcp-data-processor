@@ -943,7 +943,7 @@ def plot_choropleth_map(
     if gridlabels:
         gl = ax.gridlines(
             crs=ccrs.PlateCarree(), draw_labels=gridlabels, linewidth=0.5, color="grey"
-            )
+        )
         # Options to switch on/off individual axes labels:
         gl.xlabels_bottom = xgridax[0]
         gl.xlabels_top = xgridax[1]

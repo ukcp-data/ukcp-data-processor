@@ -6,8 +6,7 @@ from ukcp_dp.constants import DPI_DISPLAY, DPI_SAVING, REG_BI_FULL, UKCP_OSGB
 
 
 class StandardMap:
-    """
-    """
+    """ """
 
     def __init__(
         self,

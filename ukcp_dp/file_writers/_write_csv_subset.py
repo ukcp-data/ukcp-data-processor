@@ -152,7 +152,7 @@ class SubsetCsvWriter(BaseCsvWriter):
             else:
                 line = (
                     f"{y_coords[y_coord].cell(0).point},"
-                    f"{','.join(['%s' % num for num in data[: ,y_coord]])}"
+                    f"{','.join(['%s' % num for num in data[:, y_coord]])}"
                     "\n"
                 )
 

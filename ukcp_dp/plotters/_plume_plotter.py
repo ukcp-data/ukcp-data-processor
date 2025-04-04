@@ -3,6 +3,7 @@ This module contains the PlumePlotter class, which implements the _generate_grap
 from the BasePlotter base class.
 
 """
+
 import logging
 
 import iris
