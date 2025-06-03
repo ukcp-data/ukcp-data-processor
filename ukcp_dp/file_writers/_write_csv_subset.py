@@ -7,6 +7,7 @@ from the BaseCsvWriter base class.
 from datetime import datetime
 import logging
 
+from iris.exceptions import CoordinateNotFoundError
 from ukcp_dp.constants import AreaType, InputType, COLLECTION_OBS, COLLECTION_PROB
 from ukcp_dp.file_writers._base_csv_writer import BaseCsvWriter
 from ukcp_dp.file_writers._utils import ensemble_to_string
@@ -275,10 +276,15 @@ class SubsetCsvWriter(BaseCsvWriter):
         else:
             # There should only be one cube so we only make reference to
             # self.cube_list[0]
-            for ensemble_coord in self.cube_list[0].coord("ensemble_member")[:]:
-                self.header.append(
-                    f"{var}({ensemble_to_string(ensemble_coord.points[0])})"
-                )
+            try:
+                for ensemble_coord in self.cube_list[0].coord("ensemble_member")[:]:
+                    self.header.append(
+                        f"{var}({ensemble_to_string(ensemble_coord.points[0])})"
+                        )
+            except CoordinateNotFoundError:
+                # not all files have ensemble_member, some only have ensemble_member_id
+                for ensemble_coord in self.cube_list[0].coord("ensemble_member_id")[:]:
+                    self.header.append(f"{var}({str(ensemble_coord.points[0])})")
 
         output_data_file_path = self._get_full_file_name()
         self._write_headers(output_data_file_path)
