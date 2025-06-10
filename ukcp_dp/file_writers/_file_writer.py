@@ -1,12 +1,13 @@
 """
 This module provides the public entry point write_file to the file_writes package.
 
-"""
+¬"""
 import logging
 import os
 from time import gmtime, strftime
 
 import iris
+from iris.exceptions import CoordinateNotFoundError
 from ukcp_dp.constants import DataFormat
 from ukcp_dp.exception import UKCPDPInvalidParameterException
 from ukcp_dp.file_writers._write_csv import write_csv_file
@@ -80,14 +81,34 @@ def _write_netcdf_file(cube_list, overlay_cube, output_data_file_path, plot_type
         else:
             cube_file_name = f"{file_name.split('.nc')[0]}_{inx+1}.nc"
 
-        iris.save(
-            cube,
-            cube_file_name,
-            netcdf_format="NETCDF4_CLASSIC",
-            fill_value=1e20,
-            local_keys=("plot_label", "label_units", "description", "level"),
-        )
-        file_list.append(cube_file_name)
+        try:
+            iris.save(
+                cube,
+                cube_file_name,
+                netcdf_format="NETCDF4_CLASSIC",
+                fill_value=1e20,
+                local_keys=("plot_label", "label_units", "description", "level"),
+            )
+            file_list.append(cube_file_name)
+        except ValueError:
+            # Somehow "month_number" and "year" values can get messed up when calculation 
+            # the climatology.
+            # ValueError: The data type of AuxCoord <AuxCoord: year / (1) [1991]>
+            # is not supported by NETCDF4_CLASSIC and its values cannot be safely
+            # cast to a supported integer type.
+            for coord in ["month_number", "year"]:
+                try:
+                    cube.remove_coord(coord)
+                except CoordinateNotFoundError:
+                    pass
+            iris.save(
+                cube,
+                cube_file_name,
+                netcdf_format="NETCDF4_CLASSIC",
+                fill_value=1e20,
+                local_keys=("plot_label", "label_units", "description", "level"),
+            )
+            file_list.append(cube_file_name)
 
     if overlay_cube is not None:
         overlay_file_name = f"{file_name.split('.nc')[0]}_overlay.nc"
