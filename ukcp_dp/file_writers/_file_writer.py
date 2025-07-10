@@ -91,12 +91,12 @@ def _write_netcdf_file(cube_list, overlay_cube, output_data_file_path, plot_type
             )
             file_list.append(cube_file_name)
         except ValueError:
-            # Somehow "month_number" and "year" values can get messed up when calculation 
-            # the climatology.
+            # Somehow "month_number" and "year" an "season_year" values can get messed up
+            # when calculating the climatology.
             # ValueError: The data type of AuxCoord <AuxCoord: year / (1) [1991]>
             # is not supported by NETCDF4_CLASSIC and its values cannot be safely
             # cast to a supported integer type.
-            for coord in ["month_number", "year"]:
+            for coord in ["month_number", "year", "season_year"]:
                 try:
                     cube.remove_coord(coord)
                 except CoordinateNotFoundError:
