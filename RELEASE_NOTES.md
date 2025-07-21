@@ -1,3 +1,10 @@
+# Release 2.15.0
+
+This release addresses:
+
+* Include 2024 HadUK-Grid data
+
+
 # Release 2.14.0
 
 This release addresses:
