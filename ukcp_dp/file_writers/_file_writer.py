@@ -85,17 +85,22 @@ def _write_netcdf_file(cube_list, overlay_cube, output_data_file_path, plot_type
             iris.save(
                 cube,
                 cube_file_name,
-                netcdf_format="NETCDF4_CLASSIC",
+                netcdf_format="NETCDF4",
                 fill_value=1e20,
                 local_keys=("plot_label", "label_units", "description", "level"),
             )
             file_list.append(cube_file_name)
+
         except ValueError:
             # Somehow "month_number" and "year" an "season_year" values can get messed up
             # when calculating the climatology.
             # ValueError: The data type of AuxCoord <AuxCoord: year / (1) [1991]>
             # is not supported by NETCDF4_CLASSIC and its values cannot be safely
             # cast to a supported integer type.
+            #
+            # Writing with netcdf_format="NETCDF4" above rather than 
+            # netcdf_format="NETCDF4_CLASSIC" may have fixed this issue
+            #
             for coord in ["month_number", "year", "season_year"]:
                 try:
                     cube.remove_coord(coord)
