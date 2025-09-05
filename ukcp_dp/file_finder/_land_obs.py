@@ -155,7 +155,7 @@ def _get_date_ranges(input_data, variable):
 
     if variable in ["tas", "tasmax", "tasmin"]:
         if input_data.get_value(InputType.TEMPORAL_AVERAGE_TYPE) == "day":
-            start_year = "1960"
+            start_year = "1931"
         else:
             start_year = "1884"
     if variable == "rainfall":
