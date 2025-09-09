@@ -215,7 +215,7 @@ def get_ls6_test_region_daily():
         [
             path.join(
                 HADUK_DIR,
-                f"region/tasmax/day/latest/tasmax_hadukgrid_uk_region_day_19600101-{HADUK_END_YEAR}1231.nc",
+                f"region/tasmax/day/latest/tasmax_hadukgrid_uk_region_day_19310101-{HADUK_END_YEAR}1231.nc",
             )
         ]
     ]
