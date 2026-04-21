@@ -5,11 +5,14 @@ This package provides a means to compare netCDF headers with reference headers.
 
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
+from copy import deepcopy
 import difflib
 import glob
 import subprocess
 import sys
 
+
+NCDUMP = "/usr/local/miniforge/envs/ukcp18/bin/ncdump"
 
 PRODUCTION = "/badc"
 PRE_PROD = "/gws/pw/j07/ukcp18/pre-archive"
@@ -28,12 +31,12 @@ VARIABLES = [
     "tasmin",
     "sfcWind",
     "wsgmax10m",
-    #     "hurs",
-    #     "huss",
-    #     "uas",
-    #     "vas",
-    #     "prsn",
-    #     "snw",
+    "hurs",
+    "huss",
+    "uas",
+    "vas",
+    "prsn",
+    "snw",
     #     "psl",
     #     "rls",
     #     "rss",
@@ -45,7 +48,6 @@ PERIODS = ["day"]
 ENSEMBLES = ["01", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "15"]
 ENSEMBLES_INC_CMIP = ENSEMBLES + ["23", "25", "27", "29"]
 
-NCDUMP = "/usr/local/miniforge/envs/ukcp18/bin/ncdump"
 IGNORE_HEADERS = [
     "netcdf",
     ":_Format",
@@ -60,6 +62,34 @@ IGNORE_HEADERS = [
 ]
 
 VARIABLE_HEADERS = {
+    "hurs": [
+        "\tfloat hurs(ensemble_member, time, region) ;",
+        "\t\thurs:_FillValue = 1.e+20f ;",
+        '\t\thurs:standard_name = "relative_humidity" ;',
+        '\t\thurs:long_name = "Relative humidity" ;',
+        '\t\thurs:units = "%" ;',
+        '\t\thurs:description = "Relative humidity" ;',
+        '\t\thurs:label_units = "%" ;',
+        '\t\thurs:plot_label = "Relative humidity at 1.5m (%)" ;',
+        '\t\thurs:cell_methods = "time: mean" ;',
+        '\t\thurs:coordinates = "ensemble_member_id geo_region month_number year yyyymmdd" ;',
+        '\t\thurs:_Storage = "contiguous" ;',
+        '\t\thurs:_Endianness = "little" ;',
+    ],
+    "huss": [
+        "\tfloat huss(ensemble_member, time, region) ;",
+        "\t\thuss:_FillValue = 1.e+20f ;",
+        '\t\thuss:standard_name = "specific_humidity" ;',
+        '\t\thuss:long_name = "Specific humidity" ;',
+        '\t\thuss:units = "1" ;',
+        '\t\thuss:description = "Specific humidity" ;',
+        '\t\thuss:label_units = "1" ;',
+        '\t\thuss:plot_label = "Specific humidity at 1.5m (1)" ;',
+        '\t\thuss:cell_methods = "time: mean" ;',
+        '\t\thuss:coordinates = "ensemble_member_id geo_region month_number year yyyymmdd" ;',
+        '\t\thuss:_Storage = "contiguous" ;',
+        '\t\thuss:_Endianness = "little" ;',
+    ],
     "pr": [
         "\tfloat pr(ensemble_member, time, region) ;",
         "\t\tpr:_FillValue = 1.e+20f ;",
@@ -74,6 +104,20 @@ VARIABLE_HEADERS = {
         '\t\tpr:_Storage = "contiguous" ;',
         '\t\tpr:_Endianness = "little" ;',
     ],
+    "prsn": [
+        "\tfloat prsn(ensemble_member, time, region) ;",
+        "\t\tprsn:_FillValue = 1.e+20f ;",
+        '\t\tprsn:standard_name = "snowfall_flux" ;',
+        '\t\tprsn:long_name = "Snowfall Flux " ;', # N.B. there is an extra space at the end
+        '\t\tprsn:units = "mm/day" ;',
+        '\t\tprsn:description = "Snowfall flux at surface" ;',
+        '\t\tprsn:label_units = "mm/day" ;',
+        '\t\tprsn:plot_label = "Snowfall flux" ;',
+        '\t\tprsn:cell_methods = "time: mean" ;',
+        '\t\tprsn:coordinates = "ensemble_member_id geo_region month_number year yyyymmdd" ;',
+        '\t\tprsn:_Storage = "contiguous" ;',
+        '\t\tprsn:_Endianness = "little" ;',
+    ],
     "sfcWind": [
         "\tfloat sfcWind(ensemble_member, time, region) ;",
         "\t\tsfcWind:_FillValue = 1.e+20f ;",
@@ -87,6 +131,20 @@ VARIABLE_HEADERS = {
         '\t\tsfcWind:coordinates = "ensemble_member_id geo_region month_number year yyyymmdd" ;',
         '\t\tsfcWind:_Storage = "contiguous" ;',
         '\t\tsfcWind:_Endianness = "little" ;',
+    ],
+    "snw": [
+        "\tfloat snw(ensemble_member, time, region) ;",
+        "\t\tsnw:_FillValue = 1.e+20f ;",
+        '\t\tsnw:standard_name = "surface_snow_amount" ;',
+        '\t\tsnw:long_name = "Surface Snow Amount " ;', # N.B. there is an extra space at the end
+        '\t\tsnw:units = "mm" ;',
+        '\t\tsnw:description = "Amount of snow on the ground" ;',
+        '\t\tsnw:label_units = "mm" ;',
+        '\t\tsnw:plot_label = "Surface snow amount" ;',
+        '\t\tsnw:cell_methods = "time: mean" ;',
+        '\t\tsnw:coordinates = "ensemble_member_id geo_region month_number year yyyymmdd" ;',
+        '\t\tsnw:_Storage = "contiguous" ;',
+        '\t\tsnw:_Endianness = "little" ;',
     ],
     "tas": [
         "\tfloat tas(ensemble_member, time, region) ;",
@@ -130,10 +188,37 @@ VARIABLE_HEADERS = {
         '\t\ttasmin:_Storage = "contiguous" ;',
         '\t\ttasmin:_Endianness = "little" ;',
     ],
+    "uas": [
+        "\tfloat uas(ensemble_member, time, region) ;",
+        "\t\tuas:_FillValue = 1.e+20f ;",
+        '\t\tuas:standard_name = "eastward_wind" ;',
+        '\t\tuas:long_name = "Eastward wind component" ;',
+        '\t\tuas:units = "m s-1" ;',
+        '\t\tuas:description = "Eastward wind" ;',
+        '\t\tuas:label_units = "m s-1" ;',
+        '\t\tuas:plot_label = "Eastward wind at 10m (m s-1)" ;',
+        '\t\tuas:cell_methods = "time: mean" ;',
+        '\t\tuas:coordinates = "ensemble_member_id geo_region month_number year yyyymmdd" ;',
+        '\t\tuas:_Storage = "contiguous" ;',
+        '\t\tuas:_Endianness = "little" ;',
+    ],
+    "vas": [
+        "\tfloat vas(ensemble_member, time, region) ;",
+        "\t\tvas:_FillValue = 1.e+20f ;",
+        '\t\tvas:standard_name = "northward_wind" ;',
+        '\t\tvas:long_name = "Northward wind component" ;',
+        '\t\tvas:units = "m s-1" ;',
+        '\t\tvas:description = "Northward wind" ;',
+        '\t\tvas:label_units = "m s-1" ;',
+        '\t\tvas:plot_label = "Northward wind at 10m (m s-1)" ;',
+        '\t\tvas:cell_methods = "time: mean" ;',
+        '\t\tvas:coordinates = "ensemble_member_id geo_region month_number year yyyymmdd" ;',
+        '\t\tvas:_Storage = "contiguous" ;',
+        '\t\tvas:_Endianness = "little" ;',
+    ],
     "wsgmax10m": [
         "\tdouble wsgmax10m(ensemble_member, time, region) ;",
-        # "\t\twsgmax10m:_FillValue = 1.e+20f ;",
-        "\t\twsgmax10m:_FillValue = 1.e+20 ;",
+        "\t\twsgmax10m:_FillValue = 1.e+20f ;",
         '\t\twsgmax10m:standard_name = "wind_speed_of_gust" ;',
         '\t\twsgmax10m:long_name = "Maximum Wind Speed of Gust at 10m" ;',
         '\t\twsgmax10m:units = "m s-1" ;',
@@ -147,6 +232,36 @@ VARIABLE_HEADERS = {
     ],
 }
 VARIABLE_HEADERS_GRID = {
+    "hurs": [
+        "\tfloat hurs(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
+        "\t\thurs:_FillValue = 1.e+20f ;",
+        '\t\thurs:standard_name = "relative_humidity" ;',
+        '\t\thurs:long_name = "Relative humidity" ;',
+        '\t\thurs:units = "%" ;',
+        '\t\thurs:description = "Relative humidity" ;',
+        '\t\thurs:label_units = "%" ;',
+        '\t\thurs:plot_label = "Relative humidity at 1.5m (%)" ;',
+        '\t\thurs:cell_methods = "time: mean" ;',
+        '\t\thurs:grid_mapping = "transverse_mercator" ;',
+        '\t\thurs:coordinates = "ensemble_member_id latitude longitude month_number year yyyymmdd" ;',
+        '\t\thurs:_Storage = "contiguous" ;',
+        '\t\thurs:_Endianness = "little" ;',
+    ],
+    "huss": [
+        "\tfloat huss(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
+        "\t\thuss:_FillValue = 1.e+20f ;",
+        '\t\thuss:standard_name = "specific_humidity" ;',
+        '\t\thuss:long_name = "Specific humidity" ;',
+        '\t\thuss:units = "1" ;',
+        '\t\thuss:description = "Specific humidity" ;',
+        '\t\thuss:label_units = "1" ;',
+        '\t\thuss:plot_label = "Specific humidity at 1.5m (1)" ;',
+        '\t\thuss:cell_methods = "time: mean" ;',
+        '\t\thuss:grid_mapping = "transverse_mercator" ;',
+        '\t\thuss:coordinates = "ensemble_member_id latitude longitude month_number year yyyymmdd" ;',
+        '\t\thuss:_Storage = "contiguous" ;',
+        '\t\thuss:_Endianness = "little" ;',
+    ],
     "pr": [
         "\tfloat pr(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
         "\t\tpr:_FillValue = 1.e+20f ;",
@@ -162,6 +277,21 @@ VARIABLE_HEADERS_GRID = {
         '\t\tpr:_Storage = "contiguous" ;',
         '\t\tpr:_Endianness = "little" ;',
     ],
+    "prsn": [
+        "\tfloat prsn(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
+        "\t\tprsn:_FillValue = 1.e+20f ;",
+        '\t\tprsn:standard_name = "snowfall_flux" ;',
+        '\t\tprsn:long_name = "Snowfall Flux " ;', # N.B. there is an extra space at the end
+        '\t\tprsn:units = "mm/day" ;',
+        '\t\tprsn:description = "Snowfall flux at surface" ;',
+        '\t\tprsn:label_units = "mm/day" ;',
+        '\t\tprsn:plot_label = "Snowfall flux" ;',
+        '\t\tprsn:cell_methods = "time: mean" ;',
+        '\t\tprsn:grid_mapping = "transverse_mercator" ;',
+        '\t\tprsn:coordinates = "ensemble_member_id latitude longitude month_number year yyyymmdd" ;',
+        '\t\tprsn:_Storage = "contiguous" ;',
+        '\t\tprsn:_Endianness = "little" ;',
+    ],
     "sfcWind": [
         "\tfloat sfcWind(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
         "\t\tsfcWind:_FillValue = 1.e+20f ;",
@@ -176,6 +306,21 @@ VARIABLE_HEADERS_GRID = {
         '\t\tsfcWind:coordinates = "ensemble_member_id latitude longitude month_number year yyyymmdd" ;',
         '\t\tsfcWind:_Storage = "contiguous" ;',
         '\t\tsfcWind:_Endianness = "little" ;',
+    ],
+    "snw": [
+        "\tfloat snw(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
+        "\t\tsnw:_FillValue = 1.e+20f ;",
+        '\t\tsnw:standard_name = "surface_snow_amount" ;',
+        '\t\tsnw:long_name = "Surface Snow Amount " ;', # N.B. there is an extra space at the end
+        '\t\tsnw:units = "mm" ;',
+        '\t\tsnw:description = "Amount of snow on the ground" ;',
+        '\t\tsnw:label_units = "mm" ;',
+        '\t\tsnw:plot_label = "Surface snow amount" ;',
+        '\t\tsnw:cell_methods = "time: mean" ;',
+        '\t\tsnw:grid_mapping = "transverse_mercator" ;',
+        '\t\tsnw:coordinates = "ensemble_member_id latitude longitude month_number year yyyymmdd" ;',
+        '\t\tsnw:_Storage = "contiguous" ;',
+        '\t\tsnw:_Endianness = "little" ;',
     ],
     "tas": [
         "\tfloat tas(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
@@ -222,10 +367,39 @@ VARIABLE_HEADERS_GRID = {
         '\t\ttasmin:_Storage = "contiguous" ;',
         '\t\ttasmin:_Endianness = "little" ;',
     ],
+    "uas": [
+        "\tfloat uas(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
+        "\t\tuas:_FillValue = 1.e+20f ;",
+        '\t\tuas:standard_name = "eastward_wind" ;',
+        '\t\tuas:long_name = "Eastward wind component" ;',
+        '\t\tuas:units = "m s-1" ;',
+        '\t\tuas:description = "Eastward wind" ;',
+        '\t\tuas:label_units = "m s-1" ;',
+        '\t\tuas:plot_label = "Eastward wind at 10m (m s-1)" ;',
+        '\t\tuas:cell_methods = "time: mean" ;',
+        '\t\tuas:grid_mapping = "transverse_mercator" ;',
+        '\t\tuas:coordinates = "ensemble_member_id latitude longitude month_number year yyyymmdd" ;',
+        '\t\tuas:_Storage = "contiguous" ;',
+        '\t\tuas:_Endianness = "little" ;',
+    ],
+    "vas": [
+        "\tfloat vas(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
+        "\t\tvas:_FillValue = 1.e+20f ;",
+        '\t\tvas:standard_name = "northward_wind" ;',
+        '\t\tvas:long_name = "Northward wind component" ;',
+        '\t\tvas:units = "m s-1" ;',
+        '\t\tvas:description = "Northward wind" ;',
+        '\t\tvas:label_units = "m s-1" ;',
+        '\t\tvas:plot_label = "Northward wind at 10m (m s-1)" ;',
+        '\t\tvas:cell_methods = "time: mean" ;',
+        '\t\tvas:grid_mapping = "transverse_mercator" ;',
+        '\t\tvas:coordinates = "ensemble_member_id latitude longitude month_number year yyyymmdd" ;',
+        '\t\tvas:_Storage = "contiguous" ;',
+        '\t\tvas:_Endianness = "little" ;',
+    ],
     "wsgmax10m": [
         "\tfloat wsgmax10m(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
-        # "\t\twsgmax10m:_FillValue = 1.e+20f ;",
-        "\t\twsgmax10m:_FillValue = 1.e+20 ;",
+        "\t\twsgmax10m:_FillValue = 1.e+20f ;",
         '\t\twsgmax10m:standard_name = "wind_speed_of_gust" ;',
         '\t\twsgmax10m:long_name = "Maximum Wind Speed of Gust at 10m" ;',
         '\t\twsgmax10m:units = "m s-1" ;',
@@ -347,7 +521,6 @@ SAMPLE_HEADERS = {
             "dimensions:",
             "\tensemble_member = 1 ;",
             "\ttime = 7200 ;",
-            # "\ttime = 7305 ;",
             "\tregion = 8 ;",
             "\tbnds = 2 ;",
             "\tstring17 = 17 ;",
@@ -362,7 +535,6 @@ SAMPLE_HEADERS = {
             "\tdouble time(time) ;",
             '\t\ttime:axis = "T" ;',
             '\t\ttime:bounds = "time_bnds" ;',
-            # '\t\ttime:units = "hours since 1970-01-01" ;',
             '\t\ttime:units = "hours since 1970-01-01 00:00:00" ;',
             '\t\ttime:standard_name = "time" ;',
             '\t\ttime:calendar = "360_day" ;',
@@ -417,7 +589,6 @@ SAMPLE_HEADERS = {
         "day": [
             "dimensions:",
             "\tensemble_member = 1 ;",
-            # "\ttime = 7305 ;",
             "\ttime = 7200 ;",
             "\tregion = 16 ;",
             "\tbnds = 2 ;",
@@ -433,7 +604,6 @@ SAMPLE_HEADERS = {
             "\tdouble time(time) ;",
             '\t\ttime:axis = "T" ;',
             '\t\ttime:bounds = "time_bnds" ;',
-            # '\t\ttime:units = "hours since 1970-01-01" ;',
             '\t\ttime:units = "hours since 1970-01-01 00:00:00" ;',
             '\t\ttime:standard_name = "time" ;',
             '\t\ttime:calendar = "360_day" ;',
@@ -504,10 +674,8 @@ SAMPLE_HEADERS = {
             "\tdouble time(time) ;",
             '\t\ttime:axis = "T" ;',
             '\t\ttime:bounds = "time_bnds" ;',
-            # '\t\ttime:units = "hours since 1970-01-01" ;',
             '\t\ttime:units = "hours since 1970-01-01 00:00:00" ;',
             '\t\ttime:standard_name = "time" ;',
-            # '\t\ttime:calendar = "standard" ;',
             '\t\ttime:calendar = "360_day" ;',
             '\t\ttime:_Storage = "contiguous" ;',
             '\t\ttime:_Endianness = "little" ;',
@@ -577,23 +745,8 @@ def file_selector(
     for area in areas_of_interest:
         for variable in variables_of_interest:
             for period in PERIODS:
-                sample_headers = SAMPLE_HEADERS[area][period]
-                index = 9
-                try:
-                    if area == "5km":
-                        headers = VARIABLE_HEADERS_GRID[variable]
-                    else:
-                        headers = VARIABLE_HEADERS[variable]
-                except KeyError:
-                    print(
-                        f"Sorry we do not have data to compare against for {variable} {area} data "
-                        "yet"
-                    )
-                    sys.exit(1)
 
-                for item in headers:
-                    sample_headers.insert(index, item)
-                    index += 1
+                sample_headers = _get_sample_headers(area, period, variable)
 
                 for ensemble in ensembles_of_interest:
                     file_path = file_path_template.format(
@@ -604,6 +757,28 @@ def file_selector(
                         version=version_no,
                     )
                     _process_file_path(file_path, sample_headers)
+
+
+def _get_sample_headers(area, period, variable):
+    sample_headers = deepcopy(SAMPLE_HEADERS[area][period])
+    index = 9
+    try:
+        if area == "5km":
+            headers = VARIABLE_HEADERS_GRID[variable]
+        else:
+            headers = VARIABLE_HEADERS[variable]
+    except KeyError:
+        print(
+            f"Sorry we do not have data to compare against for {variable} {area} data "
+            "yet"
+        )
+        sys.exit(1)
+
+    for item in headers:
+        sample_headers.insert(index, item)
+        index += 1
+
+    return sample_headers
 
 
 def _process_file_path(file_path, sample_headers):
@@ -666,7 +841,8 @@ def _parse_command_line(argv):
         f"{PRE_PROD}/ukcp18/data. If it is in a different location then this can be overridden "
         "with the value provided by the --base_directory argument\n"
         "\n\nExample usage:"
-        "\npython compare_cpm_netcdf_headers.py -a 5km -b /my/home/dir/ukcp -n wsgmax10m -v v20220131"
+        "\npython compare_cpm_netcdf_headers.py -a 5km -b /my/home/dir/ukcp -n wsgmax10m "
+        "-v v20220131"
         "\n\n",
         formatter_class=RawDescriptionHelpFormatter,
     )
@@ -736,7 +912,7 @@ if __name__ == "__main__":
     # What variables are we checking?
     if args.variable_name is not None:
         if args.variable_name not in VARIABLES:
-            print(f"{args.variable} is not in {VARIABLES}")
+            print(f"{args.variable_name} is not in {VARIABLES}")
             sys.exit(1)
         variables = [args.variable_name]
     else:
