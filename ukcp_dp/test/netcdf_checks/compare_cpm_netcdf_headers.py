@@ -108,7 +108,7 @@ VARIABLE_HEADERS = {
         "\tfloat prsn(ensemble_member, time, region) ;",
         "\t\tprsn:_FillValue = 1.e+20f ;",
         '\t\tprsn:standard_name = "snowfall_flux" ;',
-        '\t\tprsn:long_name = "Snowfall Flux " ;', # N.B. there is an extra space at the end
+        '\t\tprsn:long_name = "Snowfall Flux " ;',  # N.B. there is an extra space at the end
         '\t\tprsn:units = "mm/day" ;',
         '\t\tprsn:description = "Snowfall flux at surface" ;',
         '\t\tprsn:label_units = "mm/day" ;',
@@ -136,7 +136,7 @@ VARIABLE_HEADERS = {
         "\tfloat snw(ensemble_member, time, region) ;",
         "\t\tsnw:_FillValue = 1.e+20f ;",
         '\t\tsnw:standard_name = "surface_snow_amount" ;',
-        '\t\tsnw:long_name = "Surface Snow Amount " ;', # N.B. there is an extra space at the end
+        '\t\tsnw:long_name = "Surface Snow Amount " ;',  # N.B. there is an extra space at the end
         '\t\tsnw:units = "mm" ;',
         '\t\tsnw:description = "Amount of snow on the ground" ;',
         '\t\tsnw:label_units = "mm" ;',
@@ -281,7 +281,7 @@ VARIABLE_HEADERS_GRID = {
         "\tfloat prsn(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
         "\t\tprsn:_FillValue = 1.e+20f ;",
         '\t\tprsn:standard_name = "snowfall_flux" ;',
-        '\t\tprsn:long_name = "Snowfall Flux " ;', # N.B. there is an extra space at the end
+        '\t\tprsn:long_name = "Snowfall Flux " ;',  # N.B. there is an extra space at the end
         '\t\tprsn:units = "mm/day" ;',
         '\t\tprsn:description = "Snowfall flux at surface" ;',
         '\t\tprsn:label_units = "mm/day" ;',
@@ -311,7 +311,7 @@ VARIABLE_HEADERS_GRID = {
         "\tfloat snw(ensemble_member, time, projection_y_coordinate, projection_x_coordinate) ;",
         "\t\tsnw:_FillValue = 1.e+20f ;",
         '\t\tsnw:standard_name = "surface_snow_amount" ;',
-        '\t\tsnw:long_name = "Surface Snow Amount " ;', # N.B. there is an extra space at the end
+        '\t\tsnw:long_name = "Surface Snow Amount " ;',  # N.B. there is an extra space at the end
         '\t\tsnw:units = "mm" ;',
         '\t\tsnw:description = "Amount of snow on the ground" ;',
         '\t\tsnw:label_units = "mm" ;',
@@ -730,6 +730,7 @@ SAMPLE_HEADERS = {
 def file_selector(
     areas_of_interest,
     ensembles_of_interest,
+    ncdump_location,
     file_path_template,
     variables_of_interest,
     version_no,
@@ -737,6 +738,7 @@ def file_selector(
     """
     @param areas_of_interest[str], a list of areas to check
     @param ensembles_of_interest[str], a list of ensembles to check
+    @param ncdump_location str, the location of the ncdump script
     @param file_path_template str, a template to be used to find files
     @param variables_of_interest[str], a list of variables to check
     @param version_no str, the version number in the path
@@ -756,7 +758,7 @@ def file_selector(
                         period=period,
                         version=version_no,
                     )
-                    _process_file_path(file_path, sample_headers)
+                    _process_file_path(file_path, ncdump_location, sample_headers)
 
 
 def _get_sample_headers(area, period, variable):
@@ -781,7 +783,7 @@ def _get_sample_headers(area, period, variable):
     return sample_headers
 
 
-def _process_file_path(file_path, sample_headers):
+def _process_file_path(file_path, ncdump_location, sample_headers):
     file_list = glob.glob(file_path, recursive=True)
     print(f"Checking {len(file_list)} files from {file_path}")
 
@@ -790,7 +792,7 @@ def _process_file_path(file_path, sample_headers):
         result = []
         file_header = (
             subprocess.run(
-                [NCDUMP, "-hs", file],
+                [ncdump_location, "-hs", file],
                 stdout=subprocess.PIPE,
                 check=False,
             )
@@ -840,6 +842,9 @@ def _parse_command_line(argv):
         "\n\nBy default the data is expected to be found under the directory "
         f"{PRE_PROD}/ukcp18/data. If it is in a different location then this can be overridden "
         "with the value provided by the --base_directory argument\n"
+        f"\n\nBy default the ncdump script is expected to be found at {NCDUMP}. If it is in a "
+        "different location then this can be overridden with the value provided by the "
+        "--ncdump_location argument\n"
         "\n\nExample usage:"
         "\npython compare_cpm_netcdf_headers.py -a 5km -b /my/home/dir/ukcp -n wsgmax10m "
         "-v v20220131"
@@ -859,6 +864,12 @@ def _parse_command_line(argv):
         f"This will have the path '{CPM_TEMPLATE}' appended to it",
     )
     parser.add_argument(
+        "-d",
+        "--ncdump_location",
+        help="If set then use this location to call ncdump. "
+        f"The default is {NCDUMP}",
+    )
+    parser.add_argument(
         "-n",
         "--variable_name",
         help="If set then only check this variable. "
@@ -867,7 +878,7 @@ def _parse_command_line(argv):
     parser.add_argument(
         "-v",
         "--version",
-        help="If set then use this version number. the default value is 'latest'",
+        help="If set then use this version number. The default value is 'latest'",
     )
     parser.add_argument(
         "-i",
@@ -900,14 +911,27 @@ if __name__ == "__main__":
 
     # What is the file path template?
     if args.production:
-        path_template = PRODUCTION_PATH_TEMPLATE
+        PATH_TEMPLATE = PRODUCTION_PATH_TEMPLATE
     elif args.base_directory is not None:
         base_directory = args.base_directory
         if base_directory.endswith("/"):
             base_directory = base_directory[:-1]
-        path_template = base_directory + CPM_TEMPLATE
+        PATH_TEMPLATE = base_directory + CPM_TEMPLATE
     else:
-        path_template = PRE_PRODUCTION_PATH_TEMPLATE
+        PATH_TEMPLATE = PRE_PRODUCTION_PATH_TEMPLATE
+
+    # Where is ncdump
+    if args.ncdump_location is not None:
+        NCDUMP_LOCATION = args.ncdump_location
+    else:
+        NCDUMP_LOCATION = NCDUMP
+    try:
+        with open(NCDUMP_LOCATION, encoding="utf-8") as _file:
+            pass
+    except IOError:
+        print(f"ncdump not found at {NCDUMP_LOCATION}")
+        print("Please use --ncdump_location argument to set the location of ncdump")
+        sys.exit(1)
 
     # What variables are we checking?
     if args.variable_name is not None:
@@ -920,9 +944,9 @@ if __name__ == "__main__":
 
     # What version are we checking
     if args.version is not None:
-        version = args.version
+        VERSION = args.version
     else:
-        version = "latest"
+        VERSION = "latest"
 
     # What ensemble members are we checking
     if args.ignore_cmip:
@@ -930,4 +954,4 @@ if __name__ == "__main__":
     else:
         ensembles = ENSEMBLES_INC_CMIP
 
-    file_selector(areas, ensembles, path_template, variables, version)
+    file_selector(areas, ensembles, NCDUMP_LOCATION, PATH_TEMPLATE, variables, VERSION)
