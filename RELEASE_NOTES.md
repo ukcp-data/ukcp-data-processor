@@ -1,9 +1,17 @@
+# Release 2.16.0
+
+This release addresses:
+
+* Add 5km daily wind speed at 10m data
+
+
 # Release 2.15.0
 
 This release addresses:
 
 * Include 2024 HadUK-Grid data
 * Generated 'nc' files are now netCDF-4 rather than netCDF-4 classic
+
 
 # Release 2.14.0
 
